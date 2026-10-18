@@ -42,7 +42,7 @@ export function App() {
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isExamOpen, setIsExamOpen] = useState(false);
 
-  const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned } = useScholarSession();
+  const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
 
   const handleNavigate = (tab: MainTab, subSection?: string) => {
     setActiveTab(tab);
@@ -159,7 +159,7 @@ export function App() {
       )}
 
       {/* Global Protected Reader Modal (when accessed via Scholar Sign-In or Direct Launch) */}
-      {isBookOwned && isReaderOpen && (
+      {(isBookOwned || isComplimentaryOwned) && isReaderOpen && (
         <Suspense fallback={null}>
           <ProtectedReaderModal
             isOpen={isReaderOpen}

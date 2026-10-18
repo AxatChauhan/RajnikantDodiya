@@ -177,6 +177,84 @@ export async function saveOrderAndLicenses(
 }
 
 /**
+ * Register a scholar for complimentary book access after SMS OTP verification.
+ * Enforces single-device license and persistent recovery across devices.
+ */
+export async function registerComplimentaryScholar(
+  name: string,
+  mobile: string
+): Promise<{
+  success: boolean;
+  orderId?: string;
+  deviceToken?: string;
+  unlockedItems?: string[];
+  error?: string;
+}> {
+  try {
+    const cleanMobile = mobile.trim().replace(/\D/g, '').slice(-10);
+    const cleanName = name.trim().slice(0, 50) || 'Scholar';
+    if (!cleanMobile || cleanMobile.length !== 10) {
+      return { success: false, error: 'Invalid 10-digit mobile number.' };
+    }
+
+    const orderId = `FREE-COMP-${Date.now().toString().slice(-6)}`;
+    const deviceToken = generateSecureDeviceToken();
+    const unlockedItems = ['complimentary_book', 'book'];
+
+    // 1. Record in Supabase orders (complimentary status)
+    try {
+      await supabase.from('orders').upsert({
+        order_id: orderId,
+        mobile: cleanMobile,
+        student_name: cleanName,
+        product_type: 'book',
+        amount: 0,
+        status: 'completed'
+      }, { onConflict: 'order_id' });
+
+      // Grant active complimentary license in student_licenses
+      await supabase.from('student_licenses').upsert({
+        mobile: cleanMobile,
+        student_name: cleanName,
+        product_type: 'book',
+        order_id: orderId,
+        is_active: true
+      }, { onConflict: 'mobile,product_type' });
+
+      // Register active 1-device session
+      await supabase.from('device_sessions').upsert({
+        mobile: cleanMobile,
+        active_device_token: deviceToken,
+        device_info: typeof navigator !== 'undefined' ? navigator.userAgent.slice(0, 150) : 'Web Client',
+        last_active_at: new Date().toISOString()
+      }, { onConflict: 'mobile' });
+    } catch (dbErr) {
+      console.warn('Supabase complimentary registration warning (graceful offline fallback):', dbErr);
+    }
+
+    // Broadcast across local browser contexts
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('atheneum_single_device_sync');
+        channel.postMessage({ type: 'TRANSFER_SESSION', mobile: cleanMobile, deviceToken });
+        channel.close();
+      }
+    } catch {
+      // ignore
+    }
+
+    return {
+      success: true,
+      orderId,
+      deviceToken,
+      unlockedItems
+    };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Registration failed.' };
+  }
+}
+
+/**
  * Sign in a scholar and transfer the 1-device active license to the current device.
  * Enforces single active device across all platforms.
  */

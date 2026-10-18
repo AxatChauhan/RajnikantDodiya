@@ -170,12 +170,14 @@ export function useScholarSession() {
     };
   }, [checkDeviceAuth]);
 
+  const isComplimentaryOwned = session.unlockedItems.includes('complimentary_book') || (Boolean(session.mobile) && session.unlockedItems.length > 0);
   const isBookOwned = session.unlockedItems.includes('book');
   const isExamOwned = session.unlockedItems.includes('exam');
   const isBundleOwned = isBookOwned && isExamOwned;
 
   return {
     session,
+    isComplimentaryOwned,
     isBookOwned,
     isExamOwned,
     isBundleOwned,

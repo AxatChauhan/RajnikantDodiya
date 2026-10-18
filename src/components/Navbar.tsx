@@ -140,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   title="Sign in to access your purchased books and CBT exams on this device"
                 >
                   <KeyRound className="w-3.5 h-3.5 text-claret shrink-0" />
-                  <span className="hidden 2xl:inline">Scholar Sign-In</span>
+                  <span className="hidden 2xl:inline">Free Pass / Sign In</span>
                   <span className="2xl:hidden">Sign In</span>
                 </button>
               )

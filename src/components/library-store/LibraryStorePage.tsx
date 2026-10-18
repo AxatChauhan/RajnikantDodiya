@@ -92,7 +92,7 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
   const [copiedCitation, setCopiedCitation] = useState(false);
 
   // Synchronized active scholar session state across the entire site
-  const { session: studentSession, isBookOwned, isExamOwned, isBundleOwned, saveSession, clearSession: handleClearSession } = useScholarSession();
+  const { session: studentSession, isBookOwned, isExamOwned, isBundleOwned, isComplimentaryOwned, saveSession, clearSession: handleClearSession } = useScholarSession();
 
   const bookProduct = STORE_PRODUCTS.find(p => p.type === 'book') || STORE_PRODUCTS[0];
   const examProduct = STORE_PRODUCTS.find(p => p.type === 'exam') || STORE_PRODUCTS[1];
@@ -192,7 +192,7 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
                   </div>
                   <div className="flex justify-between items-center pt-0.5">
                     <span className="text-[#6B5E51] text-[10px] font-mono">Holdings:</span>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-wrap">
                       {isBookOwned && (
                         <span className="text-[8.5px] font-mono bg-[#581622] text-[#FDF8EE] px-1.5 py-0.2 rounded font-bold">
                           Monograph
@@ -201,6 +201,11 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
                       {isExamOwned && (
                         <span className="text-[8.5px] font-mono bg-[#112038] text-[#E0FBFC] px-1.5 py-0.2 rounded font-bold">
                           CBT Exam
+                        </span>
+                      )}
+                      {isComplimentaryOwned && !isBookOwned && (
+                        <span className="text-[8.5px] font-mono bg-emerald-800 text-emerald-100 px-1.5 py-0.2 rounded font-bold">
+                          Complimentary Pass
                         </span>
                       )}
                     </div>
@@ -247,9 +252,9 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
                   <button
                     onClick={onOpenAuthModal}
                     className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[#D4AF37] hover:bg-[#E5C158] text-[#1E0F05] text-[11px] font-mono font-bold transition-all shadow-xs"
-                    title="Sign in with your mobile number to restore access on this device"
+                    title="Claim your complimentary scholar pass or restore purchases"
                   >
-                    Sign In
+                    Free Pass / Sign In
                   </button>
                 )}
               </div>
@@ -464,7 +469,7 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {isBookOwned ? (
+                    {isBookOwned || isComplimentaryOwned ? (
                       <button
                         onClick={() => {
                           setIsReaderSample(false);
@@ -479,12 +484,16 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
                       <>
                         <button
                           onClick={() => {
-                            setIsReaderSample(true);
-                            setIsReaderOpen(true);
+                            if (onOpenAuthModal) {
+                              onOpenAuthModal();
+                            } else {
+                              setIsReaderSample(true);
+                              setIsReaderOpen(true);
+                            }
                           }}
                           className="px-2.5 py-1.5 rounded-lg bg-[#2E160C] hover:bg-[#3D1E10] text-[#EBDBC8] border border-[#5C321E] text-[11px] font-sans font-medium transition-all min-h-[36px]"
                         >
-                          Excerpt
+                          Free Pass
                         </button>
 
                         <button
@@ -1149,7 +1158,7 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
             studentName={studentSession.name || 'Sample Scholar'}
             studentMobile={studentSession.mobile || '9876543210'}
             orderId={studentSession.orderId || 'HMP-DEMO-01'}
-            isUnlocked={!isReaderSample && isBookOwned}
+            isUnlocked={!isReaderSample && (isBookOwned || isComplimentaryOwned)}
             onUnlockRequest={() => handleOpenCheckout(bookProduct)}
           />
         </Suspense>
