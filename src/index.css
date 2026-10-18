@@ -105,3 +105,14 @@
 .focus\:border-claret:focus {
   border-color: #162A45 !important;
 }
+
+/* ========================================================= */
+/* DIGITAL RIGHTS MANAGEMENT (DRM) PRINT PROTECTION          */
+/* Blocks browser print dialog (Ctrl+P / Save to PDF leaks)  */
+/* ========================================================= */
+@media print {
+  body {
+    display: none !important;
+  }
+}
+
