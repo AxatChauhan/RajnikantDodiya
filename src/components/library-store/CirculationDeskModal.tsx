@@ -6,13 +6,10 @@ import {
   getVerifiedPrice,
   sanitizeScholarName,
   validateIndianMobile,
-  validateEmail,
-  validateUtr
+  validateEmail
 } from '../../lib/security';
-import { QRCodeSVG } from 'qrcode.react';
 import {
   X,
-  QrCode,
   ShieldCheck,
   CheckCircle2,
   Lock,
@@ -21,8 +18,6 @@ import {
   CreditCard,
   Search,
   UserCheck,
-  Copy,
-  Check,
   RotateCcw,
   Sparkles,
   Clock,
@@ -54,10 +49,6 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
   const [studentEmail, setStudentEmail] = useState('');
   const [studentMobile, setStudentMobile] = useState('');
   const [activeDeviceToken, setActiveDeviceToken] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'upi_qr' | 'upi_id' | 'razorpay'>('upi_qr');
-  const [upiUtr, setUpiUtr] = useState('');
-  const [upiIdInput, setUpiIdInput] = useState('');
-  const [copiedUpi, setCopiedUpi] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [purchaseComplete, setPurchaseComplete] = useState(false);
   const [generatedOrderId, setGeneratedOrderId] = useState('');
@@ -76,87 +67,6 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
   }, [selectedProduct]);
 
   if (!isOpen) return null;
-
-  // Standard UPI URI format supported by all Indian UPI apps
-  const officialUpiId = 'rajnikant.dodiya@oksbi';
-  const upiUri = `upi://pay?pa=${officialUpiId}&pn=Dr%20Rajnikant%20S%20Dodiya&am=${activeProduct.price}&cu=INR&tn=Atheneum%20${activeProduct.id}`;
-
-  const copyUpiId = () => {
-    navigator.clipboard.writeText(officialUpiId);
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
-  };
-
-  // Complete purchase via manual UPI (Queued for institutional verification)
-  const handleUpiPaymentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanName = sanitizeScholarName(studentName);
-    const mobileCheck = validateIndianMobile(studentMobile);
-    const isEmailValid = validateEmail(studentEmail);
-
-    if (!cleanName) {
-      alert('Please enter your valid Scholar Name.');
-      return;
-    }
-    if (!mobileCheck.isValid) {
-      alert(mobileCheck.error || 'Please enter a valid 10-digit Indian WhatsApp number.');
-      return;
-    }
-    if (!isEmailValid) {
-      alert('Please enter a valid personal or academic email address.');
-      return;
-    }
-
-    const utrCheck = validateUtr(upiUtr);
-    if (!utrCheck.isValid) {
-      alert(utrCheck.error || 'Please enter the 12-digit UTR/Ref number from your UPI payment app.');
-      return;
-    }
-
-    let verifiedPrice: number;
-    try {
-      verifiedPrice = getVerifiedPrice(activeProduct.id, activeProduct.price);
-    } catch (err: any) {
-      alert(err.message || 'Pricing integrity exception.');
-      return;
-    }
-
-    setIsProcessing(true);
-    const orderId = `HMP-${Date.now().toString().slice(-6)}`;
-    const upiPayId = `upi_utr_${utrCheck.cleanUtr}`;
-
-    setGeneratedOrderId(orderId);
-    setPaymentId(upiPayId);
-
-    const licensedItems: ('book' | 'exam')[] = [];
-    if (activeProduct.type === 'book') licensedItems.push('book');
-    else if (activeProduct.type === 'exam') licensedItems.push('exam');
-    else if (activeProduct.type === 'bundle') {
-      licensedItems.push('book');
-      licensedItems.push('exam');
-    }
-
-    // Persist manual transfer as 'pending_verification' (Zero free pass loophole)
-    const saveResult = await saveOrderAndLicenses(
-      {
-        order_id: orderId,
-        mobile: mobileCheck.cleanMobile,
-        student_name: cleanName,
-        product_type: activeProduct.type,
-        amount: verifiedPrice,
-        razorpay_payment_id: upiPayId,
-        status: 'pending_verification'
-      },
-      licensedItems
-    );
-
-    if (saveResult.deviceToken) {
-      setActiveDeviceToken(saveResult.deviceToken);
-    }
-
-    setIsProcessing(false);
-    setPurchaseComplete(true);
-  };
 
   // Complete purchase via Razorpay (Instant Bank-Verified Access)
   const handleInitiateRazorpay = async () => {
@@ -367,7 +277,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
 
         {/* TAB 1: CHECKOUT / NEW ACQUISITION */}
         {activeTab === 'checkout' && !purchaseComplete && (
-          <form onSubmit={paymentMethod === 'razorpay' ? (e) => { e.preventDefault(); handleInitiateRazorpay(); } : handleUpiPaymentSubmit} className="space-y-6">
+          <form onSubmit={(e) => { e.preventDefault(); handleInitiateRazorpay(); }} className="space-y-6">
             
             {/* 1. Select / Confirm Product */}
             <div className="space-y-2">
@@ -446,177 +356,62 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
               </div>
             </div>
 
-            {/* 3. DEDICATED UPI PAYMENT & QR CODE OPTIONS */}
+            {/* 3. SECURE ACADEMIC PAYMENT CHANNELS */}
             <div className="space-y-3 pt-3 border-t border-deckle">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-ink-faint block">
-                  Select Payment Method (India Only):
+                  Accepted Payment Methods (Instant Single-Device License):
                 </span>
-                <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                   Instant Activation
                 </span>
               </div>
 
-              {/* Payment Method Switcher */}
-              <div className="grid grid-cols-3 gap-2 p-1 rounded-xl bg-parchment-warm text-xs font-mono">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('upi_qr')}
-                  className={`py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
-                    paymentMethod === 'upi_qr'
-                      ? 'bg-claret text-white shadow-xs font-bold'
-                      : 'text-ink-muted hover:text-ink'
-                  }`}
-                >
-                  <QrCode className="w-3.5 h-3.5" />
-                  <span>UPI QR Code</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('upi_id')}
-                  className={`py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
-                    paymentMethod === 'upi_id'
-                      ? 'bg-claret text-white shadow-xs font-bold'
-                      : 'text-ink-muted hover:text-ink'
-                  }`}
-                >
-                  <Smartphone className="w-3.5 h-3.5" />
-                  <span>UPI ID / App</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('razorpay')}
-                  className={`py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
-                    paymentMethod === 'razorpay'
-                      ? 'bg-claret text-white shadow-xs font-bold'
-                      : 'text-ink-muted hover:text-ink'
-                  }`}
-                >
-                  <CreditCard className="w-3.5 h-3.5" />
-                  <span>Card / NetBanking</span>
-                </button>
-              </div>
-
-              {/* OPTION A: UPI QR CODE (DEFAULT & HIGHLY REQUESTED) */}
-              {paymentMethod === 'upi_qr' && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF6EE] border border-brass/50 space-y-4 animate-fade-in">
-                  <div className="flex flex-col sm:flex-row items-center gap-5">
-                    
-                    {/* The Scannable Dynamic UPI QR Code */}
-                    <div className="p-3 bg-white rounded-2xl border border-deckle shadow-md shrink-0 flex flex-col items-center">
-                      <QRCodeSVG
-                        value={upiUri}
-                        size={150}
-                        level="M"
-                        includeMargin={false}
-                        className="rounded-lg"
-                      />
-                      <div className="text-[10px] font-mono text-ink-muted mt-2 font-bold tracking-wider flex items-center gap-1">
-                        <span className="text-emerald-700">BHIM</span> • <span className="text-blue-700">GPay</span> • <span className="text-purple-700">PhonePe</span> • <span className="text-sky-700">Paytm</span>
-                      </div>
-                    </div>
-
-                    {/* Payee Info & Amount */}
-                    <div className="space-y-2.5 text-xs flex-1 text-center sm:text-left">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
-                          Official Scholar Account
-                        </span>
-                        <span className="font-serif font-bold text-xl text-claret">
-                          ₹{activeProduct.price}
-                        </span>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-white border border-deckle space-y-1.5 text-ink">
-                        <div className="flex items-center justify-between text-[11px] font-mono">
-                          <span className="text-ink-faint">Payee:</span>
-                          <span className="font-bold text-ink">Dr. Rajnikant S. Dodiya</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[11px] font-mono">
-                          <span className="text-ink-faint">Official UPI ID:</span>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-claret">{officialUpiId}</span>
-                            <button
-                              type="button"
-                              onClick={copyUpiId}
-                              className="p-1 rounded bg-black/5 hover:bg-black/10 text-ink-muted text-[10px] flex items-center gap-0.5"
-                              title="Copy UPI ID"
-                            >
-                              {copiedUpi ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                              <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-[11px] text-ink-muted font-reading leading-relaxed">
-                        Scan with Google Pay, PhonePe, Paytm, or BHIM. After making the payment of <strong>₹{activeProduct.price}</strong>, enter your 12-digit UTR number below to activate immediately.
-                      </p>
-
-                      {/* Mobile Deep-link */}
-                      <div className="pt-1 block sm:hidden">
-                        <a
-                          href={upiUri}
-                          className="w-full py-2.5 rounded-xl bg-emerald-800 text-white font-sans text-xs font-medium flex items-center justify-center gap-1.5 shadow-xs"
-                        >
-                          <Smartphone className="w-3.5 h-3.5" />
-                          <span>Tap to Pay in Your UPI App</span>
-                        </a>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* 12-Digit UPI UTR Input */}
-                  <div className="pt-2 border-t border-deckle/60">
-                    <label className="text-[11px] font-mono text-ink-faint block mb-1">
-                      UPI Reference Number / UTR (Optional / 12-digit transaction ID from receipt):
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 428190349120"
-                      value={upiUtr}
-                      onChange={(e) => setUpiUtr(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[44px]"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* OPTION B: UPI ID INPUT */}
-              {paymentMethod === 'upi_id' && (
-                <div className="p-4 rounded-2xl bg-parchment-warm/60 border border-deckle space-y-3 animate-fade-in">
-                  <span className="text-[11px] font-mono text-ink-faint block">
-                    Enter your Virtual Payment Address (UPI ID):
-                  </span>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="e.g. yourname@oksbi or 9876543210@paytm"
-                      value={upiIdInput}
-                      onChange={(e) => setUpiIdInput(e.target.value)}
-                      className="flex-1 px-3.5 py-2.5 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[44px]"
-                    />
-                  </div>
-                  <p className="text-[11px] text-ink-muted font-reading">
-                    A collect request for ₹{activeProduct.price} will be simulated to your UPI app.
-                  </p>
-                </div>
-              )}
-
-              {/* OPTION C: RAZORPAY GATEWAY PREVIEW */}
-              {paymentMethod === 'razorpay' && (
-                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between gap-3 text-xs text-emerald-900 animate-fade-in">
+              {/* Secure Payment Card */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF6EE] border border-brass/50 space-y-3.5 animate-fade-in">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-emerald-700 shrink-0" />
-                    <span>Razorpay Standard Checkout: RuPay, Visa, Mastercard, NetBanking.</span>
+                    <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                    <span className="text-xs font-mono font-bold text-ink">
+                      Bank-Grade Encrypted Gateway (PCI-DSS)
+                    </span>
                   </div>
-                  <span className="font-mono font-bold bg-white px-2 py-0.5 rounded border border-emerald-300 text-[10px] shrink-0">
-                    Test Mode
+                  <span className="font-serif font-bold text-xl text-claret">
+                    ₹{activeProduct.price}
                   </span>
                 </div>
-              )}
 
+                {/* Badges for all accepted payment modes */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                  <div className="p-3 rounded-xl bg-white border border-deckle flex items-center gap-2.5 shadow-2xs">
+                    <Smartphone className="w-4 h-4 text-claret shrink-0" />
+                    <div>
+                      <span className="font-bold text-[11px] block text-ink">UPI & Dynamic QR</span>
+                      <span className="text-[9px] font-mono text-ink-muted">GPay, PhonePe, Paytm, BHIM</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white border border-deckle flex items-center gap-2.5 shadow-2xs">
+                    <CreditCard className="w-4 h-4 text-claret shrink-0" />
+                    <div>
+                      <span className="font-bold text-[11px] block text-ink">Debit & Credit Cards</span>
+                      <span className="text-[9px] font-mono text-ink-muted">RuPay, Visa, Mastercard</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white border border-deckle flex items-center gap-2.5 shadow-2xs">
+                    <Lock className="w-4 h-4 text-claret shrink-0" />
+                    <div>
+                      <span className="font-bold text-[11px] block text-ink">NetBanking</span>
+                      <span className="text-[9px] font-mono text-ink-muted">SBI, HDFC, ICICI, 50+ Banks</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-ink-muted font-reading leading-relaxed">
+                  Click below to open the secure payment window. You can scan the dynamic UPI QR code with any app (Google Pay, PhonePe, Paytm), use your UPI ID, or pay via Card/NetBanking. Your scholarly license and digital watermarking will activate instantly upon bank verification.
+                </p>
+              </div>
             </div>
 
             {/* Submit Action Button */}
@@ -627,16 +422,10 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
             >
               {isProcessing ? (
                 <span>Verifying Payment & Generating License...</span>
-              ) : paymentMethod === 'razorpay' ? (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span>Launch Razorpay Gateway (₹{activeProduct.price})</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                  <span>I Have Paid ₹{activeProduct.price} via UPI • Activate My Access</span>
+                  <Lock className="w-4 h-4" />
+                  <span>Proceed to Secure Payment (₹{activeProduct.price})</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -713,25 +502,19 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
         {/* PURCHASE CONFIRMATION & ACCESS PORTAL LAUNCH */}
         {purchaseComplete && (
           <div className="text-center space-y-5 py-4 animate-fade-in">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto shadow-md ${
-              paymentId.startsWith('upi_utr_') ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'
-            }`}>
-              {paymentId.startsWith('upi_utr_') ? <Clock className="w-8 h-8 text-amber-700" /> : <CheckCircle2 className="w-8 h-8 text-emerald-700" />}
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto shadow-md bg-emerald-100 text-emerald-700">
+              <CheckCircle2 className="w-8 h-8 text-emerald-700" />
             </div>
 
             <div className="space-y-1">
-              <span className={`text-xs font-mono uppercase font-bold tracking-widest ${
-                paymentId.startsWith('upi_utr_') ? 'text-amber-800' : 'text-emerald-700'
-              }`}>
-                {paymentId.startsWith('upi_utr_') ? 'Manual Transfer Queued for Audit' : 'Academic License Activated'}
+              <span className="text-xs font-mono uppercase font-bold tracking-widest text-emerald-700">
+                Academic License Activated
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl font-normal text-ink">
-                {paymentId.startsWith('upi_utr_') ? 'Payment Receipt Logged' : `Welcome to The Atheneum, ${studentName}`}
+                Welcome to The Atheneum, {studentName}
               </h3>
               <p className="text-xs text-ink-muted font-reading max-w-md mx-auto">
-                {paymentId.startsWith('upi_utr_')
-                  ? 'Your bank UTR reference has been recorded in the institutional audit log. Passes paid via direct manual transfer are activated upon admin reconciliation.'
-                  : 'Your personal license has been registered in the institutional repository and bound to this device.'}
+                Your personal license has been registered in the institutional repository and cryptographically bound to this device.
               </p>
             </div>
 
@@ -747,7 +530,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
               </div>
               <div className="flex justify-between border-b border-deckle pb-2">
                 <span className="text-ink-faint">Payment Reference:</span>
-                <span className={`font-bold ${paymentId.startsWith('upi_utr_') ? 'text-amber-800' : 'text-emerald-700'}`}>
+                <span className="font-bold text-emerald-700">
                   {paymentId}
                 </span>
               </div>
@@ -757,30 +540,15 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
               </div>
             </div>
 
-            {paymentId.startsWith('upi_utr_') ? (
-              <div className="space-y-3 max-w-md mx-auto pt-2">
-                <p className="text-[11px] font-mono text-amber-900 bg-amber-50 border border-amber-200 p-3 rounded-xl leading-relaxed text-left">
-                  Verification takes 2–4 hours during office hours. Once verified, visit the <strong>Restore Pass</strong> tab with mobile <strong>+91 {studentMobile}</strong> to activate your pass on this device.
-                </p>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-full py-3 rounded-xl bg-[#2C1810] hover:bg-[#3D2012] text-white text-xs font-mono font-medium shadow-xs transition-all min-h-[44px]"
-                >
-                  Return to Library Desk
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleEnterPortal}
-                className="px-8 py-3.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-sans font-medium transition-all shadow-xs inline-flex items-center gap-2 min-h-[48px]"
-              >
-                <Sparkles className="w-4 h-4 text-emerald-300" />
-                <span>Enter Unlocked Reading Room / Exam Portal</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleEnterPortal}
+              className="px-8 py-3.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-sans font-medium transition-all shadow-xs inline-flex items-center gap-2 min-h-[48px]"
+            >
+              <Sparkles className="w-4 h-4 text-emerald-300" />
+              <span>Enter Unlocked Reading Room / Exam Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         )}
 
