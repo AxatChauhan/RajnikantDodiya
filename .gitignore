@@ -27,3 +27,4 @@ test-asset.webp
 *.sw?
 
 .vercel
+.env*
