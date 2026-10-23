@@ -475,6 +475,25 @@ export const LearnPage: React.FC<LearnPageProps> = ({
           <span className="text-xs font-mono text-ink-muted">Single-Device Protected Digital Reader</span>
         </div>
 
+        {/* Academic Bookstore Bridge Banner */}
+        <div className="p-4 rounded-2xl bg-parchment-warm/70 border border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-claret shrink-0" />
+            <p className="font-reading text-ink-muted">
+              Explore all digital study passes, the CBT examination simulator, and print copies in the bookstore.
+            </p>
+          </div>
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('bookstore')}
+              className="px-3.5 py-1.5 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center gap-1 shrink-0 self-start sm:self-auto"
+            >
+              <span>Open Academic Bookstore</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
         {/* Featured Book Showcase: UGC NET English Literature */}
         <div className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-deckle shadow-book space-y-6">
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6">

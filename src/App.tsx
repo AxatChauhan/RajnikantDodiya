@@ -14,6 +14,7 @@ const PublicationsPage = lazy(() => import('./components/PublicationsPage').then
 const TalksEventsPage = lazy(() => import('./components/TalksEventsPage').then(m => ({ default: m.TalksEventsPage })));
 const CommunitiesPage = lazy(() => import('./components/CommunitiesPage').then(m => ({ default: m.CommunitiesPage })));
 const LearnPage = lazy(() => import('./components/LearnPage').then(m => ({ default: m.LearnPage })));
+const AcademicStorePage = lazy(() => import('./components/library-store/AcademicStorePage').then(m => ({ default: m.AcademicStorePage })));
 const ContactPage = lazy(() => import('./components/ContactPage').then(m => ({ default: m.ContactPage })));
 
 // Lazily loaded standalone modals (Loaded on demand only when opened)
@@ -66,6 +67,7 @@ export function App() {
       talks: `Talks & Events | ${PROFESSOR_INFO.name}`,
       communities: `Communities & Initiatives | ${PROFESSOR_INFO.name}`,
       learn: `Learn & Study Hub | ${PROFESSOR_INFO.name}`,
+      bookstore: `Academic Bookstore & Study Passes | ${PROFESSOR_INFO.name}`,
       contact: `Contact & Collaboration | ${PROFESSOR_INFO.name}`
     };
     document.title = tabTitles[activeTab] || `${PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`;
@@ -136,6 +138,12 @@ export function App() {
             {activeTab === 'learn' && (
               <LearnPage
                 subSection={activeSubSection}
+                onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                onNavigate={handleNavigate}
+              />
+            )}
+            {activeTab === 'bookstore' && (
+              <AcademicStorePage
                 onOpenAuthModal={() => setIsAuthModalOpen(true)}
                 onNavigate={handleNavigate}
               />

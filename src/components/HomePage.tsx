@@ -230,11 +230,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
             <div className="pt-2 flex flex-wrap gap-2.5">
               <button
-                onClick={() => onNavigate('learn', 'books')}
+                onClick={() => onNavigate('bookstore')}
                 className="px-4 py-2 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium transition-all shadow-xs flex items-center gap-1.5"
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Read & Acquire Book</span>
+                <span>Open Academic Bookstore</span>
               </button>
 
               <button

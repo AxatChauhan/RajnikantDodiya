@@ -13,7 +13,8 @@ import {
   Sparkles,
   Users,
   Mail,
-  FileText
+  FileText,
+  ChevronRight
 } from 'lucide-react';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from '../data/professorData';
 import { useScholarSession } from '../hooks/useScholarSession';
@@ -27,7 +28,8 @@ export type MainTab =
   | 'talks'
   | 'communities'
   | 'learn'
-  | 'contact';
+  | 'contact'
+  | 'bookstore';
 
 export interface NavItemConfig {
   id: MainTab;
@@ -252,6 +254,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               </a>
             </div>
 
+            {/* BUTTON 0: [Academic Bookstore] */}
+            <button
+              onClick={() => handleNavClick('bookstore')}
+              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-2xs shrink-0 min-h-[36px] ${
+                activeTab === 'bookstore'
+                  ? 'bg-claret text-white border border-claret-dark shadow-xs'
+                  : 'bg-white hover:bg-parchment-warm border border-deckle hover:border-claret text-ink hover:text-claret'
+              }`}
+              title="Official Academic Bookstore & Study Passes"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-claret" />
+              <span className="hidden sm:inline font-serif">Bookstore</span>
+              <span className="sm:hidden font-serif">Store</span>
+            </button>
+
             {/* BUTTON 1: [Download CV] */}
             <button
               onClick={onOpenCompendium}
@@ -383,6 +400,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
             </div>
+
+            {/* Featured Academic Bookstore Card in Mobile Drawer */}
+            <button
+              onClick={() => handleNavClick('bookstore')}
+              className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                activeTab === 'bookstore'
+                  ? 'bg-claret text-white border-claret-dark shadow-xs'
+                  : 'bg-parchment-warm/70 border-deckle hover:border-claret text-ink shadow-2xs'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`p-2 rounded-xl ${activeTab === 'bookstore' ? 'bg-white/20 text-white' : 'bg-claret-soft text-claret'}`}>
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-serif text-sm font-semibold block leading-tight">Academic Bookstore</span>
+                  <span className={`text-[10px] font-mono ${activeTab === 'bookstore' ? 'text-brass' : 'text-ink-muted'}`}>
+                    Study Passes • CBT Simulator • Books
+                  </span>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </button>
 
             {/* Main Tabs Accordion List */}
             <nav className="space-y-1">

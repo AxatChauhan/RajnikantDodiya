@@ -234,10 +234,10 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
                 <span className="text-ink-faint text-[11px]">ISBN: {book.isbn}</span>
                 {onNavigate && (
                   <button
-                    onClick={() => onNavigate('learn', 'books')}
+                    onClick={() => onNavigate('bookstore')}
                     className="text-claret font-sans font-medium hover:underline flex items-center gap-1"
                   >
-                    View in Learn <ChevronRight className="w-3.5 h-3.5" />
+                    View in Bookstore <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
@@ -285,10 +285,10 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
                 <span className="text-ink-faint text-[11px]">ISBN: {book.isbn}</span>
                 {onNavigate && (
                   <button
-                    onClick={() => onNavigate('learn', 'books')}
+                    onClick={() => onNavigate('bookstore')}
                     className="text-claret font-sans font-medium hover:underline flex items-center gap-1"
                   >
-                    View in Learn <ChevronRight className="w-3.5 h-3.5" />
+                    View in Bookstore <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
