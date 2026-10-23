@@ -61,67 +61,67 @@ const THEME_CONFIG: Record<ReadingTheme, {
     modalBg: 'bg-[#FAF7F2]',
     headerBg: 'bg-[#FAF7F2]',
     sidebarBg: 'bg-[#F4EFE6]',
-    canvasBg: 'bg-[#EFE7DC]', // Warm, distinct parchment desk
-    paperBg: 'bg-[#FFFFFF]', // Crisp academic sheet
-    border: 'border-[#E2D8CC]',
+    canvasBg: 'bg-[#FAF7F2]', // Unified, seamless academic parchment
+    paperBg: 'bg-[#FAF7F2]',
+    border: 'border-[#E5DDD0]',
     textTitle: 'text-[#1C1917]',
     textBody: 'text-[#292524]',
     textMuted: 'text-[#78716C]',
-    watermarkColor: 'text-[#6B1D2F]/[0.18]',
+    watermarkColor: 'text-[#6B1D2F]/[0.10]',
     tagBg: 'bg-[#6B1D2F]/10 text-[#6B1D2F]',
-    surfaceBorder: 'border-[#E7DFD5]',
-    blockquoteBg: 'bg-[#FAF7F2]',
+    surfaceBorder: 'border-[#E5DDD0]',
+    blockquoteBg: 'bg-[#F2ECE1]',
     btnBg: 'bg-black/5 hover:bg-black/10 text-[#1C1917]'
   },
   sepia: {
     name: 'Sepia',
-    modalBg: 'bg-[#F5ECE0]',
-    headerBg: 'bg-[#EDE1D1]',
-    sidebarBg: 'bg-[#E6D6C0]',
-    canvasBg: 'bg-[#DECBB4]', // Rich antiquarian desk
-    paperBg: 'bg-[#FDF6EC]', // Warm cream sepia book page
-    border: 'border-[#D4BF9F]',
+    modalBg: 'bg-[#F5EDE0]',
+    headerBg: 'bg-[#F5EDE0]',
+    sidebarBg: 'bg-[#ECE0CD]',
+    canvasBg: 'bg-[#F5EDE0]', // Warm antiquarian page
+    paperBg: 'bg-[#F5EDE0]',
+    border: 'border-[#DFCDB6]',
     textTitle: 'text-[#2C1C0F]',
     textBody: 'text-[#3D2918]',
     textMuted: 'text-[#7C634E]',
-    watermarkColor: 'text-[#8C3D28]/[0.22]',
+    watermarkColor: 'text-[#8C3D28]/[0.12]',
     tagBg: 'bg-[#8C3D28]/15 text-[#8C3D28]',
-    surfaceBorder: 'border-[#D4BF9F]',
-    blockquoteBg: 'bg-[#F0E5D4]',
+    surfaceBorder: 'border-[#DFCDB6]',
+    blockquoteBg: 'bg-[#EDE2D1]',
     btnBg: 'bg-[#7C634E]/10 hover:bg-[#7C634E]/20 text-[#2C1C0F]'
   },
   sage: {
     name: 'Sage',
-    modalBg: 'bg-[#EDF3EC]',
-    headerBg: 'bg-[#E2EDE1]',
-    sidebarBg: 'bg-[#D6E4D4]',
-    canvasBg: 'bg-[#C3D6C1]', // Calming forest tea canvas
-    paperBg: 'bg-[#F6FAF5]', // Refreshing pale green-tinted paper
-    border: 'border-[#BFD3BC]',
+    modalBg: 'bg-[#EDF4EC]',
+    headerBg: 'bg-[#EDF4EC]',
+    sidebarBg: 'bg-[#DFECE0]',
+    canvasBg: 'bg-[#EDF4EC]', // Tranquil herbal tea leaf
+    paperBg: 'bg-[#EDF4EC]',
+    border: 'border-[#C2D6C0]',
     textTitle: 'text-[#112316]',
     textBody: 'text-[#1B3322]',
     textMuted: 'text-[#486B52]',
-    watermarkColor: 'text-[#1B4D2E]/[0.20]',
+    watermarkColor: 'text-[#1B4D2E]/[0.12]',
     tagBg: 'bg-[#1B4D2E]/15 text-[#1B4D2E]',
-    surfaceBorder: 'border-[#BFD3BC]',
-    blockquoteBg: 'bg-[#E0EBE0]',
+    surfaceBorder: 'border-[#C2D6C0]',
+    blockquoteBg: 'bg-[#DFEDE0]',
     btnBg: 'bg-[#1B4D2E]/10 hover:bg-[#1B4D2E]/20 text-[#112316]'
   },
   night: {
     name: 'Night',
-    modalBg: 'bg-[#141312]',
-    headerBg: 'bg-[#1A1917]',
-    sidebarBg: 'bg-[#1C1B19]',
-    canvasBg: 'bg-[#0B0A09]', // True OLED pitch black
-    paperBg: 'bg-[#1F1D1A]', // Deep warm charcoal book spread
-    border: 'border-[#2F2C27]',
+    modalBg: 'bg-[#121212]',
+    headerBg: 'bg-[#121212]',
+    sidebarBg: 'bg-[#181818]',
+    canvasBg: 'bg-[#121212]', // OLED dark
+    paperBg: 'bg-[#121212]',
+    border: 'border-[#2A2826]',
     textTitle: 'text-[#F5EFEB]',
-    textBody: 'text-[#E8DFC8]', // Warm ivory readable text
-    textMuted: 'text-[#A89E8D]',
-    watermarkColor: 'text-[#C5A059]/[0.24]', // Warm brass watermark
+    textBody: 'text-[#E5DFD5]',
+    textMuted: 'text-[#A0988A]',
+    watermarkColor: 'text-[#C5A059]/[0.14]',
     tagBg: 'bg-[#C5A059]/20 text-[#E0C070]',
-    surfaceBorder: 'border-[#38332C]',
-    blockquoteBg: 'bg-[#282522]',
+    surfaceBorder: 'border-[#2A2826]',
+    blockquoteBg: 'bg-[#1E1C1A]',
     btnBg: 'bg-white/10 hover:bg-white/15 text-[#F5EFEB]'
   }
 };
@@ -568,34 +568,34 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                           readingTheme === 'parchment' ? 'ring-2 ring-claret border-claret font-bold' : 'border-deckle hover:border-claret/50'
                         } bg-[#FAF7F2] text-[#1C1917]`}
                       >
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#EFE7DC] border border-[#E2D8CC]" />
+                        <span className="w-3.5 h-3.5 rounded-full bg-[#FAF7F2] border border-[#E5DDD0]" />
                         <span>Parchment</span>
                       </button>
                       <button
                         onClick={() => setReadingTheme('sepia')}
                         className={`p-2 rounded-xl text-center border font-serif text-[11px] transition-all flex flex-col items-center gap-1 ${
                           readingTheme === 'sepia' ? 'ring-2 ring-amber-700 border-amber-700 font-bold' : 'border-[#DECDB8] hover:border-amber-700/50'
-                        } bg-[#F4ECE1] text-[#2C2416]`}
+                        } bg-[#F5EDE0] text-[#2C2416]`}
                       >
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#DECBB4] border border-[#D4BF9F]" />
+                        <span className="w-3.5 h-3.5 rounded-full bg-[#F5EDE0] border border-[#DFCDB6]" />
                         <span>Sepia</span>
                       </button>
                       <button
                         onClick={() => setReadingTheme('sage')}
                         className={`p-2 rounded-xl text-center border font-serif text-[11px] transition-all flex flex-col items-center gap-1 ${
                           readingTheme === 'sage' ? 'ring-2 ring-emerald-700 border-emerald-700 font-bold' : 'border-[#CFDDD0] hover:border-emerald-700/50'
-                        } bg-[#EDF2EB] text-[#1C2826]`}
+                        } bg-[#EDF4EC] text-[#1C2826]`}
                       >
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#C3D6C1] border border-[#BFD3BC]" />
+                        <span className="w-3.5 h-3.5 rounded-full bg-[#EDF4EC] border border-[#C2D6C0]" />
                         <span>Sage</span>
                       </button>
                       <button
                         onClick={() => setReadingTheme('night')}
                         className={`p-2 rounded-xl text-center border font-serif text-[11px] transition-all flex flex-col items-center gap-1 ${
                           readingTheme === 'night' ? 'ring-2 ring-amber-400 border-amber-400 font-bold' : 'border-[#2C2622] hover:border-stone-500'
-                        } bg-[#121110] text-[#E8E2D8]`}
+                        } bg-[#121212] text-[#E8E2D8]`}
                       >
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#0B0A09] border border-[#2F2C27]" />
+                        <span className="w-3.5 h-3.5 rounded-full bg-[#121212] border border-[#2A2826]" />
                         <span>Night</span>
                       </button>
                     </div>
@@ -728,7 +728,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
         )}
 
         {/* MAIN BODY VIEWPORT (Sidebar + Wide Reading Canvas) */}
-        <div className="flex-1 min-h-0 flex overflow-hidden relative h-full">
+        <div className="flex-1 min-h-0 flex overflow-hidden relative">
           
           {/* Mobile Sidebar Backdrop */}
           {isSidebarOpen && (
@@ -821,48 +821,30 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             </div>
           </aside>
 
-          {/* SPATIOUS READING CANVAS: Dynamic Theme Background */}
+          {/* SPATIOUS READING CANVAS: Seamless, distraction-free typography layout */}
           <main
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className={`flex-1 min-h-0 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 relative flex justify-center transition-colors duration-200 ${currentTheme.canvasBg}`}
+            className={`flex-1 min-h-0 overflow-y-auto px-4 sm:px-8 lg:px-12 py-8 relative transition-colors duration-200 ${currentTheme.canvasBg}`}
             style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
             tabIndex={0}
           >
-            {/* Ambient Margin Watermark */}
+            {/* Ambient Forensic Security Watermark Overlay */}
             <div
               className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex flex-col justify-around py-12"
               aria-hidden="true"
             >
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="whitespace-nowrap -rotate-[22deg] select-none text-center my-14">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="whitespace-nowrap -rotate-[18deg] select-none text-center my-16">
                   <span className={`font-mono text-xs tracking-[0.25em] uppercase font-bold select-none ${currentTheme.watermarkColor}`}>
-                    LICENSED TO: {studentName.toUpperCase() || 'SCHOLAR'} • +91 {studentMobile || '9876543210'} • ORDER #{orderId || 'HMP-2026'}
+                    LICENSED SCHOLAR COPY • {studentName.toUpperCase() || 'REGISTERED SCHOLAR'} • +91 {studentMobile || '9876543210'} • ORDER #{orderId || 'HMP-2026'} • SPU MONOGRAPH
                   </span>
                 </div>
               ))}
             </div>
 
-            {/* Inner Readable Paper Spread: Dynamic Paper Background & Border */}
-            <article className={`w-full ${columnWidthClass} space-y-8 relative z-10 p-6 sm:p-10 md:p-14 rounded-2xl sm:rounded-3xl shadow-xl transition-colors duration-200 ${currentTheme.paperBg} ${currentTheme.surfaceBorder} border`}>
-              
-              {/* 
-                FORENSIC WATERMARK OVERLAY (ON THE READING PAPER ITSELF):
-                Positioned inside <article> with z-20 (above paperBg).
-                Clearly visible to the naked eye (opacity ~0.20), but no opaque background pills so text is completely legible.
-              */}
-              <div
-                className="absolute inset-0 pointer-events-none select-none z-20 overflow-hidden flex flex-col justify-around py-8"
-                aria-hidden="true"
-              >
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="whitespace-nowrap -rotate-[20deg] select-none text-center my-12">
-                    <span className={`font-mono text-xs sm:text-sm font-bold tracking-[0.22em] uppercase select-none ${currentTheme.watermarkColor}`}>
-                      LICENSED SCHOLAR COPY • {studentName.toUpperCase() || 'REGISTERED SCHOLAR'} • +91 {studentMobile || '9876543210'} • ORDER #{orderId || 'HMP-2026'} • SPU MONOGRAPH
-                    </span>
-                  </div>
-                ))}
-              </div>
+            {/* Reading Column: Clean Academic Setting */}
+            <article className={`w-full ${columnWidthClass} mx-auto space-y-8 relative z-10 pb-16`}>
 
               {/* Chapter Meta Header */}
               <div className="border-b border-black/10 pb-6 space-y-2 relative z-10">
@@ -954,7 +936,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                   {/* Lead Section */}
                   <div className="space-y-4 text-justify">
                     {activeChapter.fullContent.map((para, i) => (
-                      <p key={i} className="indent-6 sm:indent-8 first-letter:font-serif first-letter:text-3xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:leading-none">
+                      <p key={i} className="indent-6 sm:indent-8">
                         {renderParagraphWithHighlights(para)}
                       </p>
                     ))}
@@ -1024,50 +1006,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                     </div>
                   )}
 
-                  {/* Chapter Navigation Controls */}
-                  <div className="pt-8 border-t border-black/10 flex items-center justify-between gap-2 text-xs font-mono">
-                    <button
-                      onClick={() => {
-                        if (currentChapterIdx > 0) {
-                          setCurrentChapterIdx(prev => prev - 1);
-                          scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                      }}
-                      disabled={currentChapterIdx === 0}
-                      className={`px-3.5 py-2 rounded-xl border flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:pointer-events-none ${currentTheme.btnBg} ${currentTheme.border}`}
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      <span className="hidden sm:inline">Previous Chapter</span>
-                      <span className="sm:hidden">Prev</span>
-                    </button>
-
-                    <button
-                      onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-                      className={`px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${currentTheme.btnBg} ${currentTheme.border}`}
-                      title="Back to Top"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Top</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (currentChapterIdx < bookChapters.length - 1) {
-                          setCurrentChapterIdx(prev => prev + 1);
-                          scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                      }}
-                      disabled={currentChapterIdx === bookChapters.length - 1}
-                      className={`px-3.5 py-2 rounded-xl border flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:pointer-events-none ${currentTheme.btnBg} ${currentTheme.border}`}
-                    >
-                      <span className="hidden sm:inline">Next Chapter</span>
-                      <span className="sm:hidden">Next</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-
                   {/* End of Chapter Colophon & Forensic Stamp */}
-                  <div className={`pt-6 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono ${currentTheme.textMuted}`}>
+                  <div className={`pt-8 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono ${currentTheme.textMuted}`}>
                     <span className="italic">
                       End of {activeChapter.chapterNumber} • Dr. Rajnikant S. Dodiya
                     </span>
@@ -1076,6 +1016,22 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                       <span>Certified Scholar Stream • #{orderId || 'HMP-2026'}</span>
                     </span>
                   </div>
+
+                  {/* Next Chapter Prompt Button */}
+                  {currentChapterIdx < bookChapters.length - 1 && (
+                    <div className="pt-4 text-center">
+                      <button
+                        onClick={() => {
+                          setCurrentChapterIdx(prev => prev + 1);
+                          scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="px-6 py-2.5 rounded-xl bg-claret text-white hover:bg-claret-light text-xs font-medium transition-all shadow-xs inline-flex items-center gap-2 min-h-[42px]"
+                      >
+                        <span>Continue to {bookChapters[currentChapterIdx + 1]?.title}</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
 
                 </div>
               )}
