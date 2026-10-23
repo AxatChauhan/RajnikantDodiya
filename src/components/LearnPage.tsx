@@ -520,7 +520,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
                   Free Sample Chapters
                 </button>
 
-                {isBookOwned || isComplimentaryOwned ? (
+                {isBookOwned ? (
                   <button
                     onClick={() => {
                       setIsReaderSample(false);
@@ -530,12 +530,30 @@ export const LearnPage: React.FC<LearnPageProps> = ({
                   >
                     <BookOpen className="w-3.5 h-3.5" /> Read Unlocked Book
                   </button>
+                ) : isComplimentaryOwned ? (
+                  <div className="flex flex-col gap-2 w-full">
+                    <button
+                      onClick={() => {
+                        setIsReaderSample(true);
+                        setIsReaderOpen(true);
+                      }}
+                      className="w-full py-2 px-3 rounded-xl bg-emerald-800/10 border border-emerald-800/20 text-emerald-900 hover:bg-emerald-800/20 text-xs font-medium transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <BookOpen className="w-3.5 h-3.5 text-emerald-800" /> Read Complimentary Preface
+                    </button>
+                    <button
+                      onClick={() => handleOpenCheckout(bookProduct)}
+                      className="w-full py-2 px-3 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
+                    >
+                      <Lock className="w-3.5 h-3.5" /> Buy Reader Pass (₹399)
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => handleOpenCheckout(bookProduct)}
                     className="w-full py-2 px-3 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
                   >
-                    <Lock className="w-3.5 h-3.5" /> Buy Reader Pass (₹199)
+                    <Lock className="w-3.5 h-3.5" /> Buy Reader Pass (₹399)
                   </button>
                 )}
               </div>
@@ -858,7 +876,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
             studentName={studentSession.name || 'Sample Reader'}
             studentMobile={studentSession.mobile || '9999999999'}
             orderId={studentSession.orderId || 'SAMPLE-PASS'}
-            isUnlocked={!isReaderSample && (isBookOwned || isComplimentaryOwned)}
+            isUnlocked={!isReaderSample && isBookOwned}
           />
         </Suspense>
       )}

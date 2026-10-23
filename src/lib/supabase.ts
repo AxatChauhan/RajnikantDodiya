@@ -294,7 +294,7 @@ export async function registerOrLoginGoogleScholar(googleUser: {
 
     // 1. Check for any existing licenses linked to this email
     const existingLicenses = await fetchLicensesFromSupabase(email);
-    let unlockedItems: string[] = ['complimentary_book', 'book'];
+    let unlockedItems: string[] = ['complimentary_book'];
     let orderId = `GOOGLE-SCHOLAR-${Date.now().toString().slice(-6)}`;
 
     if (existingLicenses && existingLicenses.length > 0) {
@@ -323,7 +323,7 @@ export async function registerOrLoginGoogleScholar(googleUser: {
         order_id: orderId,
         mobile: email,
         student_name: name,
-        product_type: 'book',
+        product_type: 'complimentary_book',
         amount: 0,
         status: 'completed'
       }, { onConflict: 'order_id' });
@@ -332,7 +332,7 @@ export async function registerOrLoginGoogleScholar(googleUser: {
       await supabase.from('student_licenses').upsert({
         mobile: email,
         student_name: name,
-        product_type: 'book',
+        product_type: 'complimentary_book',
         order_id: orderId,
         is_active: true
       }, { onConflict: 'mobile,product_type' });
@@ -395,7 +395,7 @@ export async function registerComplimentaryScholar(
     const orderId = `FREE-COMP-${Date.now().toString().slice(-6)}`;
     const currentDeviceType = detectDeviceType();
     const deviceToken = generateDeviceToken(currentDeviceType);
-    const unlockedItems = ['complimentary_book', 'book'];
+    const unlockedItems = ['complimentary_book'];
 
     try {
       const { data: existingSession } = await supabase
@@ -415,7 +415,7 @@ export async function registerComplimentaryScholar(
         order_id: orderId,
         mobile: cleanMobile,
         student_name: cleanName,
-        product_type: 'book',
+        product_type: 'complimentary_book',
         amount: 0,
         status: 'completed'
       }, { onConflict: 'order_id' });
@@ -423,7 +423,7 @@ export async function registerComplimentaryScholar(
       await supabase.from('student_licenses').upsert({
         mobile: cleanMobile,
         student_name: cleanName,
-        product_type: 'book',
+        product_type: 'complimentary_book',
         order_id: orderId,
         is_active: true
       }, { onConflict: 'mobile,product_type' });
@@ -507,7 +507,7 @@ export async function loginAndTransferDevice(identifier: string): Promise<{
 
       if (unlockedItems.length === 0) {
         // Automatically provide complimentary book access if user signed in
-        unlockedItems = ['complimentary_book', 'book'];
+        unlockedItems = ['complimentary_book'];
       }
     }
 

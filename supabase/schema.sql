@@ -153,6 +153,10 @@ BEGIN
 END;
 $$;
 
+-- Restrict RPC execution: Prevent unauthorized anonymous license fulfillment
+REVOKE EXECUTE ON FUNCTION public.record_verified_purchase(TEXT, TEXT, TEXT, TEXT, NUMERIC, TEXT, TEXT[], TEXT, TEXT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.record_verified_purchase(TEXT, TEXT, TEXT, TEXT, NUMERIC, TEXT, TEXT[], TEXT, TEXT) TO service_role;
+
 -- 2. Scoped Pass Restoration RPC (Returns ONLY caller's own licenses, zero PII leak)
 CREATE OR REPLACE FUNCTION public.restore_scholar_licenses(
     p_mobile TEXT
@@ -257,23 +261,27 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'error', 'Invalid 10-digit mobile number.');
     END IF;
 
-    -- Upsert student record
+    -- Reject attempts to claim author privileges via public registration (SEC-001)
+    IF p_role = 'author' OR v_clean_email IN ('rajnikantdodiya2@gmail.com', 'rajnikant.dodiya@spuvvn.edu', 'rajnikantdodiya@hmpenglish.com') THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Author accounts cannot be created via public scholar registration.');
+    END IF;
+
+    -- Upsert student record - prevent overwriting existing password without authentication
     INSERT INTO public.students (
         full_name, mobile, email, password_hash, role
     ) VALUES (
-        p_full_name, v_clean_mobile, v_clean_email, p_password_hash, p_role
+        p_full_name, v_clean_mobile, v_clean_email, p_password_hash, 'scholar'
     )
     ON CONFLICT (mobile) DO UPDATE SET
         full_name = EXCLUDED.full_name,
-        email = EXCLUDED.email,
-        password_hash = EXCLUDED.password_hash,
-        role = EXCLUDED.role;
+        email = EXCLUDED.email
+    WHERE students.password_hash IS NULL;
 
     RETURN jsonb_build_object(
         'success', true,
         'email', v_clean_email,
         'mobile', v_clean_mobile,
-        'role', p_role
+        'role', 'scholar'
     );
 END;
 $$;

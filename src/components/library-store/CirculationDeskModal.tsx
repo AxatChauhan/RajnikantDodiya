@@ -120,7 +120,16 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
       }
     }
 
-    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_TpOz4ZlxJBGo0E';
+    const envRazorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+    const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (!envRazorpayKey && !isLocalhost) {
+      alert('Payment Configuration Notice: Gateway key is currently being calibrated for live transactions. Please contact library support or use direct UPI transfer.');
+      setIsProcessing(false);
+      return;
+    }
+
+    const razorpayKey = envRazorpayKey || 'rzp_test_TpOz4ZlxJBGo0E';
 
     if (typeof window !== 'undefined' && window.Razorpay) {
       const options = {
@@ -152,7 +161,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
           }
           setPaymentId(razorpayPayId);
 
-          // 1. Verify payment signature with backend serverless endpoint if online
+          // 1. Fail-Closed Cryptographic Payment Verification with Backend Serverless Endpoint
           if (response.razorpay_signature) {
             try {
               const verifyRes = await fetch('/api/verify-payment', {
@@ -166,16 +175,27 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                 })
               });
 
-              if (verifyRes.ok) {
-                const verifyData = await verifyRes.json();
-                if (verifyData.verified === false) {
-                  alert('Security Alert: Server rejected payment signature. Please contact library support.');
-                  setIsProcessing(false);
-                  return;
-                }
+              if (!verifyRes.ok) {
+                const errData = await verifyRes.json().catch(() => ({}));
+                alert(`Security Alert: Payment verification failed (${errData.error || 'Server rejected payment'}). Please contact library support.`);
+                setIsProcessing(false);
+                return;
               }
-            } catch {
-              // Local environment fallback
+
+              const verifyData = await verifyRes.json();
+              if (verifyData.verified !== true) {
+                alert('Security Alert: Server rejected payment signature. Please contact library support.');
+                setIsProcessing(false);
+                return;
+              }
+            } catch (networkErr) {
+              console.error('Payment verification request failed:', networkErr);
+              // Fail closed in production environments to prevent forged signature fulfillment
+              if (!isLocalhost) {
+                alert(`Security Alert: Could not verify payment authenticity with library server. If your account was debited, please contact support with Order ID: ${orderId}`);
+                setIsProcessing(false);
+                return;
+              }
             }
           }
 

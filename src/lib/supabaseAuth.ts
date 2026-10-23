@@ -171,10 +171,10 @@ async function establishVerifiedSession(
   const currentDeviceType = detectDeviceType();
   const deviceToken = generateDeviceToken(currentDeviceType);
 
-  // Author gets everything unlocked; regular scholars get complimentary monograph + paid holdings
+  // Author gets everything unlocked; regular scholars get complimentary preview + paid holdings
   let unlockedItems: string[] = isAuthor
     ? ['complimentary_book', 'book', 'exam']
-    : ['complimentary_book', 'book'];
+    : ['complimentary_book'];
 
   let orderId = isAuthor
     ? `AUTHOR-PASS-${Date.now().toString().slice(-6)}`
