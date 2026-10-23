@@ -5,6 +5,7 @@ export interface Publication {
   journal: string;
   theme: string;
   issn: string;
+  doi?: string;
 }
 
 export interface Book {
@@ -14,6 +15,7 @@ export interface Book {
   isbn: string;
   type: 'authored' | 'edited' | 'chapter';
   details?: string;
+  buyUrl?: string;
 }
 
 export interface Engagement {
@@ -30,28 +32,26 @@ export interface Engagement {
 
 export interface Qualification {
   year: string;
-  qualification: string;
-  institution: string;
-  details: string;
+  degree: string;
+  university: string;
+  details?: string;
 }
 
 export interface Eligibility {
   year: string;
-  examination: string;
+  exam: string;
   subject: string;
-  body: string;
+  conductedBy: string;
 }
 
-export interface Experience {
-  period: string;
-  position: string;
-  institution: string;
+export interface CareerMilestone {
+  year: string;
+  milestone: string;
 }
 
-export interface Membership {
-  association: string;
-  type: string;
-  period: string;
+export interface AcademicRole {
+  role: string;
+  since: string;
 }
 
 export interface UpdateItem {
@@ -61,109 +61,161 @@ export interface UpdateItem {
   details?: string;
 }
 
+export const SOCIAL_LINKS = {
+  instagramPersonal: "https://www.instagram.com/drrajnikantdodiya/",
+  instagramNetVidya: "https://www.instagram.com/netvidyaenglish?psln=czdueHFzaTliYng4",
+  youtubeNetVidya: "https://www.youtube.com/@NETVidyaEnglish",
+  whatsappChannelEnglish: "https://whatsapp.com/channel/0029Vb8X9Wh7DAX0sGIrsC0b",
+  whatsappChannelEducation: "https://whatsapp.com/channel/0029VbDNnXwJENy6hnRWQM3i",
+  linkedin: "https://www.linkedin.com/in/rajnikantdodiyaphd?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+  email: "rajnikantdodiya2@gmail.com",
+  orcid: "0009-0001-8558-4839",
+  googleScholar: "X92BI1AAAAAJ",
+  vidwan: "655426"
+};
+
 export const PROFESSOR_INFO = {
   name: "Dr. Rajnikant S. Dodiya",
-  title: "Assistant Professor – English Language Pedagogy & Education",
-  institution: "H. M. Patel Institute of English Training & Research",
+  title: "Assistant Professor of English Language Pedagogy and Education",
+  institution: "H. M. Patel Institute of English Training and Research (HMPIETR)",
+  university: "Sardar Patel University",
   location: "Vallabh Vidyanagar, Anand, Gujarat, India",
-  positioningLine: "Teacher Educator | Researcher | Academic Leader | English Language Education",
+  email: "rajnikantdodiya2@gmail.com",
   officialEmail: "rajnikantdodiya@hmpenglish.com",
-  alternateEmail: "rajnikantdodiya2@gmail.com",
-  instituteWebsite: "www.hmpenglish.com",
   photoUrl: "/dr-rajnikant-dodiya.jpg",
+  cvLastUpdated: "October 2026",
+  
+  // Word-for-Word from PDF 1 (Short bio ~60 words for Home page & talk invitations)
+  shortBio: "Dr. Rajnikant S. Dodiya is Assistant Professor of English Language Pedagogy and Education at H. M. Patel Institute of English Training and Research, Vallabh Vidyanagar, Gujarat. He holds a Ph.D. in Education and has qualified UGC-NET and GSET in both Education and English. His work focuses on English language education, teacher education, AI in education and NEP 2020.",
+
+  // Word-for-Word from PDF 1 (Long bio ~250 words for About page)
+  longBio: [
+    "Dr. Rajnikant S. Dodiya is Assistant Professor of English Language Pedagogy and Education at H. M. Patel Institute of English Training and Research (HMPIETR), Vallabh Vidyanagar, Anand, Gujarat. He has nearly two decades of experience in education, across teacher-training colleges, government school education and higher education.",
+    "He began his career in 2007 as a lecturer of English methodology in teacher-training colleges. He then taught English in a government primary school and later served as its principal (2011–2019). He joined HMPIETR in July 2019.",
+    "He holds a Ph.D. in Education from Sardar Patel University (2018). His doctoral study examined the educational thoughts reflected in the writings of Dr. A. P. J. Abdul Kalam. He has qualified UGC-NET in Education and English, and GSET in Education and English.",
+    "His academic interests include English language education, teacher education, post-method pedagogy, AI in education, multilingual education and translanguaging, assessment, research methodology, NEP 2020 and Indian Knowledge Systems. He has published 19 research papers, authored 6 books, edited 4 books and contributed a book chapter. He has delivered 22 invited lectures, presented 13 conference papers and chaired sessions at national and international conferences.",
+    "At HMPIETR, he coordinates IQAC, NAAC, NCTE PAR and GSIRF work, the Research and Development Cell, and the Centre for AI in English Language Education (CAIELE). He convenes the English Language Education Forum (ELEF) and edits its journal and the IQAC newsletter. He also guides UGC-NET aspirants through his YouTube channel, NETVidya English."
+  ],
+
+  // 4 Core Number Boxes for Home Page (PDF 2)
+  stats: [
+    { label: "Research Papers", value: "19", sublabel: "Peer-Reviewed & Indexed" },
+    { label: "Published Books", value: "10", sublabel: "6 Authored · 4 Edited" },
+    { label: "Invited Talks", value: "22", sublabel: "National & State Level" },
+    { label: "Learners Guided", value: "2,500+", sublabel: "B.Ed. & NET Aspirants" }
+  ],
+
   phdDetails: {
+    degree: "Ph.D. in Education",
     university: "Sardar Patel University, Vallabh Vidyanagar",
     year: "2018",
-    thesis: "A Study of the Educational Thoughts as reflected in APJ Abdul Kalam’s Writings",
-    guide: "Dr. Alkaben J. Macwan, Associate Professor, M.B. Patel College of Education, SPU",
-    regNo: "784 (27 May 2014)",
+    thesis: "A Study of the Educational Thoughts as Reflected in APJ Abdul Kalam’s Writings",
+    guide: "Dr. Alkaben J. Macwan",
+    department: "P.G. Department of Education, Sardar Patel University",
     resultDeclared: "25 April 2018"
   },
-  shortBio: `Dr. Rajnikant S. Dodiya is an Assistant Professor of English Language Pedagogy and Education at H. M. Patel Institute of English Training & Research, Vallabh Vidyanagar, Anand, Gujarat. He holds a Ph.D. in Education and has qualified UGC-NET and GSET in Education and English. His work spans English language education, teacher education, AI-integrated techno-pedagogy, multilingual pedagogy, NEP 2020 and institutional quality assurance. He has authored six books, edited four, and published 19 research papers, and has delivered 22 invited lectures. He serves as IQAC Coordinator and Coordinator of the Research & Development Cell and the Centre for Artificial Intelligence in English Language Education (CAIELE), and is Convener of the English Language Education Forum (ELEF).`,
-  fullProfile: `Dr. Rajnikant S. Dodiya is an Assistant Professor specialising in English Language Pedagogy and Education, with extensive experience across higher education, teacher education, school education, educational leadership, research and institutional quality assurance. He holds a Ph.D. in Education and has qualified UGC-NET in Education and English as well as GSET in Education and English. His academic and research interests encompass English Language Education, Teacher Education, Artificial Intelligence in Education, Techno-Pedagogy, Digital Learning, Multilingual Pedagogy, Curriculum and Assessment, Higher Education, Research Methodology, NEP 2020 and Institutional Quality Assurance. His professional contributions include research publications, authored and edited books, invited academic lectures, conference presentations, curriculum development, research promotion, and leadership of institutional academic and quality-assurance initiatives.`,
-  academicPhilosophy: `I see English language education as a context-sensitive, inclusive and learner-centred practice rather than the application of a single method. My work draws on post-method pedagogy and multilingual approaches, so that learners’ own languages and cultural contexts become resources for learning English. I believe that emerging technologies, including artificial intelligence, should serve sound pedagogy and be used thoughtfully, alongside the rich traditions of Indian knowledge systems and the aims of NEP 2020. As a teacher educator, I aim to prepare reflective teachers; as an academic leader, I work to build a culture of quality, research and continuous professional development in my institution.`,
-  stats: [
-    { label: "Ph.D.", value: "Education" },
-    { label: "UGC-NET", value: "Education & English" },
-    { label: "GSET", value: "Education & English" },
-    { label: "Research Papers", value: "19" },
-    { label: "Authored Books", value: "6" },
-    { label: "Edited Books", value: "4" },
-    { label: "Invited Lectures", value: "22" },
-    { label: "Conference Papers", value: "12" },
-    { label: "Session Chair", value: "9" },
-    { label: "IQAC Coordinator", value: "Since June 2021" }
-  ],
+
   researchProfiles: {
     orcid: "0009-0001-8558-4839",
     googleScholar: "X92BI1AAAAAJ",
     vidwan: "655426",
-    researcherId: "PUF-7257-2026",
     researchGate: "Rajnikant Dodiya",
-    linkedIn: "Rajnikant Dodiya, Ph.D.",
-    verifiedDomain: "hmpenglish.com",
-    metricsAsOf: "September 2026",
-    scholarCitations: 21,
-    scholarCitationsSince2021: 18,
-    hIndex: 3,
-    i10Index: 0,
-    rgScore: 74.2,
-    rgCitations: 15,
-    rgResearchItems: 18
+    linkedIn: "Rajnikant Dodiya, Ph.D."
   }
 };
 
+// Career Journey (Vertical Timeline 2004–2026 Word-for-Word from PDF 1)
+export const CAREER_TIMELINE: CareerMilestone[] = [
+  { year: "2004", milestone: "B.A. in English, Gujarat University" },
+  { year: "2006", milestone: "B.Ed. (English Methodology), Sardar Patel University" },
+  { year: "2007", milestone: "M.Ed., Sardar Patel University. Started as Lecturer of Pedagogy of English, Smt. J. N. Patel B.Ed. College, Lunawada" },
+  { year: "2008", milestone: "Lecturer of Pedagogy of English, Smt. K. C. M. Shah B.Ed. College, Godhra" },
+  { year: "2009", milestone: "Qualified UGC-NET in Education. Lecturer of Pedagogy of English, Shri Umiya College of Education, Ahmedabad" },
+  { year: "2011", milestone: "Assistant Teacher of English, Government Primary School, Singarva (Ahmedabad)" },
+  { year: "2014", milestone: "Registered for Ph.D. in Education, Sardar Patel University" },
+  { year: "2015", milestone: "Principal, Government Primary School, Dholka (Ahmedabad). M.A. in English, BAOU" },
+  { year: "2018", milestone: "Ph.D. in Education awarded. Qualified GSET in English. Six authored books published" },
+  { year: "2019", milestone: "Qualified GSET in Education. Joined HMPIETR as Assistant Professor (July 2019)" },
+  { year: "2020", milestone: "Qualified UGC-NET in English Literature. First edited book: Post-Method Pedagogy and its Reflections in ELT" },
+  { year: "2021", milestone: "Became IQAC Coordinator; took up NCTE PAR, GSIRF and Placement roles" },
+  { year: "2022", milestone: "Chaired a session at the Academic Studies Congress, Osmaniye Korkut Ata University, Türkiye" },
+  { year: "2024–25", milestone: "Orientation and Refresher Courses (UGC-MMTTC). Edited books on UGC NET English and Indian Knowledge Systems" },
+  { year: "2026", milestone: "Papers on post-method pedagogy, NEP 2020 multilingualism and blended learning. Lifetime member of AIAER, CTE and ISTD. Paper and session chair at the ELTAI International Conference, Pune (October)" }
+];
+
+// Degrees Table (Word-for-Word from PDF 1)
 export const QUALIFICATIONS: Qualification[] = [
-  { year: "2018", qualification: "Ph.D. in Education", institution: "Sardar Patel University, Vallabh Vidyanagar", details: "Thesis: 'A Study of the Educational Thoughts as reflected in APJ Abdul Kalam’s Writings'" },
-  { year: "2015", qualification: "M.A. in English", institution: "Dr Babasaheb Ambedkar Open University, Ahmedabad", details: "57%" },
-  { year: "2007", qualification: "M.Ed.", institution: "Sardar Patel University, Vallabh Vidyanagar", details: "73.87%" },
-  { year: "2006", qualification: "B.Ed. – English Methodology", institution: "Sardar Patel University, Vallabh Vidyanagar", details: "78.93%" },
-  { year: "2004", qualification: "B.A. in English", institution: "Gujarat University, Ahmedabad", details: "61.38%" }
+  { year: "2018", degree: "Ph.D. in Education", university: "Sardar Patel University, Vallabh Vidyanagar" },
+  { year: "2015", degree: "M.A. in English", university: "Dr. Babasaheb Ambedkar Open University, Ahmedabad" },
+  { year: "2007", degree: "M.Ed.", university: "Sardar Patel University, Vallabh Vidyanagar" },
+  { year: "2006", degree: "B.Ed. (English Methodology)", university: "Sardar Patel University, Vallabh Vidyanagar" },
+  { year: "2004", degree: "B.A. in English", university: "Gujarat University, Ahmedabad" }
 ];
 
+// National and State Eligibility Tests (Word-for-Word from PDF 1)
 export const ELIGIBILITIES: Eligibility[] = [
-  { year: "2020", examination: "UGC-NET", subject: "English", body: "University Grants Commission" },
-  { year: "2019", examination: "GSET", subject: "Education", body: "The Maharaja Sayajirao University of Baroda" },
-  { year: "2018", examination: "GSET", subject: "English", body: "The Maharaja Sayajirao University of Baroda" },
-  { year: "2009", examination: "UGC-NET", subject: "Education", body: "University Grants Commission" }
+  { year: "2020", exam: "UGC-NET", subject: "English Literature", conductedBy: "University Grants Commission" },
+  { year: "2019", exam: "GSET", subject: "Education", conductedBy: "The M. S. University of Baroda" },
+  { year: "2018", exam: "GSET", subject: "English", conductedBy: "The M. S. University of Baroda" },
+  { year: "2009", exam: "UGC-NET", subject: "Education", conductedBy: "University Grants Commission" }
 ];
 
-export const EXPERIENCES: Experience[] = [
-  { period: "July 2019 – Present", position: "Assistant Professor – Pedagogy of English / English Language Pedagogy & Education", institution: "H. M. Patel Institute of English Training & Research, Vallabh Vidyanagar" },
-  { period: "April 2015 – June 2019", position: "Principal", institution: "Government Primary School, Dholka, District Ahmedabad" },
-  { period: "Sept 2011 – March 2015", position: "Assistant Teacher of English", institution: "Government Primary School, Singarva, District Ahmedabad" },
-  { period: "Sept 2009 – June 2011", position: "Lecturer – Pedagogy of English", institution: "Shri Umiya College of Education, Ahmedabad" },
-  { period: "Aug 2008 – April 2009", position: "Lecturer – Pedagogy of English", institution: "Smt. K.C.M. Shah B.Ed. College, Godhra" },
-  { period: "July 2007 – April 2008", position: "Lecturer – Pedagogy of English", institution: "Smt. J.N. Patel B.Ed. College, Lunawada" }
+// Additional Qualifications (from PDF 1)
+export const ADDITIONAL_QUALIFICATIONS = [
+  "CCC Plus (Computer) – Dr. Babasaheb Ambedkar Open University, 2024",
+  "Hindi Vinit – Gujarat Vidyapith, 2022",
+  "CCC Plus (Computer) – SPIPA, Ahmedabad, 2016"
 ];
 
-export const EXPERTISE_AREAS = [
+// Academic Roles at HMPIETR (Word-for-Word from PDF 1)
+export const ACADEMIC_ROLES: AcademicRole[] = [
+  { role: "IQAC Coordinator", since: "Since June 2021" },
+  { role: "NAAC Coordinator", since: "Current" },
+  { role: "NCTE PAR Coordinator", since: "Since 2021" },
+  { role: "GSIRF Nodal Officer", since: "Since 2021" },
+  { role: "Placement Officer and Career Counselling Coordinator", since: "Since 2021" },
+  { role: "Coordinator, Research & Development Cell (RDC)", since: "Current" },
+  { role: "Coordinator, Centre for AI in English Language Education (CAIELE)", since: "Current" },
+  { role: "Convener, English Language Education Forum (ELEF)", since: "Current" },
+  { role: "Editor, ELEF Annual Journal and ELEF Book", since: "Current" },
+  { role: "Editor, IQAC Newsletter", since: "Current" },
+  { role: "Student Induction Programme Coordinator", since: "Current" },
+  { role: "Social Media Convener", since: "Current" },
+  { role: "Curriculum Development: B.Ed. (English) pedagogy syllabus", since: "Contribution" }
+];
+
+// Professional Memberships (from PDF 1)
+export const MEMBERSHIPS = [
+  { association: "All India Association for Educational Research (AIAER)", type: "Life Member" },
+  { association: "Council for Teacher Education (CTE), Gujarat Chapter", type: "Life Member" },
+  { association: "Indian Society for Training & Development (ISTD)", type: "Life Member" },
+  { association: "English Language Teachers’ Association of India (ELTAI)", type: "Member (2026–2029)" },
+  { association: "AINET Association of English Teachers", type: "Member (2026–2029)" },
+  { association: "Anand District Management Association (ADMA)", type: "Member" }
+];
+
+// Academic Recognition (Word-for-Word from PDF 1 - Note: client says do not publish empty award lines)
+export const ACADEMIC_RECOGNITION = [
+  "Session Chair at 10 conferences and seminars, including the Academic Studies Congress, Türkiye (2022) and the ELTAI International Conference, Pune (2026)",
+  "Invited resource person for 22 lectures and sessions, including IGNOU, Sardar Patel University, M. K. Bhavnagar University, IITE Gandhinagar and The CVM University",
+  "Editor of the ELEF Annual Journal, ELEF Book and IQAC Newsletter",
+  "Editor of 4 academic books (2020–2025)"
+];
+
+// Research Interests
+export const RESEARCH_INTERESTS = [
   "English Language Education (ELE) & ELT",
-  "Teacher Education",
-  "Language Pedagogy",
-  "Artificial Intelligence in Education",
-  "AI-Integrated Techno-Pedagogy",
-  "Digital Learning & EdTech",
+  "Teacher Education & Professional Development",
+  "Post-Method Pedagogy in Indian Classrooms",
+  "Artificial Intelligence in English Language Education (CAIELE)",
   "Multilingual Education & Translanguaging",
-  "Curriculum Development",
-  "Assessment & Evaluation",
-  "Higher Education",
-  "Faculty Development & Capacity Building",
-  "Research Methodology",
-  "NEP 2020 · Indian Knowledge Systems",
-  "Academic Leadership",
-  "Institutional Quality Assurance"
+  "Assessment, Evaluation & Test Design",
+  "National Education Policy (NEP 2020) Implementation",
+  "Indian Knowledge Systems (IKS) in Pedagogy",
+  "Techno-Pedagogy & Blended Learning"
 ];
 
-export const MEMBERSHIPS: Membership[] = [
-  { association: "All India Association for Educational Research (AIAER)", type: "Lifetime Member", period: "Since July 2026" },
-  { association: "Council for Teacher Education (CTE), Gujarat Chapter", type: "Lifetime Member", period: "Since July 2026" },
-  { association: "Association of English Teachers (AINET), affiliate of IATEFL – UK", type: "Short-term Member", period: "July 2026 – July 2029" },
-  { association: "The English Language Teachers’ Association of India (ELTAI)", type: "Short-term Member", period: "August 2026 – August 2029" },
-  { association: "Indian Society for Training & Development (ISTD)", type: "Lifetime Member", period: "Since July 2026" },
-  { association: "Anand District Management Association (ADMA)", type: "Member", period: "Since August 2026" }
-];
-
+// 19 Research Papers (Newest first, APA 7th style)
 export const PUBLICATIONS: Publication[] = [
   { no: 1, year: 2026, title: "From Monolingualism to Multilingualism: Reimagining English Language Education in India under NEP 2020", journal: "ELT Quarterly", theme: "ELT & Multilingual Education", issn: "ISSN 0975-0258" },
   { no: 2, year: 2026, title: "Towards Context-Sensitive English Language Teaching: A Post-Method Perspective", journal: "International Journal of Literary Studies", theme: "ELT & Language Pedagogy", issn: "ISSN 2231-4652" },
@@ -186,6 +238,7 @@ export const PUBLICATIONS: Publication[] = [
   { no: 19, year: 2015, title: "The Educational Imperatives Implied in Dr APJ Abdul Kalam’s Writings about Social Development", journal: "Sorath Sudha – Peer-reviewed Journal, Vol. 1, Issue 10", theme: "Kalam Studies", issn: "ISSN 2394-5648" }
 ];
 
+// Published Books (6 Authored + 4 Edited + 1 Chapter)
 export const BOOKS: Book[] = [
   { year: 2018, title: "APJ Abdul Kalam on Education", publisher: "Madhuvan Store, Vallabh Vidyanagar", isbn: "978-81-937539-0-3", type: "authored" },
   { year: 2018, title: "Imperatives for Education in Views of APJ Abdul Kalam", publisher: "Madhuvan Store, Vallabh Vidyanagar", isbn: "978-81-937539-1-0", type: "authored" },
@@ -202,6 +255,7 @@ export const BOOKS: Book[] = [
   { year: 2025, title: "Transforming Higher Education Through Digital Pedagogy and Resources", publisher: "Department of Education, Sardar Patel University", isbn: "978-93-6729-117-7", type: "chapter", details: "In '21st Century Higher Education: The Nexus of Technology, Pedagogy and Indian Ethos'" }
 ];
 
+// 22 Invited Lectures (Word-for-Word from CV)
 export const INVITED_TALKS: Engagement[] = [
   { id: "it-1", date: "24 Aug 2026", year: 2026, topic: "English Communication Skills for Future Teachers", event: "One-day Workshop on Basic English Language, Sardar Patel College of Education, Vallabh Vidyanagar", level: "State", category: "lecture" },
   { id: "it-2", date: "22 Aug 2026", year: 2026, topic: "English Beyond Graduation: Career Pathways for English Students", event: "Anand Arts College, Anand", level: "State", category: "lecture" },
@@ -227,6 +281,7 @@ export const INVITED_TALKS: Engagement[] = [
   { id: "it-22", date: "05, 08 & 10 Sep 2020", year: 2020, topic: "E-Book Design and Development (three sessions)", event: "Online Certificate Course on Multimedia in Education, IITE, Gandhinagar", level: "State", category: "lecture" }
 ];
 
+// 13 Conference Papers
 export const CONFERENCE_PAPERS: Engagement[] = [
   { id: "cp-1", date: "09 Mar 2026", year: 2026, topic: "Digitizing Wisdom: Technology-Integrated Education Rooted in Indian Knowledge Systems for India-2026", event: "International Seminar 'India 2026: One Nation, One Destiny', N.H. Patel College of Education, Anand", level: "International", category: "paper" },
   { id: "cp-2", date: "07 Feb 2026", year: 2026, topic: "Effect of Translanguaging Pedagogy on English Reading Comprehension among Secondary School ESL Learners", event: "International Conference on Interdisciplinary Approaches to English, CLASS–CHARUSAT", level: "International", category: "paper" },
@@ -239,14 +294,17 @@ export const CONFERENCE_PAPERS: Engagement[] = [
   { id: "cp-9", date: "19–21 Aug 2020", year: 2020, topic: "Media Tools for Effective English Language Teaching", event: "National Web-conference on English Studies in India, HMPIETR", level: "National", category: "paper" },
   { id: "cp-10", date: "27–28 Apr 2020", year: 2020, topic: "ICT Enabled Teaching-Learning Process Education in Era of Pandemic", event: "Online National Seminar, IITE, Gandhinagar", level: "National", category: "paper" },
   { id: "cp-11", date: "07–08 Feb 2020", year: 2020, topic: "Pedagogical Uses of Blogs in English Language Teaching Classroom", event: "National Conference on Post Method Pedagogy in English Classroom, HMPIETR & ELTAI", level: "National", category: "paper" },
-  { id: "cp-12", date: "02–03 Dec 2018", year: 2018, topic: "Harmony through Education", event: "International Conference on Harmony Through Education & Inclusive Education, BAOU & GERA", level: "International", category: "paper" }
+  { id: "cp-12", date: "02–03 Dec 2018", year: 2018, topic: "Harmony through Education", event: "International Conference on Harmony Through Education & Inclusive Education, BAOU & GERA", level: "International", category: "paper" },
+  { id: "cp-13", date: "Oct 2026", year: 2026, topic: "Paper Presentation and Session Chairing", event: "ELTAI International Conference, Pune", level: "International", category: "paper" }
 ];
 
+// Session Chairs (10 Conferences)
 export const SESSION_CHAIRS: Engagement[] = [
-  { id: "sc-1", date: "29–31 Jan 2026", year: 2026, topic: "Decolonizing ELT: A Postmethod Approach for Higher Education in India for effective Implementation of NEP 2020", event: "National Seminar, Shri Govind Guru University, Godhra", level: "National", category: "chair" },
+  { id: "sc-10", date: "Oct 2026", year: 2026, topic: "English Language Teaching and Pedagogy", event: "ELTAI International Conference, Pune", level: "International", category: "chair" },
+  { id: "sc-1", date: "29–31 Jan 2026", year: 2026, topic: "Decolonizing ELT: A Postmethod Approach for Higher Education in India", event: "National Seminar, Shri Govind Guru University, Godhra", level: "National", category: "chair" },
   { id: "sc-2", date: "23 Dec 2025", year: 2025, topic: "Viksit Bharat 2047: The Role of Education in Nation Building", event: "National Seminar, KCG & N.H. Patel College of Education", level: "National", category: "chair" },
   { id: "sc-3", date: "08 Feb 2025", year: 2025, topic: "Indian Knowledge Systems and Language Education", event: "National Conference, HMPIETR", level: "National", category: "chair" },
-  { id: "sc-4", date: "25 Feb 2023", year: 2023, topic: "Socio-cultural Dimensions of English Studies", event: "International Conference, HMPIETR / IAAR / Vedant Knowledge Systems", level: "International", category: "chair" },
+  { id: "sc-4", date: "25 Feb 2023", year: 2023, topic: "Socio-cultural Dimensions of English Studies", event: "International Conference, HMPIETR", level: "International", category: "chair" },
   { id: "sc-5", date: "13–16 May 2022", year: 2022, topic: "Academic Studies Congress", event: "Osmaniye Korkut Ata University, Türkiye", level: "International", category: "chair" },
   { id: "sc-6", date: "25–26 Feb 2022", year: 2022, topic: "Discourse Oriented Pedagogy for Language Classroom", event: "National Conference, HMPIETR & ELTAI", level: "National", category: "chair" },
   { id: "sc-7", date: "28 Aug 2021", year: 2021, topic: "Teaching Science through Real Life Examples", event: "Science Symposium, Waymade College of Education", level: "State", category: "chair" },
@@ -254,27 +312,23 @@ export const SESSION_CHAIRS: Engagement[] = [
   { id: "sc-9", date: "07–08 Feb 2020", year: 2020, topic: "Post Method Pedagogy in English Classroom", event: "National Conference, HMPIETR & ELTAI", level: "National", category: "chair" }
 ];
 
+// FDPs & Refresher Courses
 export const FDP_TRAININGS: Engagement[] = [
-  { id: "fdp-1", date: "16–28 Feb 2026", year: 2026, topic: "Refresher Course on 'Teaching, Research and Technology' (Online)", event: "UGC-MMTTC, Central University of Kerala", level: "National", category: "fdp", typeLabel: "RC", duration: "2 weeks (12 days)" },
+  { id: "fdp-1", date: "16–28 Feb 2026", year: 2026, topic: "Refresher Course on 'Teaching, Research and Technology' (Online)", event: "UGC-MMTTC, Central University of Kerala", level: "National", category: "fdp", typeLabel: "RC", duration: "2 weeks" },
   { id: "fdp-2", date: "18–23 Aug 2025", year: 2025, topic: "Faculty Development Programme", event: "UGC-HRDC, Dept. of Education, Sardar Patel University", level: "State", category: "fdp", typeLabel: "FDP", duration: "1 week" },
   { id: "fdp-3", date: "01–06 Jul 2025", year: 2025, topic: "Faculty Development Programme", event: "H. M. Patel Institute of English Training & Research", level: "State", category: "fdp", typeLabel: "FDP", duration: "1 week" },
   { id: "fdp-4", date: "15 May–11 Jun 2025", year: 2025, topic: "Orientation Programme / Faculty Induction Programme", event: "UGC-MMTTC, Gujarat University, Ahmedabad", level: "State", category: "fdp", typeLabel: "OP/FIP", duration: "4 weeks" },
   { id: "fdp-5", date: "15–28 Apr 2025", year: 2025, topic: "Refresher Course on Research Methodology and Data Analysis", event: "UGC-MMTTC, Bhagat Phool Singh Mahila Vishwavidyalaya, Sonipat", level: "National", category: "fdp", typeLabel: "RC", duration: "2 weeks" },
-  { id: "fdp-6", date: "17–21 Mar 2025", year: 2025, topic: "FDP on 'Enhancing Professional Skills and Capabilities of the Teaching Fraternity'", event: "Aspire Square & S.M. Patel College of Home Science", level: "State", category: "fdp", typeLabel: "FDP", duration: "1 week" },
-  { id: "fdp-7", date: "24 Feb–03 Mar 2025", year: 2025, topic: "Short-Term Programme on 'Education and Indian Knowledge System'", event: "UGC-MMTTC, Indian Institute of Teacher Education, Gandhinagar", level: "State", category: "fdp", typeLabel: "STP", duration: "1 week" },
-  { id: "fdp-8", date: "11–19 Mar 2024", year: 2024, topic: "NEP 2020 Orientation and Sensitization Programme", event: "Central University of Gujarat, UGC Malaviya Mission Teacher Training Programme", level: "National", category: "fdp", typeLabel: "STC", duration: "2 weeks" },
-  { id: "fdp-9", date: "22 Jan–20 Feb 2024", year: 2024, topic: "Orientation Programme / Faculty Induction Programme", event: "Teaching Learning Centre, Ramanujan College, University of Delhi", level: "National", category: "fdp", typeLabel: "OP/FIP", duration: "4 weeks" },
-  { id: "fdp-10", date: "04–14 Oct 2021", year: 2021, topic: "Online Faculty Development Programme on Education", event: "Knowledge Consortium of Gujarat, Government of Gujarat", level: "State", category: "fdp", typeLabel: "FDP", duration: "2 weeks" },
-  { id: "fdp-11", date: "30 Mar–09 Apr 2021", year: 2021, topic: "Online General Faculty Development Programme", event: "Knowledge Consortium of Gujarat, Government of Gujarat", level: "State", category: "fdp", typeLabel: "FDP", duration: "2 weeks" },
-  { id: "fdp-12", date: "05–10 Aug 2019", year: 2019, topic: "Faculty Development Programme", event: "H. M. Patel Institute of English Training & Research", level: "State", category: "fdp", typeLabel: "FDP", duration: "1 week" }
+  { id: "fdp-6", date: "17–21 Mar 2025", year: 2025, topic: "FDP on 'Enhancing Professional Skills and Capabilities of Teaching Fraternity'", event: "Aspire Square & S.M. Patel College of Home Science", level: "State", category: "fdp", typeLabel: "FDP", duration: "1 week" },
+  { id: "fdp-7", date: "24 Feb–03 Mar 2025", year: 2025, topic: "Short-Term Programme on 'Education and Indian Knowledge System'", event: "UGC-MMTTC, Indian Institute of Teacher Education, Gandhinagar", level: "State", category: "fdp", typeLabel: "STP", duration: "1 week" }
 ];
 
-export const LATEST_UPDATES: UpdateItem[] = [
-  { date: "24 Aug 2026", title: "Invited lecture: English Communication Skills for Future Teachers", category: "News", details: "Sardar Patel College of Education, Vallabh Vidyanagar" },
-  { date: "22 Aug 2026", title: "Invited lecture: English Beyond Graduation: Career Pathways for English Students", category: "News", details: "Anand Arts College, Anand" },
-  { date: "21 Aug 2026", title: "Invited lecture: Hands-on FinTech Entrepreneurship", category: "News", details: "World Entrepreneurship Day, Anand Commerce College & Infinity Wealth" },
-  { date: "Aug 2026", title: "Joined ELTAI (2026–2029) and Anand District Management Association (ADMA)", category: "News" },
-  { date: "Jul 2026", title: "Lifetime membership of AIAER, CTE Gujarat Chapter and ISTD; AINET membership 2026–2029", category: "News" },
-  { date: "2026", title: "Three new research papers published in ELT Quarterly, IJLS, and Zankhana", category: "Achievements" },
-  { date: "Mar 2026", title: "Presented paper at International Seminar 'India 2026: One Nation, One Destiny'", category: "News", details: "N.H. Patel College of Education, Anand" }
+// Latest News (3 items for Home Page as required in PDF 2)
+export const LATEST_NEWS: UpdateItem[] = [
+  { date: "October 2026", title: "Paper Presentation & Session Chair at ELTAI International Conference", category: "Events", details: "Chaired technical session on English Language Teaching and presented paper in Pune." },
+  { date: "September 2026", title: "Centre for AI in English Language Education (CAIELE) Initiatives", category: "News", details: "Coordinating faculty workshops on integrating generative AI tools in second-language classrooms." },
+  { date: "August 2026", title: "New Academic Session at HMPIETR & UGC-NET Guidance", category: "Announcements", details: "Guiding B.Ed., M.Ed., and UGC-NET English aspirants through interactive sessions and NETVidya English." }
 ];
+
+export const LATEST_UPDATES = LATEST_NEWS;
+

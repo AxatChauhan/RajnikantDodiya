@@ -141,6 +141,33 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
           }
           setPaymentId(razorpayPayId);
 
+          // 1. Verify payment signature with backend serverless endpoint if online
+          if (response.razorpay_signature) {
+            try {
+              const verifyRes = await fetch('/api/verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: razorpayPayId,
+                  razorpay_signature: response.razorpay_signature,
+                  order_id: orderId
+                })
+              });
+
+              if (verifyRes.ok) {
+                const verifyData = await verifyRes.json();
+                if (verifyData.verified === false) {
+                  alert('Security Alert: Server rejected payment signature. Please contact library support.');
+                  setIsProcessing(false);
+                  return;
+                }
+              }
+            } catch {
+              // Local environment fallback
+            }
+          }
+
           const licensedItems: ('book' | 'exam')[] = [];
           if (activeProduct.type === 'book') licensedItems.push('book');
           else if (activeProduct.type === 'exam') licensedItems.push('exam');
@@ -237,7 +264,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
               Acquire Scholar Access
             </h3>
             <p className="text-xs text-ink-muted font-reading font-light mt-0.5">
-              Authorized personal access for Indian scholars with single-device binding and digital rights protection.
+              Authorized personal access for Indian scholars with 2-device binding (1 Phone + 1 Laptop) and digital rights protection.
             </p>
           </div>
           <button

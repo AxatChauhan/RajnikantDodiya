@@ -94,6 +94,8 @@ export function computeSessionSeal(
 export function sanitizeScholarName(name: string): string {
   if (!name) return '';
   return name
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Strip full script tags and inline code
+    .replace(/<[^>]+>/g, '') // Strip any remaining HTML tags
     .replace(/[<>'"`;]/g, '') // Strip potential script injection characters
     .trim()
     .slice(0, 80);
@@ -101,13 +103,28 @@ export function sanitizeScholarName(name: string): string {
 
 export function validateIndianMobile(mobile: string): { isValid: boolean; cleanMobile: string; error?: string } {
   const digitsOnly = mobile.replace(/\D/g, '');
-  const cleanMobile = digitsOnly.slice(-10);
 
-  if (cleanMobile.length !== 10) {
-    return { isValid: false, cleanMobile, error: 'Mobile number must be exactly 10 digits.' };
+  let cleanMobile = digitsOnly;
+  if (digitsOnly.length === 10) {
+    cleanMobile = digitsOnly;
+  } else if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
+    cleanMobile = digitsOnly.slice(1);
+  } else if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
+    cleanMobile = digitsOnly.slice(2);
+  } else {
+    return {
+      isValid: false,
+      cleanMobile: digitsOnly.slice(-10),
+      error: 'Please enter a valid 10-digit Indian mobile number (e.g., 9876543210 or +91 9876543210).'
+    };
   }
-  if (!/^[6-9]/.test(cleanMobile)) {
-    return { isValid: false, cleanMobile, error: 'Please enter a valid Indian mobile number starting with 6, 7, 8, or 9.' };
+
+  if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+    return {
+      isValid: false,
+      cleanMobile,
+      error: 'Please enter a valid Indian mobile number starting with 6, 7, 8, or 9.'
+    };
   }
   return { isValid: true, cleanMobile };
 }
@@ -119,15 +136,16 @@ export function validateEmail(email: string): boolean {
 }
 
 export function validateUtr(utr: string): { isValid: boolean; cleanUtr: string; error?: string } {
-  const cleanUtr = utr.trim().replace(/[^a-zA-Z0-9]/g, '');
-  if (cleanUtr.length < 8 || cleanUtr.length > 22) {
+  const trimmed = utr.trim();
+  // Strictly enforce 8-22 alphanumeric characters with no spaces or SQL/script punctuation
+  if (!/^[a-zA-Z0-9]{8,22}$/.test(trimmed)) {
     return {
       isValid: false,
-      cleanUtr,
-      error: 'Bank UTR / Transaction Reference must be between 8 and 22 alphanumeric characters.'
+      cleanUtr: trimmed.replace(/[^a-zA-Z0-9]/g, ''),
+      error: 'Bank UTR / Transaction Reference must be 8 to 22 alphanumeric characters with no special symbols.'
     };
   }
-  return { isValid: true, cleanUtr };
+  return { isValid: true, cleanUtr: trimmed };
 }
 
 // 5. CBT EXAM ANSWER OBFUSCATION (CIPHER MASK)
@@ -148,3 +166,16 @@ export function unmaskAnswer(masked: string | number): number {
   }
   return Number(masked) || 0;
 }
+
+// 6. AUTHOR & FACULTY SECURITY GUARDS (ANTI-IMPERSONATION)
+export const AUTHOR_EMAILS = [
+  'rajnikantdodiya@hmpenglish.com',
+  'rajnikantdodiya2@gmail.com',
+  'rajnikant.dodiya@spuvvn.edu'
+];
+
+export function isAuthorEmail(email: string): boolean {
+  if (!email) return false;
+  return AUTHOR_EMAILS.includes(email.trim().toLowerCase());
+}
+

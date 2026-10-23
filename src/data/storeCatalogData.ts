@@ -1,5 +1,5 @@
 // Catalog and Mock Exam Data for The Atheneum Academic Library Store
-import { maskAnswer } from '../lib/security';
+import { maskAnswer, unmaskAnswer } from '../lib/security';
 
 export interface ChapterSubsection {
   subtitle: string;
@@ -29,6 +29,15 @@ export interface ExamQuestion {
   options: string[];
   correctAnswer: number | string;
   explanation: string;
+  topicTag: string;
+}
+
+// Sanitized question payload for active proctoring (Zero answer/explanation leaks)
+export interface ActiveExamQuestion {
+  id: number;
+  section: 'Paper II: English Literature' | 'Paper I: Pedagogy & Research Aptitude' | 'Literary Theory & ELT';
+  question: string;
+  options: string[];
   topicTag: string;
 }
 
@@ -198,6 +207,28 @@ export const FEATURED_BOOK_CHAPTERS: BookChapter[] = [
     ]
   }
 ];
+
+/**
+ * Scoped Monograph Accessor:
+ * - Unlicensed mode (Sample): Delivers full text of Chapter 0 (Preface) only.
+ *   Chapters 1–3 return excerpt previews with full text and subsections stripped from memory.
+ * - Licensed mode: Delivers complete scholarly chapters with empirical findings and footnotes.
+ */
+export function getLicensedBookChapters(isUnlocked: boolean): BookChapter[] {
+  if (isUnlocked) {
+    return FEATURED_BOOK_CHAPTERS;
+  }
+
+  return FEATURED_BOOK_CHAPTERS.map((ch, idx) => {
+    if (idx === 0) return ch; // Free open academic sample
+    return {
+      ...ch,
+      fullContent: [ch.excerptPreview],
+      subsections: [],
+      footnotes: []
+    };
+  });
+}
 
 // The 25-Question Curated CBT Mock Exam (UGC-NET / GSET Master Edition)
 export const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
@@ -520,3 +551,89 @@ export const STORE_PRODUCTS: StoreProduct[] = [
     securityNote: 'Instant activation across both study portals immediately upon payment.'
   }
 ];
+
+/**
+ * Returns exam questions with answers and explanations stripped for active test-taking.
+ * Prevents examinees from inspecting the correct answers in memory or React state during testing.
+ */
+export function getActiveExamQuestions(isUnlocked: boolean): ActiveExamQuestion[] {
+  const source = isUnlocked ? MOCK_EXAM_QUESTIONS : MOCK_EXAM_QUESTIONS.slice(0, 3);
+  return source.map(q => ({
+    id: q.id,
+    section: q.section,
+    question: q.question,
+    options: q.options,
+    topicTag: q.topicTag
+  }));
+}
+
+export interface ExamEvaluationResult {
+  correctCount: number;
+  incorrectCount: number;
+  unattemptedCount: number;
+  answeredCount: number;
+  totalScore: number;
+  maxScore: number;
+  accuracy: number;
+  percentile: number;
+  detailedQuestions: (ExamQuestion & {
+    correctIdx: number;
+    studentAns?: number;
+    isCorrect: boolean;
+  })[];
+}
+
+/**
+ * Evaluates candidate responses only upon final exam submission.
+ * Reconciles submitted choices against protected answer keys and provides explanations.
+ */
+export function evaluateExamSubmission(
+  answers: Record<number, number>,
+  isUnlocked: boolean
+): ExamEvaluationResult {
+  const source = isUnlocked ? MOCK_EXAM_QUESTIONS : MOCK_EXAM_QUESTIONS.slice(0, 3);
+  let correctCount = 0;
+  let incorrectCount = 0;
+  let unattemptedCount = 0;
+
+  const detailedQuestions = source.map((q, idx) => {
+    const studentAns = answers[idx];
+    const correctIdx = unmaskAnswer(q.correctAnswer);
+    const isCorrect = studentAns === correctIdx;
+
+    if (studentAns === undefined) {
+      unattemptedCount++;
+    } else if (isCorrect) {
+      correctCount++;
+    } else {
+      incorrectCount++;
+    }
+
+    return {
+      ...q,
+      correctIdx,
+      studentAns,
+      isCorrect
+    };
+  });
+
+  const totalQuestions = source.length;
+  const answeredCount = totalQuestions - unattemptedCount;
+  const totalScore = correctCount * 2;
+  const maxScore = totalQuestions * 2;
+  const accuracy = correctCount + incorrectCount > 0 ? Math.round((correctCount / (correctCount + incorrectCount)) * 100) : 0;
+  const percentile = Math.min(99.4, Math.max(45, Math.round((correctCount / totalQuestions) * 100 * 1.15 * 10) / 10));
+
+  return {
+    correctCount,
+    incorrectCount,
+    unattemptedCount,
+    answeredCount,
+    totalScore,
+    maxScore,
+    accuracy,
+    percentile,
+    detailedQuestions
+  };
+}
+

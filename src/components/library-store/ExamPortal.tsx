@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { MOCK_EXAM_QUESTIONS, ExamQuestion } from '../../data/storeCatalogData';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  getActiveExamQuestions,
+  evaluateExamSubmission,
+  ActiveExamQuestion,
+  ExamEvaluationResult
+} from '../../data/storeCatalogData';
 import { unmaskAnswer } from '../../lib/security';
 import { Clock, CheckCircle2, AlertCircle, Bookmark, Award, X, RotateCcw, ChevronRight, ChevronLeft, ShieldCheck, FileText, Lock } from 'lucide-react';
 
@@ -143,11 +148,11 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
 
   if (!isOpen) return null;
 
-  // Scoped questions and total based on unlock status
-  const evaluatedQuestions = isUnlocked ? MOCK_EXAM_QUESTIONS : MOCK_EXAM_QUESTIONS.slice(0, 3);
-  const totalQuestions = evaluatedQuestions.length;
+  // Scoped active questions (Zero answers/explanations exposed in active state)
+  const activeQuestions: ActiveExamQuestion[] = getActiveExamQuestions(isUnlocked);
+  const totalQuestions = activeQuestions.length;
 
-  const currentQ: ExamQuestion = evaluatedQuestions[currentIdx] || MOCK_EXAM_QUESTIONS[currentIdx] || MOCK_EXAM_QUESTIONS[0];
+  const currentQ: ActiveExamQuestion = activeQuestions[currentIdx] || activeQuestions[0];
 
   // Helper formatting
   const formatTime = (seconds: number) => {
@@ -203,27 +208,20 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
     }
   };
 
-  // Evaluation calculations
-  let correctCount = 0;
-  let incorrectCount = 0;
-  let unattemptedCount = 0;
+  // Evaluation computed strictly upon submission
+  const evaluation: ExamEvaluationResult | null = useMemo(() => {
+    if (!examSubmitted) return null;
+    return evaluateExamSubmission(answers, isUnlocked);
+  }, [examSubmitted, answers, isUnlocked]);
 
-  evaluatedQuestions.forEach((q, idx) => {
-    const studentAns = answers[idx];
-    if (studentAns === undefined) {
-      unattemptedCount++;
-    } else if (studentAns === unmaskAnswer(q.correctAnswer)) {
-      correctCount++;
-    } else {
-      incorrectCount++;
-    }
-  });
-
-  const answeredCount = evaluatedQuestions.filter((_, idx) => answers[idx] !== undefined).length;
-  const totalScore = correctCount * 2; // 2 marks each
-  const maxScore = totalQuestions * 2;
-  const accuracy = correctCount + incorrectCount > 0 ? Math.round((correctCount / (correctCount + incorrectCount)) * 100) : 0;
-  const percentile = Math.min(99.4, Math.max(45, Math.round((correctCount / totalQuestions) * 100 * 1.15 * 10) / 10));
+  const correctCount = evaluation?.correctCount || 0;
+  const incorrectCount = evaluation?.incorrectCount || 0;
+  const unattemptedCount = evaluation?.unattemptedCount || 0;
+  const answeredCount = evaluation?.answeredCount || 0;
+  const totalScore = evaluation?.totalScore || 0;
+  const maxScore = evaluation?.maxScore || (totalQuestions * 2);
+  const accuracy = evaluation?.accuracy || 0;
+  const percentile = evaluation?.percentile || 0;
 
   const handleRestart = () => {
     try {
@@ -477,7 +475,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
             <div className="hidden lg:flex lg:w-80 bg-[#FAF7F2] border-l border-deckle p-4 sm:p-5 flex-col justify-between shrink-0">
               <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-wider text-claret font-bold block">
-                  Question Palette ({MOCK_EXAM_QUESTIONS.length} MCQs)
+                  Question Palette ({totalQuestions} MCQs)
                 </span>
 
                 {/* Legend */}
@@ -502,7 +500,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
 
                 {/* Question Buttons Grid */}
                 <div className="grid grid-cols-5 gap-2 max-h-56 overflow-y-auto pr-1">
-                  {MOCK_EXAM_QUESTIONS.map((_, i) => {
+                  {activeQuestions.map((_, i) => {
                     const status = statuses[i] || 'unvisited';
                     const isCurrent = i === currentIdx;
                     const isLocked = !isUnlocked && i >= 3;
@@ -558,7 +556,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                   <div className="w-12 h-1 bg-stone-300 rounded-full mx-auto" />
                   <div className="flex items-center justify-between pb-2 border-b border-deckle">
                     <span className="text-xs font-mono uppercase tracking-wider text-claret font-bold">
-                      Question Palette ({MOCK_EXAM_QUESTIONS.length} MCQs)
+                      Question Palette ({totalQuestions} MCQs)
                     </span>
                     <button
                       onClick={() => setIsMobilePaletteOpen(false)}
@@ -590,7 +588,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
 
                   {/* Buttons Grid */}
                   <div className="grid grid-cols-5 gap-2 max-h-56 overflow-y-auto pr-1">
-                    {MOCK_EXAM_QUESTIONS.map((_, i) => {
+                    {activeQuestions.map((_, i) => {
                       const status = statuses[i] || 'unvisited';
                       const isCurrent = i === currentIdx;
                       const isLocked = !isUnlocked && i >= 3;
@@ -704,9 +702,9 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
               </div>
 
               <div className="space-y-4">
-                {evaluatedQuestions.map((q, idx) => {
-                  const studentAns = answers[idx];
-                  const isCorrect = studentAns === unmaskAnswer(q.correctAnswer);
+                {(evaluation?.detailedQuestions || []).map((q, idx) => {
+                  const studentAns = q.studentAns;
+                  const isCorrect = q.isCorrect;
                   const isAttempted = studentAns !== undefined;
 
                   return (
@@ -727,7 +725,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-sans">
                         {q.options.map((opt, i) => {
-                          const isOptionCorrect = i === unmaskAnswer(q.correctAnswer);
+                          const isOptionCorrect = i === q.correctIdx;
                           const isSelectedByStudent = studentAns === i;
 
                           let badgeStyle = 'bg-white border-deckle text-ink-muted';

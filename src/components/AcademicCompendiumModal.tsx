@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QUALIFICATIONS, ELIGIBILITIES, EXPERIENCES, INVITED_TALKS, CONFERENCE_PAPERS, SESSION_CHAIRS, FDP_TRAININGS } from '../data/professorData';
+import { QUALIFICATIONS, ELIGIBILITIES, INVITED_TALKS, CONFERENCE_PAPERS, SESSION_CHAIRS, FDP_TRAININGS } from '../data/professorData';
 import { X, Award, GraduationCap, Mic, BookOpen, Users, FileText, CheckCircle2 } from 'lucide-react';
 
 interface AcademicCompendiumModalProps {
@@ -108,9 +108,9 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                       {QUALIFICATIONS.map((q, idx) => (
                         <tr key={idx} className="hover:bg-parchment-light">
                           <td className="py-2.5 px-3 font-mono font-bold text-claret">{q.year}</td>
-                          <td className="py-2.5 px-3 font-medium text-ink">{q.qualification}</td>
-                          <td className="py-2.5 px-3">{q.institution}</td>
-                          <td className="py-2.5 px-3 font-mono text-[11px]">{q.details}</td>
+                          <td className="py-2.5 px-3 font-medium text-ink">{q.degree}</td>
+                          <td className="py-2.5 px-3">{q.university}</td>
+                          <td className="py-2.5 px-3 font-mono text-[11px]">{q.details || ''}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -127,11 +127,11 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                   {ELIGIBILITIES.map((el, idx) => (
                     <div key={idx} className="p-3.5 rounded-xl bg-parchment-warm/60 border border-deckle text-xs space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-serif font-medium text-ink text-sm">{el.examination}</span>
+                        <span className="font-serif font-medium text-ink text-sm">{el.exam}</span>
                         <span className="font-mono text-claret font-bold">{el.year}</span>
                       </div>
                       <p className="text-ink-muted">Subject: <strong className="text-ink">{el.subject}</strong></p>
-                      <p className="text-ink-faint text-[11px] font-mono">Conducting Body: {el.body}</p>
+                      <p className="text-ink-faint text-[11px] font-mono">Conducting Body: {el.conductedBy}</p>
                     </div>
                   ))}
                 </div>

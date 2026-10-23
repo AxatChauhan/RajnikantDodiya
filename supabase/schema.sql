@@ -4,12 +4,14 @@
 -- ZERO-VULNERABILITY ROW LEVEL SECURITY (RLS) & STORED PROCEDURES (RPC)
 -- ==============================================================================
 
--- 1. Students Registry
+-- 1. Students Registry (Centralized Multi-Device Credentials)
 CREATE TABLE IF NOT EXISTS public.students (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name TEXT NOT NULL,
     mobile TEXT NOT NULL UNIQUE,
-    email TEXT,
+    email TEXT UNIQUE,
+    password_hash TEXT,
+    role TEXT DEFAULT 'scholar',
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -65,10 +67,11 @@ DROP POLICY IF EXISTS "Allow anon select licenses" ON public.student_licenses;
 DROP POLICY IF EXISTS "Allow anon update licenses" ON public.student_licenses;
 DROP POLICY IF EXISTS "Allow anon all device_sessions" ON public.device_sessions;
 
--- Allow anonymous callers to strictly query ONLY their own mobile number session
-CREATE POLICY "Allow anon scoped device session check" ON public.device_sessions
-    FOR SELECT TO anon
-    USING (true);
+-- Strictly deny unrestricted wildcard SELECT on device_sessions to prevent PII harvesting
+-- Token verification and license checks are routed exclusively through secure stored procedures:
+-- 1. verify_device_token(p_mobile, p_device_token)
+-- 2. restore_scholar_licenses(p_mobile)
+DROP POLICY IF EXISTS "Allow anon scoped device session check" ON public.device_sessions;
 
 -- Allow anonymous callers to insert verified orders through stored procedures or scoped insert
 CREATE POLICY "Allow anon insert orders" ON public.orders
@@ -225,3 +228,91 @@ BEGIN
     );
 END;
 $$;
+
+-- 4. Centralized Multi-Device Scholar Registration RPC
+CREATE OR REPLACE FUNCTION public.register_scholar_credential(
+    p_email TEXT,
+    p_full_name TEXT,
+    p_mobile TEXT,
+    p_password_hash TEXT,
+    p_role TEXT DEFAULT 'scholar'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_clean_email TEXT;
+    v_clean_mobile TEXT;
+BEGIN
+    v_clean_email := lower(trim(p_email));
+    v_clean_mobile := regexp_replace(p_mobile, '\D', '', 'g');
+    v_clean_mobile := right(v_clean_mobile, 10);
+
+    IF length(v_clean_email) < 5 OR position('@' in v_clean_email) = 0 THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Invalid email address.');
+    END IF;
+
+    IF length(v_clean_mobile) <> 10 THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Invalid 10-digit mobile number.');
+    END IF;
+
+    -- Upsert student record
+    INSERT INTO public.students (
+        full_name, mobile, email, password_hash, role
+    ) VALUES (
+        p_full_name, v_clean_mobile, v_clean_email, p_password_hash, p_role
+    )
+    ON CONFLICT (mobile) DO UPDATE SET
+        full_name = EXCLUDED.full_name,
+        email = EXCLUDED.email,
+        password_hash = EXCLUDED.password_hash,
+        role = EXCLUDED.role;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'email', v_clean_email,
+        'mobile', v_clean_mobile,
+        'role', p_role
+    );
+END;
+$$;
+
+-- 5. Centralized Multi-Device Scholar Authentication RPC
+CREATE OR REPLACE FUNCTION public.authenticate_scholar_credential(
+    p_email TEXT,
+    p_password_hash TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_clean_email TEXT;
+    v_student RECORD;
+BEGIN
+    v_clean_email := lower(trim(p_email));
+
+    SELECT full_name, mobile, email, password_hash, role
+    INTO v_student
+    FROM public.students
+    WHERE lower(email) = v_clean_email;
+
+    IF v_student IS NULL THEN
+        RETURN jsonb_build_object('success', false, 'error', 'No scholar account found with this email. Please create a pass below.');
+    END IF;
+
+    IF v_student.password_hash IS NULL OR v_student.password_hash <> p_password_hash THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Invalid email or password.');
+    END IF;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'name', v_student.full_name,
+        'mobile', v_student.mobile,
+        'email', v_student.email,
+        'role', coalesce(v_student.role, 'scholar')
+    );
+END;
+$$;
+

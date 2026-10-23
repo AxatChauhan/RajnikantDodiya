@@ -2,15 +2,18 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar, MainTab } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { useScholarSession } from './hooks/useScholarSession';
-import { PROFESSOR_INFO } from './data/professorData';
-import { Feather, ExternalLink, Archive } from 'lucide-react';
+import { PROFESSOR_INFO, SOCIAL_LINKS } from './data/professorData';
+import { Feather, ExternalLink, Archive, Download, UserCheck } from 'lucide-react';
 import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary';
+import { handleGoogleAuthRedirect } from './lib/googleAuth';
 
-// Lazily loaded tab views (Optimized for instant Initial Paint)
+// Lazily loaded 8 main tab views (Optimized for instant Initial Paint)
+const AboutPage = lazy(() => import('./components/AboutPage').then(m => ({ default: m.AboutPage })));
 const ResearchPage = lazy(() => import('./components/ResearchPage').then(m => ({ default: m.ResearchPage })));
-const LiterarySalonPage = lazy(() => import('./components/LiterarySalonPage').then(m => ({ default: m.LiterarySalonPage })));
-const LibraryStorePage = lazy(() => import('./components/library-store/LibraryStorePage').then(m => ({ default: m.LibraryStorePage })));
-const LeadershipPage = lazy(() => import('./components/LeadershipPage').then(m => ({ default: m.LeadershipPage })));
+const PublicationsPage = lazy(() => import('./components/PublicationsPage').then(m => ({ default: m.PublicationsPage })));
+const TalksEventsPage = lazy(() => import('./components/TalksEventsPage').then(m => ({ default: m.TalksEventsPage })));
+const CommunitiesPage = lazy(() => import('./components/CommunitiesPage').then(m => ({ default: m.CommunitiesPage })));
+const LearnPage = lazy(() => import('./components/LearnPage').then(m => ({ default: m.LearnPage })));
 const ContactPage = lazy(() => import('./components/ContactPage').then(m => ({ default: m.ContactPage })));
 
 // Lazily loaded standalone modals (Loaded on demand only when opened)
@@ -27,9 +30,9 @@ const AcademicLoadingFallback: React.FC = () => (
     </div>
     <div className="space-y-1">
       <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
-        Sardar Patel University Repository
+        HMPIETR • Sardar Patel University
       </span>
-      <p className="font-serif text-base text-ink">Retrieving Academic Folio...</p>
+      <p className="font-serif text-base text-ink">Loading Academic Profile...</p>
     </div>
   </div>
 );
@@ -51,14 +54,19 @@ export function App() {
   };
 
   useEffect(() => {
-    const tabTitles: Record<string, string> = {
+    handleGoogleAuthRedirect();
+  }, []);
+
+  useEffect(() => {
+    const tabTitles: Record<MainTab, string> = {
       home: `${PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`,
-      research: `Research & Books | ${PROFESSOR_INFO.name}`,
-      salon: `The Literary Salon | ${PROFESSOR_INFO.name}`,
-      store: `The Atheneum | Academic Acquisitions | ${PROFESSOR_INFO.name}`,
-      leadership: `Academic Leadership | ${PROFESSOR_INFO.name}`,
-      contact: `Dialogue & Contact | ${PROFESSOR_INFO.name}`,
-      about: `About | ${PROFESSOR_INFO.name}`
+      about: `About Dr. Rajnikant Dodiya | ${PROFESSOR_INFO.name}`,
+      research: `Research | ${PROFESSOR_INFO.name}`,
+      publications: `Publications & Books | ${PROFESSOR_INFO.name}`,
+      talks: `Talks & Events | ${PROFESSOR_INFO.name}`,
+      communities: `Communities & Initiatives | ${PROFESSOR_INFO.name}`,
+      learn: `Learn & Study Hub | ${PROFESSOR_INFO.name}`,
+      contact: `Contact & Collaboration | ${PROFESSOR_INFO.name}`
     };
     document.title = tabTitles[activeTab] || `${PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`;
   }, [activeTab]);
@@ -77,7 +85,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-[#FAF9F5] text-ink font-sans relative selection:bg-claret selection:text-white pb-24 lg:pb-20">
       
-      {/* Navigation Bar */}
+      {/* 8-Tab Navigation Bar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleNavigate}
@@ -95,34 +103,51 @@ export function App() {
                 onOpenCompendium={() => setIsCompendiumOpen(true)}
               />
             )}
+            {activeTab === 'about' && (
+              <AboutPage
+                subSection={activeSubSection}
+                onOpenCompendium={() => setIsCompendiumOpen(true)}
+              />
+            )}
             {activeTab === 'research' && (
               <ResearchPage
-                onOpenCompendium={() => setIsCompendiumOpen(true)}
+                subSection={activeSubSection}
                 onNavigate={handleNavigate}
               />
             )}
-            {activeTab === 'salon' && <LiterarySalonPage />}
-            {activeTab === 'store' && (
-              <LibraryStorePage onOpenAuthModal={() => setIsAuthModalOpen(true)} />
-            )}
-            {activeTab === 'leadership' && (
-              <LeadershipPage
-                onOpenCompendium={() => setIsCompendiumOpen(true)}
-              />
-            )}
-            {activeTab === 'contact' && <ContactPage />}
-            {activeTab === 'about' && (
-              <HomePage
-                initialView="cv"
+            {activeTab === 'publications' && (
+              <PublicationsPage
+                subSection={activeSubSection}
                 onNavigate={handleNavigate}
-                onOpenCompendium={() => setIsCompendiumOpen(true)}
               />
+            )}
+            {activeTab === 'talks' && (
+              <TalksEventsPage
+                subSection={activeSubSection}
+                onNavigate={handleNavigate}
+              />
+            )}
+            {activeTab === 'communities' && (
+              <CommunitiesPage
+                subSection={activeSubSection}
+                onNavigate={handleNavigate}
+              />
+            )}
+            {activeTab === 'learn' && (
+              <LearnPage
+                subSection={activeSubSection}
+                onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                onNavigate={handleNavigate}
+              />
+            )}
+            {activeTab === 'contact' && (
+              <ContactPage subSection={activeSubSection} />
             )}
           </Suspense>
         </AcademicErrorBoundary>
       </main>
 
-      {/* Global Academic Compendium & Accreditation Modal */}
+      {/* Global Academic Profile & CV Modal */}
       {isCompendiumOpen && (
         <Suspense fallback={null}>
           <AcademicCompendiumModal
@@ -132,7 +157,7 @@ export function App() {
         </Suspense>
       )}
 
-      {/* Global Scholar Sign-In & Single-Device Transfer Modal */}
+      {/* Global Student Sign-In & Single-Device Pass Modal */}
       {isAuthModalOpen && (
         <Suspense fallback={null}>
           <ScholarAuthModal
@@ -158,7 +183,7 @@ export function App() {
         </Suspense>
       )}
 
-      {/* Global Protected Reader Modal (when accessed via Scholar Sign-In or Direct Launch) */}
+      {/* Global Protected Reader Modal */}
       {(isBookOwned || isComplimentaryOwned) && isReaderOpen && (
         <Suspense fallback={null}>
           <ProtectedReaderModal
@@ -172,7 +197,7 @@ export function App() {
         </Suspense>
       )}
 
-      {/* Global UGC-NET CBT Exam Portal (when accessed via Scholar Sign-In or Direct Launch) */}
+      {/* Global UGC-NET CBT Exam Portal */}
       {isExamOwned && isExamOpen && (
         <Suspense fallback={null}>
           <ExamPortal
@@ -185,7 +210,7 @@ export function App() {
         </Suspense>
       )}
 
-      {/* Global Bookish Footer */}
+      {/* Academic Footer */}
       <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-20 sm:mt-28 pt-8 border-t border-deckle space-y-4 text-xs text-ink-muted">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
@@ -196,15 +221,36 @@ export function App() {
 
           {/* Social / Research Profile Links */}
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-[11px] font-mono text-ink-muted">
-            <a href={`https://orcid.org/${PROFESSOR_INFO.researchProfiles.orcid}`} target="_blank" rel="noreferrer" className="hover:text-claret underline flex items-center gap-1">
+            <a
+              href={`https://orcid.org/${PROFESSOR_INFO.researchProfiles.orcid}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-claret underline flex items-center gap-1"
+            >
               ORCID <ExternalLink className="w-3 h-3" />
             </a>
-            <a href={`https://scholar.google.com/citations?user=${PROFESSOR_INFO.researchProfiles.googleScholar}`} target="_blank" rel="noreferrer" className="hover:text-claret underline flex items-center gap-1">
+            <a
+              href={`https://scholar.google.com/citations?user=${PROFESSOR_INFO.researchProfiles.googleScholar}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-claret underline flex items-center gap-1"
+            >
               Google Scholar <ExternalLink className="w-3 h-3" />
             </a>
-            <button onClick={() => setIsCompendiumOpen(true)} className="hover:text-claret font-sans font-medium text-claret flex items-center gap-1">
-              <Archive className="w-3 h-3" />
-              <span>Accreditation Record</span>
+            <a
+              href={`https://vidwan.inflibnet.ac.in/profile/${PROFESSOR_INFO.researchProfiles.vidwan}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-claret underline flex items-center gap-1"
+            >
+              Vidwan <ExternalLink className="w-3 h-3" />
+            </a>
+            <button
+              onClick={() => setIsCompendiumOpen(true)}
+              className="hover:text-claret font-sans font-medium text-claret flex items-center gap-1"
+            >
+              <Download className="w-3 h-3" />
+              <span>Download CV</span>
             </button>
           </div>
         </div>

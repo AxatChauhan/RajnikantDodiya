@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useScholarSession, ScholarSession } from '../../hooks/useScholarSession';
-import { loginAndTransferDevice, registerComplimentaryScholar } from '../../lib/supabase';
-import { setupRecaptchaVerifier, sendSmsOtp, confirmSmsOtp } from '../../lib/firebase';
-import { validateIndianMobile } from '../../lib/security';
-import { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
+import React, { useState } from 'react';
+import { useScholarSession } from '../../hooks/useScholarSession';
+import { signInScholar, signUpScholar, signOutScholar } from '../../lib/credentialAuth';
+import { detectDeviceType, getDeviceDescription } from '../../lib/deviceSecurity';
 import {
   X,
   ShieldCheck,
@@ -11,16 +9,20 @@ import {
   BookOpen,
   Laptop,
   CheckCircle2,
-  Lock,
   ArrowRight,
   LogOut,
   Sparkles,
   AlertCircle,
   Loader2,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  User,
+  Phone,
+  Shield,
   KeyRound,
-  RotateCcw,
-  Check,
-  Gift
+  UserPlus
 } from 'lucide-react';
 
 interface ScholarAuthModalProps {
@@ -30,652 +32,544 @@ interface ScholarAuthModalProps {
   onOpenExam?: () => void;
 }
 
-type AuthTab = 'complimentary' | 'restore';
-type OtpStep = 'input_details' | 'verify_otp';
-
 export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
   isOpen,
   onClose,
   onOpenReader,
   onOpenExam
 }) => {
-  const { session, saveSession, clearSession, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
+  const { session, saveSession, clearSession, isExamOwned } = useScholarSession();
 
-  // Active Tab: 'complimentary' (default) or 'restore'
-  const [activeTab, setActiveTab] = useState<AuthTab>('complimentary');
+  // Mode: 'signin' | 'signup'
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
-  // Complimentary Flow State
-  const [nameInput, setNameInput] = useState('');
-  const [mobileInput, setMobileInput] = useState('');
-  const [otpInput, setOtpInput] = useState('');
-  const [otpStep, setOtpStep] = useState<OtpStep>('input_details');
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | undefined>(undefined);
-  const [isSimulated, setIsSimulated] = useState<boolean>(false);
-
-  // Restore Flow State
-  const [restoreMobileInput, setRestoreMobileInput] = useState('');
+  // Form Fields
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Status & Feedback
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Resend Countdown Timer
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
-
-  // Countdown timer effect
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setInterval(() => {
-      setResendCooldown((prev) => Math.max(0, prev - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
-
-  // Clean up reCAPTCHA verifier on modal unmount
-  useEffect(() => {
-    if (!isOpen) {
-      setOtpStep('input_details');
-      setOtpInput('');
-      setErrorMessage(null);
-      setSuccessMessage(null);
-      if (recaptchaVerifierRef.current) {
-        try {
-          recaptchaVerifierRef.current.clear();
-        } catch {
-          // ignore
-        }
-        recaptchaVerifierRef.current = null;
-      }
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
-  const isLoggedIn = session.unlockedItems && session.unlockedItems.length > 0 && Boolean(session.mobile);
+  const isLoggedIn = Boolean(session.email || session.mobile) && session.unlockedItems.length > 0;
+  const currentDeviceType = detectDeviceType();
 
   // -------------------------------------------------------------
-  // HANDLER 1: Send SMS OTP for Complimentary Scholar Registration
+  // HANDLER: Sign In
   // -------------------------------------------------------------
-  const handleRequestOtp = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const cleanName = nameInput.trim();
-    if (!cleanName || cleanName.length < 2) {
-      setErrorMessage('Please enter your full name (at least 2 letters) for your Scholar Pass.');
-      return;
-    }
-
-    const mobileCheck = validateIndianMobile(mobileInput);
-    if (!mobileCheck.isValid) {
-      setErrorMessage(mobileCheck.error || 'Please enter a valid 10-digit Indian mobile number.');
-      return;
-    }
-
     setIsSubmitting(true);
-
-    try {
-      // Initialize or get reCAPTCHA verifier
-      if (!recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current = setupRecaptchaVerifier('scholar-recaptcha-container');
-      }
-
-      const res = await sendSmsOtp(mobileCheck.cleanMobile, recaptchaVerifierRef.current);
-      setIsSubmitting(false);
-
-      if (res.success) {
-        setConfirmationResult(res.confirmationResult);
-        setIsSimulated(Boolean(res.isSimulated));
-        setOtpStep('verify_otp');
-        setResendCooldown(45);
-        if (res.isSimulated) {
-          setSuccessMessage('Dev Notice: Test OTP is active. Use 123456 to verify immediately.');
-        } else {
-          setSuccessMessage(`6-digit SMS verification code dispatched to +91 ${mobileCheck.cleanMobile}.`);
-        }
-      } else {
-        setErrorMessage(res.error || 'Failed to send verification code. Please check your number.');
-      }
-    } catch (err: any) {
-      setIsSubmitting(false);
-      setErrorMessage(err?.message || 'Verification service error. Please try again.');
-    }
-  };
-
-  // -------------------------------------------------------------
-  // HANDLER 2: Confirm OTP & Issue Complimentary Scholar Pass
-  // -------------------------------------------------------------
-  const handleConfirmOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    setSuccessMessage(null);
-
-    const cleanOtp = otpInput.trim().replace(/\D/g, '');
-    if (cleanOtp.length !== 6) {
-      setErrorMessage('Please enter the complete 6-digit SMS code.');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // 1. Verify OTP with Firebase
-      const verifyRes = await confirmSmsOtp(confirmationResult, cleanOtp, isSimulated);
-      if (!verifyRes.success) {
-        setIsSubmitting(false);
-        setErrorMessage(verifyRes.error || 'Incorrect verification code. Please check your SMS.');
-        return;
-      }
-
-      // 2. Firebase verification passed! Register complimentary pass in our database
-      const cleanMobile = mobileInput.trim().replace(/\D/g, '').slice(-10);
-      const regRes = await registerComplimentaryScholar(nameInput.trim(), cleanMobile);
-
-      setIsSubmitting(false);
-
-      if (regRes.success) {
-        const newSession: ScholarSession = {
-          name: nameInput.trim(),
-          mobile: cleanMobile,
-          orderId: regRes.orderId || `FREE-COMP-${Date.now().toString().slice(-6)}`,
-          unlockedItems: regRes.unlockedItems || ['complimentary_book', 'book'],
-          deviceToken: regRes.deviceToken
-        };
-
-        saveSession(newSession);
-        setSuccessMessage('Phone verified! Your Complimentary Scholar Pass is active on this device.');
-      } else {
-        setErrorMessage(regRes.error || 'Failed to initialize session. Please try again.');
-      }
-    } catch (err: any) {
-      setIsSubmitting(false);
-      setErrorMessage(err?.message || 'Verification process failed.');
-    }
-  };
-
-  // -------------------------------------------------------------
-  // HANDLER 3: Restore Paid Purchases (Existing Candidates)
-  // -------------------------------------------------------------
-  const handleRestorePaid = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    setSuccessMessage(null);
-
-    const mobileCheck = validateIndianMobile(restoreMobileInput);
-    if (!mobileCheck.isValid) {
-      setErrorMessage(mobileCheck.error || 'Please enter a valid 10-digit Indian mobile number.');
-      return;
-    }
-
-    const cleanMobile = mobileCheck.cleanMobile;
-    setIsSubmitting(true);
-    const result = await loginAndTransferDevice(cleanMobile);
+    const result = await signInScholar({ email, password });
     setIsSubmitting(false);
 
-    if (result.success && result.unlockedItems && result.unlockedItems.length > 0) {
-      const newSession: ScholarSession = {
-        name: result.name || 'Scholar',
-        mobile: cleanMobile,
-        orderId: result.orderId || `HMP-${Date.now().toString().slice(-6)}`,
-        unlockedItems: result.unlockedItems,
-        deviceToken: result.deviceToken
-      };
-
-      saveSession(newSession);
-      setSuccessMessage('1-Device License transferred! Your holdings are active on this device.');
-      setRestoreMobileInput('');
+    if (result.success && result.session) {
+      saveSession(result.session);
+      setSuccessMessage(result.message || 'Signed in successfully! 2-Device Pass is active.');
+      setPassword('');
     } else {
-      setErrorMessage(
-        result.error || `No active holdings found for +91 ${cleanMobile}. Claim a Free Pass or purchase at the desk.`
-      );
+      setErrorMessage(result.error || 'Invalid credentials. Please verify your email and password.');
     }
   };
 
-  const handleSignOut = () => {
+  // -------------------------------------------------------------
+  // HANDLER: Sign Up (Create Pass)
+  // -------------------------------------------------------------
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    setIsSubmitting(true);
+    const result = await signUpScholar({
+      name,
+      email,
+      phone,
+      password
+    });
+    setIsSubmitting(false);
+
+    if (result.success && result.session) {
+      saveSession(result.session);
+      setSuccessMessage(result.message || 'Pass created successfully! Active on this device.');
+      setPassword('');
+    } else {
+      setErrorMessage(result.error || 'Failed to create pass. Please verify your details.');
+    }
+  };
+
+  // -------------------------------------------------------------
+  // HANDLER: Sign Out
+  // -------------------------------------------------------------
+  const handleSignOut = async () => {
+    await signOutScholar();
     clearSession();
     setSuccessMessage(null);
     setErrorMessage(null);
-    setOtpStep('input_details');
-    setOtpInput('');
+    setEmail('');
+    setPassword('');
+    setName('');
+    setPhone('');
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/70 backdrop-blur-xs animate-fade-in">
       <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-book-xl border border-deckle relative overflow-hidden">
         
-        {/* Invisible Firebase reCAPTCHA Container */}
-        <div id="scholar-recaptcha-container" />
-
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center z-20"
+          className="absolute top-4 right-4 p-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors z-10"
+          aria-label="Close modal"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
+        {/* ========================================================= */}
+        {/* VIEW A: LOGGED-IN SCHOLAR / AUTHOR DASHBOARD              */}
+        {/* ========================================================= */}
         {isLoggedIn ? (
-          /* ========================================================= */
-          /* LOGGED IN: ACTIVE SCHOLAR HOLDINGS VIEW                   */
-          /* ========================================================= */
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fade-in">
+            {/* Header Badge */}
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-claret text-white flex items-center justify-center shadow-xs">
-                <ShieldCheck className="w-6 h-6 text-brass" />
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold font-serif shadow-sm overflow-hidden shrink-0 ${
+                session.role === 'author' ? 'bg-brass text-white' : 'bg-claret text-white'
+              }`}>
+                {session.role === 'author' ? (
+                  <Shield className="w-6 h-6 text-amber-200" />
+                ) : (
+                  <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                )}
               </div>
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-semibold block">
-                  Active Scholar Pass
+              <div className="flex-1 min-w-0">
+                <span className={`text-[10px] font-mono uppercase tracking-widest font-bold flex items-center gap-1 ${
+                  session.role === 'author' ? 'text-brass-dark' : 'text-emerald-700'
+                }`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  {session.role === 'author' ? 'Site Owner & Author Pass' : 'Active 2-Device Scholar Pass'}
                 </span>
-                <h3 className="font-serif text-2xl text-ink font-normal leading-tight">
+                <h3 className="font-serif text-xl sm:text-2xl text-ink font-normal truncate">
                   {session.name}
                 </h3>
-              </div>
-            </div>
-
-            {successMessage && (
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2 animate-fade-in">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{successMessage}</span>
-              </div>
-            )}
-
-            {/* Pass Metadata */}
-            <div className="p-4 rounded-xl bg-parchment-warm/70 border border-deckle space-y-2 text-xs">
-              <div className="flex justify-between items-center">
-                <span className="text-ink-muted font-reading">Verified WhatsApp Mobile:</span>
-                <span className="font-mono text-ink font-semibold flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  +91 {session.mobile}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-ink-muted font-reading">Accession ID:</span>
-                <span className="font-mono text-ink font-semibold">#{session.orderId}</span>
-              </div>
-              <div className="flex justify-between items-center pt-1 border-t border-deckle/60">
-                <span className="text-ink-muted font-reading">Device License:</span>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                  <span>1-Device Active Here</span>
+                <span className="text-xs font-mono text-ink-muted truncate block">
+                  {session.email} • +91 {session.mobile}
                 </span>
               </div>
             </div>
 
-            {/* Holdings & Direct Launchers */}
-            <div className="space-y-3">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-ink-muted font-bold block">
-                Your Academic Holdings:
-              </span>
-
-              {/* Complimentary Reading Room Holding */}
-              <div className="p-4 rounded-xl border border-deckle bg-white shadow-2xs flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200">
-                    <BookOpen className="w-4 h-4 text-emerald-700" />
-                  </div>
-                  <div>
-                    <h5 className="font-serif text-sm font-medium text-ink leading-tight">
-                      Complimentary Reading Room (Treatise)
-                    </h5>
-                    <span className="text-[10px] font-mono text-emerald-700 font-bold block mt-0.5">
-                      ✓ Free Scholar Pass Active
-                    </span>
-                  </div>
-                </div>
-
-                {onOpenReader && (
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onOpenReader();
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center gap-1 shrink-0 min-h-[36px]"
-                  >
-                    <span>Read Book</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
+            {/* 2-Device Policy Status Card */}
+            <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-deckle space-y-3">
+              <div className="flex items-center justify-between border-b border-deckle pb-2">
+                <span className="text-xs font-mono uppercase tracking-wider text-claret font-bold">
+                  Authorized Devices (2-Device Policy)
+                </span>
+                <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">
+                  1 Phone + 1 Laptop
+                </span>
               </div>
 
-              {/* CBT Exam Holding */}
-              <div className="p-4 rounded-xl border border-deckle bg-white shadow-2xs flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-claret-soft text-claret flex items-center justify-center shrink-0">
-                    <Laptop className="w-4 h-4" />
+              <div className="grid grid-cols-2 gap-2.5 text-xs font-mono">
+                {/* Phone Slot */}
+                <div className={`p-3 rounded-xl border flex flex-col justify-between ${
+                  currentDeviceType === 'phone'
+                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 font-medium'
+                    : 'bg-white border-deckle text-ink-muted'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <Smartphone className="w-4 h-4 text-claret" />
+                    <span className="text-[10px] font-bold">
+                      {currentDeviceType === 'phone' ? 'THIS DEVICE' : 'AUTHORIZED'}
+                    </span>
                   </div>
                   <div>
-                    <h5 className="font-serif text-sm font-medium text-ink leading-tight">
-                      UGC-NET Paper I CBT Simulator
-                    </h5>
-                    <span className="text-[10px] font-mono text-ink-muted block mt-0.5">
-                      {isExamOwned ? (
-                        <span className="text-emerald-700 font-bold">✓ Enrolled Candidate</span>
-                      ) : (
-                        <span>Candidate License (₹299)</span>
-                      )}
+                    <span className="font-sans font-bold block text-ink text-xs">Mobile Phone</span>
+                    <span className="text-[10px] text-ink-faint">
+                      {currentDeviceType === 'phone' ? getDeviceDescription() : 'Phone Slot Active'}
                     </span>
                   </div>
                 </div>
 
-                {isExamOwned && onOpenExam ? (
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onOpenExam();
-                    }}
-                    className="px-3 py-1.5 rounded-lg bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center gap-1 shrink-0 min-h-[36px]"
-                  >
-                    <span>Launch CBT</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <span className="text-[10px] font-mono text-ink-faint px-2 py-1 rounded bg-parchment-warm border border-deckle">
-                    Not Enrolled
-                  </span>
-                )}
+                {/* Laptop Slot */}
+                <div className={`p-3 rounded-xl border flex flex-col justify-between ${
+                  currentDeviceType === 'laptop'
+                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 font-medium'
+                    : 'bg-white border-deckle text-ink-muted'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <Laptop className="w-4 h-4 text-claret" />
+                    <span className="text-[10px] font-bold">
+                      {currentDeviceType === 'laptop' ? 'THIS DEVICE' : 'AUTHORIZED'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-sans font-bold block text-ink text-xs">Laptop / PC</span>
+                    <span className="text-[10px] text-ink-faint">
+                      {currentDeviceType === 'laptop' ? getDeviceDescription() : 'Laptop Slot Active'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-ink-muted font-reading leading-relaxed">
+                You can access your monograph and CBT test simulations simultaneously on both your mobile phone and laptop.
+              </p>
+            </div>
+
+            {/* Unlocked Study Assets */}
+            <div className="space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-ink-faint font-semibold block">
+                Your Academic Holdings & Entitlements:
+              </span>
+              <div className="space-y-2">
+                {/* Monograph Entry */}
+                <div className="p-3.5 rounded-xl bg-parchment-warm border border-deckle flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <BookOpen className="w-4 h-4 text-claret shrink-0" />
+                    <div>
+                      <strong className="font-serif text-ink text-sm block">Techno-Pedagogical English Monograph</strong>
+                      <span className="text-ink-faint text-[11px]">Peer-Reviewed Edition • Watermarked Reader</span>
+                    </div>
+                  </div>
+                  {onOpenReader && (
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onOpenReader();
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-claret text-white font-medium text-xs hover:bg-claret-light transition-all shadow-xs shrink-0 flex items-center gap-1"
+                    >
+                      <span>Read</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* CBT Exam Engine Entry */}
+                <div className="p-3.5 rounded-xl bg-parchment-warm border border-deckle flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-brass-dark shrink-0" />
+                    <div>
+                      <strong className="font-serif text-ink text-sm block">UGC-NET & GSET CBT Simulation</strong>
+                      <span className="text-ink-faint text-[11px]">
+                        {isExamOwned || session.role === 'author'
+                          ? 'Full 25-Question Licensed Edition'
+                          : 'Free 3-Question Diagnostic Preview'}
+                      </span>
+                    </div>
+                  </div>
+                  {onOpenExam && (
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onOpenExam();
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-deckle text-claret font-medium text-xs hover:bg-claret-soft transition-all shadow-2xs shrink-0 flex items-center gap-1"
+                    >
+                      <span>Open Exam</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Actions: Sign Out */}
-            <div className="pt-2 border-t border-deckle flex items-center justify-between">
-              <span className="text-[11px] font-reading text-ink-faint">
-                Need to release this device?
-              </span>
+            {/* Sign Out Button */}
+            <div className="pt-2 border-t border-deckle flex items-center justify-between text-xs font-mono">
+              <span className="text-ink-faint">Order #{session.orderId}</span>
               <button
                 onClick={handleSignOut}
-                className="px-3 py-1.5 rounded-lg bg-parchment-warm hover:bg-parchment-deep text-xs font-mono text-ink-muted hover:text-ink transition-all flex items-center gap-1.5 min-h-[36px]"
+                className="px-3 py-1.5 rounded-lg text-rose-700 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors flex items-center gap-1.5"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out of Device</span>
+                <span>Sign Out</span>
               </button>
             </div>
           </div>
         ) : (
           /* ========================================================= */
-          /* NOT LOGGED IN: TABS (COMPLIMENTARY PASS vs RESTORE PAID)  */
+          /* VIEW B: CREDENTIAL SIGN-IN & PASS CREATION               */
           /* ========================================================= */
-          <div className="space-y-5">
-            {/* Tab Selector */}
-            <div className="flex rounded-xl bg-parchment-warm p-1 border border-deckle gap-1 text-xs font-sans">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('complimentary');
-                  setErrorMessage(null);
-                  setSuccessMessage(null);
-                }}
-                className={`flex-1 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
-                  activeTab === 'complimentary'
-                    ? 'bg-claret text-white shadow-2xs font-semibold'
-                    : 'text-ink-muted hover:text-ink'
-                }`}
-              >
-                <Gift className="w-3.5 h-3.5" />
-                <span>Free Scholar Pass</span>
-              </button>
+          <div className="space-y-4 animate-fade-in">
+            {/* Modal Title */}
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-claret mb-1">
+                <ShieldCheck className="w-4 h-4" />
+                <span>The Atheneum • Scholar Access</span>
+              </div>
+              <h3 className="font-serif text-2xl sm:text-3xl text-ink font-normal">
+                {authMode === 'signin' ? 'Scholar Sign-In' : 'Create Scholar Pass'}
+              </h3>
+              <p className="text-xs text-ink-muted font-reading leading-relaxed mt-0.5">
+                Every pass includes <strong>2 active devices: 1 Mobile Phone + 1 Laptop</strong> simultaneously.
+              </p>
+            </div>
 
+            {/* Tab Switcher */}
+            <div className="grid grid-cols-2 p-1 rounded-xl bg-parchment-warm text-xs font-mono border border-deckle">
               <button
                 type="button"
                 onClick={() => {
-                  setActiveTab('restore');
+                  setAuthMode('signin');
                   setErrorMessage(null);
                   setSuccessMessage(null);
                 }}
-                className={`flex-1 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
-                  activeTab === 'restore'
-                    ? 'bg-claret text-white shadow-2xs font-semibold'
+                className={`py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
+                  authMode === 'signin'
+                    ? 'bg-claret text-white shadow-xs font-bold'
                     : 'text-ink-muted hover:text-ink'
                 }`}
               >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span>Restore Paid Purchases</span>
+                <KeyRound className="w-3.5 h-3.5 shrink-0" />
+                <span>Sign In</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('signup');
+                  setErrorMessage(null);
+                  setSuccessMessage(null);
+                }}
+                className={`py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
+                  authMode === 'signup'
+                    ? 'bg-claret text-white shadow-xs font-bold'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                <UserPlus className="w-3.5 h-3.5 shrink-0" />
+                <span>Create Pass</span>
               </button>
             </div>
 
-            {/* Error Message Toast */}
+            {/* Error Message */}
             {errorMessage && (
-              <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-start gap-2 animate-fade-in">
-                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-2 animate-fade-in">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">{errorMessage}</p>
               </div>
             )}
 
-            {/* Success Message Toast */}
+            {/* Success Message */}
             {successMessage && (
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-start gap-2 animate-fade-in">
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-start gap-2 animate-fade-in">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">{successMessage}</p>
               </div>
             )}
 
-            {activeTab === 'complimentary' ? (
-              /* ===================================================== */
-              /* TAB 1: FREE SCHOLAR PASS (FIREBASE SMS OTP)           */
-              /* ===================================================== */
-              <div className="space-y-4">
+            {/* ------------------------------------------------------- */}
+            {/* FORM 1: SIGN IN (EMAIL + PASSWORD)                      */}
+            {/* ------------------------------------------------------- */}
+            {authMode === 'signin' && (
+              <form onSubmit={handleSignIn} className="space-y-3 pt-1 animate-fade-in">
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold block">
-                    Complimentary Accession
-                  </span>
-                  <h3 className="font-serif text-2xl text-ink font-normal mt-0.5">
-                    Claim Free Scholar Reading Pass
-                  </h3>
-                  <p className="text-xs text-ink-muted font-reading leading-relaxed mt-1">
-                    Enter your name and mobile number. A 6-digit SMS verification code will be dispatched to confirm your single-device pass.
-                  </p>
+                  <label className="text-xs font-mono text-ink-faint block mb-1">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      placeholder="you@gmail.com or university email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[44px]"
+                    />
+                    <Mail className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
 
-                {otpStep === 'input_details' ? (
-                  /* STEP 1: Enter Name & Mobile */
-                  <form onSubmit={handleRequestOtp} className="space-y-3.5">
-                    <div>
-                      <label className="text-xs font-medium text-ink block mb-1">
-                        Your Full Name (For Personalized Scholar Watermark) *
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="e.g. Arjun Patel"
-                        value={nameInput}
-                        onChange={(e) => setNameInput(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-parchment-warm/60 border border-deckle text-ink text-sm font-reading placeholder-ink-faint focus:outline-none focus:border-claret min-h-[44px]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-medium text-ink block mb-1">
-                        Your WhatsApp Mobile Number (For SMS OTP) *
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-xs font-mono text-ink-muted">
-                          +91
-                        </div>
-                        <input
-                          required
-                          type="tel"
-                          maxLength={10}
-                          placeholder="9876543210"
-                          value={mobileInput}
-                          onChange={(e) => setMobileInput(e.target.value.replace(/\D/g, ''))}
-                          className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-parchment-warm/60 border border-deckle text-ink text-sm font-mono placeholder-ink-faint focus:outline-none focus:border-claret min-h-[44px]"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-parchment-warm/60 border border-deckle text-[11px] text-ink-muted space-y-1">
-                      <div className="flex items-center gap-1.5 font-medium text-ink">
-                        <ShieldCheck className="w-3.5 h-3.5 text-claret" />
-                        <span>Genuine Scholar Protection</span>
-                      </div>
-                      <p className="leading-relaxed">
-                        We send a 6-digit SMS code to verify genuine phone ownership. No random numbers or spam allowed.
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !nameInput.trim() || mobileInput.length !== 10}
-                      className="w-full py-3 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50 text-white text-xs font-medium shadow-xs flex items-center justify-center gap-2 transition-all min-h-[44px]"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Dispatching 6-Digit SMS OTP...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Smartphone className="w-4 h-4" />
-                          <span>Send 6-Digit SMS Verification Code</span>
-                        </>
-                      )}
-                    </button>
-                  </form>
-                ) : (
-                  /* STEP 2: Enter 6-Digit SMS OTP */
-                  <form onSubmit={handleConfirmOtp} className="space-y-4 animate-fade-in">
-                    <div className="p-3.5 rounded-xl bg-parchment-warm/80 border border-deckle text-xs text-ink flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] font-mono text-ink-muted block uppercase">Code sent to</span>
-                        <span className="font-mono font-bold text-ink">+91 {mobileInput}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOtpStep('input_details');
-                          setOtpInput('');
-                          setErrorMessage(null);
-                        }}
-                        className="text-xs font-mono text-claret hover:underline"
-                      >
-                        Change Number
-                      </button>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-medium text-ink block mb-1">
-                        Enter the 6-Digit SMS Code *
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        autoFocus
-                        maxLength={6}
-                        placeholder="••••••"
-                        value={otpInput}
-                        onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                        className="w-full text-center tracking-[0.5em] px-4 py-3 rounded-xl bg-parchment-warm/60 border border-deckle text-ink text-xl font-mono placeholder-ink-faint focus:outline-none focus:border-claret min-h-[48px]"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-ink-muted">Didn't receive SMS?</span>
-                      {resendCooldown > 0 ? (
-                        <span className="text-ink-faint">Resend in {resendCooldown}s</span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={handleRequestOtp}
-                          disabled={isSubmitting}
-                          className="text-claret font-bold hover:underline inline-flex items-center gap-1"
-                        >
-                          <RotateCcw className="w-3 h-3" />
-                          <span>Resend OTP Code</span>
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || otpInput.trim().length !== 6}
-                      className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 text-white text-xs font-medium shadow-xs flex items-center justify-center gap-2 transition-all min-h-[44px]"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Verifying Code & Authorizing Device...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Check className="w-4 h-4" />
-                          <span>Verify Phone & Start Reading</span>
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-              </div>
-            ) : (
-              /* ===================================================== */
-              /* TAB 2: RESTORE PAID PURCHASES (EXISTING CANDIDATES)   */
-              /* ===================================================== */
-              <div className="space-y-4">
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold block">
-                    Candidate Recovery
-                  </span>
-                  <h3 className="font-serif text-2xl text-ink font-normal mt-0.5">
-                    Restore Paid Purchases
-                  </h3>
-                  <p className="text-xs text-ink-muted font-reading leading-relaxed mt-1">
-                    Enter the WhatsApp mobile number used when acquiring Dr. Dodiya’s Monograph or UGC-NET CBT Exam.
-                  </p>
+                  <label className="text-xs font-mono text-ink-faint block mb-1">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[44px]"
+                    />
+                    <Lock className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-1 text-ink-muted hover:text-ink absolute right-3 top-1/2 -translate-y-1/2"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
 
-                <form onSubmit={handleRestorePaid} className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-ink block mb-1.5">
-                      Your Registered WhatsApp Mobile Number *
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-xs font-mono text-ink-muted">
-                        +91
-                      </div>
-                      <input
-                        required
-                        type="tel"
-                        maxLength={10}
-                        placeholder="9876543210"
-                        value={restoreMobileInput}
-                        onChange={(e) => setRestoreMobileInput(e.target.value.replace(/\D/g, ''))}
-                        className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-parchment-warm/60 border border-deckle text-ink text-sm font-mono placeholder-ink-faint focus:outline-none focus:border-claret min-h-[44px]"
-                      />
-                    </div>
-                  </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 px-4 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-2 min-h-[46px]"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <KeyRound className="w-4 h-4" />
+                  )}
+                  <span className="font-semibold">Sign In to 2-Device Pass</span>
+                </button>
 
-                  <div className="p-3.5 rounded-xl bg-parchment-warm border border-deckle text-[11px] text-ink-muted font-reading leading-relaxed space-y-1">
-                    <div className="flex items-center gap-1.5 font-medium text-ink">
-                      <Lock className="w-3.5 h-3.5 text-claret" />
-                      <span>Single-Device Protection</span>
-                    </div>
-                    <p>
-                      Authorizing this device will safely transfer your active holdings here and release other sessions.
-                    </p>
-                  </div>
-
+                <p className="text-center text-xs text-ink-muted pt-1">
+                  Don't have a pass?{' '}
                   <button
-                    type="submit"
-                    disabled={isSubmitting || restoreMobileInput.length !== 10}
-                    className="w-full py-3 rounded-xl bg-claret hover:bg-claret-light disabled:opacity-50 text-white text-xs font-medium shadow-xs flex items-center justify-center gap-2 transition-all min-h-[44px]"
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('signup');
+                      setErrorMessage(null);
+                    }}
+                    className="text-claret font-bold hover:underline"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Verifying Database Licenses...</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>Restore Holdings to This Device</span>
-                      </>
-                    )}
+                    Create your 2-Device Pass
                   </button>
-                </form>
-              </div>
+                </p>
+              </form>
             )}
+
+            {/* ------------------------------------------------------- */}
+            {/* FORM 2: CREATE PASS (NAME + EMAIL + PHONE + PASSWORD)   */}
+            {/* ------------------------------------------------------- */}
+            {authMode === 'signup' && (
+              <form onSubmit={handleSignUp} className="space-y-3 pt-1 animate-fade-in">
+                <div>
+                  <label className="text-xs font-mono text-ink-faint block mb-1">
+                    Full Name *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Dr. Rajnikant Dodiya or Priya Sharma"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-deckle bg-white text-base sm:text-xs font-sans text-ink focus:outline-none focus:border-claret min-h-[42px]"
+                    />
+                    <User className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-mono text-ink-faint block mb-1">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      placeholder="you@gmail.com or university email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[42px]"
+                    />
+                    <Mail className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-mono text-ink-faint block mb-1">
+                    WhatsApp Mobile Number (+91) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. 9876543210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[42px]"
+                    />
+                    <Phone className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-mono text-ink-faint block mb-1">
+                    Create Password (min 6 characters) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-10 py-2 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[42px]"
+                    />
+                    <Lock className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-1 text-ink-muted hover:text-ink absolute right-3 top-1/2 -translate-y-1/2"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 px-4 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-2 min-h-[46px]"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <UserPlus className="w-4 h-4" />
+                  )}
+                  <span className="font-semibold">Create 2-Device Pass & Enter</span>
+                </button>
+
+                <p className="text-center text-xs text-ink-muted pt-1">
+                  Already registered?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('signin');
+                      setErrorMessage(null);
+                    }}
+                    className="text-claret font-bold hover:underline"
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </form>
+            )}
+
+            {/* Benefits Pill */}
+            <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-deckle space-y-1.5 text-xs font-reading">
+              <div className="flex items-center gap-2 text-claret font-mono font-bold text-[11px] uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>2-Device Academic Protection:</span>
+              </div>
+              <ul className="space-y-1 text-ink-muted list-disc list-inside text-[11px]">
+                <li>Sign in on both your <strong>Mobile Phone and Laptop</strong> at the same time</li>
+                <li>Instant access to Dr. Dodiya's monograph reader & CBT simulation preview</li>
+                <li>Encrypted with client-side SHA-256 salted hashing</li>
+              </ul>
+            </div>
+
+            {/* 2-Device Policy Notice Footer */}
+            <div className="pt-2 border-t border-deckle flex items-center justify-between text-[11px] font-mono text-ink-faint">
+              <span>Dual-Device Access Active</span>
+              <span className="text-claret font-semibold">1 Phone + 1 Laptop</span>
+            </div>
           </div>
         )}
 

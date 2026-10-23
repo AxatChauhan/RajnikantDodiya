@@ -1,5 +1,6 @@
 import React from 'react';
-import { Smartphone, ShieldAlert, X, ArrowRight, RotateCcw } from 'lucide-react';
+import { ShieldAlert, X, RotateCcw, Smartphone, Laptop } from 'lucide-react';
+import { detectDeviceType } from '../../lib/deviceSecurity';
 
 interface DeviceTransferredModalProps {
   isOpen: boolean;
@@ -13,6 +14,8 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
   onReLogin
 }) => {
   if (!isOpen) return null;
+
+  const currentType = detectDeviceType();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-pure/75 backdrop-blur-xs animate-fade-in">
@@ -33,20 +36,35 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
 
         <div>
           <span className="text-[10px] font-mono uppercase tracking-widest text-amber-800 font-bold block mb-1">
-            Security & Licensing Notice
+            2-Device Licensing Policy
           </span>
           <h3 className="font-serif text-2xl text-ink font-normal">
             Session Transferred
           </h3>
           <p className="text-xs text-ink-muted font-reading leading-relaxed mt-2">
-            Your scholar account was just used to sign in on <strong>another device</strong>. In accordance with Dr. Dodiya's 1-device academic policy, this device has been automatically logged out to prevent unauthorized duplication.
+            Your scholar account allows <strong>2 active devices: 1 Phone and 1 Laptop</strong>. This session was transferred because a newer {currentType === 'phone' ? 'mobile phone' : 'laptop / computer'} signed into your account.
           </p>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-parchment-warm border border-deckle text-[11px] text-ink-muted font-reading leading-relaxed text-left space-y-1">
-          <span className="font-medium text-ink block">Want to study on this device instead?</span>
-          <p>
-            You can transfer your active pass back to this device at any time with a single tap.
+        {/* 2-Device Policy Visual Pill */}
+        <div className="p-3.5 rounded-2xl bg-parchment-warm border border-deckle text-[11px] text-ink-muted font-reading leading-relaxed text-left space-y-2">
+          <span className="font-medium text-ink block font-sans">Dual-Device Entitlement:</span>
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div className={`p-2 rounded-xl border flex items-center gap-1.5 ${
+              currentType === 'phone' ? 'bg-amber-100/70 border-amber-300 text-amber-900 font-bold' : 'bg-white border-deckle text-emerald-800'
+            }`}>
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Phone {currentType === 'phone' ? '(Transferred)' : '(Active)'}</span>
+            </div>
+            <div className={`p-2 rounded-xl border flex items-center gap-1.5 ${
+              currentType === 'laptop' ? 'bg-amber-100/70 border-amber-300 text-amber-900 font-bold' : 'bg-white border-deckle text-emerald-800'
+            }`}>
+              <Laptop className="w-3.5 h-3.5" />
+              <span>Laptop {currentType === 'laptop' ? '(Transferred)' : '(Active)'}</span>
+            </div>
+          </div>
+          <p className="text-[10px] text-ink-faint">
+            You can keep your phone and laptop active together. Signing into a second {currentType} replaces the previous {currentType} slot.
           </p>
         </div>
 
@@ -59,7 +77,7 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
             className="w-full py-3 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs flex items-center justify-center gap-2 transition-all min-h-[44px]"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Transfer Pass Back to This Device</span>
+            <span>Transfer {currentType === 'phone' ? 'Phone' : 'Laptop'} Slot Back to This Device</span>
           </button>
 
           <button

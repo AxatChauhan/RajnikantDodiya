@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FEATURED_BOOK_CHAPTERS, BookChapter } from '../../data/storeCatalogData';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { getLicensedBookChapters, BookChapter } from '../../data/storeCatalogData';
 import {
   X,
   BookOpen,
@@ -245,7 +245,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   const [audioSpeed, setAudioSpeed] = useState<1 | 1.25 | 1.5>(1);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const activeChapter: BookChapter = FEATURED_BOOK_CHAPTERS[currentChapterIdx];
+  const bookChapters = useMemo(() => getLicensedBookChapters(Boolean(isUnlocked)), [isUnlocked]);
+  const activeChapter: BookChapter = bookChapters[currentChapterIdx] || bookChapters[0];
   const currentTheme = THEME_CONFIG[readingTheme];
 
   // Intercept right click and print shortcuts for copyright protection
@@ -274,7 +275,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
         }
       }
       if (!isCitationOpen && !isSearchOpen) {
-        if (e.key === 'ArrowRight' && currentChapterIdx < FEATURED_BOOK_CHAPTERS.length - 1) {
+        if (e.key === 'ArrowRight' && currentChapterIdx < bookChapters.length - 1) {
           setCurrentChapterIdx(prev => prev + 1);
         }
         if (e.key === 'ArrowLeft' && currentChapterIdx > 0) {
@@ -693,12 +694,12 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                   Table of Contents
                 </span>
                 <span className={`text-[10px] font-mono ${currentTheme.textMuted}`}>
-                  4 Chapters • {FEATURED_BOOK_CHAPTERS.reduce((acc, c) => acc + (c.readingTimeMinutes || 6), 0)} min total
+                  4 Chapters • {bookChapters.reduce((acc, c) => acc + (c.readingTimeMinutes || 6), 0)} min total
                 </span>
               </div>
 
               <div className="space-y-2">
-                {FEATURED_BOOK_CHAPTERS.map((ch, idx) => {
+                {bookChapters.map((ch, idx) => {
                   const isActive = idx === currentChapterIdx;
                   const isChapterLocked = !isUnlocked && idx > 0;
                   const isBookmarked = bookmarkedChapters.includes(idx);
@@ -999,7 +1000,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
           {/* Center Navigation Shortcuts */}
           <div className="flex items-center gap-3 text-[11px] font-sans">
             <span className={`hidden md:inline font-mono ${currentTheme.textMuted}`}>
-              Chapter {currentChapterIdx + 1} of {FEATURED_BOOK_CHAPTERS.length}
+              Chapter {currentChapterIdx + 1} of {bookChapters.length}
             </span>
 
             {/* Audio Companion Button */}
@@ -1024,8 +1025,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
           </div>
 
           <button
-            disabled={currentChapterIdx === FEATURED_BOOK_CHAPTERS.length - 1}
-            onClick={() => setCurrentChapterIdx(prev => Math.min(FEATURED_BOOK_CHAPTERS.length - 1, prev + 1))}
+            disabled={currentChapterIdx === bookChapters.length - 1}
+            onClick={() => setCurrentChapterIdx(prev => Math.min(bookChapters.length - 1, prev + 1))}
             className="px-4 py-1.5 rounded-xl bg-claret text-white hover:bg-claret-light disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 min-h-[38px] font-sans font-medium shadow-xs transition-all"
           >
             <span className="hidden sm:inline">Next Chapter</span>
