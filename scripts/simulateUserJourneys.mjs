@@ -15,7 +15,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import crypto from 'crypto';
 
-const BASE_URL = 'http://localhost:5174';
+const BASE_URL = process.env.TARGET_URL || 'https://rajnikantdodiya.com';
 
 // Colors for terminal reporting
 const GREEN = '\x1b[32m';
@@ -149,7 +149,7 @@ async function runFullSiteSimulation() {
     const res = await fetch(BASE_URL);
     step('System', 'Fetch Landing Page', res.status === 200, `HTTP status ${res.status}`);
     const html = await res.text();
-    step('System', 'HTML Document Integrity', html.includes('Dr. Rajnikant S. Dodiya') && html.includes('id="root"') && html.includes('/src/main.tsx'), 'Found institutional identity & React mount point');
+    step('System', 'HTML Document Integrity', html.includes('Dr. Rajnikant S. Dodiya') && html.includes('id="root"') && (html.includes('/src/main.tsx') || html.includes('/assets/')), 'Found institutional identity & React mount point');
     step('System', 'Viewport & Security Headers Verification', html.includes('charset="UTF-8"') && html.includes('viewport'), 'Meta tags verified');
   } catch (err) {
     step('System', 'Server Reachable', false, err.message);
