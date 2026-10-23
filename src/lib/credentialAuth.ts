@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * PRODUCTION CREDENTIAL AUTHENTICATION & 2-DEVICE LIMITING ENGINE
- * The Atheneum Academic Platform • Sardar Patel University
+ * Dr. Rajnikant S. Dodiya Academic Platform • Sardar Patel University
  * Dr. Rajnikant S. Dodiya | HMPIETR
  * ============================================================================
  * Production-grade authentication with:

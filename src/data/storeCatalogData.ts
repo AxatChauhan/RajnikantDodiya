@@ -1,4 +1,4 @@
-// Catalog and Mock Exam Data for The Atheneum Academic Library Store
+// Catalog and Mock Exam Data for Dr. Rajnikant S. Dodiya Academic Study & Learn Hub
 import { maskAnswer, unmaskAnswer } from '../lib/security';
 
 export interface ChapterSubsection {
@@ -220,7 +220,18 @@ export function getLicensedBookChapters(isUnlocked: boolean): BookChapter[] {
   }
 
   return FEATURED_BOOK_CHAPTERS.map((ch, idx) => {
-    if (idx === 0) return ch; // Free open academic sample
+    if (idx === 0) {
+      // Extremely brief sample preview (only 1 single introductory paragraph, zero subsections, zero footnotes)
+      return {
+        ...ch,
+        title: `${ch.title} (Sample Excerpt)`,
+        fullContent: [
+          ch.fullContent[0]
+        ],
+        subsections: [],
+        footnotes: []
+      };
+    }
     return {
       ...ch,
       fullContent: [ch.excerptPreview],

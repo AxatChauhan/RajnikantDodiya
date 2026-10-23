@@ -13,6 +13,16 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
   onClose,
   onReLogin
 }) => {
+  React.useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const currentType = detectDeviceType();

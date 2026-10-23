@@ -146,6 +146,17 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
     return () => clearInterval(timer);
   }, [isOpen, examSubmitted]);
 
+  // Lock background scrolling when CBT Exam Portal is open
+  useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Scoped active questions (Zero answers/explanations exposed in active state)
@@ -343,7 +354,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                         Full 25-Question UGC-NET/GSET CBT Simulation
                       </h4>
                       <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed">
-                        Questions 4 through 25 contain high-yield problems on British Literature, Post-Method Pedagogy, NEP 2020 frameworks, and Research Methodology. Enroll at The Atheneum to unlock all 25 questions, the 60-minute NTA countdown, and complete faculty rationales.
+                        Questions 4 through 25 contain high-yield problems on British Literature, Post-Method Pedagogy, NEP 2020 frameworks, and Research Methodology. Enroll in the full exam to unlock all 25 questions, the 60-minute NTA countdown, and complete faculty rationales.
                       </p>
                     </div>
                     <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -766,7 +777,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                         Unlock All 25 UGC-NET/GSET Questions & Explanations
                       </h4>
                       <p className="text-xs text-ink-muted font-reading leading-relaxed">
-                        You have reviewed the 3 free diagnostic questions. The remaining 22 questions cover Post-Method Pedagogy, Shakespearean Drama, Romanticism, Research Aptitude, and NEP 2020. Enroll in the Full CBT Exam Portal at The Atheneum to practice with all 25 questions and unlock Dr. Dodiya's complete rationales.
+                        You have reviewed the 3 free diagnostic questions. The remaining 22 questions cover Post-Method Pedagogy, Shakespearean Drama, Romanticism, Research Aptitude, and NEP 2020. Enroll in the Full CBT Exam Portal to practice with all 25 questions and unlock Dr. Dodiya's complete rationales.
                       </p>
                     </div>
                     <div className="pt-2">

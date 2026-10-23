@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * THE ATHENEUM ACADEMIC PLATFORM SECURITY & CRYPTOGRAPHY SUITE
+ * DR. RAJNIKANT DODIYA ACADEMIC PLATFORM SECURITY & CRYPTOGRAPHY SUITE
  * Dr. Rajnikant S. Dodiya | HMPIETR, Sardar Patel University
  * ============================================================================
  * Handles immutable catalog pricing, cryptographic session sealing,

@@ -66,6 +66,17 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
     }
   }, [selectedProduct]);
 
+  // Lock background scrolling when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Complete purchase via Razorpay (Instant Bank-Verified Access)
@@ -116,7 +127,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
         key: razorpayKey,
         amount: verifiedPrice * 100, // in paise - strictly verified against immutable catalog!
         currency: 'INR',
-        name: 'The Atheneum | Dr. Rajnikant S. Dodiya',
+        name: 'Academic Study Portal | Dr. Rajnikant S. Dodiya',
         description: `Acquisition: ${activeProduct.title}`,
         image: 'https://rajnikantdodiya.com/favicon.svg',
         prefill: {
@@ -358,13 +369,22 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-mono text-ink-faint block mb-1">WhatsApp Mobile (+91)</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[11px] font-mono text-ink-faint block">WhatsApp Mobile (+91)</label>
+                    <span className="text-[10px] font-mono text-ink-muted">10 digits only</span>
+                  </div>
                   <input
                     type="tel"
+                    inputMode="numeric"
                     required
+                    maxLength={10}
+                    pattern="[6-9][0-9]{9}"
                     placeholder="10-digit mobile number"
                     value={studentMobile}
-                    onChange={(e) => setStudentMobile(e.target.value)}
+                    onChange={(e) => {
+                      const cleanDigits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setStudentMobile(cleanDigits);
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-deckle bg-parchment-warm/40 text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[44px]"
                   />
                 </div>
@@ -472,14 +492,23 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-mono text-ink-faint block">Registered Mobile Number (+91)</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-ink-faint block">Registered Mobile Number (+91)</label>
+                <span className="text-[10px] font-mono text-ink-muted">10 digits only</span>
+              </div>
               <div className="flex gap-2">
                 <input
                   type="tel"
+                  inputMode="numeric"
                   required
+                  maxLength={10}
+                  pattern="[6-9][0-9]{9}"
                   placeholder="e.g. 9876543210"
                   value={restoreMobile}
-                  onChange={(e) => setRestoreMobile(e.target.value)}
+                  onChange={(e) => {
+                    const cleanDigits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    setRestoreMobile(cleanDigits);
+                  }}
                   className="flex-1 px-4 py-3 rounded-xl border border-deckle bg-parchment-warm/40 text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[44px]"
                 />
                 <button
@@ -538,7 +567,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                 Academic License Activated
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl font-normal text-ink">
-                Welcome to The Atheneum, {studentName}
+                Welcome to the Academic Study Portal, {studentName}
               </h3>
               <p className="text-xs text-ink-muted font-reading max-w-md mx-auto">
                 Your personal license has been registered in the institutional repository and cryptographically bound to this device.

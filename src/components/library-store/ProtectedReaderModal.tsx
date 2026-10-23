@@ -233,7 +233,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [bookmarkedChapters, setBookmarkedChapters] = useState<number[]>(() => {
     try {
-      const saved = localStorage.getItem('atheneum_book_bookmarks');
+      const saved = localStorage.getItem('rd_monograph_bookmarks');
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -248,6 +248,42 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   const bookChapters = useMemo(() => getLicensedBookChapters(Boolean(isUnlocked)), [isUnlocked]);
   const activeChapter: BookChapter = bookChapters[currentChapterIdx] || bookChapters[0];
   const currentTheme = THEME_CONFIG[readingTheme];
+
+  // Lock background scrolling when reading portal is open
+  useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  const FONT_FAMILY_MAP: Record<FontFamily, string> = {
+    serif: "'Lora', 'Newsreader', Georgia, 'Times New Roman', serif",
+    sans: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+    mono: "'Space Mono', 'JetBrains Mono', 'Courier New', monospace"
+  };
+
+  const FONT_SIZE_MAP: Record<FontSize, { fontSize: string; lineHeight: string }> = {
+    compact: { fontSize: '15px', lineHeight: '1.6' },
+    standard: { fontSize: '18px', lineHeight: '1.75' },
+    large: { fontSize: '22px', lineHeight: '1.85' },
+    grand: { fontSize: '26px', lineHeight: '2.0' }
+  };
+
+  const handleDecreaseFontSize = () => {
+    const order: FontSize[] = ['compact', 'standard', 'large', 'grand'];
+    const idx = order.indexOf(fontSize);
+    if (idx > 0) setFontSize(order[idx - 1]);
+  };
+
+  const handleIncreaseFontSize = () => {
+    const order: FontSize[] = ['compact', 'standard', 'large', 'grand'];
+    const idx = order.indexOf(fontSize);
+    if (idx < order.length - 1) setFontSize(order[idx + 1]);
+  };
 
   // Intercept right click and print shortcuts for copyright protection
   useEffect(() => {
@@ -318,7 +354,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
     setBookmarkedChapters(prev => {
       const next = prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx];
       try {
-        localStorage.setItem('atheneum_book_bookmarks', JSON.stringify(next));
+        localStorage.setItem('rd_monograph_bookmarks', JSON.stringify(next));
       } catch {
         // ignore
       }
@@ -480,6 +516,28 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
               <Quote className="w-4 h-4 text-claret" />
               <span className="hidden xl:inline text-xs font-sans font-medium">Cite</span>
             </button>
+
+            {/* Quick Font Size Adjusters (A- and A+) */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-black/5 text-xs font-mono shrink-0">
+              <button
+                onClick={handleDecreaseFontSize}
+                disabled={fontSize === 'compact'}
+                className="px-2 py-1 rounded-lg hover:bg-white/80 disabled:opacity-30 transition-all font-serif font-bold text-xs"
+                title="Decrease Font Size (A-)"
+                aria-label="Decrease Font Size"
+              >
+                A-
+              </button>
+              <button
+                onClick={handleIncreaseFontSize}
+                disabled={fontSize === 'grand'}
+                className="px-2 py-1 rounded-lg hover:bg-white/80 disabled:opacity-30 transition-all font-serif font-bold text-sm"
+                title="Increase Font Size (A+)"
+                aria-label="Increase Font Size"
+              >
+                A+
+              </button>
+            </div>
 
             {/* Reading Preferences (Themes & Fonts) Popover Toggle */}
             <div className="relative">
@@ -670,7 +728,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
         )}
 
         {/* MAIN BODY VIEWPORT (Sidebar + Wide Reading Canvas) */}
-        <div className="flex-1 flex overflow-hidden relative">
+        <div className="flex-1 min-h-0 flex overflow-hidden relative h-full">
           
           {/* Mobile Sidebar Backdrop */}
           {isSidebarOpen && (
@@ -767,7 +825,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
           <main
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className={`flex-1 overflow-y-auto p-4 sm:p-8 lg:p-12 relative flex justify-center transition-colors duration-200 ${currentTheme.canvasBg}`}
+            className={`flex-1 min-h-0 h-full overflow-y-auto p-4 sm:p-8 lg:p-12 relative flex justify-center transition-colors duration-200 ${currentTheme.canvasBg}`}
+            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
             tabIndex={0}
           >
             {/* Ambient Margin Watermark */}
@@ -785,7 +844,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             </div>
 
             {/* Inner Readable Paper Spread: Dynamic Paper Background & Border */}
-            <article className={`w-full ${columnWidthClass} space-y-8 relative z-10 p-6 sm:p-10 md:p-14 rounded-2xl sm:rounded-3xl shadow-xl transition-colors duration-200 ${currentTheme.paperBg} ${currentTheme.surfaceBorder} border overflow-hidden`}>
+            <article className={`w-full ${columnWidthClass} space-y-8 relative z-10 p-6 sm:p-10 md:p-14 rounded-2xl sm:rounded-3xl shadow-xl transition-colors duration-200 ${currentTheme.paperBg} ${currentTheme.surfaceBorder} border`}>
               
               {/* 
                 FORENSIC WATERMARK OVERLAY (ON THE READING PAPER ITSELF):
@@ -857,7 +916,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                         Unlock the Full 4-Chapter Scholarly Monograph
                       </h3>
                       <p className={`text-xs sm:text-sm font-reading leading-relaxed ${currentTheme.textMuted}`}>
-                        You are viewing the complimentary Preface & Prolegomena sample. Chapters I through III contain complete empirical tables, post-method pedagogy models, and Dr. Kalam's educational epistemologies. Acquire an authorized single-device pass at The Atheneum to read instantly.
+                        You are viewing the complimentary Preface & Prolegomena sample. Chapters I through III contain complete empirical tables, post-method pedagogy models, and Dr. Kalam's educational epistemologies. Acquire an authorized single-device pass at the Academic Learn Hub to read instantly.
                       </p>
                     </div>
 
@@ -882,8 +941,15 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                   </div>
                 </div>
               ) : (
-                /* UNLOCKED FULL CONTENT */
-                <div className={`space-y-6 ${fontClass} ${fontSizeClass} ${lineSpacingClass} ${currentTheme.textBody} relative z-10`}>
+                /* UNLOCKED FULL CONTENT OR SAMPLE PREFACE */
+                <div
+                  className={`space-y-6 ${currentTheme.textBody} relative z-10`}
+                  style={{
+                    fontFamily: FONT_FAMILY_MAP[fontFamily],
+                    fontSize: FONT_SIZE_MAP[fontSize].fontSize,
+                    lineHeight: lineSpacing === 'relaxed' ? '2.1' : FONT_SIZE_MAP[fontSize].lineHeight
+                  }}
+                >
                   
                   {/* Lead Section */}
                   <div className="space-y-4 text-justify">
@@ -893,6 +959,36 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                       </p>
                     ))}
                   </div>
+
+                  {/* Sample Excerpt Concluded Callout for Chapter 0 in Sample Mode */}
+                  {!isUnlocked && (
+                    <div className="mt-8 p-6 sm:p-8 rounded-2xl border-2 border-dashed border-claret/30 bg-claret-soft/30 text-center space-y-3">
+                      <div className="w-10 h-10 rounded-xl bg-claret text-white flex items-center justify-center mx-auto shadow-xs">
+                        <Lock className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold bg-claret-soft px-3 py-1 rounded-full border border-claret/20 inline-block">
+                        Sample Excerpt Concluded
+                      </span>
+                      <h3 className={`font-serif text-lg sm:text-xl font-normal ${currentTheme.textTitle}`}>
+                        Unlock the Complete Monograph
+                      </h3>
+                      <p className={`text-xs font-reading max-w-md mx-auto leading-relaxed ${currentTheme.textMuted}`}>
+                        This concludes the complimentary sample preview. Unlock the full edition to access all 4 complete chapters, pedagogy tables, curriculum frameworks, and empirical findings.
+                      </p>
+                      <div className="pt-2">
+                        <button
+                          onClick={() => {
+                            onClose();
+                            onUnlockRequest?.();
+                          }}
+                          className="px-6 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>Acquire Full Monograph Pass (₹399)</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Subsections if available */}
                   {activeChapter.subsections && activeChapter.subsections.length > 0 && (
@@ -928,8 +1024,50 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                     </div>
                   )}
 
+                  {/* Chapter Navigation Controls */}
+                  <div className="pt-8 border-t border-black/10 flex items-center justify-between gap-2 text-xs font-mono">
+                    <button
+                      onClick={() => {
+                        if (currentChapterIdx > 0) {
+                          setCurrentChapterIdx(prev => prev - 1);
+                          scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      disabled={currentChapterIdx === 0}
+                      className={`px-3.5 py-2 rounded-xl border flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:pointer-events-none ${currentTheme.btnBg} ${currentTheme.border}`}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      <span className="hidden sm:inline">Previous Chapter</span>
+                      <span className="sm:hidden">Prev</span>
+                    </button>
+
+                    <button
+                      onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+                      className={`px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${currentTheme.btnBg} ${currentTheme.border}`}
+                      title="Back to Top"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Top</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (currentChapterIdx < bookChapters.length - 1) {
+                          setCurrentChapterIdx(prev => prev + 1);
+                          scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      disabled={currentChapterIdx === bookChapters.length - 1}
+                      className={`px-3.5 py-2 rounded-xl border flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:pointer-events-none ${currentTheme.btnBg} ${currentTheme.border}`}
+                    >
+                      <span className="hidden sm:inline">Next Chapter</span>
+                      <span className="sm:hidden">Next</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
                   {/* End of Chapter Colophon & Forensic Stamp */}
-                  <div className={`pt-10 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono ${currentTheme.textMuted}`}>
+                  <div className={`pt-6 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono ${currentTheme.textMuted}`}>
                     <span className="italic">
                       End of {activeChapter.chapterNumber} • Dr. Rajnikant S. Dodiya
                     </span>

@@ -55,6 +55,17 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // Prevent background scrolling when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const isLoggedIn = Boolean(session.email || session.mobile) && session.unlockedItems.length > 0;
@@ -89,11 +100,17 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    const cleanDigits = phone.replace(/\D/g, '');
+    if (cleanDigits.length !== 10 || !/^[6-9]\d{9}$/.test(cleanDigits)) {
+      setErrorMessage('Mobile number must be exactly 10 digits starting with 6, 7, 8, or 9.');
+      return;
+    }
+
     setIsSubmitting(true);
     const result = await signUpScholar({
       name,
       email,
-      phone,
+      phone: cleanDigits,
       password
     });
     setIsSubmitting(false);
@@ -303,7 +320,7 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
             <div>
               <div className="flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-claret mb-1">
                 <ShieldCheck className="w-4 h-4" />
-                <span>The Atheneum • Scholar Access</span>
+                <span>Student & Scholar Portal • Access Pass</span>
               </div>
               <h3 className="font-serif text-2xl sm:text-3xl text-ink font-normal">
                 {authMode === 'signin' ? 'Scholar Sign-In' : 'Create Scholar Pass'}
@@ -481,16 +498,25 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-mono text-ink-faint block mb-1">
-                    WhatsApp Mobile Number (+91) *
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-mono text-ink-faint block">
+                      WhatsApp Mobile Number (+91) *
+                    </label>
+                    <span className="text-[10px] font-mono text-ink-muted">10 digits only</span>
+                  </div>
                   <div className="relative">
                     <input
                       type="tel"
+                      inputMode="numeric"
                       required
+                      maxLength={10}
+                      pattern="[6-9][0-9]{9}"
                       placeholder="e.g. 9876543210"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => {
+                        const cleanDigits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setPhone(cleanDigits);
+                      }}
                       className="w-full pl-10 pr-3.5 py-2 rounded-xl border border-deckle bg-white text-base sm:text-xs font-mono text-ink focus:outline-none focus:border-claret min-h-[42px]"
                     />
                     <Phone className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />

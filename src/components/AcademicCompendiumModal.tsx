@@ -15,6 +15,17 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
 }) => {
   const [activeTab, setActiveTab] = useState<'qualifications' | 'talks' | 'conferences' | 'chairs' | 'fdp'>(defaultTab);
 
+  // Prevent background scrolling when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

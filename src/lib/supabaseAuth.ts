@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * SUPABASE PRODUCTION AUTHENTICATION & AUTHOR ROLE MANAGER
- * The Atheneum • Sardar Patel University • Dr. Rajnikant S. Dodiya
+ * Sardar Patel University • Dr. Rajnikant S. Dodiya Academic Portal
  * ============================================================================
  * 1. Passwordless Supabase Email OTP (No Google Cloud, No Firebase required)
  * 2. Dedicated Author Master PIN for Site Owner (Dr. Rajnikant Dodiya)

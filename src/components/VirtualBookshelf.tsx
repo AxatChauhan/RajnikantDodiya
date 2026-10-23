@@ -211,7 +211,7 @@ export const VirtualBookshelf: React.FC<VirtualBookshelfProps> = ({ onNavigate }
                     className="px-4 py-2 rounded-xl bg-emerald-900 text-white text-xs font-medium hover:bg-emerald-800 transition-all shadow-xs flex items-center gap-1.5"
                   >
                     <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
-                    <span>View in The Atheneum</span>
+                    <span>View in Learn Hub</span>
                   </button>
                 )}
                 <button

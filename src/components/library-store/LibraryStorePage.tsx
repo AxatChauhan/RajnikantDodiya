@@ -153,7 +153,7 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#3D2012]/90 border border-[#D4AF37]/40 text-[#F5E6B3] text-[10px] sm:text-xs font-mono font-medium shadow-inner">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E5C158] animate-pulse" />
-              <span>THE ATHENEUM • SARDAR PATEL UNIVERSITY REPOSITORY</span>
+              <span>STUDY & LEARN HUB • SARDAR PATEL UNIVERSITY REPOSITORY</span>
             </div>
             
             <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#FFFDF9] font-normal tracking-tight leading-snug">
@@ -342,7 +342,7 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
             {/* Brass Center Plaque */}
             <div className="px-4 py-1 rounded bg-gradient-to-r from-[#9A7426] via-[#E2C374] to-[#9A7426] text-[#24130A] shadow-sm border border-[#F5DC9A] text-center font-serif uppercase tracking-widest text-[11px] sm:text-xs md:text-sm font-bold flex items-center gap-2">
               <Library className="w-3.5 h-3.5 text-[#3B1F0A]" />
-              <span>THE ATHENEUM • UNIVERSITY ACADEMIC STACKS • BAY I – III</span>
+              <span>ACADEMIC STUDY & LEARN HUB • UNIVERSITY STACKS • BAY I – III</span>
             </div>
 
             <div className="flex items-center gap-2">
