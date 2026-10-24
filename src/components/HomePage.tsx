@@ -38,10 +38,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
       {/* 1. HERO SECTION: SHORT INTRO + PHOTO & BADGES (PDF 1 & 2) */}
       {/* ========================================================= */}
       <section className="folio-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 bg-white border border-deckle shadow-book relative overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 items-center">
           
           {/* Left Column: Short Intro */}
-          <div className="lg:col-span-7 space-y-4 sm:space-y-5">
+          <div className="md:col-span-7 space-y-4 sm:space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-claret-soft border border-claret/20 text-claret text-xs font-mono font-semibold">
               <ProfessorCrestIcon className="w-4 h-4" />
               <span>{PROFESSOR_INFO.institution}</span>
@@ -103,9 +103,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             </div>
           </div>
 
-          {/* Right Column: Professor Photo - Constrained Aspect Ratio (Never Cut Off) */}
-          <div className="lg:col-span-5 relative w-full max-w-sm sm:max-w-md mx-auto lg:max-w-none">
-            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-deckle shadow-book-lg bg-parchment-warm group aspect-[4/5]">
+          {/* Right Column: Professor Photo - 1:1 Aspect Ratio (Never Cut Off on Any Device) */}
+          <div className="md:col-span-5 relative w-full max-w-[320px] sm:max-w-[360px] md:max-w-none mx-auto">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-deckle shadow-book-lg bg-parchment-warm group aspect-square">
               <img
                 src={PROFESSOR_INFO.photoUrl}
                 alt={PROFESSOR_INFO.name}
@@ -113,8 +113,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 loading="eager"
                 decoding="async"
                 width={400}
-                height={500}
-                className="w-full h-full object-cover object-[center_16%] filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
+                height={400}
+                className="w-full h-full object-cover object-center filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
               />
               {/* Subtle top-corner academic seal badge */}
               <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-deckle shadow-2xs text-[10px] font-mono font-semibold uppercase tracking-wider text-claret">
