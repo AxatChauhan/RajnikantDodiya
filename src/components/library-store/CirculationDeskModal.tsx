@@ -301,7 +301,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close checkout"
-            className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
+            className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>

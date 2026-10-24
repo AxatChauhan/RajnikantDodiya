@@ -679,7 +679,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             {/* Close Reader */}
             <button
               onClick={onClose}
-              className={`p-2 rounded-xl hover:text-claret transition-colors shrink-0 min-h-[38px] min-w-[38px] flex items-center justify-center ${currentTheme.btnBg}`}
+              className={`p-2 rounded-xl hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center ${currentTheme.btnBg}`}
               aria-label="Close reader"
             >
               <X className="w-5 h-5" />

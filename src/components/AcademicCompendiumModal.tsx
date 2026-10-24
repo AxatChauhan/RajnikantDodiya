@@ -105,7 +105,22 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                   <GraduationCap className="w-4 h-4 text-claret" />
                   <span>Formal Academic Qualifications</span>
                 </h4>
-                <div className="overflow-x-auto rounded-xl border border-deckle bg-white">
+                {/* Mobile Card Feed (<640px) */}
+                <div className="sm:hidden space-y-2">
+                  {QUALIFICATIONS.map((q, idx) => (
+                    <div key={idx} className="p-3 rounded-xl bg-parchment-warm/40 border border-deckle text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-serif font-medium text-ink">{q.degree}</span>
+                        <span className="font-mono text-claret font-bold">{q.year}</span>
+                      </div>
+                      <p className="text-[11px] text-ink-muted">{q.university}</p>
+                      {q.details && <p className="text-[10px] font-mono text-ink-faint">{q.details}</p>}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table (>=640px) */}
+                <div className="hidden sm:block overflow-x-auto rounded-xl border border-deckle bg-white">
                   <table className="w-full text-left text-xs text-ink-muted min-w-[500px]">
                     <thead className="bg-parchment-warm text-ink font-mono text-[11px] uppercase">
                       <tr>
@@ -157,7 +172,24 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                 <Mic className="w-4 h-4 text-claret" />
                 <span>22 Invited Talks, Resource Lectures & Keynotes</span>
               </h4>
-              <div className="overflow-x-auto rounded-xl border border-deckle bg-white">
+              {/* Mobile Card Feed (<640px) */}
+              <div className="sm:hidden space-y-2">
+                {INVITED_TALKS.map((t) => (
+                  <div key={t.id} className="p-3 rounded-xl bg-parchment-warm/40 border border-deckle text-xs space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-claret font-bold">{t.date}</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-parchment-deep text-ink-muted border border-deckle">
+                        {t.level}
+                      </span>
+                    </div>
+                    <h5 className="font-serif font-medium text-ink leading-snug">{t.topic}</h5>
+                    <p className="text-[11px] text-ink-muted font-reading">{t.event}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table (>=640px) */}
+              <div className="hidden sm:block overflow-x-auto rounded-xl border border-deckle bg-white">
                 <table className="w-full text-left text-xs text-ink-muted min-w-[540px]">
                   <thead className="bg-parchment-warm text-ink font-mono text-[11px] uppercase">
                     <tr>
@@ -193,7 +225,24 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                 <BookOpen className="w-4 h-4 text-claret" />
                 <span>12 Conference & Seminar Papers Presented</span>
               </h4>
-              <div className="overflow-x-auto rounded-xl border border-deckle bg-white">
+              {/* Mobile Card Feed (<640px) */}
+              <div className="sm:hidden space-y-2">
+                {CONFERENCE_PAPERS.map((p) => (
+                  <div key={p.id} className="p-3 rounded-xl bg-parchment-warm/40 border border-deckle text-xs space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-claret font-bold">{p.date}</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-parchment-deep text-ink-muted border border-deckle">
+                        {p.level}
+                      </span>
+                    </div>
+                    <h5 className="font-serif font-medium text-ink leading-snug">{p.topic}</h5>
+                    <p className="text-[11px] text-ink-muted font-reading">{p.event}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table (>=640px) */}
+              <div className="hidden sm:block overflow-x-auto rounded-xl border border-deckle bg-white">
                 <table className="w-full text-left text-xs text-ink-muted min-w-[540px]">
                   <thead className="bg-parchment-warm text-ink font-mono text-[11px] uppercase">
                     <tr>
@@ -229,7 +278,24 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                 <Award className="w-4 h-4 text-brass-dark" />
                 <span>9 National & International Session Chair Appointments</span>
               </h4>
-              <div className="overflow-x-auto rounded-xl border border-deckle bg-white">
+              {/* Mobile Card Feed (<640px) */}
+              <div className="sm:hidden space-y-2">
+                {SESSION_CHAIRS.map((sc) => (
+                  <div key={sc.id} className="p-3 rounded-xl bg-parchment-warm/40 border border-deckle text-xs space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-claret font-bold">{sc.date}</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-parchment-deep text-ink-muted border border-deckle">
+                        {sc.level}
+                      </span>
+                    </div>
+                    <h5 className="font-serif font-medium text-ink leading-snug">{sc.topic}</h5>
+                    <p className="text-[11px] text-ink-muted font-reading">{sc.event}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table (>=640px) */}
+              <div className="hidden sm:block overflow-x-auto rounded-xl border border-deckle bg-white">
                 <table className="w-full text-left text-xs text-ink-muted min-w-[500px]">
                   <thead className="bg-parchment-warm text-ink font-mono text-[11px] uppercase">
                     <tr>
@@ -263,7 +329,24 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
                 <Users className="w-4 h-4 text-claret" />
                 <span>Faculty Development Programmes & UGC Refresher Courses</span>
               </h4>
-              <div className="overflow-x-auto rounded-xl border border-deckle bg-white">
+              {/* Mobile Card Feed (<640px) */}
+              <div className="sm:hidden space-y-2">
+                {FDP_TRAININGS.map((f) => (
+                  <div key={f.id} className="p-3 rounded-xl bg-parchment-warm/40 border border-deckle text-xs space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-claret font-bold">{f.date}</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-parchment-deep text-ink-muted border border-deckle font-bold">
+                        {f.typeLabel}
+                      </span>
+                    </div>
+                    <h5 className="font-serif font-medium text-ink leading-snug">{f.topic}</h5>
+                    <p className="text-[11px] text-ink-muted font-reading">{f.event} • <span className="font-mono">{f.duration}</span></p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table (>=640px) */}
+              <div className="hidden sm:block overflow-x-auto rounded-xl border border-deckle bg-white">
                 <table className="w-full text-left text-xs text-ink-muted min-w-[580px]">
                   <thead className="bg-parchment-warm text-ink font-mono text-[11px] uppercase">
                     <tr>

@@ -379,7 +379,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* MOBILE COLLAPSIBLE DRAWER (8 TABS + ACCORDIONS)       */}
         {/* ===================================================== */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-deckle bg-white/98 backdrop-blur-lg px-4 py-4 max-h-[82vh] overflow-y-auto space-y-4 animate-fade-in shadow-2xl">
+          <div className="lg:hidden border-t border-deckle bg-white/98 backdrop-blur-lg px-4 py-4 max-h-[calc(100dvh-130px)] pb-24 overflow-y-auto space-y-4 animate-fade-in shadow-2xl">
             
             {/* Quick Actions in Mobile Drawer */}
             <div className="grid grid-cols-2 gap-2 pb-3 border-b border-deckle">
