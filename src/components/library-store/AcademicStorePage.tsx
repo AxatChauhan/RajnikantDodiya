@@ -298,7 +298,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           
           {/* PRODUCT 1: DIGITAL MONOGRAPH */}
-          <div className="p-6 rounded-3xl bg-white border-2 border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-claret/50">
+          <div className="p-5 sm:p-6 rounded-3xl bg-white border-2 border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-claret/50">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-claret font-bold bg-claret-soft px-2.5 py-1 rounded">
@@ -370,7 +370,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
           </div>
 
           {/* PRODUCT 2: CBT MOCK EXAM SIMULATOR */}
-          <div className="p-6 rounded-3xl bg-white border-2 border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-blue-900/40">
+          <div className="p-5 sm:p-6 rounded-3xl bg-white border-2 border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-blue-900/40">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-blue-900 font-bold bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
@@ -442,7 +442,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
           </div>
 
           {/* PRODUCT 3: THE SCHOLAR BUNDLE (BEST VALUE) */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1C140E] to-[#2E1810] text-white border-2 border-brass/50 shadow-book flex flex-col justify-between space-y-6 relative overflow-hidden">
+          <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#1C140E] to-[#2E1810] text-white border-2 border-brass/50 shadow-book flex flex-col justify-between space-y-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-brass/10 rounded-full blur-2xl pointer-events-none" />
             
             <div className="space-y-4 relative z-10">
@@ -523,13 +523,13 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
               value={restorePhone}
               onChange={e => setRestorePhone(e.target.value)}
               placeholder="Enter 10-digit mobile (+91)"
-              className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-deckle text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:border-claret"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-deckle text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:border-claret min-h-[44px]"
               maxLength={14}
             />
             <button
               type="submit"
               disabled={restoreLoading}
-              className="px-4 py-2 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs disabled:opacity-50 shrink-0"
+              className="px-5 py-2.5 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs disabled:opacity-50 shrink-0 min-h-[44px] flex items-center justify-center"
             >
               {restoreLoading ? 'Verifying...' : 'Restore Pass'}
             </button>

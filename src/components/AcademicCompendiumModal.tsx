@@ -30,7 +30,7 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/60 backdrop-blur-sm animate-fade-in">
-      <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full p-5 sm:p-8 shadow-book-xl border border-deckle max-h-[92vh] flex flex-col justify-between overflow-hidden">
+      <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full p-4 sm:p-8 shadow-book-xl border border-deckle max-h-[92dvh] flex flex-col justify-between overflow-hidden">
         
         {/* Header */}
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-deckle shrink-0">
@@ -297,13 +297,13 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
         </div>
 
         {/* Footer */}
-        <div className="pt-3 border-t border-deckle flex items-center justify-between text-xs shrink-0">
-          <span className="font-mono text-ink-faint text-[11px]">
+        <div className="pt-3 border-t border-deckle flex items-center justify-between gap-3 text-xs shrink-0">
+          <span className="hidden sm:inline font-mono text-ink-faint text-[11px] truncate">
             H. M. Patel Institute of English Training & Research Institutional Portfolio
           </span>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-claret text-white text-xs font-medium hover:bg-claret-light transition-all shadow-xs min-h-[44px]"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-claret text-white text-xs font-medium hover:bg-claret-light transition-all shadow-xs min-h-[44px] justify-center flex items-center"
           >
             Close Archive
           </button>

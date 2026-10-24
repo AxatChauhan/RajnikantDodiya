@@ -254,10 +254,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               </a>
             </div>
 
-            {/* BUTTON 0: [Academic Bookstore] */}
+            {/* BUTTON 0: [Academic Bookstore] - Desktop only to declutter mobile/tablet header */}
             <button
               onClick={() => handleNavClick('bookstore')}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-2xs shrink-0 min-h-[36px] ${
+              className={`hidden lg:flex px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-sans font-medium transition-all items-center gap-1.5 shadow-2xs shrink-0 min-h-[38px] ${
                 activeTab === 'bookstore'
                   ? 'bg-claret text-white border border-claret-dark shadow-xs'
                   : 'bg-white hover:bg-parchment-warm border border-deckle hover:border-claret text-ink hover:text-claret'
@@ -265,14 +265,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Official Academic Bookstore & Study Passes"
             >
               <BookOpen className="w-3.5 h-3.5 text-claret" />
-              <span className="hidden sm:inline font-serif">Bookstore</span>
-              <span className="sm:hidden font-serif">Store</span>
+              <span className="font-serif">Bookstore</span>
             </button>
 
-            {/* BUTTON 1: [Download CV] */}
+            {/* BUTTON 1: [Download CV] - Desktop only to preserve mobile breathing room */}
             <button
               onClick={onOpenCompendium}
-              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-deckle hover:border-claret text-xs font-sans font-medium text-ink-muted hover:text-claret transition-all flex items-center gap-1.5 shadow-2xs shrink-0 min-h-[36px]"
+              className="hidden lg:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-deckle hover:border-claret text-xs font-sans font-medium text-ink-muted hover:text-claret transition-all items-center gap-1.5 shadow-2xs shrink-0 min-h-[38px]"
               title="View or Download Dr. Dodiya's Curriculum Vitae"
             >
               <Download className="w-3.5 h-3.5 text-claret" />
@@ -284,20 +283,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               isScholarActive ? (
                 <button
                   onClick={onOpenAuthModal}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 font-semibold hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 min-h-[36px]"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 font-semibold hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-10 min-h-[40px]"
                   title="View your active student pass"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="truncate max-w-[85px] sm:max-w-[105px]">{session.name}</span>
+                  <span className="truncate max-w-[85px] sm:max-w-[110px]">{session.name}</span>
                 </button>
               ) : (
                 <button
                   onClick={onOpenAuthModal}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 min-h-[36px]"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-10 min-h-[40px]"
                   title="Sign in with your verified WhatsApp number"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>Student Login</span>
+                  <span className="hidden sm:inline">Student Login</span>
+                  <span className="sm:hidden">Login</span>
                 </button>
               )
             )}
@@ -305,7 +305,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
-              className="lg:hidden p-2 rounded-xl bg-parchment-warm border border-deckle text-ink-muted hover:text-ink transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center ml-1"
+              className="lg:hidden p-2 rounded-xl bg-parchment-warm border border-deckle text-ink-muted hover:text-ink transition-colors h-10 w-10 min-h-[40px] min-w-[40px] flex items-center justify-center shrink-0"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-claret" /> : <Menu className="w-5 h-5" />}
@@ -517,56 +517,91 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* ========================================================= */}
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF9F5]/98 backdrop-blur-md border-t border-deckle px-2 py-1.5 flex items-center justify-around shadow-book pb-[max(env(safe-area-inset-bottom),0.5rem)]"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF9F5]/96 backdrop-blur-xl border-t border-deckle/80 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] min-h-[64px] pb-[max(env(safe-area-inset-bottom),0.625rem)] pt-1 px-1 flex items-stretch justify-between"
       >
         <button
           onClick={() => handleNavClick('home')}
-          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all min-w-[44px] min-h-[44px] ${
-            activeTab === 'home' ? 'text-claret font-bold' : 'text-ink-muted hover:text-ink'
-          }`}
+          className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
+          aria-label="Navigate to Home"
         >
-          <ProfessorCrestIcon className="w-4 h-4 mb-0.5" />
-          <span className="text-[10px] font-sans">Home</span>
+          <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
+            activeTab === 'home' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
+          }`}>
+            <ProfessorCrestIcon className="w-5 h-5" />
+          </span>
+          <span className={`text-[10px] font-sans transition-colors ${
+            activeTab === 'home' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
+          }`}>
+            Home
+          </span>
         </button>
 
         <button
           onClick={() => handleNavClick('about')}
-          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all min-w-[44px] min-h-[44px] ${
-            activeTab === 'about' ? 'text-claret font-bold' : 'text-ink-muted hover:text-ink'
-          }`}
+          className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
+          aria-label="Navigate to About"
         >
-          <GraduationCap className="w-4 h-4 mb-0.5" />
-          <span className="text-[10px] font-sans">About</span>
+          <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
+            activeTab === 'about' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
+          }`}>
+            <GraduationCap className="w-5 h-5" />
+          </span>
+          <span className={`text-[10px] font-sans transition-colors ${
+            activeTab === 'about' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
+          }`}>
+            About
+          </span>
         </button>
 
         <button
-          onClick={() => handleNavClick('publications')}
-          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all min-w-[44px] min-h-[44px] ${
-            activeTab === 'publications' ? 'text-claret font-bold' : 'text-ink-muted hover:text-ink'
-          }`}
+          onClick={() => handleNavClick('bookstore')}
+          className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
+          aria-label="Navigate to Official Academic Bookstore"
         >
-          <BookOpen className="w-4 h-4 mb-0.5" />
-          <span className="text-[10px] font-sans">Books</span>
+          <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
+            activeTab === 'bookstore' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
+          }`}>
+            <BookOpen className="w-5 h-5" />
+          </span>
+          <span className={`text-[10px] font-sans transition-colors ${
+            activeTab === 'bookstore' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
+          }`}>
+            Store
+          </span>
         </button>
 
         <button
           onClick={() => handleNavClick('learn')}
-          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all min-w-[44px] min-h-[44px] ${
-            activeTab === 'learn' ? 'text-claret font-bold' : 'text-ink-muted hover:text-ink'
-          }`}
+          className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
+          aria-label="Navigate to Learn & LMS"
         >
-          <Sparkles className="w-4 h-4 mb-0.5" />
-          <span className="text-[10px] font-sans">Learn</span>
+          <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
+            activeTab === 'learn' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
+          }`}>
+            <Sparkles className="w-5 h-5" />
+          </span>
+          <span className={`text-[10px] font-sans transition-colors ${
+            activeTab === 'learn' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
+          }`}>
+            Learn
+          </span>
         </button>
 
         <button
-          onClick={() => handleNavClick('contact')}
-          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all min-w-[44px] min-h-[44px] ${
-            activeTab === 'contact' ? 'text-claret font-bold' : 'text-ink-muted hover:text-ink'
-          }`}
+          onClick={() => setMobileMenuOpen(prev => !prev)}
+          className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
+          aria-label="Toggle Full Menu Drawer"
         >
-          <Mail className="w-4 h-4 mb-0.5" />
-          <span className="text-[10px] font-sans">Contact</span>
+          <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
+            mobileMenuOpen ? 'bg-claret/10 text-claret' : 'text-ink-muted'
+          }`}>
+            <Menu className="w-5 h-5" />
+          </span>
+          <span className={`text-[10px] font-sans transition-colors ${
+            mobileMenuOpen ? 'text-claret font-bold' : 'text-ink-muted font-normal'
+          }`}>
+            Menu
+          </span>
         </button>
       </nav>
     </>

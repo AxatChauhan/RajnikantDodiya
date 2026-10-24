@@ -89,9 +89,19 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
           Milestones across nearly two decades of teaching, research, and educational administration.
         </p>
 
-        {/* Vertical Timeline Table / Feed */}
-        <div className="overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
-          <table className="w-full text-left text-xs text-ink-muted min-w-[500px]">
+        {/* Mobile Feed (<640px) */}
+        <div className="sm:hidden space-y-2.5">
+          {CAREER_TIMELINE.map((item, idx) => (
+            <div key={idx} className="p-3.5 rounded-xl bg-white border border-deckle shadow-book space-y-1">
+              <span className="font-mono text-xs font-bold text-claret block">{item.year}</span>
+              <p className="font-reading text-xs text-ink font-normal leading-relaxed">{item.milestone}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table (>=640px) */}
+        <div className="hidden sm:block overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
+          <table className="w-full text-left text-xs text-ink-muted">
             <thead className="bg-parchment-warm text-ink border-b border-deckle font-mono text-[10px] sm:text-[11px] uppercase">
               <tr>
                 <th className="py-3 px-4 w-28 sm:w-32">Year</th>
@@ -123,11 +133,26 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
           <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">Qualifications</h2>
         </div>
 
-        {/* Degrees Table */}
+        {/* Degrees */}
         <div className="space-y-3">
           <h3 className="text-xs sm:text-sm font-mono font-semibold uppercase text-ink-muted">Degrees</h3>
-          <div className="overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
-            <table className="w-full text-left text-xs text-ink-muted min-w-[500px]">
+
+          {/* Mobile Card Feed (<640px) */}
+          <div className="sm:hidden space-y-2.5">
+            {QUALIFICATIONS.map((q, idx) => (
+              <div key={idx} className="p-3.5 rounded-xl bg-white border border-deckle shadow-book flex items-start justify-between gap-3">
+                <div className="space-y-0.5">
+                  <h4 className="font-serif text-xs font-medium text-ink">{q.degree}</h4>
+                  <p className="text-[11px] text-ink-muted font-reading">{q.university}</p>
+                </div>
+                <span className="font-mono text-xs font-bold text-claret shrink-0">{q.year}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (>=640px) */}
+          <div className="hidden sm:block overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
+            <table className="w-full text-left text-xs text-ink-muted">
               <thead className="bg-parchment-warm text-ink border-b border-deckle font-mono text-[10px] sm:text-[11px] uppercase">
                 <tr>
                   <th className="py-2.5 px-4 w-24">Year</th>
@@ -169,8 +194,26 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
           <h3 className="text-xs sm:text-sm font-mono font-semibold uppercase text-ink-muted">
             National and State Eligibility Tests
           </h3>
-          <div className="overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
-            <table className="w-full text-left text-xs text-ink-muted min-w-[500px]">
+
+          {/* Mobile Card Feed (<640px) */}
+          <div className="sm:hidden space-y-2.5">
+            {ELIGIBILITIES.map((e, idx) => (
+              <div key={idx} className="p-3.5 rounded-xl bg-white border border-deckle shadow-book flex items-start justify-between gap-3">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold text-claret">{e.exam}</span>
+                    <span className="text-[11px] text-ink-muted font-medium">• {e.subject}</span>
+                  </div>
+                  <p className="text-[11px] text-ink-faint font-reading">{e.conductedBy}</p>
+                </div>
+                <span className="font-mono text-xs font-bold text-ink-muted shrink-0">{e.year}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (>=640px) */}
+          <div className="hidden sm:block overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
+            <table className="w-full text-left text-xs text-ink-muted">
               <thead className="bg-parchment-warm text-ink border-b border-deckle font-mono text-[10px] sm:text-[11px] uppercase">
                 <tr>
                   <th className="py-2.5 px-4 w-24">Year</th>
@@ -218,13 +261,25 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
           <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">Academic Roles</h2>
         </div>
 
-        {/* Roles at HMPIETR Table */}
+        {/* Roles at HMPIETR */}
         <div className="space-y-3">
           <h3 className="text-xs sm:text-sm font-mono font-semibold uppercase text-ink-muted">
             At H. M. Patel Institute of English Training and Research
           </h3>
-          <div className="overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
-            <table className="w-full text-left text-xs text-ink-muted min-w-[500px]">
+
+          {/* Mobile Grid Cards (<640px) */}
+          <div className="sm:hidden grid grid-cols-1 gap-2.5">
+            {ACADEMIC_ROLES.map((r, idx) => (
+              <div key={idx} className="p-3.5 rounded-xl bg-white border border-deckle shadow-book flex items-center justify-between gap-3 text-xs">
+                <span className="font-medium text-ink font-serif">{r.role}</span>
+                <span className="font-mono text-claret text-[11px] font-bold shrink-0">{r.since}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (>=640px) */}
+          <div className="hidden sm:block overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
+            <table className="w-full text-left text-xs text-ink-muted">
               <thead className="bg-parchment-warm text-ink border-b border-deckle font-mono text-[10px] sm:text-[11px] uppercase">
                 <tr>
                   <th className="py-2.5 px-4">Role</th>

@@ -63,8 +63,8 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
         </p>
       </div>
 
-      {/* Subtab Navigation Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
+      {/* Subtab Navigation Pills with Edge-to-Edge Bleed on Mobile */}
+      <div className="-mx-3 px-3 sm:mx-0 sm:px-0 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
         {[
           { id: 'papers', label: `Research Papers (${PUBLICATIONS.length})` },
           { id: 'authored', label: `Authored Books (${authoredBooks.length})` },
@@ -356,7 +356,34 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
           <span className="text-xs font-mono text-ink-muted">National & International</span>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
+        {/* Mobile Card Feed (<640px) */}
+        <div className="sm:hidden space-y-3">
+          {CONFERENCE_PAPERS.map(paper => (
+            <div key={paper.id} className="p-4 rounded-xl bg-white border border-deckle shadow-book space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-xs text-ink-muted">{paper.date}</span>
+                <span
+                  className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                    paper.level === 'International'
+                      ? 'bg-claret-soft text-claret'
+                      : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {paper.level}
+                </span>
+              </div>
+              <h4 className="font-reading font-medium text-ink text-xs leading-snug">
+                {paper.topic}
+              </h4>
+              <p className="text-[11px] text-ink-muted font-reading">
+                {paper.event}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table (>=640px) */}
+        <div className="hidden sm:block overflow-x-auto rounded-2xl border border-deckle bg-white shadow-book">
           <table className="w-full text-left text-xs text-ink min-w-[620px]">
             <thead className="bg-parchment-warm/80 text-ink-muted border-b border-deckle font-mono text-[11px] uppercase">
               <tr>

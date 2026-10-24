@@ -76,10 +76,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             </div>
 
             {/* Direct Action Buttons */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={() => onNavigate('about')}
-                className="px-5 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center gap-2 min-h-[42px]"
+                className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center gap-2 min-h-[44px]"
               >
                 <span>Read Full Biography</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -87,7 +87,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
               <button
                 onClick={onOpenCompendium}
-                className="px-4 py-2.5 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-medium border border-deckle transition-all flex items-center gap-1.5 min-h-[42px]"
+                className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-medium border border-deckle transition-all flex items-center gap-1.5 min-h-[44px]"
               >
                 <Download className="w-3.5 h-3.5 text-claret" />
                 <span>Download CV</span>
@@ -95,7 +95,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
               <button
                 onClick={() => onNavigate('learn')}
-                className="px-4 py-2.5 rounded-xl bg-white hover:bg-parchment-warm text-claret text-xs font-medium border border-claret/30 transition-all flex items-center gap-1.5 min-h-[42px]"
+                className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-white hover:bg-parchment-warm text-claret text-xs font-medium border border-claret/30 transition-all flex items-center gap-1.5 min-h-[44px]"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Explore Books & NET Courses</span>
@@ -103,9 +103,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             </div>
           </div>
 
-          {/* Right Column: Professor Photo */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative rounded-2xl overflow-hidden border border-deckle shadow-book-lg bg-parchment-warm group">
+          {/* Right Column: Professor Photo - Constrained Aspect Ratio (Never Cut Off) */}
+          <div className="lg:col-span-5 relative w-full max-w-sm sm:max-w-md mx-auto lg:max-w-none">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-deckle shadow-book-lg bg-parchment-warm group aspect-[4/5]">
               <img
                 src={PROFESSOR_INFO.photoUrl}
                 alt={PROFESSOR_INFO.name}
@@ -113,19 +113,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 loading="eager"
                 decoding="async"
                 width={400}
-                height={430}
-                className="w-full h-[320px] sm:h-[400px] lg:h-[430px] object-cover object-top filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
+                height={500}
+                className="w-full h-full object-cover object-[center_16%] filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink-pure/85 via-ink-pure/20 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-white space-y-0.5">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-brass-light block">
-                  Faculty • Researcher • Mentor
-                </span>
-                <h3 className="font-serif text-lg sm:text-xl font-normal text-white">{PROFESSOR_INFO.name}</h3>
-                <p className="text-[11px] text-parchment-deep font-light">
-                  HMPIETR • Sardar Patel University, Vallabh Vidyanagar
-                </p>
+              {/* Subtle top-corner academic seal badge */}
+              <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-deckle shadow-2xs text-[10px] font-mono font-semibold uppercase tracking-wider text-claret">
+                Academic Profile
               </div>
+            </div>
+
+            {/* Dignified Caption Below Portrait (Leaves 100% of Face & Suit Unobscured) */}
+            <div className="mt-3 text-center space-y-0.5">
+              <span className="text-[10.5px] font-mono uppercase tracking-widest text-claret font-semibold block">
+                Faculty • Researcher • Mentor
+              </span>
+              <p className="text-xs text-ink-muted font-reading font-light">
+                {PROFESSOR_INFO.institution}
+              </p>
             </div>
           </div>
 
@@ -228,10 +232,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               Curated examination sourcebook for university scholars, research trainees, and UGC-NET / GSET candidates.
             </p>
 
-            <div className="pt-2 flex flex-wrap gap-2.5">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
               <button
                 onClick={() => onNavigate('bookstore')}
-                className="px-4 py-2 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium transition-all shadow-xs flex items-center gap-1.5"
+                className="w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium transition-all shadow-xs flex items-center gap-1.5 min-h-[42px]"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Open Academic Bookstore</span>
@@ -239,7 +243,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
               <button
                 onClick={() => onNavigate('publications')}
-                className="px-3.5 py-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-medium border border-deckle transition-all"
+                className="w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-medium border border-deckle transition-all min-h-[42px] flex items-center"
               >
                 <span>View All 10 Books</span>
               </button>

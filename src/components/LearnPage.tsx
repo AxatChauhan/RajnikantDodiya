@@ -210,8 +210,8 @@ export const LearnPage: React.FC<LearnPageProps> = ({
         )}
       </div>
 
-      {/* Subtab Navigation Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
+      {/* Subtab Navigation Pills with Edge-to-Edge Bleed on Mobile */}
+      <div className="-mx-3 px-3 sm:mx-0 sm:px-0 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
         {[
           { id: 'ugc-net-english', label: 'UGC NET English' },
           { id: 'ugc-net-education', label: 'UGC NET Education' },
@@ -293,13 +293,13 @@ export const LearnPage: React.FC<LearnPageProps> = ({
               </ul>
             </div>
 
-            <div className="pt-4 border-t border-deckle/60 flex flex-wrap items-center gap-3">
+            <div className="pt-4 border-t border-deckle/60 space-y-2">
               <button
                 onClick={() => {
                   setIsExamSample(true);
                   setIsExamOpen(true);
                 }}
-                className="px-4 py-2 rounded-xl bg-parchment-warm text-ink hover:bg-parchment-warm/60 border border-deckle text-xs font-medium transition-all"
+                className="w-full py-2.5 px-3 rounded-xl bg-parchment-warm text-ink hover:bg-parchment-deep border border-deckle text-xs font-medium transition-all text-center min-h-[42px]"
               >
                 Free Sample Test
               </button>
@@ -309,14 +309,14 @@ export const LearnPage: React.FC<LearnPageProps> = ({
                     setIsExamSample(false);
                     setIsExamOpen(true);
                   }}
-                  className="px-4 py-2 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-medium transition-all shadow-xs flex items-center gap-1.5"
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5 min-h-[42px]"
                 >
                   <Laptop className="w-3.5 h-3.5" /> Launch Unlocked CBT Exam
                 </button>
               ) : (
                 <button
                   onClick={() => handleOpenCheckout(examProduct)}
-                  className="px-4 py-2 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center gap-1.5"
+                  className="w-full py-2.5 px-3 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5 min-h-[42px]"
                 >
                   <Lock className="w-3.5 h-3.5" /> Buy CBT Pass (₹299)
                 </button>
