@@ -298,15 +298,16 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           
           {/* PRODUCT 1: DIGITAL MONOGRAPH */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-white border-2 border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-claret/50">
+          <div className="pw-card p-5 sm:p-6 rounded-3xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-claret/50">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-claret font-bold bg-claret-soft px-2.5 py-1 rounded">
                   {bookProduct.badge}
                 </span>
-                <div className="text-right">
+                <div className="text-right flex items-baseline gap-1.5">
                   <span className="font-serif font-bold text-2xl text-ink">₹{bookProduct.price}</span>
-                  <span className="text-[11px] font-mono text-ink-muted line-through ml-1.5">₹{bookProduct.originalPrice}</span>
+                  <span className="text-xs font-mono text-gray-400 line-through">₹{bookProduct.originalPrice}</span>
+                  <span className="discount-pill text-[10px] px-2 py-0.5 rounded-full font-mono">50% OFF</span>
                 </div>
               </div>
 
@@ -370,15 +371,16 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
           </div>
 
           {/* PRODUCT 2: CBT MOCK EXAM SIMULATOR */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-white border-2 border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-blue-900/40">
+          <div className="pw-card p-5 sm:p-6 rounded-3xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-6 transition-all hover:border-blue-900/40">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-blue-900 font-bold bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
                   {examProduct.badge}
                 </span>
-                <div className="text-right">
+                <div className="text-right flex items-baseline gap-1.5">
                   <span className="font-serif font-bold text-2xl text-ink">₹{examProduct.price}</span>
-                  <span className="text-[11px] font-mono text-ink-muted line-through ml-1.5">₹{examProduct.originalPrice}</span>
+                  <span className="text-xs font-mono text-gray-400 line-through">₹{examProduct.originalPrice}</span>
+                  <span className="discount-pill text-[10px] px-2 py-0.5 rounded-full font-mono">50% OFF</span>
                 </div>
               </div>
 
@@ -442,7 +444,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
           </div>
 
           {/* PRODUCT 3: THE SCHOLAR BUNDLE (BEST VALUE) */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#1C140E] to-[#2E1810] text-white border-2 border-brass/50 shadow-book flex flex-col justify-between space-y-6 relative overflow-hidden">
+          <div className="pw-card p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#1C140E] to-[#2E1810] text-white border-2 border-brass/50 shadow-book flex flex-col justify-between space-y-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-brass/10 rounded-full blur-2xl pointer-events-none" />
             
             <div className="space-y-4 relative z-10">
@@ -450,9 +452,10 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                 <span className="text-[10px] font-mono uppercase tracking-wider text-brass font-bold bg-brass/15 border border-brass/30 px-2.5 py-1 rounded">
                   {bundleProduct.badge}
                 </span>
-                <div className="text-right">
+                <div className="text-right flex items-baseline gap-1.5">
                   <span className="font-serif font-bold text-2xl text-brass">₹{bundleProduct.price}</span>
-                  <span className="text-[11px] font-mono text-[#D7C3B0] line-through ml-1.5">₹{bundleProduct.originalPrice}</span>
+                  <span className="text-xs font-mono text-[#D7C3B0] line-through">₹{bundleProduct.originalPrice}</span>
+                  <span className="bg-amber-400 text-ink text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">50% OFF</span>
                 </div>
               </div>
 
