@@ -189,6 +189,15 @@
   box-shadow: 0 -8px 30px rgba(22, 42, 69, 0.08);
 }
 
+/* Utility to hide scrollbars while maintaining scroll functionality */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* ========================================================= */
 /* DIGITAL RIGHTS MANAGEMENT (DRM) PRINT PROTECTION          */
 /* Blocks browser print dialog (Ctrl+P / Save to PDF leaks)  */

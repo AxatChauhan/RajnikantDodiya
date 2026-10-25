@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { PUBLICATIONS, BOOKS, CONFERENCE_PAPERS, Publication, Book, Engagement } from '../data/professorData';
+import { useSiteContent } from '../contexts/SiteContentContext';
 import {
   BookOpen,
   FileText,
@@ -22,6 +23,9 @@ interface PublicationsPageProps {
 }
 
 export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, onNavigate }) => {
+  const { books } = useSiteContent();
+  const allBooks = books && books.length > 0 ? books : BOOKS;
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('All');
 
@@ -44,9 +48,9 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
     });
   }, [searchTerm, selectedTheme]);
 
-  const authoredBooks = BOOKS.filter(b => b.type === 'authored');
-  const editedBooks = BOOKS.filter(b => b.type === 'edited');
-  const bookChapters = BOOKS.filter(b => b.type === 'chapter');
+  const authoredBooks = allBooks.filter(b => b.type === 'authored');
+  const editedBooks = allBooks.filter(b => b.type === 'edited');
+  const bookChapters = allBooks.filter(b => b.type === 'chapter');
 
   return (
     <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2 sm:pt-4">

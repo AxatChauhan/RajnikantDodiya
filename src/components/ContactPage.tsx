@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from '../data/professorData';
+import { useSiteContent } from '../contexts/SiteContentContext';
 import {
   Mail,
   MapPin,
@@ -22,6 +23,7 @@ interface ContactPageProps {
 }
 
 export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
+  const { profile } = useSiteContent();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -35,7 +37,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
     message: ''
   });
 
-  const recipientEmail = PROFESSOR_INFO.email;
+  const recipientEmail = profile.email || PROFESSOR_INFO.email;
+  const professorName = profile.name || PROFESSOR_INFO.name;
+  const professorTitle = profile.title || PROFESSOR_INFO.title;
+  const professorInstitution = profile.institution || PROFESSOR_INFO.institution;
+  const professorLocation = profile.location || PROFESSOR_INFO.location;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,8 +206,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
             <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
               Official Academic Contact
             </span>
-            <h3 className="font-serif text-2xl text-ink font-normal">{PROFESSOR_INFO.name}</h3>
-            <p className="text-xs text-claret font-mono font-semibold">{PROFESSOR_INFO.title}</p>
+            <h3 className="font-serif text-2xl text-ink font-normal">{professorName}</h3>
+            <p className="text-xs text-claret font-mono font-semibold">{professorTitle}</p>
           </div>
 
           <div className="space-y-4 text-xs font-sans text-ink-muted">
@@ -209,7 +215,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
               <Building2 className="w-4 h-4 text-claret shrink-0 mt-0.5" />
               <div>
                 <strong className="font-medium text-ink block mb-0.5">Department & Institution:</strong>
-                <p className="font-light leading-relaxed">{PROFESSOR_INFO.institution}</p>
+                <p className="font-light leading-relaxed">{professorInstitution}</p>
                 <p className="font-light leading-relaxed">{PROFESSOR_INFO.university}</p>
               </div>
             </div>
@@ -218,7 +224,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
               <MapPin className="w-4 h-4 text-claret shrink-0 mt-0.5" />
               <div>
                 <strong className="font-medium text-ink block mb-0.5">Location:</strong>
-                <p className="font-light leading-relaxed">{PROFESSOR_INFO.location}</p>
+                <p className="font-light leading-relaxed">{professorLocation}</p>
               </div>
             </div>
 
@@ -227,10 +233,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
               <div>
                 <strong className="font-medium text-ink block mb-0.5">Email (Primary for Inquiries):</strong>
                 <a
-                  href={`mailto:${PROFESSOR_INFO.email}`}
+                  href={`mailto:${recipientEmail}`}
                   className="text-claret font-mono underline hover:text-claret-dark block break-all font-medium"
                 >
-                  {PROFESSOR_INFO.email}
+                  {recipientEmail}
                 </a>
               </div>
             </div>

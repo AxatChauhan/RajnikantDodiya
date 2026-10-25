@@ -138,7 +138,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { session } = useScholarSession();
-  const { openStudio, profile } = useSiteContent();
+  const { openStudio, profile, alertBanner, layoutSettings } = useSiteContent();
 
   const isScholarActive = Boolean(
     session.unlockedItems && session.unlockedItems.length > 0 && session.mobile
@@ -180,27 +180,74 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* ========================================================= */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#FAF9F5]/98 backdrop-blur-md border-b border-deckle transition-all shadow-xs">
         
+        {/* TOP ANNOUNCEMENT ALERT BAR (Directly integrated in document flow to prevent overlap) */}
+        {layoutSettings?.showEmergencyAlert && alertBanner?.enabled && (
+          <aside
+            aria-label="Important Announcement"
+            className={`py-1.5 sm:py-2 px-3 sm:px-4 text-xs font-sans border-b shadow-2xs transition-all ${
+              alertBanner.badgeType === 'urgent'
+                ? 'bg-[#6B1D2F] text-white border-[#4D1220]'
+                : alertBanner.badgeType === 'success'
+                ? 'bg-[#1B4332] text-white border-[#081C15]'
+                : alertBanner.badgeType === 'gold'
+                ? 'bg-[#2A2312] text-[#F3E7C4] border-[#44381C]'
+                : 'bg-claret text-white border-claret-dark'
+            }`}
+          >
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-2.5">
+              <span className="font-mono text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/15 shrink-0 shadow-2xs">
+                {alertBanner.badgeText || (
+                  alertBanner.badgeType === 'urgent'
+                    ? 'Notice'
+                    : alertBanner.badgeType === 'success'
+                    ? 'Update'
+                    : 'Announcement'
+                )}
+              </span>
+              <span className="font-medium text-xs leading-tight truncate flex-1 text-center sm:text-left">
+                {alertBanner.text}
+              </span>
+              {alertBanner.buttonText && (
+                <button
+                  onClick={() => {
+                    if (alertBanner.buttonLink.startsWith('#')) {
+                      const target = alertBanner.buttonLink.replace('#', '') as MainTab;
+                      handleNavClick(target);
+                    } else if (alertBanner.buttonLink.startsWith('http')) {
+                      window.open(alertBanner.buttonLink, '_blank');
+                    }
+                  }}
+                  className="text-[11px] underline font-semibold hover:opacity-80 transition-opacity ml-1 inline-flex items-center gap-0.5 shrink-0"
+                >
+                  <span>{alertBanner.buttonText}</span>
+                  <span>→</span>
+                </button>
+              )}
+            </div>
+          </aside>
+        )}
+
         {/* ROW 1: Brand Identity & Utility Bar */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-3">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-3">
           
           {/* Brand Logo & Name */}
           <button
             onClick={() => handleNavClick('home')}
-            className="flex items-center gap-2.5 sm:gap-3 text-left group shrink-0 py-1"
+            className="flex items-center gap-2 sm:gap-3 text-left group shrink min-w-0 py-1"
           >
             <ProfessorCrestIcon className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
             <div className="min-w-0 pr-1">
               <h1 className="font-serif text-sm sm:text-base font-semibold text-ink group-hover:text-claret transition-colors leading-tight truncate">
                 {profile.name || PROFESSOR_INFO.name}
               </h1>
-              <p className="text-[10px] sm:text-[11px] font-mono text-ink-muted font-normal tracking-wide truncate max-w-[170px] sm:max-w-none">
+              <p className="text-[10px] sm:text-[11px] font-mono text-ink-muted font-normal tracking-wide truncate max-w-[145px] sm:max-w-none">
                 Assistant Professor • {profile.institution || PROFESSOR_INFO.institution}
               </p>
             </div>
           </button>
 
-          {/* Social Links (Same-Color Icons as per brief) & Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Social Links & Action Buttons */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             
             {/* Social Media Cluster (Desktop) */}
             <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 rounded-xl bg-parchment-warm/70 border border-deckle text-ink-muted text-xs">
@@ -271,10 +318,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-serif">Bookstore</span>
             </button>
 
-            {/* BUTTON 1: [Download CV] - Desktop only to preserve mobile breathing room */}
+            {/* BUTTON 1: [Download CV] - xl only to prevent 1024px laptop crowding */}
             <button
               onClick={onOpenCompendium}
-              className="hidden lg:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-deckle hover:border-claret text-xs font-sans font-medium text-ink-muted hover:text-claret transition-all items-center gap-1.5 shadow-2xs shrink-0 min-h-[38px]"
+              className="hidden xl:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-deckle hover:border-claret text-xs font-sans font-medium text-ink-muted hover:text-claret transition-all items-center gap-1.5 shadow-2xs shrink-0 min-h-[38px]"
               title="View or Download Dr. Dodiya's Curriculum Vitae"
             >
               <Download className="w-3.5 h-3.5 text-claret" />
@@ -286,16 +333,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               isScholarActive ? (
                 <button
                   onClick={onOpenAuthModal}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 font-semibold hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-10 min-h-[40px]"
+                  className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 font-semibold hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-9 sm:h-10 min-h-[36px]"
                   title="View your active student pass"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="truncate max-w-[85px] sm:max-w-[110px]">{session.name}</span>
+                  <span className="truncate max-w-[80px] sm:max-w-[110px]">{session.name}</span>
                 </button>
               ) : (
                 <button
                   onClick={onOpenAuthModal}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-10 min-h-[40px]"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-9 sm:h-10 min-h-[36px]"
                   title="Sign in with your verified WhatsApp number"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
@@ -305,20 +352,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               )
             )}
 
-            {/* BUTTON 3: [🏛️ Author Studio] */}
+            {/* BUTTON 3: [🏛️ Author Studio] - Hidden on mobile (<sm) to prevent overflow */}
             <button
               onClick={openStudio}
-              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret-soft hover:bg-claret hover:text-white border border-claret/30 text-claret text-xs font-serif font-semibold transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-10 min-h-[40px]"
+              className="hidden sm:inline-flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret-soft hover:bg-claret hover:text-white border border-claret/30 text-claret text-xs font-serif font-semibold transition-all items-center gap-1.5 shadow-2xs shrink-0 h-9 sm:h-10 min-h-[36px]"
               title="Dedicated Author Studio for Dr. Rajnikant Dodiya"
             >
               <Shield className="w-3.5 h-3.5 text-brass shrink-0" />
-              <span className="hidden sm:inline">Studio</span>
+              <span>Studio</span>
             </button>
 
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
-              className="lg:hidden p-2 rounded-xl bg-parchment-warm border border-deckle text-ink-muted hover:text-ink transition-colors h-10 w-10 min-h-[40px] min-w-[40px] flex items-center justify-center shrink-0"
+              className="lg:hidden p-1.5 sm:p-2 rounded-xl bg-parchment-warm border border-deckle text-ink-muted hover:text-ink transition-colors h-9 w-9 sm:h-10 sm:w-10 min-h-[36px] min-w-[36px] flex items-center justify-center shrink-0"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-claret" /> : <Menu className="w-5 h-5" />}
@@ -326,17 +373,32 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* ROW 2: Primary 8-Tab Desktop Navigation with Dropdowns */}
+        {/* ROW 2: Primary 8-Tab Desktop Navigation with Dropdowns & Laptop Horizontal Scroll Resilience */}
         <div className="hidden lg:block border-t border-deckle/60 bg-[#FAF9F5]/90">
           <nav
             aria-label="Main Menu"
-            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between"
+            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto scrollbar-none"
           >
             <div className="flex items-center gap-0.5 xl:gap-1 py-1">
               {MAIN_NAV_ITEMS.map((item) => {
                 const isActive = activeTab === item.id;
                 const hasSubtabs = item.subtabs && item.subtabs.length > 0;
                 const isDropdownOpen = openDropdown === item.id;
+
+                // Responsive label mapping for compact 1024px laptop viewports
+                const displayLabel = item.id === 'communities' ? (
+                  <>
+                    <span className="lg:inline xl:hidden">Communities</span>
+                    <span className="hidden xl:inline">Communities & Initiatives</span>
+                  </>
+                ) : item.id === 'talks' ? (
+                  <>
+                    <span className="lg:inline xl:hidden">Talks</span>
+                    <span className="hidden xl:inline">Talks & Events</span>
+                  </>
+                ) : (
+                  item.label
+                );
 
                 return (
                   <div
@@ -347,13 +409,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <button
                       onClick={() => handleNavClick(item.id)}
-                      className={`px-2.5 xl:px-3 py-2 rounded-lg text-xs xl:text-[13px] font-sans transition-all flex items-center gap-1 whitespace-nowrap min-h-[38px] ${
+                      className={`px-2 xl:px-3 py-2 rounded-lg text-xs xl:text-[13px] font-sans transition-all flex items-center gap-1 whitespace-nowrap min-h-[38px] ${
                         isActive
                           ? 'bg-claret text-white font-medium shadow-xs'
                           : 'text-ink-muted hover:text-ink hover:bg-parchment-deep/50'
                       }`}
                     >
-                      <span>{item.label}</span>
+                      <span>{displayLabel}</span>
                       {hasSubtabs && (
                         <ChevronDown className={`w-3 h-3 transition-transform opacity-70 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                       )}

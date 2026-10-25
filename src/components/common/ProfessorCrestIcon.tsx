@@ -33,7 +33,7 @@ export const ProfessorCrestIcon: React.FC<ProfessorCrestIconProps> = ({
         width={size}
         height={size}
         onError={() => setImgError(true)}
-        className="w-full h-full object-cover object-center"
+        className="w-full h-full object-cover object-[center_18%]"
       />
     </div>
   );

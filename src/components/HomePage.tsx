@@ -155,15 +155,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 decoding="async"
                 width={420}
                 height={420}
-                className="w-full h-full object-cover object-center filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-[center_18%] filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-claret/60 via-transparent to-transparent opacity-30" />
             </div>
 
-            {/* 4 Floating Achievement Chips - Desktop Positioned Overlay */}
-            <div className="hidden lg:block">
+            {/* 4 Floating Achievement Chips - Desktop Positioned Overlay (Floats along left & right flanks) */}
+            <div className="hidden lg:block pointer-events-none">
               {/* Chip 1: Top-Left */}
-              <div className="absolute -top-4 -left-6 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink">
+              <div className="absolute top-4 -left-6 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
                 <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
                   <Award className="w-4 h-4" />
                 </span>
@@ -173,19 +173,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 </div>
               </div>
 
-              {/* Chip 2: Top-Right */}
-              <div className="absolute -top-4 -right-4 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink">
-                <span className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                  <BookOpen className="w-4 h-4" />
-                </span>
-                <div>
-                  <p className="text-[10px] text-ink-muted uppercase leading-none">Catalog</p>
-                  <p className="text-xs font-bold leading-tight">10 Published Books</p>
-                </div>
-              </div>
-
-              {/* Chip 3: Bottom-Left */}
-              <div className="absolute -bottom-4 -left-4 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink">
+              {/* Chip 2: Mid-Left (No bottom collision) */}
+              <div className="absolute bottom-14 -left-6 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
                 <span className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
                   <GraduationCap className="w-4 h-4" />
                 </span>
@@ -195,8 +184,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 </div>
               </div>
 
-              {/* Chip 4: Bottom-Right */}
-              <div className="absolute -bottom-4 -right-4 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink">
+              {/* Chip 3: Top-Right */}
+              <div className="absolute top-4 -right-5 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
+                <span className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                  <BookOpen className="w-4 h-4" />
+                </span>
+                <div>
+                  <p className="text-[10px] text-ink-muted uppercase leading-none">Catalog</p>
+                  <p className="text-xs font-bold leading-tight">10 Published Books</p>
+                </div>
+              </div>
+
+              {/* Chip 4: Mid-Right (No bottom collision) */}
+              <div className="absolute bottom-14 -right-5 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
                 <span className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
                   <Star className="w-4 h-4 text-purple-600 fill-current" />
                 </span>
@@ -207,7 +207,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               </div>
             </div>
 
-            {/* Mobile / Tablet Friendly 2x2 Achievement Grid (No Clipping on Narrow Screens) */}
+            {/* Mobile / Tablet Friendly 2x2 Achievement Grid (Clean Spacing, No Overlap) */}
             <div className="lg:hidden grid grid-cols-2 gap-2 mt-4">
               <div className="floating-badge p-2 rounded-xl flex items-center gap-2 text-xs font-sans">
                 <Award className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -227,14 +227,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               </div>
             </div>
 
-            {/* Caption */}
-            <div className="mt-3 text-center space-y-0.5">
-              <span className="text-[11px] font-mono uppercase tracking-widest text-claret font-bold block">
-                {profile.name || PROFESSOR_INFO.name}
+            {/* Dignified Academic Caption Below (Clean Margin, Zero Overlap on All Devices) */}
+            <div className="mt-6 text-center">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-deckle shadow-2xs text-[11px] font-mono font-semibold uppercase tracking-wider text-claret">
+                <ProfessorCrestIcon className="w-3.5 h-3.5" />
+                <span>Faculty • Academic Researcher • Mentor</span>
               </span>
-              <p className="text-xs text-ink-muted">
-                {profile.institution || PROFESSOR_INFO.institution}
-              </p>
             </div>
           </div>
 

@@ -9,6 +9,7 @@ import {
   MEMBERSHIPS,
   ACADEMIC_RECOGNITION
 } from '../data/professorData';
+import { useSiteContent } from '../contexts/SiteContentContext';
 import {
   GraduationCap,
   Award,
@@ -29,15 +30,22 @@ interface AboutPageProps {
 }
 
 export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendium }) => {
+  const { profile } = useSiteContent();
+  const professorName = profile.name || PROFESSOR_INFO.name;
+  const professorTitle = profile.title || PROFESSOR_INFO.title;
+  const professorInstitution = profile.institution || PROFESSOR_INFO.institution;
+  const shortBio = profile.shortBio || PROFESSOR_INFO.shortBio;
+  const longBio = profile.longBio && profile.longBio.length > 0 ? profile.longBio : PROFESSOR_INFO.longBio;
+
   return (
     <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2 sm:pt-4">
       
       {/* Page Title & Breadcrumb Header */}
       <div className="pb-4 border-b border-deckle">
         <span className="text-xs font-mono uppercase tracking-widest text-claret font-semibold">Faculty Profile</span>
-        <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1">About Dr. Rajnikant S. Dodiya</h1>
+        <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1">About {professorName}</h1>
         <p className="text-xs sm:text-sm text-ink-muted font-reading font-light mt-1">
-          Assistant Professor of English Language Pedagogy and Education • HMPIETR, Sardar Patel University
+          {professorTitle} • {professorInstitution}
         </p>
       </div>
 
@@ -53,7 +61,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
             <span className="text-xs font-mono font-bold uppercase tracking-wider">Short Bio (For Introductions & Talk Invitations)</span>
           </div>
           <p className="text-xs sm:text-sm text-ink font-reading leading-relaxed">
-            {PROFESSOR_INFO.shortBio}
+            {shortBio}
           </p>
         </div>
 
@@ -64,7 +72,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
             <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">Full Biography</h2>
           </div>
           <div className="space-y-3.5 text-xs sm:text-sm text-ink-muted font-reading font-light leading-relaxed">
-            {PROFESSOR_INFO.longBio.map((paragraph, idx) => (
+            {longBio.map((paragraph, idx) => (
               <p key={idx} className="indent-4 sm:indent-6">
                 {paragraph}
               </p>

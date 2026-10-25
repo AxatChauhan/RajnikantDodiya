@@ -110,50 +110,11 @@ function AppInner() {
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
-      {/* Top Announcement Alert Bar (Customized via Studio) */}
-      {layoutSettings.showEmergencyAlert && alertBanner.enabled && (
-        <aside
-          aria-label="Important Announcement"
-          className={`fixed top-16 sm:top-18 left-0 right-0 z-30 py-2 px-4 text-xs font-sans border-b shadow-xs transition-all ${
-            alertBanner.badgeType === 'urgent'
-              ? 'bg-[#6B1D2F] text-white border-[#4D1220]'
-              : alertBanner.badgeType === 'success'
-              ? 'bg-[#1B4332] text-white border-[#081C15]'
-              : alertBanner.badgeType === 'gold'
-              ? 'bg-[#2A2312] text-[#F3E7C4] border-[#44381C]'
-              : 'bg-claret text-white border-claret-dark'
-          }`}
-        >
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-2 text-center">
-            <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 font-bold shadow-2xs">
-              {alertBanner.badgeText || 'Notice'}
-            </span>
-            <span className="font-medium text-xs leading-tight">{alertBanner.text}</span>
-            {alertBanner.buttonText && (
-              <button
-                onClick={() => {
-                  if (alertBanner.buttonLink.startsWith('#')) {
-                    const target = alertBanner.buttonLink.replace('#', '') as MainTab;
-                    handleNavigate(target);
-                  } else if (alertBanner.buttonLink.startsWith('http')) {
-                    window.open(alertBanner.buttonLink, '_blank');
-                  }
-                }}
-                className="text-[11px] underline font-semibold hover:opacity-80 transition-opacity ml-1 inline-flex items-center gap-0.5"
-              >
-                <span>{alertBanner.buttonText}</span>
-                <span>→</span>
-              </button>
-            )}
-          </div>
-        </aside>
-      )}
-
       {/* Main Container */}
       <main className={`max-w-7xl mx-auto px-3 sm:px-6 md:px-8 min-h-[75vh] ${
-        layoutSettings.showEmergencyAlert && alertBanner.enabled
-          ? 'pt-32 sm:pt-36'
-          : 'pt-24 sm:pt-28'
+        layoutSettings?.showEmergencyAlert && alertBanner?.enabled
+          ? 'pt-28 sm:pt-32 lg:pt-40'
+          : 'pt-20 sm:pt-24 lg:pt-36'
       }`}>
         <AcademicErrorBoundary fallbackTitle="Academic Section Interrupted">
           <Suspense fallback={<AcademicLoadingFallback />}>

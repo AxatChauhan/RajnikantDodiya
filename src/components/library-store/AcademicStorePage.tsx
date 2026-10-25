@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { STORE_PRODUCTS, StoreProduct } from '../../data/storeCatalogData';
 import { BOOKS, SOCIAL_LINKS, PROFESSOR_INFO } from '../../data/professorData';
 import { useScholarSession, ScholarSession } from '../../hooks/useScholarSession';
+import { useSiteContent } from '../../contexts/SiteContentContext';
 import { generateSecureDeviceToken } from '../../lib/security';
 import { loginAndTransferDevice } from '../../lib/supabase';
 import {
@@ -64,6 +65,9 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
   onOpenAuthModal,
   onNavigate
 }) => {
+  const { books } = useSiteContent();
+  const allBooks = books && books.length > 0 ? books : BOOKS;
+
   const [selectedProduct, setSelectedProduct] = useState<StoreProduct | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
@@ -559,7 +563,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
               Physical Library & University Press
             </span>
             <h2 className="font-serif text-2xl text-ink font-normal mt-0.5">
-              Published Print Volumes (10 Books)
+              Published Print Volumes ({allBooks.length} Books)
             </h2>
           </div>
           <span className="text-xs font-mono text-ink-muted">6 Authored • 4 Edited Works</span>
@@ -570,7 +574,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {BOOKS.map((book, idx) => (
+          {allBooks.map((book, idx) => (
             <div
               key={idx}
               className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3 transition-all hover:border-claret/50 group"
