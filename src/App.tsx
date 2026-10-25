@@ -81,7 +81,7 @@ function AppInner() {
       publications: `Publications & Books | ${profile.name || PROFESSOR_INFO.name}`,
       talks: `Talks & Events | ${profile.name || PROFESSOR_INFO.name}`,
       communities: `Communities & Initiatives | ${profile.name || PROFESSOR_INFO.name}`,
-      learn: `Learn & Study Hub | ${profile.name || PROFESSOR_INFO.name}`,
+      learn: `Study Materials & Examination Passes | ${profile.name || PROFESSOR_INFO.name}`,
       bookstore: `Academic Bookstore & Study Passes | ${profile.name || PROFESSOR_INFO.name}`,
       contact: `Contact & Collaboration | ${profile.name || PROFESSOR_INFO.name}`
     };

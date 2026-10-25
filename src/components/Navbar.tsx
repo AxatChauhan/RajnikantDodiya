@@ -99,15 +99,11 @@ export const MAIN_NAV_ITEMS: NavItemConfig[] = [
   },
   {
     id: 'learn',
-    label: 'Learn',
+    label: 'Study Materials',
     subtabs: [
-      { id: 'ugc-net-english', label: 'UGC NET English' },
-      { id: 'ugc-net-education', label: 'UGC NET Education' },
-      { id: 'gujarat-tet', label: 'Gujarat TET (In Prep)' },
-      { id: 'books', label: 'Books (With Buy Links)' },
-      { id: 'free-resources', label: 'Free Resources & Official Links' },
-      { id: 'ai-tutor', label: 'AI Tutor' },
-      { id: 'blog', label: 'Pedagogy Blog' }
+      { id: 'net-vidya-english', label: 'NET Vidya English' },
+      { id: 'net-vidya-education', label: 'NET Vidya Education' },
+      { id: 'tet-ii-gujarat', label: 'TET-II Gujarat' }
     ]
   },
   {
@@ -659,7 +655,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => handleNavClick('learn')}
           className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
-          aria-label="Navigate to Learn & LMS"
+          aria-label="Navigate to Study Materials"
         >
           <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
             activeTab === 'learn' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
@@ -669,7 +665,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className={`text-[10px] font-sans transition-colors ${
             activeTab === 'learn' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
           }`}>
-            Learn
+            Materials
           </span>
         </button>
 

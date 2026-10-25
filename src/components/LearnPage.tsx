@@ -1,8 +1,10 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useMemo } from 'react';
 import { STORE_PRODUCTS, StoreProduct } from '../data/storeCatalogData';
 import { BOOKS, SOCIAL_LINKS, PROFESSOR_INFO } from '../data/professorData';
+import { STUDY_TRACKS, StudyTrackId, StudyTrack, StudyBundleOption } from '../data/studyMaterialsData';
 import { useScholarSession, ScholarSession } from '../hooks/useScholarSession';
-import { generateSecureDeviceToken } from '../lib/security';
+import { signInScholar, signUpScholar, signOutScholar } from '../lib/credentialAuth';
+import { validateIndianMobile, validateEmail, generateSecureDeviceToken } from '../lib/security';
 import {
   BookOpen,
   GraduationCap,
@@ -23,7 +25,18 @@ import {
   Send,
   Bot,
   UserCheck,
-  RotateCcw
+  RotateCcw,
+  Check,
+  Eye,
+  EyeOff,
+  UserPlus,
+  KeyRound,
+  Shield,
+  Smartphone,
+  Zap,
+  Layers,
+  Award,
+  Book
 } from 'lucide-react';
 import { MainTab } from './Navbar';
 
@@ -49,12 +62,60 @@ export const LearnPage: React.FC<LearnPageProps> = ({
   onOpenAuthModal,
   onNavigate
 }) => {
+  // Determine active track from subSection URL parameter or fallback to English
+  const [activeTrackId, setActiveTrackId] = useState<StudyTrackId>(() => {
+    if (subSection === 'net-vidya-education') return 'net-vidya-education';
+    if (subSection === 'tet-ii-gujarat') return 'tet-ii-gujarat';
+    return 'net-vidya-english';
+  });
+
+  // Keep track in sync when user clicks navbar subtabs
+  useEffect(() => {
+    if (subSection === 'net-vidya-education') setActiveTrackId('net-vidya-education');
+    else if (subSection === 'tet-ii-gujarat') setActiveTrackId('tet-ii-gujarat');
+    else if (subSection === 'net-vidya-english') setActiveTrackId('net-vidya-english');
+  }, [subSection]);
+
+  const currentTrack: StudyTrack = useMemo(() => {
+    return STUDY_TRACKS[activeTrackId] || STUDY_TRACKS['net-vidya-english'];
+  }, [activeTrackId]);
+
+  // Auth & Session
+  const {
+    session: studentSession,
+    isBookOwned,
+    isExamOwned,
+    isBundleOwned,
+    saveSession,
+    clearSession: handleClearSession
+  } = useScholarSession();
+
+  const isLoggedIn = Boolean(
+    (studentSession.email || studentSession.mobile) && studentSession.unlockedItems.length > 0
+  );
+
+  // Sign up / Sign in Form State (For non-logged in candidates)
+  const [authMode, setAuthMode] = useState<'signup' | 'signin'>('signup');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authSubmitting, setAuthSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+
+  // Modals & Reader state
   const [selectedProduct, setSelectedProduct] = useState<StoreProduct | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isExamOpen, setIsExamOpen] = useState(false);
   const [isReaderSample, setIsReaderSample] = useState(false);
   const [isExamSample, setIsExamSample] = useState(false);
+
+  // Interactive Demo PDF Reader Modal
+  const [isDemoViewerOpen, setIsDemoViewerOpen] = useState(false);
+  const [demoActiveTab, setDemoActiveTab] = useState<'overview' | 'questions' | 'notes'>('overview');
 
   // AI Tutor State
   const [aiQuestion, setAiQuestion] = useState('');
@@ -63,32 +124,99 @@ export const LearnPage: React.FC<LearnPageProps> = ({
   >([
     {
       role: 'assistant',
-      text: 'Hello! I am Dr. Dodiya’s virtual pedagogy tutor. Ask me anything about UGC NET English Literature, Teacher Education, Post-Method Pedagogy, or NEP 2020.'
+      text: 'Hello! I am Dr. Dodiya’s virtual pedagogy tutor. Ask me anything about UGC NET English Literature, Teacher Education, Post-Method Pedagogy, or Gujarat TET-II.'
     }
   ]);
 
-  const {
-    session: studentSession,
-    isBookOwned,
-    isExamOwned,
-    isComplimentaryOwned,
-    saveSession,
-    clearSession: handleClearSession
-  } = useScholarSession();
+  // Handle Candidate Sign Up
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setAuthSuccess(null);
 
-  const bookProduct = STORE_PRODUCTS.find(p => p.type === 'book') || STORE_PRODUCTS[0];
-  const examProduct = STORE_PRODUCTS.find(p => p.type === 'exam') || STORE_PRODUCTS[1];
-  const bundleProduct = STORE_PRODUCTS.find(p => p.type === 'bundle') || STORE_PRODUCTS[2];
+    const cleanName = name.trim();
+    const cleanPhone = phone.trim();
+    const cleanEmail = email.trim();
 
-  const handleOpenCheckout = (product: StoreProduct) => {
+    if (!cleanName) {
+      setAuthError('Please enter your full name.');
+      return;
+    }
+    if (!validateIndianMobile(cleanPhone)) {
+      setAuthError('Please enter a valid 10-digit Indian WhatsApp mobile number.');
+      return;
+    }
+    if (!validateEmail(cleanEmail)) {
+      setAuthError('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setAuthError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setAuthSubmitting(true);
+    const result = await signUpScholar({
+      name: cleanName,
+      phone: cleanPhone,
+      email: cleanEmail,
+      password
+    });
+    setAuthSubmitting(false);
+
+    if (result.success && result.session) {
+      saveSession(result.session);
+      setAuthSuccess('Student account created successfully! Welcome to your Study Dashboard.');
+      setPassword('');
+    } else {
+      setAuthError(result.error || 'Failed to create student account. Please verify details.');
+    }
+  };
+
+  // Handle Candidate Sign In
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setAuthSuccess(null);
+
+    const cleanEmail = email.trim();
+    if (!validateEmail(cleanEmail)) {
+      setAuthError('Please enter your registered email address.');
+      return;
+    }
+    if (!password) {
+      setAuthError('Please enter your password.');
+      return;
+    }
+
+    setAuthSubmitting(true);
+    const result = await signInScholar({
+      email: cleanEmail,
+      password
+    });
+    setAuthSubmitting(false);
+
+    if (result.success && result.session) {
+      saveSession(result.session);
+      setAuthSuccess('Signed in successfully! Dual-device student pass is active.');
+      setPassword('');
+    } else {
+      setAuthError(result.error || 'Invalid credentials. Please verify your email and password.');
+    }
+  };
+
+  // Trigger Purchase / Checkout for Study Bundle
+  const handleSelectBundle = (bundle: StudyBundleOption) => {
+    const product = STORE_PRODUCTS.find(p => p.id === bundle.id) || STORE_PRODUCTS[0];
     setSelectedProduct(product);
     setIsCheckoutOpen(true);
   };
 
+  // Handle Successful Bundle Purchase
   const handlePurchaseSuccess = (
     product: StoreProduct,
-    name: string,
-    mobile: string,
+    buyerName: string,
+    buyerMobile: string,
     orderId: string,
     deviceToken?: string
   ) => {
@@ -101,24 +229,81 @@ export const LearnPage: React.FC<LearnPageProps> = ({
     }
 
     const updatedSession: ScholarSession = {
-      name,
-      mobile,
-      orderId,
+      ...studentSession,
+      name: buyerName || studentSession.name,
+      mobile: buyerMobile || studentSession.mobile,
+      orderId: orderId || studentSession.orderId,
       unlockedItems: updatedUnlocks,
       deviceToken: deviceToken || studentSession.deviceToken || generateSecureDeviceToken()
     };
 
     saveSession(updatedSession);
+    setIsCheckoutOpen(false);
 
+    // Open purchased material immediately
     if (product.type === 'book') {
       setIsReaderSample(false);
       setIsReaderOpen(true);
-    } else {
+    } else if (product.type === 'exam') {
       setIsExamSample(false);
       setIsExamOpen(true);
     }
   };
 
+  // Generate / Download Demo PDF file
+  const handleDownloadDemoPdf = () => {
+    const demo = currentTrack.demoPdf;
+    const content = [
+      `================================================================`,
+      `  ${demo.title.toUpperCase()}`,
+      `  ${demo.subtitle}`,
+      `  H.M. Patel Institute of English Training and Research (HMPIETR)`,
+      `  Sardar Patel University • Vallabh Vidyanagar`,
+      `================================================================\n`,
+      `COURSE TRACK: ${currentTrack.name} (${currentTrack.examCode})`,
+      `TARGET ASPIRANTS: ${currentTrack.targetAspirants}`,
+      `OFFICIAL NOTE: ${currentTrack.officialNotificationNote}\n`,
+      `----------------------------------------------------------------`,
+      `1. OVERVIEW & PEDAGOGICAL DIRECTIVES`,
+      `----------------------------------------------------------------`,
+      demo.overview,
+      `\nKEY TOPICS COVERED IN THIS TRACK:`,
+      ...demo.keyTopics.map((t, idx) => `  ${idx + 1}. ${t}`),
+      `\n----------------------------------------------------------------`,
+      `2. HIGH-YIELD CURRICULAR EXCERPTS`,
+      `----------------------------------------------------------------`,
+      ...demo.excerptText.map(p => `\n${p}`),
+      `\n----------------------------------------------------------------`,
+      `3. SOLVED MODEL EXAMINATION QUESTIONS WITH PEDAGOGICAL RATIONALE`,
+      `----------------------------------------------------------------`,
+      ...demo.sampleQuestions.map((q, idx) => {
+        return [
+          `\n[QUESTION ${idx + 1}]: ${q.question}`,
+          ...q.options.map((opt, oIdx) => `  (${String.fromCharCode(65 + oIdx)}) ${opt}`),
+          `CORRECT ANSWER: (${String.fromCharCode(65 + q.correctIndex)})`,
+          `RATIONALE: ${q.explanation}`
+        ].join('\n');
+      }),
+      `\n================================================================`,
+      `STUDY MATERIALS & ENROLLMENT:`,
+      `To unlock complete doctoral monographs, 25-MCQ CBT examination simulators,`,
+      `and priority mentorship, access your student portal at:`,
+      `https://rajnikantdodiya.com`,
+      `================================================================`
+    ].join('\n');
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = demo.downloadFileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // AI Tutor Ask Handler
   const handleAiAsk = (prompt?: string) => {
     const q = prompt || aiQuestion;
     if (!q.trim()) return;
@@ -127,754 +312,888 @@ export const LearnPage: React.FC<LearnPageProps> = ({
     setAiConversation(newConvo);
     if (!prompt) setAiQuestion('');
 
-    // Pre-configured intelligent academic answers based on Dr. Dodiya's publications
     setTimeout(() => {
       let answer =
-        'That is an insightful academic query. In the context of English language pedagogy and NEP 2020, research stresses balancing systemic linguistic competence with context-sensitive classroom realities. Feel free to explore Dr. Dodiya’s papers on Post-Method Pedagogy and Multilingualism in the Publications tab!';
+        'That is an insightful query. In Dr. Dodiya’s pedagogical research at HMPIETR, preparing for competitive examinations requires balancing linguistic structure with context-sensitive classroom realities. Feel free to explore the study bundles and sample questions in this portal!';
 
       const lower = q.toLowerCase();
       if (lower.includes('post-method') || lower.includes('kumaravadivelu')) {
         answer =
-          'Kumaravadivelu’s Post-Method framework comprises three organizing principles: (1) Particularity: language teaching must be sensitive to local socio-cultural, political, and institutional contexts; (2) Practicality: teachers should develop their own context-sensitive theories from practice; and (3) Possibility: education must empower learners to recognize and alter socio-historical identities. See Dr. Dodiya’s 2020 and 2026 papers for classroom applications.';
-      } else if (lower.includes('net') || lower.includes('syllabus') || lower.includes('paper 1')) {
+          'Kumaravadivelu’s Post-Method framework comprises three organizing principles: (1) Particularity (context-sensitive pedagogy), (2) Practicality (teacher theory developed from practice), and (3) Possibility (empowering socio-historical identities). See Dr. Dodiya’s papers and monograph for classroom applications.';
+      } else if (lower.includes('english') || lower.includes('literature') || lower.includes('paper 2')) {
         answer =
-          'UGC NET English (Subject Code 30) comprises Paper 1 (Teaching & Research Aptitude - 50 questions, 100 marks) and Paper 2 (English Literature - 100 questions, 200 marks covering Drama, Poetry, Fiction, Non-fiction, Language, Cultural Studies, and Literary Theory). Practice regularly with our 25-MCQ simulator right on this page! Disclaimer: Verify all exam notifications and syllabus details with the official UGC/NTA notice.';
-      } else if (lower.includes('kalam') || lower.includes('abdul kalam')) {
+          'UGC NET English (Subject Code 30) comprises Paper 1 (General Teaching & Research Aptitude) and Paper 2 (English Literature covering Drama, Poetry, Fiction, Non-fiction, Cultural Studies, and Literary Theory). Regular timed MCQ practice with our CBT simulator is strongly advised.';
+      } else if (lower.includes('education') || lower.includes('code 09')) {
         answer =
-          'Dr. A.P.J. Abdul Kalam’s educational vision emphasizes three core pillars: (1) Value-based moral foundation to produce enlightened citizens; (2) Creative thinking and experiential learning over rote memorization; and (3) Entrepreneurial capacity to make youth job creators rather than job seekers. This was the subject of Dr. Dodiya’s Ph.D. dissertation (SPU, 2018).';
+          'UGC NET Education (Subject Code 09) covers philosophical, sociological, and psychological foundations, alongside research methodology and teacher education. Dr. Dodiya’s doctoral monograph at Sardar Patel University focuses on Dr. Kalam’s educational thought and creative inquiry.';
+      } else if (lower.includes('tet') || lower.includes('gujarat')) {
+        answer =
+          'Gujarat TET-II focuses on upper-primary language methodology (Std 6 to 8). Key emphasis is on LSRW skills development, BICS vs. CALP, and constructive translanguaging for Gujarati-medium trainees.';
       }
 
       setAiConversation([...newConvo, { role: 'assistant', text: answer }]);
-    }, 600);
+    }, 500);
   };
 
   return (
-    <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2 sm:pt-4">
-      {/* Title Header */}
-      <div className="pb-4 border-b border-deckle flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-mono uppercase tracking-widest text-claret font-semibold">
-            Student Learning Portal
-          </span>
-          <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1">
-            Learn & Study Hub
-          </h1>
-          <p className="text-xs sm:text-sm text-ink-muted font-reading font-light mt-1">
-            UGC NET guidance, CBT exam practice simulator, digital books, and verified open-access educational resources.
-          </p>
-        </div>
-
-        {/* Student Pass Badge */}
-        {studentSession.unlockedItems.length > 0 ? (
-          <div className="p-3.5 rounded-2xl bg-white border border-deckle shadow-book text-xs space-y-1 max-w-xs shrink-0">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold uppercase text-claret">
-                Active Student Pass
-              </span>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
-                1-Device Active
-              </span>
+    <div className="space-y-10 sm:space-y-14 animate-fade-in pt-2 sm:pt-4">
+      
+      {/* ========================================================= */}
+      {/* 1. PORTAL HEADER & THREE STUDY TRACK SUBTABS              */}
+      {/* ========================================================= */}
+      <div className="space-y-5 pb-6 border-b border-deckle">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-claret-soft text-claret text-xs font-mono font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Official Academic Study & Examination Portal</span>
             </div>
-            <p className="font-serif text-ink font-semibold truncate">{studentSession.name}</p>
-            <p className="text-[11px] font-mono text-ink-muted">Access ID: #{studentSession.orderId}</p>
-            <div className="pt-1 flex items-center justify-between text-[10px] font-mono">
-              <button
-                onClick={onOpenAuthModal}
-                className="text-claret hover:underline font-semibold"
-              >
-                Switch Device
-              </button>
-              <button
-                onClick={handleClearSession}
-                className="text-ink-muted hover:text-claret hover:underline"
-              >
-                Log Out
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="p-3.5 rounded-2xl bg-parchment-warm/80 border border-deckle text-xs space-y-1 max-w-xs shrink-0">
-            <span className="text-[10px] font-mono uppercase text-claret font-bold block">
-              Student / Scholar Access
-            </span>
-            <p className="text-ink-muted font-reading text-[11px]">
-              Access complimentary sample reading, or sign in with your mobile number to unlock your pass.
+            <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1.5 tracking-tight">
+              Study Materials & Course Passes
+            </h1>
+            <p className="text-xs sm:text-sm text-ink-muted font-reading font-light mt-1">
+              Curated lecture notes, free demo PDF samplers, CBT online mock exams, and complete preparation bundles by{' '}
+              <span className="font-semibold text-ink">{PROFESSOR_INFO.name}</span>.
             </p>
-            <button
-              onClick={onOpenAuthModal}
-              className="mt-1 text-xs text-claret font-medium hover:underline flex items-center gap-1 font-sans"
-            >
-              <UserCheck className="w-3.5 h-3.5" /> Student Sign-In / Pass
-            </button>
           </div>
-        )}
-      </div>
 
-      {/* Subtab Navigation Pills with Edge-to-Edge Bleed on Mobile */}
-      <div className="-mx-3 px-3 sm:mx-0 sm:px-0 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
-        {[
-          { id: 'ugc-net-english', label: 'UGC NET English' },
-          { id: 'ugc-net-education', label: 'UGC NET Education' },
-          { id: 'gujarat-tet', label: 'Gujarat TET (In Prep)' },
-          { id: 'books', label: 'Books (With Buy Links)' },
-          { id: 'free-resources', label: 'Free Resources & Portals' },
-          { id: 'ai-tutor', label: 'AI Pedagogy Tutor' },
-          { id: 'blog', label: 'Pedagogy Blog' }
-        ].map(pill => (
-          <a
-            key={pill.id}
-            href={`#${pill.id}`}
-            className="px-3 py-1.5 rounded-xl bg-parchment-warm border border-deckle text-ink-muted hover:text-claret hover:border-claret font-medium whitespace-nowrap transition-all shadow-2xs"
-          >
-            {pill.label}
-          </a>
-        ))}
-      </div>
-
-      {/* ========================================================= */}
-      {/* 1. UGC NET ENGLISH                                        */}
-      {/* ========================================================= */}
-      <section id="ugc-net-english" className="space-y-6">
-        <div className="pb-2 border-b border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-claret">
-            <GraduationCap className="w-5 h-5 shrink-0" />
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-              UGC NET / GSET in English Literature
-            </h2>
-          </div>
-          <a
-            href={SOCIAL_LINKS.whatsappChannelEnglish}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-xl self-start sm:self-auto transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-700" />
-            Join UGC NET English WhatsApp Channel
-          </a>
-        </div>
-
-        {/* Mandatory Statutory Notice */}
-        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
-          <p className="font-reading">
-            <strong className="font-semibold">Candidate Notice:</strong> Verify all exam notifications, syllabus details, and dates with the official UGC/NTA notice on{' '}
-            <a
-              href="https://ugcnet.nta.ac.in"
-              target="_blank"
-              rel="noreferrer"
-              className="underline font-medium hover:text-amber-950"
-            >
-              ugcnet.nta.ac.in
-            </a>.
-          </p>
-        </div>
-
-        {/* Exam Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* CBT Simulator Card */}
-          <div className="p-6 rounded-2xl bg-white border border-deckle shadow-book space-y-4 flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-claret font-bold bg-claret-soft px-2.5 py-1 rounded">
-                  Interactive CBT Portal
+          {/* User Account / Pass Status Indicator */}
+          {isLoggedIn ? (
+            <div className="p-3.5 rounded-2xl bg-white border border-deckle shadow-book text-xs space-y-1.5 max-w-sm shrink-0">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase text-claret flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Student Pass Active</span>
                 </span>
-                <span className="font-serif font-bold text-lg text-claret">₹299</span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                  2-Device Cloud Pass
+                </span>
               </div>
-              <h3 className="font-serif text-xl text-ink font-medium">
-                UGC NET English CBT Examination Simulator
-              </h3>
-              <p className="text-xs text-ink-muted font-reading leading-relaxed">
-                Realistic Computer-Based Test (CBT) environment modeled after the official NTA user interface. Features 25 curated high-yield questions with Dr. Dodiya's verified explanations, instant scoring, and single-device DRM protection.
+              <p className="font-serif text-ink font-semibold text-sm truncate">{studentSession.name}</p>
+              <p className="text-[11px] font-mono text-ink-muted truncate">
+                {studentSession.email || `+91 ${studentSession.mobile}`}
               </p>
-              <ul className="text-xs text-ink-muted space-y-1.5 pl-5 list-disc">
-                <li>Timed 50-minute exam simulation with live countdown clock.</li>
-                <li>Instant score breakdown with comprehensive academic rationales.</li>
-                <li>Sample test available for immediate free practice.</li>
-              </ul>
-            </div>
-
-            <div className="pt-4 border-t border-deckle/60 space-y-2">
-              <button
-                onClick={() => {
-                  setIsExamSample(true);
-                  setIsExamOpen(true);
-                }}
-                className="w-full py-2.5 px-3 rounded-xl bg-parchment-warm text-ink hover:bg-parchment-deep border border-deckle text-xs font-medium transition-all text-center min-h-[42px]"
-              >
-                Free Sample Test
-              </button>
-              {isExamOwned ? (
+              <div className="pt-1 flex items-center justify-between text-[11px] font-mono border-t border-deckle/60">
                 <button
-                  onClick={() => {
-                    setIsExamSample(false);
-                    setIsExamOpen(true);
-                  }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5 min-h-[42px]"
+                  onClick={onOpenAuthModal}
+                  className="text-claret hover:underline font-semibold"
                 >
-                  <Laptop className="w-3.5 h-3.5" /> Launch Unlocked CBT Exam
+                  Manage Devices
                 </button>
-              ) : (
                 <button
-                  onClick={() => handleOpenCheckout(examProduct)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5 min-h-[42px]"
+                  onClick={handleClearSession}
+                  className="text-ink-muted hover:text-claret hover:underline"
                 >
-                  <Lock className="w-3.5 h-3.5" /> Buy CBT Pass (₹299)
+                  Sign Out
                 </button>
-              )}
-            </div>
-          </div>
-
-          {/* Syllabus Breakdown & Guidance Card */}
-          <div className="p-6 rounded-2xl bg-white border border-deckle shadow-book space-y-4 flex flex-col justify-between">
-            <div className="space-y-3">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-blue-800 font-bold bg-blue-50 px-2.5 py-1 rounded inline-block">
-                Syllabus Architecture
-              </span>
-              <h3 className="font-serif text-xl text-ink font-medium">
-                10 Core Units of UGC NET English
-              </h3>
-              <p className="text-xs text-ink-muted font-reading leading-relaxed">
-                Structured unit breakdown covering Drama, Poetry, Fiction, Non-Fictional Prose, Language: Basic Concepts, English in India, Cultural Studies, Literary Criticism, Literary Theory post-World War II, and Research Methods.
-              </p>
-              <div className="p-3 rounded-xl bg-parchment-warm/70 border border-deckle text-xs space-y-1">
-                <span className="font-semibold text-ink block font-mono text-[11px]">
-                  Dr. Dodiya’s Proven Preparation Strategy:
-                </span>
-                <p className="text-ink-muted leading-relaxed font-light">
-                  Prioritize Literary Theory, Cultural Studies, and ELT in India. These three domains yield the highest question density relative to syllabus volume.
-                </p>
               </div>
             </div>
-
-            <div className="pt-4 border-t border-deckle/60 flex items-center justify-between text-xs font-mono">
-              <span className="text-ink-faint">Subject Code: 30</span>
-              <a
-                href={SOCIAL_LINKS.youtubeNetVidya}
-                target="_blank"
-                rel="noreferrer"
-                className="text-claret font-sans font-medium hover:underline flex items-center gap-1"
-              >
-                Watch Video Guidance <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+          ) : (
+            <div className="p-3.5 rounded-2xl bg-parchment-warm/80 border border-deckle text-xs space-y-1.5 max-w-sm shrink-0">
+              <span className="text-[10px] font-mono uppercase text-claret font-bold flex items-center gap-1">
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>Candidate Access</span>
+              </span>
+              <p className="text-ink-muted font-reading text-xs leading-relaxed">
+                Download the free demo PDF below, or create your student pass to unlock study bundles.
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================= */}
-      {/* 2. UGC NET EDUCATION                                      */}
-      {/* ========================================================= */}
-      <section id="ugc-net-education" className="space-y-6">
-        <div className="pb-2 border-b border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-claret">
-            <BookMarked className="w-5 h-5 shrink-0" />
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-              UGC NET / GSET in Education
-            </h2>
-          </div>
-          <a
-            href={SOCIAL_LINKS.whatsappChannelEducation}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-xl self-start sm:self-auto transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-700" />
-            Join UGC NET Education WhatsApp Channel
-          </a>
-        </div>
-
-        {/* Mandatory Statutory Notice */}
-        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
-          <p className="font-reading">
-            <strong className="font-semibold">Notice for Candidates:</strong> Verify all syllabus updates and paper patterns with official UGC notices on{' '}
-            <a
-              href="https://www.ugc.gov.in"
-              target="_blank"
-              rel="noreferrer"
-              className="underline font-medium hover:text-amber-950"
-            >
-              ugc.gov.in
-            </a>.
-          </p>
-        </div>
-
-        <div className="p-6 rounded-2xl bg-white border border-deckle shadow-book space-y-4">
-          <div className="space-y-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded inline-block">
-              Mentor Credentials: UGC-NET (2009) & GSET (2019) in Education
-            </span>
-            <h3 className="font-serif text-xl text-ink font-medium">
-              Comprehensive Study Guidance for Education Aspirants
-            </h3>
-            <p className="text-xs text-ink-muted font-reading leading-relaxed">
-              Dr. Dodiya has guided hundreds of M.Ed. students and research scholars preparing for the National Eligibility Test in Education (Subject Code 09). Key focus areas include Educational Philosophy (Sankhya, Vedanta, Pragmatism), Educational Psychology, Teacher Education Models, and Educational Research Methodologies.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-            <div className="p-4 rounded-xl bg-parchment-warm/70 border border-deckle space-y-1">
-              <span className="font-mono text-xs font-semibold text-ink block">Unit 1 & 2</span>
-              <p className="text-xs text-ink-muted">Educational Studies, Philosophy & History of Education</p>
-            </div>
-            <div className="p-4 rounded-xl bg-parchment-warm/70 border border-deckle space-y-1">
-              <span className="font-mono text-xs font-semibold text-ink block">Unit 4 & 6</span>
-              <p className="text-xs text-ink-muted">Teacher Education & Research in Education</p>
-            </div>
-            <div className="p-4 rounded-xl bg-parchment-warm/70 border border-deckle space-y-1">
-              <span className="font-mono text-xs font-semibold text-ink block">Unit 7 & 8</span>
-              <p className="text-xs text-ink-muted">Pedagogy, Andragogy & Educational Technology</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================= */}
-      {/* 3. GUJARAT TET / TAT                                      */}
-      {/* ========================================================= */}
-      <section id="gujarat-tet" className="space-y-4">
-        <div className="pb-2 border-b border-deckle flex items-center justify-between">
-          <div className="flex items-center gap-2 text-claret">
-            <HelpCircle className="w-5 h-5 shrink-0" />
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-              Gujarat TET & TAT Preparation
-            </h2>
-          </div>
-          <span className="px-3 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-mono font-bold">
-            Coming Soon — In Preparation
-          </span>
-        </div>
-
-        <div className="p-6 rounded-2xl bg-parchment-warm/60 border border-deckle text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-deckle flex items-center justify-center mx-auto text-claret shadow-xs">
-            <GraduationCap className="w-6 h-6" />
-          </div>
-          <h3 className="font-serif text-lg text-ink font-medium">
-            Gujarat TET-I, TET-II, and TAT (Secondary & Higher Secondary)
-          </h3>
-          <p className="text-xs text-ink-muted font-reading max-w-lg mx-auto leading-relaxed">
-            Targeted study modules for Gujarat state teacher recruitment exams are currently under development. Modules will include Gujarati-medium pedagogical primers, educational psychology question banks, and English methodology summaries.
-          </p>
-          <span className="inline-block text-[11px] font-mono text-claret font-semibold">
-            Expected Launch: Academic Session 2026–2027
-          </span>
-        </div>
-      </section>
-
-      {/* ========================================================= */}
-      {/* 4. BOOKS (WITH BUY LINKS & IN-BROWSER READER)            */}
-      {/* ========================================================= */}
-      <section id="books" className="space-y-6">
-        <div className="pb-2 border-b border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-claret">
-            <BookOpen className="w-5 h-5 shrink-0" />
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-              Academic Books (Digital Reader & Purchase Links)
-            </h2>
-          </div>
-          <span className="text-xs font-mono text-ink-muted">Single-Device Protected Digital Reader</span>
-        </div>
-
-        {/* Academic Bookstore Bridge Banner */}
-        <div className="p-4 rounded-2xl bg-parchment-warm/70 border border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-claret shrink-0" />
-            <p className="font-reading text-ink-muted">
-              Explore all digital study passes, the CBT examination simulator, and print copies in the bookstore.
-            </p>
-          </div>
-          {onNavigate && (
-            <button
-              onClick={() => onNavigate('bookstore')}
-              className="px-3.5 py-1.5 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center gap-1 shrink-0 self-start sm:self-auto"
-            >
-              <span>Open Academic Bookstore</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
           )}
         </div>
 
-        {/* Featured Book Showcase: UGC NET English Literature */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-deckle shadow-book space-y-6">
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-claret-soft text-claret text-xs font-mono font-bold border border-claret/20">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Featured Scholarly Work</span>
-              </div>
-              <h3 className="font-serif text-2xl sm:text-3xl text-ink font-normal leading-snug">
-                UGC NET English Literature (Second Edition)
-              </h3>
-              <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed">
-                By Dr. Rajnikant S. Dodiya • Published by Madhuvan Store (ISBN: 978-93-90256-27-3). 
-                The definitive companion for NET/GSET candidates featuring period-by-period British literature chronologies, contemporary critical theory matrices, Indian English literature summaries, and model papers.
-              </p>
-              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-ink-faint pt-1">
-                <span>ISBN: 978-93-90256-27-3</span>
-                <span>•</span>
-                <span>Pages: 420</span>
-                <span>•</span>
-                <span className="text-emerald-700 font-bold">In-Browser Reader Available</span>
-              </div>
-            </div>
+        {/* ======================================================= */}
+        {/* THREE COURSE SUBTABS: English • Education • TET-II      */}
+        {/* ======================================================= */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          {(Object.keys(STUDY_TRACKS) as StudyTrackId[]).map((trackId) => {
+            const track = STUDY_TRACKS[trackId];
+            const isSelected = activeTrackId === trackId;
 
-            {/* Price & Action Box */}
-            <div className="p-5 rounded-2xl bg-parchment-warm/80 border border-deckle w-full lg:w-72 shrink-0 space-y-3 text-center sm:text-left">
-              <div>
-                <span className="text-[10px] font-mono uppercase text-ink-muted block">
-                  Digital Reader License
+            return (
+              <button
+                key={trackId}
+                onClick={() => setActiveTrackId(trackId)}
+                className={`p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between ${
+                  isSelected
+                    ? 'bg-claret text-white border-claret shadow-md ring-2 ring-claret/20'
+                    : 'bg-white hover:bg-parchment-warm/70 border-deckle text-ink hover:border-claret/50 shadow-2xs'
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-2xl shrink-0">{track.icon}</span>
+                  <div className="min-w-0">
+                    <span className="font-serif text-sm font-semibold block leading-tight truncate">
+                      {track.name}
+                    </span>
+                    <span className={`text-[10px] font-mono block truncate ${
+                      isSelected ? 'text-brass-light' : 'text-ink-muted'
+                    }`}>
+                      {track.examCode}
+                    </span>
+                  </div>
+                </div>
+                {isSelected && (
+                  <span className="w-2 h-2 rounded-full bg-brass shrink-0 animate-pulse ml-2" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* 2. CANDIDATE EXPERIENCE (IF NOT LOGGED IN)                */}
+      {/* Free Demo PDF + Quick Onboarding / Sign-Up Form           */}
+      {/* ========================================================= */}
+      {!isLoggedIn && (
+        <section className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* LEFT COLUMN: Free Demo PDF Showcase Card */}
+            <div className="lg:col-span-7 folio-card p-6 sm:p-8 rounded-3xl bg-white border border-deckle shadow-book space-y-5">
+              <div className="flex items-center justify-between gap-2 border-b border-deckle pb-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-mono font-bold border border-emerald-200">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Free Candidate Demo PDF</span>
                 </span>
-                <div className="font-serif text-2xl font-bold text-claret mt-0.5">₹199</div>
-                <span className="text-[10px] font-mono text-ink-faint">Locks to 1 Active Device</span>
+                <span className="text-xs font-mono text-ink-muted">
+                  {currentTrack.demoPdf.pages} • {currentTrack.demoPdf.fileSize}
+                </span>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-deckle/60">
+              <div>
+                <h3 className="font-serif text-2xl text-ink font-normal leading-snug">
+                  {currentTrack.demoPdf.title}
+                </h3>
+                <p className="text-xs font-mono text-claret font-semibold mt-1">
+                  {currentTrack.name} • {currentTrack.examCode}
+                </p>
+                <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed mt-2.5">
+                  {currentTrack.demoPdf.overview}
+                </p>
+              </div>
+
+              {/* Demo PDF Highlights List */}
+              <div className="p-4 rounded-2xl bg-parchment-warm/70 border border-deckle space-y-2">
+                <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-ink-muted block">
+                  What is included in this free demo:
+                </span>
+                <div className="space-y-1.5 text-xs text-ink font-sans">
+                  {currentTrack.demoPdf.keyTopics.map((topic, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>{topic}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Two Action Buttons: Read Online & Download Demo */}
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button
-                  onClick={() => {
-                    setIsReaderSample(true);
-                    setIsReaderOpen(true);
-                  }}
-                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-white/80 border border-deckle text-xs font-medium text-ink transition-all shadow-2xs"
+                  onClick={() => setIsDemoViewerOpen(true)}
+                  className="flex-1 py-3 px-4 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-2 min-h-[44px]"
                 >
-                  Free Sample Chapters
+                  <BookOpen className="w-4 h-4" />
+                  <span>Read Free Demo PDF (Instant Reader)</span>
                 </button>
 
-                {isBookOwned ? (
-                  <button
-                    onClick={() => {
-                      setIsReaderSample(false);
-                      setIsReaderOpen(true);
-                    }}
-                    className="w-full py-2 px-3 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
-                  >
-                    <BookOpen className="w-3.5 h-3.5" /> Read Unlocked Book
-                  </button>
-                ) : isComplimentaryOwned ? (
-                  <div className="flex flex-col gap-2 w-full">
-                    <button
-                      onClick={() => {
-                        setIsReaderSample(true);
-                        setIsReaderOpen(true);
-                      }}
-                      className="w-full py-2 px-3 rounded-xl bg-emerald-800/10 border border-emerald-800/20 text-emerald-900 hover:bg-emerald-800/20 text-xs font-medium transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <BookOpen className="w-3.5 h-3.5 text-emerald-800" /> Read Complimentary Preface
-                    </button>
-                    <button
-                      onClick={() => handleOpenCheckout(bookProduct)}
-                      className="w-full py-2 px-3 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
-                    >
-                      <Lock className="w-3.5 h-3.5" /> Buy Reader Pass (₹399)
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleOpenCheckout(bookProduct)}
-                    className="w-full py-2 px-3 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
-                  >
-                    <Lock className="w-3.5 h-3.5" /> Buy Reader Pass (₹399)
-                  </button>
-                )}
+                <button
+                  onClick={handleDownloadDemoPdf}
+                  className="py-3 px-4 rounded-xl bg-white hover:bg-parchment-warm border border-deckle text-ink text-xs font-semibold shadow-2xs transition-all flex items-center justify-center gap-2 min-h-[44px]"
+                  title="Download offline text and solved questions"
+                >
+                  <Download className="w-4 h-4 text-claret" />
+                  <span>Download Demo PDF</span>
+                </button>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Other Published Books Grid */}
-        <div className="space-y-3">
-          <h3 className="font-serif text-lg text-ink font-medium">Other Published Volumes</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {BOOKS.filter(b => b.isbn !== '978-93-90256-27-3').map((book, idx) => (
-              <div
-                key={idx}
-                className="p-5 rounded-2xl bg-white border border-deckle shadow-book space-y-2 flex flex-col justify-between"
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-claret font-semibold capitalize">{book.type}</span>
-                    <span className="text-ink-muted">{book.year}</span>
-                  </div>
-                  <h4 className="font-serif text-base text-ink font-medium leading-snug">
-                    {book.title}
-                  </h4>
-                  <p className="text-xs text-ink-muted font-reading">
-                    Publisher: {book.publisher}
-                  </p>
+            {/* RIGHT COLUMN: Candidate Account Gate (Sign Up / Sign In Form) */}
+            <div className="lg:col-span-5 folio-card p-6 sm:p-7 rounded-3xl bg-[#FCFAF7] border-2 border-claret/30 shadow-book space-y-4">
+              <div className="space-y-1 text-center sm:text-left">
+                <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-claret uppercase tracking-wider">
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>{authMode === 'signup' ? 'Create Student Pass' : 'Student Sign In'}</span>
                 </div>
-                <div className="pt-2 border-t border-deckle/60 flex items-center justify-between text-xs font-mono">
-                  <span className="text-ink-faint text-[11px]">ISBN: {book.isbn}</span>
-                  <a
-                    href={`mailto:rajnikantdodiya2@gmail.com?subject=Inquiry%20regarding%20book%20${encodeURIComponent(book.title)}`}
-                    className="text-claret font-sans font-medium hover:underline text-xs"
-                  >
-                    Order Physical Copy
-                  </a>
-                </div>
+                <h4 className="font-serif text-xl text-ink font-normal">
+                  {authMode === 'signup' ? 'Register for Full Study Materials' : 'Access Your Student Account'}
+                </h4>
+                <p className="text-xs text-ink-muted font-reading">
+                  {authMode === 'signup'
+                    ? 'Save your progress, access your personalized library, and buy study bundles with 2-device cloud pass.'
+                    : 'Sign in to access your purchased study materials and CBT mock tests.'}
+                </p>
               </div>
-            ))}
+
+              {/* Auth Mode Toggle */}
+              <div className="grid grid-cols-2 p-1 rounded-xl bg-parchment-deep/60 border border-deckle text-xs font-sans font-medium text-center">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('signup'); setAuthError(null); }}
+                  className={`py-1.5 rounded-lg transition-all ${
+                    authMode === 'signup' ? 'bg-white shadow-xs font-bold text-claret' : 'text-ink-muted'
+                  }`}
+                >
+                  Sign Up (New)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('signin'); setAuthError(null); }}
+                  className={`py-1.5 rounded-lg transition-all ${
+                    authMode === 'signin' ? 'bg-white shadow-xs font-bold text-claret' : 'text-ink-muted'
+                  }`}
+                >
+                  Sign In (Existing)
+                </button>
+              </div>
+
+              {/* Feedback Alerts */}
+              {authError && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 animate-fade-in">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{authError}</span>
+                </div>
+              )}
+              {authSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2 animate-fade-in">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{authSuccess}</span>
+                </div>
+              )}
+
+              {/* FORM */}
+              <form onSubmit={authMode === 'signup' ? handleSignUp : handleSignIn} className="space-y-3">
+                {authMode === 'signup' && (
+                  <div>
+                    <label className="text-[11px] font-mono uppercase text-ink-muted font-semibold block mb-1">
+                      Full Candidate Name:
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      placeholder="e.g. Aarav Patel"
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-deckle focus:border-claret focus:outline-none text-ink shadow-2xs font-sans"
+                    />
+                  </div>
+                )}
+
+                {authMode === 'signup' && (
+                  <div>
+                    <label className="text-[11px] font-mono uppercase text-ink-muted font-semibold block mb-1">
+                      WhatsApp Mobile Number:
+                    </label>
+                    <div className="flex gap-2">
+                      <span className="px-2.5 py-2 text-xs rounded-xl bg-parchment-warm border border-deckle font-mono text-ink-muted flex items-center">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        value={phone}
+                        onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
+                        placeholder="10-digit mobile"
+                        className="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-deckle focus:border-claret focus:outline-none text-ink shadow-2xs font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-[11px] font-mono uppercase text-ink-muted font-semibold block mb-1">
+                    Email Address:
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="student@example.com"
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-deckle focus:border-claret focus:outline-none text-ink shadow-2xs font-sans"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-mono uppercase text-ink-muted font-semibold block mb-1">
+                    Password:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      placeholder={authMode === 'signup' ? 'Create a secure password' : 'Enter your password'}
+                      className="w-full px-3 py-2 pr-9 text-xs rounded-xl bg-white border border-deckle focus:border-claret focus:outline-none text-ink shadow-2xs font-sans"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(p => !p)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
+                    >
+                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={authSubmitting}
+                  className="w-full py-2.5 px-4 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-2 min-h-[42px] disabled:opacity-50 mt-2"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>
+                    {authSubmitting
+                      ? 'Establishing Pass...'
+                      : authMode === 'signup'
+                      ? 'Sign Up & Open My Study Dashboard →'
+                      : 'Sign In to Student Account →'}
+                  </span>
+                </button>
+              </form>
+
+              <div className="pt-1 text-center">
+                <span className="text-[10px] font-mono text-ink-muted">
+                  Strict 2-Device Policy (1 Mobile Phone + 1 Laptop) • DRM Watermarked
+                </span>
+              </div>
+            </div>
+
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ========================================================= */}
-      {/* 5. FREE RESOURCES & OFFICIAL LINKS                        */}
+      {/* 3. LOGGED-IN CANDIDATE PORTAL: "MY STUDY MATERIALS"       */}
+      {/* Displays currently unlocked/owned materials for this track */}
       {/* ========================================================= */}
-      <section id="free-resources" className="space-y-6">
-        <div className="pb-2 border-b border-deckle flex items-center justify-between">
-          <div className="flex items-center gap-2 text-claret">
-            <Download className="w-5 h-5 shrink-0" />
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-              Free Resources & Official Academic Portals
+      {isLoggedIn && (
+        <section className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-deckle">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
+                Student Account Dashboard
+              </span>
+              <h2 className="font-serif text-2xl text-ink font-normal mt-0.5">
+                My Enrolled Study Materials ({currentTrack.name})
+              </h2>
+            </div>
+            <span className="text-xs font-mono text-ink-muted">
+              {studentSession.unlockedItems.length} Content Licenses Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            {/* MATERIAL 1: Complimentary Track Demo PDF Sampler */}
+            <div className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                    ✓ Enrolled (Free Sampler)
+                  </span>
+                  <span className="text-ink-muted">{currentTrack.demoPdf.pages}</span>
+                </div>
+                <h4 className="font-serif text-base text-ink font-medium leading-snug">
+                  {currentTrack.demoPdf.title}
+                </h4>
+                <p className="text-xs text-ink-muted font-reading line-clamp-2">
+                  {currentTrack.demoPdf.overview}
+                </p>
+              </div>
+
+              <div className="pt-2 flex items-center gap-2">
+                <button
+                  onClick={() => setIsDemoViewerOpen(true)}
+                  className="flex-1 py-2 px-3 rounded-xl bg-claret text-white text-xs font-medium hover:bg-claret-light transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Read Online</span>
+                </button>
+                <button
+                  onClick={handleDownloadDemoPdf}
+                  className="p-2 rounded-xl bg-parchment-warm border border-deckle text-claret hover:bg-parchment-deep transition-colors"
+                  title="Download offline notes"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* MATERIAL 2: Dr. Dodiya's Monograph & Pedagogical Treatise */}
+            <div className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    isBookOwned || isBundleOwned
+                      ? 'text-emerald-800 bg-emerald-50 border border-emerald-200'
+                      : 'text-amber-800 bg-amber-50 border border-amber-200'
+                  }`}>
+                    {isBookOwned || isBundleOwned ? '✓ Enrolled (Full E-Book)' : 'Sample Active (Preface)'}
+                  </span>
+                  <span className="text-ink-muted">Doctoral Study</span>
+                </div>
+                <h4 className="font-serif text-base text-ink font-medium leading-snug">
+                  Educational Thoughts of APJ Abdul Kalam
+                </h4>
+                <p className="text-xs text-ink-muted font-reading line-clamp-2">
+                  Doctoral treatise investigating creative inquiry, moral leadership in classrooms, and NEP 2020 pedagogy.
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    setIsReaderSample(!isBookOwned && !isBundleOwned);
+                    setIsReaderOpen(true);
+                  }}
+                  className="w-full py-2 px-3 rounded-xl bg-claret text-white text-xs font-medium hover:bg-claret-light transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>{isBookOwned || isBundleOwned ? 'Open Full Monograph' : 'Read Sample Chapters'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* MATERIAL 3: CBT Master Mock Examination Simulator */}
+            <div className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    isExamOwned || isBundleOwned
+                      ? 'text-emerald-800 bg-emerald-50 border border-emerald-200'
+                      : 'text-amber-800 bg-amber-50 border border-amber-200'
+                  }`}>
+                    {isExamOwned || isBundleOwned ? '✓ Enrolled (Full CBT Engine)' : 'Sample Test (5 MCQs)'}
+                  </span>
+                  <span className="text-ink-muted">25 MCQs • 60 Mins</span>
+                </div>
+                <h4 className="font-serif text-base text-ink font-medium leading-snug">
+                  CBT Master Mock Exam Simulator
+                </h4>
+                <p className="text-xs text-ink-muted font-reading line-clamp-2">
+                  Timed NTA-style online test series with instant scorecard, percentile, and Dr. Dodiya’s rationale.
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    setIsExamSample(!isExamOwned && !isBundleOwned);
+                    setIsExamOpen(true);
+                  }}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-700 text-white text-xs font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{isExamOwned || isBundleOwned ? 'Launch Full CBT Exam' : 'Try Sample Test (5 MCQs)'}</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* ========================================================= */}
+      {/* 4. STUDY BUNDLES WITH PRICE TAGS (BUY & UNLOCK)           */}
+      {/* Available for purchase to all students                    */}
+      {/* ========================================================= */}
+      <section className="space-y-5">
+        <div className="pb-2 border-b border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
+              Study Packages & Enrolment
+            </span>
+            <h2 className="font-serif text-2xl text-ink font-normal mt-0.5">
+              Available Study Bundles for {currentTrack.name}
             </h2>
           </div>
-          <span className="text-xs font-mono text-ink-muted">Open Access</span>
+          <span className="text-xs font-mono text-ink-muted">
+            Bank-Verified Secure Payment • Instant Access
+          </span>
         </div>
 
-        {/* Official Government & Regulatory Portals */}
-        <div className="space-y-3">
-          <span className="text-xs font-mono uppercase tracking-wider text-ink-faint block">
-            Verified National Education & Exam Portals
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-            <a
-              href="https://www.ugc.gov.in"
-              target="_blank"
-              rel="noreferrer"
-              className="p-4 rounded-xl bg-white border border-deckle hover:border-claret transition-all shadow-2xs space-y-1 block group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-claret">UGC Official</span>
-                <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
-              </div>
-              <p className="text-[11px] text-ink-muted">University Grants Commission Notifications & Syllabi</p>
-            </a>
+        <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed">
+          Select a study bundle below to add its complete materials, full-length CBT test simulators, and e-books directly into your student account.
+        </p>
 
-            <a
-              href="https://ugcnet.nta.ac.in"
-              target="_blank"
-              rel="noreferrer"
-              className="p-4 rounded-xl bg-white border border-deckle hover:border-claret transition-all shadow-2xs space-y-1 block group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-claret">NTA UGC-NET</span>
-                <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
-              </div>
-              <p className="text-[11px] text-ink-muted">National Testing Agency Exam Schedules & Admit Cards</p>
-            </a>
+        {/* BUNDLE CARDS GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-1">
+          {currentTrack.bundles.map((bundle) => {
+            const isOwned =
+              (bundle.productType === 'book' && (isBookOwned || isBundleOwned)) ||
+              (bundle.productType === 'exam' && (isExamOwned || isBundleOwned)) ||
+              (bundle.productType === 'bundle' && isBundleOwned);
 
-            <a
-              href="https://ncte.gov.in"
-              target="_blank"
-              rel="noreferrer"
-              className="p-4 rounded-xl bg-white border border-deckle hover:border-claret transition-all shadow-2xs space-y-1 block group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-claret">NCTE Portal</span>
-                <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
-              </div>
-              <p className="text-[11px] text-ink-muted">National Council for Teacher Education Norms & PAR</p>
-            </a>
-
-            <a
-              href="https://ncert.nic.in"
-              target="_blank"
-              rel="noreferrer"
-              className="p-4 rounded-xl bg-white border border-deckle hover:border-claret transition-all shadow-2xs space-y-1 block group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-claret">NCERT Portal</span>
-                <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
-              </div>
-              <p className="text-[11px] text-ink-muted">School Curriculum Frameworks & NEP Textbooks</p>
-            </a>
-          </div>
-        </div>
-
-        {/* Free Lecture Notes & Downloads */}
-        <div className="space-y-3 pt-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-ink-faint block">
-            Dr. Dodiya’s Open Lecture Notes
-          </span>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-white border border-deckle shadow-book space-y-2">
-              <span className="text-[10px] font-mono uppercase text-claret font-bold">PDF Handout</span>
-              <h4 className="font-serif text-sm font-medium text-ink">
-                Post-Method Pedagogy: The 10 Macrostrategies Summary
-              </h4>
-              <p className="text-xs text-ink-muted font-reading">
-                A concise classroom reference for teacher-trainees detailing Kumaravadivelu's 10 macrostrategies with Indian classroom examples.
-              </p>
-              <a
-                href={SOCIAL_LINKS.whatsappChannelEnglish}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-claret font-medium hover:underline pt-1"
+            return (
+              <div
+                key={bundle.id}
+                className={`pw-card p-6 sm:p-7 rounded-3xl flex flex-col justify-between space-y-5 relative transition-all ${
+                  bundle.isPopular
+                    ? 'border-2 border-claret shadow-xl ring-4 ring-claret/5 bg-gradient-to-b from-white to-[#FAF7F2]'
+                    : 'bg-white border border-gray-200'
+                }`}
               >
-                Download via WhatsApp Channel <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
+                {/* Popular Badge */}
+                {bundle.isPopular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-claret text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">
+                    ★ Most Popular Choice
+                  </div>
+                )}
 
-            <div className="p-4 rounded-2xl bg-white border border-deckle shadow-book space-y-2">
-              <span className="text-[10px] font-mono uppercase text-blue-800 font-bold">Slide Deck</span>
-              <h4 className="font-serif text-sm font-medium text-ink">
-                AI in Second-Language Classrooms: Prompts & Rubrics
-              </h4>
-              <p className="text-xs text-ink-muted font-reading">
-                Workshop slide deck prepared for CAIELE teacher development sessions at HMPIETR.
-              </p>
-              <a
-                href={SOCIAL_LINKS.whatsappChannelEnglish}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-claret font-medium hover:underline pt-1"
-              >
-                Download via WhatsApp Channel <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className="text-[11px] font-bold text-claret bg-claret-soft px-2.5 py-0.5 rounded-full">
+                      {bundle.badge}
+                    </span>
+                    <span className="discount-pill px-2 py-0.5 rounded-full text-[10px]">
+                      Save {bundle.discountPercentage}%
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-serif text-xl text-ink font-semibold leading-tight">
+                      {bundle.title}
+                    </h3>
+                    <p className="text-xs text-ink-muted font-reading mt-1 leading-snug">
+                      {bundle.subtitle}
+                    </p>
+                  </div>
+
+                  {/* PRICE TAG */}
+                  <div className="pt-2 flex items-baseline gap-2">
+                    <span className="font-serif text-3xl sm:text-4xl text-ink font-bold">
+                      ₹{bundle.price}
+                    </span>
+                    <span className="text-xs text-ink-muted line-through font-mono">
+                      ₹{bundle.originalPrice}
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-bold">
+                      One-time fee
+                    </span>
+                  </div>
+
+                  {/* Features Bullet List */}
+                  <div className="pt-2 space-y-2 border-t border-deckle/60">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-ink-muted block">
+                      Included Study Materials:
+                    </span>
+                    <ul className="space-y-1.5 text-xs text-ink font-sans">
+                      {bundle.features.map((feat, fIdx) => (
+                        <li key={fIdx} className="flex items-start gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="leading-snug">{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* BUY / ENROL BUTTON */}
+                <div className="pt-3 border-t border-deckle/60">
+                  {isOwned ? (
+                    <button
+                      onClick={() => {
+                        if (bundle.productType === 'book') {
+                          setIsReaderSample(false);
+                          setIsReaderOpen(true);
+                        } else {
+                          setIsExamSample(false);
+                          setIsExamOpen(true);
+                        }
+                      }}
+                      className="w-full py-3 px-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs hover:bg-emerald-100 transition-colors"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>✓ Enrolled • Open Material</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (!isLoggedIn) {
+                          // Scroll to signup box
+                          window.scrollTo({ top: 320, behavior: 'smooth' });
+                          setAuthError('Please create a free account or sign in above before completing checkout.');
+                        } else {
+                          handleSelectBundle(bundle);
+                        }
+                      }}
+                      className={`w-full py-3 px-4 rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center gap-2 transition-all min-h-[44px] ${
+                        bundle.isPopular
+                          ? 'bg-claret hover:bg-claret-light text-white'
+                          : 'bg-ink hover:bg-black text-white'
+                      }`}
+                    >
+                      <Zap className="w-4 h-4 text-brass" />
+                      <span>Buy Study Bundle (₹{bundle.price}) →</span>
+                    </button>
+                  )}
+                </div>
+
+              </div>
+            );
+          })}
         </div>
       </section>
 
       {/* ========================================================= */}
-      {/* 6. AI PEDAGOGY TUTOR                                      */}
+      {/* 5. INTERACTIVE DEMO PDF READER MODAL                      */}
+      {/* Allows candidates to sample Dr. Dodiya's notes & MCQs     */}
       {/* ========================================================= */}
-      <section id="ai-tutor" className="folio-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-white border border-deckle shadow-book space-y-5">
-        <div className="flex items-center gap-2 text-claret border-b border-deckle pb-3">
+      {isDemoViewerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/70 backdrop-blur-xs animate-fade-in">
+          <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90dvh] overflow-y-auto p-6 sm:p-8 shadow-book-xl border border-deckle relative space-y-5">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-3 border-b border-deckle pb-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                  Free Candidate Sampler
+                </span>
+                <h3 className="font-serif text-xl sm:text-2xl text-ink font-normal mt-1">
+                  {currentTrack.demoPdf.title}
+                </h3>
+                <span className="text-xs font-mono text-ink-muted">
+                  {currentTrack.name} • {currentTrack.demoPdf.pages}
+                </span>
+              </div>
+              <button
+                onClick={() => setIsDemoViewerOpen(false)}
+                className="p-1.5 rounded-lg bg-parchment-warm hover:bg-parchment-deep text-ink-muted"
+                aria-label="Close reader"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Sub-tabs inside demo modal */}
+            <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-parchment-warm/80 border border-deckle text-xs font-medium text-center">
+              <button
+                onClick={() => setDemoActiveTab('overview')}
+                className={`py-1.5 rounded-lg transition-all ${
+                  demoActiveTab === 'overview' ? 'bg-white shadow-2xs font-bold text-claret' : 'text-ink-muted'
+                }`}
+              >
+                Overview & Syllabus
+              </button>
+              <button
+                onClick={() => setDemoActiveTab('notes')}
+                className={`py-1.5 rounded-lg transition-all ${
+                  demoActiveTab === 'notes' ? 'bg-white shadow-2xs font-bold text-claret' : 'text-ink-muted'
+                }`}
+              >
+                Sample Notes Excerpt
+              </button>
+              <button
+                onClick={() => setDemoActiveTab('questions')}
+                className={`py-1.5 rounded-lg transition-all ${
+                  demoActiveTab === 'questions' ? 'bg-white shadow-2xs font-bold text-claret' : 'text-ink-muted'
+                }`}
+              >
+                Solved MCQs ({currentTrack.demoPdf.sampleQuestions.length})
+              </button>
+            </div>
+
+            {/* Tab 1: Overview */}
+            {demoActiveTab === 'overview' && (
+              <div className="space-y-4 text-xs font-sans text-ink leading-relaxed">
+                <p className="font-reading text-sm text-ink-muted leading-relaxed">
+                  {currentTrack.demoPdf.overview}
+                </p>
+                <div className="p-4 rounded-xl bg-parchment-warm/60 border border-deckle space-y-2">
+                  <span className="font-mono text-[11px] font-bold uppercase text-claret block">
+                    Core Exam Competencies:
+                  </span>
+                  <ul className="space-y-1.5 list-disc pl-4 text-ink-muted font-reading">
+                    {currentTrack.demoPdf.keyTopics.map((topic, idx) => (
+                      <li key={idx}>{topic}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: Sample Notes */}
+            {demoActiveTab === 'notes' && (
+              <div className="space-y-3 text-xs font-reading text-ink leading-relaxed max-h-72 overflow-y-auto p-1">
+                {currentTrack.demoPdf.excerptText.map((paragraph, idx) => (
+                  <p key={idx} className={paragraph.startsWith('UNIT') || paragraph.startsWith('PREFACE') ? 'font-bold font-mono text-claret pt-2' : ''}>
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Tab 3: Solved MCQs */}
+            {demoActiveTab === 'questions' && (
+              <div className="space-y-4 text-xs font-sans max-h-72 overflow-y-auto p-1">
+                {currentTrack.demoPdf.sampleQuestions.map((q, idx) => (
+                  <div key={idx} className="p-3.5 rounded-xl bg-parchment-warm/50 border border-deckle space-y-2">
+                    <p className="font-bold text-ink">
+                      {idx + 1}. {q.question}
+                    </p>
+                    <div className="space-y-1 pl-2">
+                      {q.options.map((opt, oIdx) => (
+                        <div
+                          key={oIdx}
+                          className={`p-1.5 rounded-lg flex items-center gap-2 ${
+                            oIdx === q.correctIndex
+                              ? 'bg-emerald-100/70 text-emerald-950 font-semibold'
+                              : 'text-ink-muted'
+                          }`}
+                        >
+                          <span className="font-mono font-bold">({String.fromCharCode(65 + oIdx)})</span>
+                          <span>{opt}</span>
+                          {oIdx === q.correctIndex && <Check className="w-3.5 h-3.5 text-emerald-700 ml-auto" />}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-emerald-900 font-reading pt-1 border-t border-deckle/60">
+                      <strong>Pedagogical Rationale:</strong> {q.explanation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Modal Footer Actions */}
+            <div className="pt-2 flex items-center justify-between gap-3 border-t border-deckle">
+              <button
+                onClick={handleDownloadDemoPdf}
+                className="py-2 px-3 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-xs font-sans font-medium text-claret flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Demo File</span>
+              </button>
+              <button
+                onClick={() => setIsDemoViewerOpen(false)}
+                className="py-2 px-4 rounded-xl bg-claret text-white text-xs font-semibold"
+              >
+                Done
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* 6. AI PEDAGOGY TUTOR (INTERACTIVE ACADEMIC COMPANION)     */}
+      {/* ========================================================= */}
+      <section id="ai-tutor" className="folio-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-white border border-deckle shadow-book space-y-4">
+        <div className="flex items-center gap-2 text-claret">
           <Bot className="w-5 h-5 shrink-0" />
           <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-            AI Pedagogy & Literature Study Assistant
+            Dr. Dodiya Virtual Pedagogy Tutor
           </h2>
         </div>
 
-        <p className="text-xs sm:text-sm text-ink-muted font-reading font-light leading-relaxed">
-          Ask questions regarding UGC NET English literature topics, teacher-education principles, or Dr. Dodiya's published research areas.
+        <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed">
+          Ask questions about UGC-NET syllabus requirements, Dr. Kalam’s educational epistemology, or Kumaravadivelu’s post-method parameters.
         </p>
 
-        {/* Quick Question Prompts */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="text-ink-muted font-medium text-[11px]">Quick Prompts:</span>
-          {[
-            'Explain Post-Method Pedagogy in 3 principles',
-            'What are the 10 units of UGC NET English?',
-            'Summarize APJ Abdul Kalam on Education'
-          ].map((prompt, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleAiAsk(prompt)}
-              className="px-3 py-1 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret border border-deckle text-[11px] transition-all"
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
-
-        {/* Chat Window */}
-        <div className="p-4 rounded-2xl bg-parchment-warm/60 border border-deckle space-y-3 max-h-72 overflow-y-auto">
+        {/* Conversation Box */}
+        <div className="p-4 rounded-2xl bg-parchment-warm/70 border border-deckle space-y-3 max-h-64 overflow-y-auto text-xs font-sans">
           {aiConversation.map((msg, idx) => (
             <div
               key={idx}
-              className={`p-3 rounded-xl text-xs ${
+              className={`p-3 rounded-xl ${
                 msg.role === 'user'
-                  ? 'bg-claret text-white ml-auto max-w-[80%]'
-                  : 'bg-white text-ink border border-deckle max-w-[85%]'
+                  ? 'bg-claret text-white ml-auto max-w-[85%]'
+                  : 'bg-white text-ink border border-deckle mr-auto max-w-[85%] shadow-2xs font-reading'
               }`}
             >
-              <span className="text-[10px] font-mono uppercase font-bold block mb-1 opacity-75">
-                {msg.role === 'user' ? 'You' : 'Academic Assistant'}
+              <span className="font-mono text-[10px] block opacity-75 mb-0.5">
+                {msg.role === 'user' ? 'You' : 'Pedagogy Tutor'}
               </span>
-              <p className="font-reading leading-relaxed">{msg.text}</p>
+              <p className="leading-relaxed">{msg.text}</p>
             </div>
           ))}
         </div>
 
-        {/* Input Bar */}
+        {/* Input Form */}
         <form
           onSubmit={e => {
             e.preventDefault();
             handleAiAsk();
           }}
-          className="flex items-center gap-2"
+          className="flex gap-2"
         >
           <input
             type="text"
-            placeholder="Type your academic or exam query here..."
             value={aiQuestion}
             onChange={e => setAiQuestion(e.target.value)}
-            className="flex-1 px-4 py-2 rounded-xl bg-parchment-warm/70 border border-deckle text-xs text-ink placeholder:text-ink-muted focus:outline-none focus:border-claret"
+            placeholder="Ask a question about UGC NET English or Education..."
+            className="flex-1 px-4 py-2.5 text-xs rounded-xl bg-white border border-deckle focus:border-claret focus:outline-none text-ink shadow-2xs font-sans"
           />
           <button
             type="submit"
-            className="px-4 py-2 rounded-xl bg-claret text-white hover:bg-claret-dark text-xs font-medium transition-all shadow-xs flex items-center gap-1.5"
+            className="px-4 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
           >
-            <Send className="w-3.5 h-3.5" /> Ask
+            <Send className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Ask</span>
           </button>
         </form>
       </section>
 
       {/* ========================================================= */}
-      {/* 7. PEDAGOGY BLOG                                          */}
+      {/* 7. OFFICIAL GOVERNMENT PORTALS & RESOURCE DIRECTORY       */}
       {/* ========================================================= */}
-      <section id="blog" className="space-y-6">
-        <div className="pb-2 border-b border-deckle flex items-center justify-between">
-          <div className="flex items-center gap-2 text-claret">
-            <FileText className="w-5 h-5 shrink-0" />
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">
-              Pedagogy Blog & Reflective Essays
-            </h2>
-          </div>
-          <span className="text-xs font-mono text-ink-muted">Teacher Education Perspectives</span>
-        </div>
+      <section className="folio-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-parchment-warm/60 border border-deckle space-y-4">
+        <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold block">
+          Official University & NTA Directories
+        </span>
+        <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
+          Official Verification & Government Exam Portals
+        </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-5 rounded-2xl bg-white border border-deckle shadow-book space-y-2 flex flex-col justify-between">
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-mono text-claret font-bold uppercase">ELT & NEP 2020</span>
-              <h3 className="font-serif text-base text-ink font-medium leading-snug">
-                From Monolingualism to Translanguaging in Indian Classrooms
-              </h3>
-              <p className="text-xs text-ink-muted font-reading leading-relaxed">
-                Why rigid English-only policies fail in regional contexts and how embracing mother-tongue scaffolding accelerates language proficiency.
-              </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs font-sans">
+          <a
+            href="https://ugcnet.nta.ac.in/"
+            target="_blank"
+            rel="noreferrer"
+            className="p-3.5 rounded-xl bg-white border border-deckle hover:border-claret text-ink flex items-center justify-between group shadow-2xs transition-colors"
+          >
+            <div>
+              <span className="font-semibold block">NTA UGC-NET Portal</span>
+              <span className="text-[10px] font-mono text-ink-muted">ugcnet.nta.ac.in</span>
             </div>
-            <span className="text-[11px] font-mono text-ink-faint pt-2 border-t border-deckle/60">
-              By Dr. Rajnikant S. Dodiya
-            </span>
-          </div>
+            <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
+          </a>
 
-          <div className="p-5 rounded-2xl bg-white border border-deckle shadow-book space-y-2 flex flex-col justify-between">
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-mono text-blue-800 font-bold uppercase">Techno-Pedagogy</span>
-              <h3 className="font-serif text-base text-ink font-medium leading-snug">
-                Generative AI as a Scaffolding Partner for English Trainees
-              </h3>
-              <p className="text-xs text-ink-muted font-reading leading-relaxed">
-                Reflections from CAIELE workshops on using conversational agents for pronunciation feedback and contextual vocabulary building.
-              </p>
+          <a
+            href="https://www.gujaratgset.ac.in/"
+            target="_blank"
+            rel="noreferrer"
+            className="p-3.5 rounded-xl bg-white border border-deckle hover:border-claret text-ink flex items-center justify-between group shadow-2xs transition-colors"
+          >
+            <div>
+              <span className="font-semibold block">Gujarat GSET Portal</span>
+              <span className="text-[10px] font-mono text-ink-muted">gujaratgset.ac.in</span>
             </div>
-            <span className="text-[11px] font-mono text-ink-faint pt-2 border-t border-deckle/60">
-              By Dr. Rajnikant S. Dodiya
-            </span>
-          </div>
+            <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
+          </a>
 
-          <div className="p-5 rounded-2xl bg-white border border-deckle shadow-book space-y-2 flex flex-col justify-between">
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-mono text-purple-800 font-bold uppercase">Philosophy of Education</span>
-              <h3 className="font-serif text-base text-ink font-medium leading-snug">
-                Dr. Kalam’s Vision of the Enlightened Teacher
-              </h3>
-              <p className="text-xs text-ink-muted font-reading leading-relaxed">
-                Examining the pedagogical imperatives of teacher empathy, moral mentorship, and curiosity in shaping the nation’s youth.
-              </p>
+          <a
+            href="https://sebexam.org/"
+            target="_blank"
+            rel="noreferrer"
+            className="p-3.5 rounded-xl bg-white border border-deckle hover:border-claret text-ink flex items-center justify-between group shadow-2xs transition-colors"
+          >
+            <div>
+              <span className="font-semibold block">Gujarat SEB (TET-II)</span>
+              <span className="text-[10px] font-mono text-ink-muted">sebexam.org</span>
             </div>
-            <span className="text-[11px] font-mono text-ink-faint pt-2 border-t border-deckle/60">
-              By Dr. Rajnikant S. Dodiya
-            </span>
-          </div>
+            <ExternalLink className="w-3.5 h-3.5 text-ink-muted group-hover:text-claret" />
+          </a>
         </div>
       </section>
 
       {/* ========================================================= */}
-      {/* LAZY MODALS                                               */}
+      {/* MODALS: Checkout Modal, DRM Reader, CBT Exam Portal       */}
       {/* ========================================================= */}
       {isCheckoutOpen && (
         <Suspense fallback={null}>
@@ -892,10 +1211,16 @@ export const LearnPage: React.FC<LearnPageProps> = ({
           <ProtectedReaderModal
             isOpen={isReaderOpen}
             onClose={() => setIsReaderOpen(false)}
-            studentName={studentSession.name || 'Sample Reader'}
-            studentMobile={studentSession.mobile || '9999999999'}
-            orderId={studentSession.orderId || 'SAMPLE-PASS'}
-            isUnlocked={!isReaderSample && isBookOwned}
+            studentName={studentSession.name || 'Scholar Candidate'}
+            studentMobile={studentSession.mobile || 'Verified Pass'}
+            orderId={studentSession.orderId || 'DEMO-PASS'}
+            isUnlocked={isBookOwned || isBundleOwned}
+            onUnlockRequest={() => {
+              setIsReaderOpen(false);
+              const bookProd = STORE_PRODUCTS.find(p => p.type === 'book') || STORE_PRODUCTS[0];
+              setSelectedProduct(bookProd);
+              setIsCheckoutOpen(true);
+            }}
           />
         </Suspense>
       )}
@@ -905,12 +1230,19 @@ export const LearnPage: React.FC<LearnPageProps> = ({
           <ExamPortal
             isOpen={isExamOpen}
             onClose={() => setIsExamOpen(false)}
-            studentName={studentSession.name || 'Candidate'}
-            orderId={studentSession.orderId || 'SAMPLE-CBT'}
-            isUnlocked={!isExamSample && isExamOwned}
+            studentName={studentSession.name || 'Scholar Candidate'}
+            orderId={studentSession.orderId || 'DEMO-PASS'}
+            isUnlocked={isExamOwned || isBundleOwned}
+            onUnlockRequest={() => {
+              setIsExamOpen(false);
+              const examProd = STORE_PRODUCTS.find(p => p.type === 'exam') || STORE_PRODUCTS[1];
+              setSelectedProduct(examProd);
+              setIsCheckoutOpen(true);
+            }}
           />
         </Suspense>
       )}
+
     </div>
   );
 };
