@@ -373,13 +373,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* ROW 2: Primary 8-Tab Desktop Navigation with Dropdowns & Laptop Horizontal Scroll Resilience */}
+        {/* ROW 2: Primary 8-Tab Desktop Navigation with Dropdowns */}
         <div className="hidden lg:block border-t border-deckle/60 bg-[#FAF9F5]/90">
           <nav
             aria-label="Main Menu"
-            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto scrollbar-none"
+            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center overflow-visible"
           >
-            <div className="flex items-center gap-0.5 xl:gap-1 py-1">
+            <div className="flex items-center gap-0.5 xl:gap-1 py-1 flex-nowrap">
               {MAIN_NAV_ITEMS.map((item) => {
                 const isActive = activeTab === item.id;
                 const hasSubtabs = item.subtabs && item.subtabs.length > 0;

@@ -28,6 +28,11 @@
     color: #16191F;
     background-color: var(--color-canvas, #FAF9F5);
     font-size: var(--font-size-base, 16px);
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: hidden;
+    width: 100%;
   }
 }
 
