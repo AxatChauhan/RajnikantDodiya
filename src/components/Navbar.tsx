@@ -14,10 +14,12 @@ import {
   Users,
   Mail,
   FileText,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from '../data/professorData';
 import { useScholarSession } from '../hooks/useScholarSession';
+import { useSiteContent } from '../contexts/SiteContentContext';
 import { ProfessorCrestIcon } from './common/ProfessorCrestIcon';
 
 export type MainTab =
@@ -136,6 +138,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { session } = useScholarSession();
+  const { openStudio, profile } = useSiteContent();
 
   const isScholarActive = Boolean(
     session.unlockedItems && session.unlockedItems.length > 0 && session.mobile
@@ -188,10 +191,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <ProfessorCrestIcon className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
             <div className="min-w-0 pr-1">
               <h1 className="font-serif text-sm sm:text-base font-semibold text-ink group-hover:text-claret transition-colors leading-tight truncate">
-                {PROFESSOR_INFO.name}
+                {profile.name || PROFESSOR_INFO.name}
               </h1>
               <p className="text-[10px] sm:text-[11px] font-mono text-ink-muted font-normal tracking-wide truncate max-w-[170px] sm:max-w-none">
-                Assistant Professor • HMPIETR, SPU
+                Assistant Professor • {profile.institution || PROFESSOR_INFO.institution}
               </p>
             </div>
           </button>
@@ -301,6 +304,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )
             )}
+
+            {/* BUTTON 3: [🏛️ Author Studio] */}
+            <button
+              onClick={openStudio}
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret-soft hover:bg-claret hover:text-white border border-claret/30 text-claret text-xs font-serif font-semibold transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-10 min-h-[40px]"
+              title="Dedicated Author Studio for Dr. Rajnikant Dodiya"
+            >
+              <Shield className="w-3.5 h-3.5 text-brass shrink-0" />
+              <span className="hidden sm:inline">Studio</span>
+            </button>
 
             {/* Mobile Hamburger Menu Toggle */}
             <button
@@ -474,6 +487,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 );
               })}
             </nav>
+
+            {/* Professor Studio Button in Mobile Drawer */}
+            <div className="pt-2 border-t border-deckle">
+              <button
+                onClick={() => { setMobileMenuOpen(false); openStudio(); }}
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-claret to-claret-light text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs min-h-[44px]"
+              >
+                <Shield className="w-4 h-4 text-brass" />
+                <span>🏛️ Professor Studio (Themes & Content)</span>
+              </button>
+            </div>
 
             {/* Social Channels in Mobile Menu */}
             <div className="pt-3 border-t border-deckle space-y-2">

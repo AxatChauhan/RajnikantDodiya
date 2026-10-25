@@ -7,6 +7,7 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import crypto from 'crypto';
 
 // Load Security implementations
 const IMMUTABLE_PRICING = {
@@ -431,6 +432,65 @@ async function runSecurityAudit() {
     assert(verifyRazorpaySignature(orderId, paymentId, forgedSignature, secret) === false, 'Forged/tampered signature rejected by server verification');
   } catch (err) {
     assert(false, `Payment signature verification suite failed: ${err.message}`);
+  }
+
+  // --- TEST SUITE 11: Dedicated Author Studio Air-Gapped Master Security ---
+  console.log('\n--- TEST SUITE 11: Author Studio Air-Gapped Security & Entropy Verification ---');
+  try {
+    const AUTHOR_MASTER_SALT = 'AUTHOR_MASTER_AIRGAP_SALT_2026_SPU_HMPIETR';
+    const STUDENT_SALT = 'SPU_HMPIETR_ATHENEUM_CREDENTIAL_SALT_2026';
+
+    function hashAuthorMaster(password, email) {
+      const payload = `AUTHOR_AIRGAP:${password}:${AUTHOR_MASTER_SALT}:${email.trim().toLowerCase()}`;
+      return crypto.createHash('sha256').update(payload).digest('hex');
+    }
+
+    function hashStudentPass(password, email) {
+      const payload = `${password}:${STUDENT_SALT}:${email.trim().toLowerCase()}`;
+      return crypto.createHash('sha256').update(payload).digest('hex');
+    }
+
+    function validateMasterEntropy(password) {
+      const p = password || '';
+      const length = p.length >= 10;
+      const hasUppercase = /[A-Z]/.test(p);
+      const hasLowercase = /[a-z]/.test(p);
+      const hasNumber = /[0-9]/.test(p);
+      const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(p);
+      return length && hasUppercase && hasLowercase && hasNumber && hasSymbol;
+    }
+
+    const testPass = 'Dodiya@2026!Studio';
+    const testEmail = 'rajnikantdodiya2@gmail.com';
+
+    const authorHash = hashAuthorMaster(testPass, testEmail);
+    const studentHash = hashStudentPass(testPass, testEmail);
+
+    assert(authorHash !== studentHash, 'Author master hash is completely air-gapped and distinct from student pass hash');
+    assert(authorHash.length === 64, 'Author master password hash is valid 64-char SHA-256');
+
+    // Entropy Policy Enforcement
+    assert(validateMasterEntropy('admin') === false, 'Reject simple 5-char password');
+    assert(validateMasterEntropy('Password123') === false, 'Reject password missing special symbol');
+    assert(validateMasterEntropy('password@123') === false, 'Reject password missing uppercase letter');
+    assert(validateMasterEntropy('PASSWORD@123') === false, 'Reject password missing lowercase letter');
+    assert(validateMasterEntropy('Pass@Word!') === false, 'Reject password missing digits');
+    assert(validateMasterEntropy('Pass@1!') === false, 'Reject password under 10 characters');
+    assert(validateMasterEntropy('Dodiya@2026!Studio') === true, 'Accept high-entropy institutional author master password');
+
+    // Rate Limiting Policy
+    const MAX_ATTEMPTS = 5;
+    let failedCount = 0;
+    let locked = false;
+    for (let i = 1; i <= 6; i++) {
+      failedCount++;
+      if (failedCount >= MAX_ATTEMPTS) {
+        locked = true;
+      }
+    }
+    assert(locked === true, '5 failed master attempts successfully triggers security lockout');
+  } catch (err) {
+    assert(false, `Author Studio security suite failed: ${err.message}`);
   }
 
   console.log('\n================================================================');

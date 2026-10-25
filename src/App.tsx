@@ -3,9 +3,10 @@ import { Navbar, MainTab } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { useScholarSession } from './hooks/useScholarSession';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from './data/professorData';
-import { Feather, ExternalLink, Archive, Download, UserCheck } from 'lucide-react';
+import { Feather, ExternalLink, Archive, Download, UserCheck, Shield, Sparkles } from 'lucide-react';
 import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary';
 import { handleGoogleAuthRedirect } from './lib/googleAuth';
+import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
 
 // Lazily loaded 8 main tab views (Optimized for instant Initial Paint)
 const AboutPage = lazy(() => import('./components/AboutPage').then(m => ({ default: m.AboutPage })));
@@ -23,6 +24,7 @@ const ScholarAuthModal = lazy(() => import('./components/library-store/ScholarAu
 const DeviceTransferredModal = lazy(() => import('./components/library-store/DeviceTransferredModal').then(m => ({ default: m.DeviceTransferredModal })));
 const ProtectedReaderModal = lazy(() => import('./components/library-store/ProtectedReaderModal').then(m => ({ default: m.ProtectedReaderModal })));
 const ExamPortal = lazy(() => import('./components/library-store/ExamPortal').then(m => ({ default: m.ExamPortal })));
+const AuthorStudioModal = lazy(() => import('./components/studio/AuthorStudioModal').then(m => ({ default: m.AuthorStudioModal })));
 
 const AcademicLoadingFallback: React.FC = () => (
   <div className="min-h-[45vh] flex flex-col items-center justify-center p-8 space-y-3 text-center animate-fade-in">
@@ -38,7 +40,7 @@ const AcademicLoadingFallback: React.FC = () => (
   </div>
 );
 
-export function App() {
+function AppInner() {
   const [activeTab, setActiveTab] = useState<MainTab>('home');
   const [activeSubSection, setActiveSubSection] = useState<string | undefined>(undefined);
   const [isCompendiumOpen, setIsCompendiumOpen] = useState(false);
@@ -47,6 +49,7 @@ export function App() {
   const [isExamOpen, setIsExamOpen] = useState(false);
 
   const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
+  const { alertBanner, layoutSettings, openStudio, profile } = useSiteContent();
 
   const handleNavigate = (tab: MainTab, subSection?: string) => {
     setActiveTab(tab);
@@ -58,20 +61,32 @@ export function App() {
     handleGoogleAuthRedirect();
   }, []);
 
+  // Keyboard shortcut for Author Studio: Ctrl + Shift + S
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        openStudio();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [openStudio]);
+
   useEffect(() => {
     const tabTitles: Record<MainTab, string> = {
-      home: `${PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`,
-      about: `About Dr. Rajnikant Dodiya | ${PROFESSOR_INFO.name}`,
-      research: `Research | ${PROFESSOR_INFO.name}`,
-      publications: `Publications & Books | ${PROFESSOR_INFO.name}`,
-      talks: `Talks & Events | ${PROFESSOR_INFO.name}`,
-      communities: `Communities & Initiatives | ${PROFESSOR_INFO.name}`,
-      learn: `Learn & Study Hub | ${PROFESSOR_INFO.name}`,
-      bookstore: `Academic Bookstore & Study Passes | ${PROFESSOR_INFO.name}`,
-      contact: `Contact & Collaboration | ${PROFESSOR_INFO.name}`
+      home: `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`,
+      about: `About Dr. Rajnikant Dodiya | ${profile.name || PROFESSOR_INFO.name}`,
+      research: `Research | ${profile.name || PROFESSOR_INFO.name}`,
+      publications: `Publications & Books | ${profile.name || PROFESSOR_INFO.name}`,
+      talks: `Talks & Events | ${profile.name || PROFESSOR_INFO.name}`,
+      communities: `Communities & Initiatives | ${profile.name || PROFESSOR_INFO.name}`,
+      learn: `Learn & Study Hub | ${profile.name || PROFESSOR_INFO.name}`,
+      bookstore: `Academic Bookstore & Study Passes | ${profile.name || PROFESSOR_INFO.name}`,
+      contact: `Contact & Collaboration | ${profile.name || PROFESSOR_INFO.name}`
     };
-    document.title = tabTitles[activeTab] || `${PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`;
-  }, [activeTab]);
+    document.title = tabTitles[activeTab] || `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`;
+  }, [activeTab, profile.name]);
 
   useEffect(() => {
     if (activeSubSection) {
@@ -85,7 +100,7 @@ export function App() {
   }, [activeTab, activeSubSection]);
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] text-ink font-sans relative selection:bg-claret selection:text-white pb-24 lg:pb-20">
+    <div className="min-h-screen text-ink font-sans relative selection:bg-claret selection:text-white pb-24 lg:pb-20">
       
       {/* 8-Tab Navigation Bar */}
       <Navbar
@@ -95,8 +110,51 @@ export function App() {
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
+      {/* Top Announcement Alert Bar (Customized via Studio) */}
+      {layoutSettings.showEmergencyAlert && alertBanner.enabled && (
+        <aside
+          aria-label="Important Announcement"
+          className={`fixed top-16 sm:top-18 left-0 right-0 z-30 py-2 px-4 text-xs font-sans border-b shadow-xs transition-all ${
+            alertBanner.badgeType === 'urgent'
+              ? 'bg-[#6B1D2F] text-white border-[#4D1220]'
+              : alertBanner.badgeType === 'success'
+              ? 'bg-[#1B4332] text-white border-[#081C15]'
+              : alertBanner.badgeType === 'gold'
+              ? 'bg-[#2A2312] text-[#F3E7C4] border-[#44381C]'
+              : 'bg-claret text-white border-claret-dark'
+          }`}
+        >
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-2 text-center">
+            <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 font-bold shadow-2xs">
+              {alertBanner.badgeText || 'Notice'}
+            </span>
+            <span className="font-medium text-xs leading-tight">{alertBanner.text}</span>
+            {alertBanner.buttonText && (
+              <button
+                onClick={() => {
+                  if (alertBanner.buttonLink.startsWith('#')) {
+                    const target = alertBanner.buttonLink.replace('#', '') as MainTab;
+                    handleNavigate(target);
+                  } else if (alertBanner.buttonLink.startsWith('http')) {
+                    window.open(alertBanner.buttonLink, '_blank');
+                  }
+                }}
+                className="text-[11px] underline font-semibold hover:opacity-80 transition-opacity ml-1 inline-flex items-center gap-0.5"
+              >
+                <span>{alertBanner.buttonText}</span>
+                <span>→</span>
+              </button>
+            )}
+          </div>
+        </aside>
+      )}
+
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 pt-24 sm:pt-28 min-h-[75vh]">
+      <main className={`max-w-7xl mx-auto px-3 sm:px-6 md:px-8 min-h-[75vh] ${
+        layoutSettings.showEmergencyAlert && alertBanner.enabled
+          ? 'pt-32 sm:pt-36'
+          : 'pt-24 sm:pt-28'
+      }`}>
         <AcademicErrorBoundary fallbackTitle="Academic Section Interrupted">
           <Suspense fallback={<AcademicLoadingFallback />}>
             {activeTab === 'home' && (
@@ -218,13 +276,18 @@ export function App() {
         </Suspense>
       )}
 
+      {/* Global Author Studio Modal (Air-gapped Master Gateway) */}
+      <Suspense fallback={null}>
+        <AuthorStudioModal />
+      </Suspense>
+
       {/* Academic Footer */}
       <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-20 sm:mt-28 pt-8 border-t border-deckle space-y-4 text-xs text-ink-muted">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
             <Feather className="w-4 h-4 text-claret shrink-0" />
-            <span className="font-serif font-medium text-ink text-sm">{PROFESSOR_INFO.name}</span>
-            <span className="text-ink-faint">• Assistant Professor • {PROFESSOR_INFO.institution}</span>
+            <span className="font-serif font-medium text-ink text-sm">{profile.name || PROFESSOR_INFO.name}</span>
+            <span className="text-ink-faint">• Assistant Professor • {profile.institution || PROFESSOR_INFO.institution}</span>
           </div>
 
           {/* Social / Research Profile Links */}
@@ -260,15 +323,31 @@ export function App() {
               <Download className="w-3 h-3" />
               <span>Download CV</span>
             </button>
+            <button
+              onClick={openStudio}
+              className="hover:text-claret font-sans font-medium text-claret flex items-center gap-1 border border-claret/30 px-2 py-0.5 rounded-lg bg-claret-soft"
+              title="Professor Studio (Ctrl+Shift+S)"
+            >
+              <Shield className="w-3 h-3 text-brass" />
+              <span>Professor Studio</span>
+            </button>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-deckle/60 text-[11px] text-ink-faint text-center sm:text-left">
-          <span>© {new Date().getFullYear()} {PROFESSOR_INFO.name} | All Academic Rights Reserved</span>
-          <span>H. M. Patel Institute of English Training & Research, Vallabh Vidyanagar</span>
+          <span>© {new Date().getFullYear()} {profile.name || PROFESSOR_INFO.name} | All Academic Rights Reserved</span>
+          <span>{profile.institution || PROFESSOR_INFO.institution}, {profile.location || PROFESSOR_INFO.location}</span>
         </div>
       </footer>
 
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <SiteContentProvider>
+      <AppInner />
+    </SiteContentProvider>
   );
 }
