@@ -3,7 +3,7 @@ import { Navbar, MainTab } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { useScholarSession } from './hooks/useScholarSession';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from './data/professorData';
-import { Feather, ExternalLink, Download } from 'lucide-react';
+import { Feather, ExternalLink } from 'lucide-react';
 import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary';
 import { handleGoogleAuthRedirect } from './lib/googleAuth';
 import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
@@ -277,13 +277,6 @@ function AppInner() {
             >
               Vidwan <ExternalLink className="w-3 h-3" />
             </a>
-            <button
-              onClick={() => setIsCompendiumOpen(true)}
-              className="hover:text-claret font-sans font-medium text-claret flex items-center gap-1"
-            >
-              <Download className="w-3 h-3" />
-              <span>Download CV</span>
-            </button>
           </div>
         </div>
 

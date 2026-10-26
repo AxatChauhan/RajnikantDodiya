@@ -17,7 +17,6 @@ import {
   MessageCircle,
   FileText,
   ChevronRight,
-  Download,
   CheckCircle2,
   Star,
   Check,
@@ -34,7 +33,7 @@ import { useSiteContent } from '../contexts/SiteContentContext';
 
 interface HomePageProps {
   onNavigate: (tab: MainTab, subId?: string) => void;
-  onOpenCompendium: () => void;
+  onOpenCompendium?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium }) => {
@@ -120,14 +119,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 <Zap className="w-4 h-4 text-brass" />
                 <span>Explore Study Passes & Books</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />
-              </button>
-
-              <button
-                onClick={onOpenCompendium}
-                className="w-full sm:w-auto justify-center px-4 py-3 rounded-xl bg-white hover:bg-gray-50 text-ink text-xs font-semibold border border-gray-300 shadow-2xs transition-all flex items-center gap-1.5 min-h-[46px]"
-              >
-                <Download className="w-3.5 h-3.5 text-claret" />
-                <span>Download Academic CV</span>
               </button>
 
               <a

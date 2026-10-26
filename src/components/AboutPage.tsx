@@ -16,7 +16,6 @@ import {
   Calendar,
   Briefcase,
   Users,
-  Download,
   CheckCircle2,
   FileText,
   Building,
@@ -366,18 +365,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
             <span className="text-[11px] font-mono text-claret font-semibold block pt-1">
               Last updated: October 2026
             </span>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {onOpenCompendium && (
-              <button
-                onClick={onOpenCompendium}
-                className="px-4 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center gap-2 min-h-[42px]"
-              >
-                <Download className="w-4 h-4" />
-                <span>View / Download CV</span>
-              </button>
-            )}
           </div>
         </div>
       </section>

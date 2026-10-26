@@ -3,7 +3,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  Download,
   KeyRound,
   ShieldCheck,
   ExternalLink,
@@ -119,7 +118,7 @@ export const MAIN_NAV_ITEMS: NavItemConfig[] = [
 interface NavbarProps {
   activeTab: MainTab;
   setActiveTab: (tab: MainTab, subSection?: string) => void;
-  onOpenCompendium: () => void;
+  onOpenCompendium?: () => void;
   onOpenAuthModal?: () => void;
 }
 
@@ -313,16 +312,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-serif">Bookstore</span>
             </button>
 
-            {/* BUTTON 1: [Download CV] - xl only to prevent 1024px laptop crowding */}
-            <button
-              onClick={onOpenCompendium}
-              className="hidden xl:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-deckle hover:border-claret text-xs font-sans font-medium text-ink-muted hover:text-claret transition-all items-center gap-1.5 shadow-2xs shrink-0 min-h-[38px]"
-              title="View or Download Dr. Dodiya's Curriculum Vitae"
-            >
-              <Download className="w-3.5 h-3.5 text-claret" />
-              <span>Download CV</span>
-            </button>
-
             {/* BUTTON 2: [Student Login] */}
             {onOpenAuthModal && (
               isScholarActive ? (
@@ -442,24 +431,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="lg:hidden border-t border-deckle bg-white/98 backdrop-blur-lg px-4 py-4 max-h-[calc(100dvh-130px)] pb-24 overflow-y-auto space-y-4 animate-fade-in shadow-2xl">
             
             {/* Quick Actions in Mobile Drawer */}
-            <div className="grid grid-cols-2 gap-2 pb-3 border-b border-deckle">
-              <button
-                onClick={() => { setMobileMenuOpen(false); onOpenCompendium(); }}
-                className="py-2.5 px-3 rounded-xl bg-parchment-warm border border-deckle text-xs font-sans font-medium text-claret flex items-center justify-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download CV</span>
-              </button>
-              {onOpenAuthModal && (
+            {onOpenAuthModal && (
+              <div className="pb-3 border-b border-deckle">
                 <button
                   onClick={() => { setMobileMenuOpen(false); onOpenAuthModal(); }}
-                  className="py-2.5 px-3 rounded-xl bg-claret text-white text-xs font-sans font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full py-2.5 px-3 rounded-xl bg-claret text-white text-xs font-sans font-medium flex items-center justify-center gap-1.5 shadow-xs"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
                   <span>{isScholarActive ? 'My Pass' : 'Student Login'}</span>
                 </button>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Featured Academic Bookstore Card in Mobile Drawer */}
             <button
