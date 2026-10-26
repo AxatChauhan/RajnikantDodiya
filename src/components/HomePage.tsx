@@ -376,10 +376,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               {/* PW-Style Deliverable Checklist */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
                 {[
-                  'Complete Doctoral Monograph (180+ Pages)',
+                  `Complete Doctoral Monograph (${featuredBook.pageCount || 320}+ Pages)`,
                   'Instant Digital 2-Device Pass (Phone + Laptop)',
                   'Direct WhatsApp Author Inquiry & Hard Copy Orders',
-                  'Free Public Academic Sample of Chapter 0'
+                  `Free Public Academic Sample (First ${featuredBook.previewPages || 20} Pages)`
                 ].map((feat, i) => (
                   <div key={i} className="flex items-center gap-2 text-ink-muted">
                     <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">

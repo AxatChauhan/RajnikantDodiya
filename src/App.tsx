@@ -211,28 +211,36 @@ function AppInner() {
       )}
 
       {/* Global Protected Reader Modal */}
-      {(isBookOwned || isComplimentaryOwned) && isReaderOpen && (
+      {isReaderOpen && (
         <Suspense fallback={null}>
           <ProtectedReaderModal
             isOpen={isReaderOpen}
             onClose={() => setIsReaderOpen(false)}
-            studentName={session.name}
-            studentMobile={session.mobile}
-            orderId={session.orderId}
-            isUnlocked={true}
+            studentName={session.name || 'Registered Scholar'}
+            studentMobile={session.mobile || 'Pass Active'}
+            orderId={session.orderId || 'HMP-2026'}
+            isUnlocked={isBookOwned}
+            onUnlockRequest={() => {
+              setIsReaderOpen(false);
+              handleNavigate('bookstore');
+            }}
           />
         </Suspense>
       )}
 
       {/* Global UGC-NET CBT Exam Portal */}
-      {isExamOwned && isExamOpen && (
+      {isExamOpen && (
         <Suspense fallback={null}>
           <ExamPortal
             isOpen={isExamOpen}
             onClose={() => setIsExamOpen(false)}
-            studentName={session.name}
-            orderId={session.orderId}
-            isUnlocked={true}
+            studentName={session.name || 'Candidate'}
+            orderId={session.orderId || 'HMP-2026'}
+            isUnlocked={isExamOwned}
+            onUnlockRequest={() => {
+              setIsExamOpen(false);
+              handleNavigate('bookstore');
+            }}
           />
         </Suspense>
       )}

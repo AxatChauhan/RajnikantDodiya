@@ -16,6 +16,10 @@ export interface Book {
   type: 'authored' | 'edited' | 'chapter';
   details?: string;
   buyUrl?: string;
+  pageCount?: number;
+  previewPages?: number;
+  samplePdfUrl?: string;
+  manuscriptFileUrl?: string;
 }
 
 export interface Engagement {
