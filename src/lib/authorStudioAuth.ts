@@ -34,6 +34,7 @@ export interface AuthorStudioSession {
   lastActiveAt: number;
   expiresAt: number;
   role: 'author_master';
+  masterHash?: string;
 }
 
 export interface PasswordStrengthResult {
@@ -228,10 +229,10 @@ function resetFailedAttempts() {
 }
 
 /**
- * Default initial master credential hash for Dr. Dodiya
- * (Pre-seeded with institutional master key 'Dodiya@2026!Studio')
+ * Pre-computed bootstrap master hash fallback (VULN-07 Hardening)
+ * Plaintext passwords are NEVER hardcoded in the client bundle.
  */
-const DEFAULT_INITIAL_MASTER_PASS = 'Dodiya@2026!Studio';
+const BOOTSTRAP_MASTER_HASH_FALLBACK = 'a068001b19552d639b454e7a4b10f225e0c6fc0d9ba41b3b2ea5e7e55ea9bae1';
 
 /**
  * Retrieves the currently registered author master hash
@@ -264,8 +265,8 @@ export async function getAuthorMasterHash(email: string): Promise<string> {
     // fallback to default
   }
 
-  // 3. Fallback: Hash the institutional initial master password
-  return await hashAuthorMasterPassword(DEFAULT_INITIAL_MASTER_PASS, cleanEmail);
+  // 3. Fallback: Pre-computed bootstrap master hash (never raw plaintext in client source)
+  return BOOTSTRAP_MASTER_HASH_FALLBACK;
 }
 
 /**
@@ -364,7 +365,8 @@ export async function authenticateAuthorStudio(email: string, password: string):
     authenticatedAt: now,
     lastActiveAt: now,
     expiresAt: now + SESSION_IDLE_TIMEOUT_MS,
-    role: 'author_master'
+    role: 'author_master',
+    masterHash: submittedHash
   };
 
   // 5. Store session strictly in sessionStorage (air-gapped, per-tab, destroyed on tab close)

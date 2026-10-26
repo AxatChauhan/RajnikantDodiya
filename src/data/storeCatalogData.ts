@@ -242,7 +242,8 @@ export function getLicensedBookChapters(isUnlocked: boolean): BookChapter[] {
 }
 
 // The 25-Question Curated CBT Mock Exam (UGC-NET / GSET Master Edition)
-export const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
+// VULN-06 Hardening: Kept internal to module; only sanitized questions are surfaced for active testing
+const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
   {
     id: 1,
     section: 'Paper II: English Literature',

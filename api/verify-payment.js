@@ -53,7 +53,13 @@ export default async function handler(req, res) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      order_id
+      order_id,
+      mobile,
+      student_name,
+      product_type,
+      amount,
+      licensed_items,
+      device_token
     } = req.body || {};
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -95,9 +101,40 @@ export default async function handler(req, res) {
       });
     }
 
+    // VULN-05 Hardening: Atomic Server-Side Fulfillment via Supabase Service Role Key
+    let fulfilledServerSide = false;
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (supabaseUrl && serviceRoleKey && mobile) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+        
+        const { data: rpcData, error: rpcErr } = await adminSupabase.rpc('record_verified_purchase', {
+          p_order_id: order_id || `ORD-${Date.now()}`,
+          p_mobile: mobile,
+          p_student_name: student_name || 'Scholar',
+          p_product_type: product_type || 'book',
+          p_amount: Number(amount) || 399,
+          p_payment_id: razorpay_payment_id,
+          p_licensed_items: licensed_items || [product_type || 'book'],
+          p_device_token: device_token || `dev_srv_${Date.now()}`,
+          p_status: 'completed'
+        });
+
+        if (!rpcErr && rpcData?.success) {
+          fulfilledServerSide = true;
+        }
+      } catch (fulfillErr) {
+        console.warn('Server-side fulfillment notice (falling back to client):', fulfillErr);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       verified: true,
+      fulfilled: fulfilledServerSide,
       paymentId: razorpay_payment_id,
       orderId: order_id
     });

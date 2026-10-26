@@ -327,16 +327,16 @@ async function establishVerifiedSession(
       order_id: orderId,
       mobile: email,
       student_name: name,
-      product_type: isAuthor ? 'bundle' : 'book',
+      product_type: isAuthor ? 'bundle' : 'complimentary_book',
       amount: 0,
       status: 'completed'
     }, { onConflict: 'order_id' });
 
-    // Upsert licenses
+    // Upsert licenses (VULN-04 Hardening: scholars only receive complimentary preview, NEVER paid monograph)
     await supabase.from('student_licenses').upsert({
       mobile: email,
       student_name: name,
-      product_type: isAuthor ? 'bundle' : 'book',
+      product_type: isAuthor ? 'bundle' : 'complimentary_book',
       order_id: orderId,
       is_active: true
     }, { onConflict: 'mobile,product_type' });

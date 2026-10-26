@@ -162,6 +162,16 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
           setPaymentId(razorpayPayId);
 
           // 1. Fail-Closed Cryptographic Payment Verification with Backend Serverless Endpoint
+          const licensedItems: ('book' | 'exam')[] = [];
+          if (activeProduct.type === 'book') licensedItems.push('book');
+          else if (activeProduct.type === 'exam') licensedItems.push('exam');
+          else if (activeProduct.type === 'bundle') {
+            licensedItems.push('book');
+            licensedItems.push('exam');
+          }
+
+          let isServerFulfilled = false;
+
           if (response.razorpay_signature) {
             try {
               const verifyRes = await fetch('/api/verify-payment', {
@@ -171,7 +181,13 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: razorpayPayId,
                   razorpay_signature: response.razorpay_signature,
-                  order_id: orderId
+                  order_id: orderId,
+                  mobile: mobileCheck.cleanMobile,
+                  student_name: cleanName,
+                  product_type: activeProduct.type,
+                  amount: verifiedPrice,
+                  licensed_items: licensedItems,
+                  device_token: activeDeviceToken || undefined
                 })
               });
 
@@ -188,6 +204,10 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                 setIsProcessing(false);
                 return;
               }
+
+              if (verifyData.fulfilled) {
+                isServerFulfilled = true;
+              }
             } catch (networkErr) {
               console.error('Payment verification request failed:', networkErr);
               // Fail closed in production environments to prevent forged signature fulfillment
@@ -199,29 +219,24 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
             }
           }
 
-          const licensedItems: ('book' | 'exam')[] = [];
-          if (activeProduct.type === 'book') licensedItems.push('book');
-          else if (activeProduct.type === 'exam') licensedItems.push('exam');
-          else if (activeProduct.type === 'bundle') {
-            licensedItems.push('book');
-            licensedItems.push('exam');
-          }
+          // If not fulfilled server-side, fallback to client save
+          if (!isServerFulfilled) {
+            const saveResult = await saveOrderAndLicenses(
+              {
+                order_id: orderId,
+                mobile: mobileCheck.cleanMobile,
+                student_name: cleanName,
+                product_type: activeProduct.type,
+                amount: verifiedPrice,
+                razorpay_payment_id: razorpayPayId,
+                status: 'completed'
+              },
+              licensedItems
+            );
 
-          const saveResult = await saveOrderAndLicenses(
-            {
-              order_id: orderId,
-              mobile: mobileCheck.cleanMobile,
-              student_name: cleanName,
-              product_type: activeProduct.type,
-              amount: verifiedPrice,
-              razorpay_payment_id: razorpayPayId,
-              status: 'completed'
-            },
-            licensedItems
-          );
-
-          if (saveResult.deviceToken) {
-            setActiveDeviceToken(saveResult.deviceToken);
+            if (saveResult.deviceToken) {
+              setActiveDeviceToken(saveResult.deviceToken);
+            }
           }
 
           setIsProcessing(false);

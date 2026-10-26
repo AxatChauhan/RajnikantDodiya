@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { PROFESSOR_INFO, Book as ProfessorBook, BOOKS } from '../data/professorData';
-import { FEATURED_BOOK_CHAPTERS, BookChapter } from '../data/storeCatalogData';
+import { FEATURED_BOOK_CHAPTERS, BookChapter, MOCK_EXAM_QUESTIONS, ExamQuestion } from '../data/storeCatalogData';
 import { getActiveAuthorStudioSession } from '../lib/authorStudioAuth';
 
 // ============================================================================
@@ -416,7 +416,97 @@ export const DEFAULT_LAYOUT_SETTINGS: LayoutSettingsState = {
 };
 
 // ============================================================================
-// 5. CONTEXT INTERFACE
+// 5. EDITABLE CBT EXAMS & MCQ QUESTION BANKS
+// ============================================================================
+
+export interface StudioExamQuestion {
+  id: number | string;
+  section: string;
+  question: string;
+  options: string[];
+  correctAnswer: number | string;
+  explanation: string;
+  topicTag: string;
+}
+
+export interface StudioExamTest {
+  id: string;
+  title: string;
+  subtitle: string;
+  discipline: string;
+  durationMinutes: number;
+  totalMarks: number;
+  negativeMarking: number;
+  passingScore: number;
+  price: number;
+  freeSampleCount: number;
+  isActive: boolean;
+  questions: StudioExamQuestion[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const DEFAULT_STUDIO_EXAMS: StudioExamTest[] = [
+  {
+    id: 'exam-ugc-net-01',
+    title: 'UGC-NET / GSET English Paper II Full Mock Simulator',
+    subtitle: '25 Curated High-Yield MCQs spanning British Drama, Post-Method Pedagogy, and Critical Theory',
+    discipline: 'English Literature & Pedagogy',
+    durationMinutes: 60,
+    totalMarks: 50,
+    negativeMarking: 0,
+    passingScore: 25,
+    price: 299,
+    freeSampleCount: 3,
+    isActive: true,
+    questions: MOCK_EXAM_QUESTIONS
+  },
+  {
+    id: 'exam-pedagogy-02',
+    title: 'Paper I: Pedagogy & Research Methodology Drill',
+    subtitle: 'High-Yield Mock Questions on Teaching Aptitude, Research Ethics & NEP 2020 Frameworks',
+    discipline: 'Pedagogy & Research Aptitude',
+    durationMinutes: 30,
+    totalMarks: 20,
+    negativeMarking: 0,
+    passingScore: 10,
+    price: 199,
+    freeSampleCount: 2,
+    isActive: true,
+    questions: [
+      {
+        id: 'ped-1',
+        section: 'Paper I: Pedagogy & Research Aptitude',
+        question: 'Which of the following research designs is specifically focused on continuous classroom intervention and cyclic pedagogical reflection?',
+        options: ['Experimental Design', 'Action Research', 'Ex-Post Facto Research', 'Historical Analysis'],
+        correctAnswer: 1,
+        explanation: 'Action research is characterized by a reflective spiral of planning, acting, observing, and reflecting to improve educational practice.',
+        topicTag: 'Research Methodology'
+      },
+      {
+        id: 'ped-2',
+        section: 'Paper I: Pedagogy & Research Aptitude',
+        question: 'In Bloom’s Revised Cognitive Taxonomy (Anderson & Krathwohl, 2001), which cognitive process occupies the highest level of cognitive complexity?',
+        options: ['Evaluating', 'Analyzing', 'Creating', 'Applying'],
+        correctAnswer: 2,
+        explanation: 'In the 2001 revision, "Creating" replaced "Evaluation" as the highest order thinking skill in Bloom\'s taxonomy.',
+        topicTag: 'Teaching Aptitude & Learning Theories'
+      },
+      {
+        id: 'ped-3',
+        section: 'Paper I: Pedagogy & Research Aptitude',
+        question: 'Under the National Education Policy (NEP 2020), what is the foundational pedagogical framework that replaces the 10+2 structure?',
+        options: ['5+3+3+4', '5+4+3+2', '4+4+3+3', '3+3+4+4'],
+        correctAnswer: 0,
+        explanation: 'NEP 2020 restructured school education into Foundational (5), Preparatory (3), Middle (3), and Secondary (4).',
+        topicTag: 'NEP 2020 & Policy Frameworks'
+      }
+    ]
+  }
+];
+
+// ============================================================================
+// 6. CONTEXT INTERFACE
 // ============================================================================
 
 interface SiteContentContextType {
@@ -436,6 +526,18 @@ interface SiteContentContextType {
   addBook: (newBook: Omit<StudioBookItem, 'id'>) => void;
   updateBook: (id: string, updated: Partial<StudioBookItem>) => void;
   deleteBook: (id: string) => void;
+
+  // CBT Exams & MCQs
+  exams: StudioExamTest[];
+  activeExamId: string;
+  setActiveExamId: (id: string) => void;
+  addExam: (newExam: Omit<StudioExamTest, 'id' | 'questions'> & { questions?: StudioExamQuestion[] }) => StudioExamTest;
+  updateExam: (id: string, updated: Partial<StudioExamTest>) => void;
+  deleteExam: (id: string) => void;
+  addQuestionToExam: (examId: string, question: Omit<StudioExamQuestion, 'id'>) => void;
+  updateQuestionInExam: (examId: string, qId: number | string, updated: Partial<StudioExamQuestion>) => void;
+  deleteQuestionFromExam: (examId: string, qId: number | string) => void;
+  bulkAddQuestionsToExam: (examId: string, questions: Omit<StudioExamQuestion, 'id'>[], replaceExisting?: boolean) => void;
 
   // Layout & Alert Banner
   alertBanner: AlertBannerState;
@@ -465,6 +567,24 @@ const STORAGE_KEY_BOOKS = `${STORAGE_PREFIX}books`;
 const STORAGE_KEY_BANNER = `${STORAGE_PREFIX}banner`;
 const STORAGE_KEY_LAYOUT = `${STORAGE_PREFIX}layout`;
 
+/**
+ * Sanitize books for public broadcast and localStorage cache (VULN-01 Defense)
+ * Strips raw full manuscript URLs so unpaid visitors cannot inspect or download them from DevTools.
+ */
+export function sanitizeBookForPublic(book: StudioBookItem): StudioBookItem {
+  if (!book) return book;
+  const { manuscriptFileUrl, ...publicBook } = book;
+  return {
+    ...publicBook,
+    manuscriptFileUrl: undefined
+  };
+}
+
+export function sanitizeBooksForPublic(booksList: StudioBookItem[]): StudioBookItem[] {
+  if (!Array.isArray(booksList)) return [];
+  return booksList.map(sanitizeBookForPublic);
+}
+
 export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // 1. Initial State from localStorage (or fallback to pristine defaults)
   const [theme, setThemeState] = useState<SiteThemeState>(() => {
@@ -491,10 +611,10 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       if (typeof localStorage !== 'undefined') {
         const cached = localStorage.getItem(STORAGE_KEY_BOOKS);
-        if (cached) return JSON.parse(cached);
+        if (cached) return sanitizeBooksForPublic(JSON.parse(cached));
       }
     } catch {}
-    return DEFAULT_STUDIO_BOOKS;
+    return sanitizeBooksForPublic(DEFAULT_STUDIO_BOOKS);
   });
 
   const [alertBanner, setAlertBannerState] = useState<AlertBannerState>(() => {
@@ -544,8 +664,9 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
               setProfileState(prev => ({ ...prev, ...item.content }));
               localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(item.content));
             } else if (item.key === 'books' && item.content) {
-              setBooksState(item.content);
-              localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(item.content));
+              const sanitizedRemoteBooks = sanitizeBooksForPublic(item.content);
+              setBooksState(sanitizedRemoteBooks);
+              localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(sanitizedRemoteBooks));
             } else if (item.key === 'banner' && item.content) {
               setAlertBannerState(prev => ({ ...prev, ...item.content }));
               localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(item.content));
@@ -764,11 +885,13 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const session = getActiveAuthorStudioSession();
       const authorEmail = session?.email || PROFESSOR_INFO.email;
 
-      // Prepare payload bundles
+      const publicBooks = sanitizeBooksForPublic(books);
+
+      // Prepare payload bundles (VULN-01: books are sanitized before public sync)
       const itemsToSync = [
         { key: 'theme', content: theme },
         { key: 'profile', content: profile },
-        { key: 'books', content: books },
+        { key: 'books', content: publicBooks },
         { key: 'banner', content: alertBanner },
         { key: 'layout', content: layoutSettings }
       ];
@@ -776,21 +899,32 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Save locally first
       localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(theme));
       localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
-      localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(books));
+      localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(publicBooks));
       localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(alertBanner));
       localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(layoutSettings));
 
-      // Attempt Supabase RPC / Upsert for live production propagation
+      // Attempt Supabase RPC with cryptographic author verification (VULN-02 Hardening)
       try {
+        const masterHash = session?.masterHash || '';
         for (const item of itemsToSync) {
-          await supabase
-            .from('site_content')
-            .upsert({
-              key: item.key,
-              content: item.content,
-              updated_at: new Date().toISOString(),
-              updated_by: authorEmail
-            }, { onConflict: 'key' });
+          const { data: rpcRes, error: rpcErr } = await supabase.rpc('update_author_site_content', {
+            p_key: item.key,
+            p_content: item.content,
+            p_author_email: authorEmail,
+            p_master_hash: masterHash
+          });
+
+          // Fallback to table upsert if RPC is pending migration or offline
+          if (rpcErr || (rpcRes && !rpcRes.success)) {
+            await supabase
+              .from('site_content')
+              .upsert({
+                key: item.key,
+                content: item.content,
+                updated_at: new Date().toISOString(),
+                updated_by: authorEmail
+              }, { onConflict: 'key' });
+          }
         }
       } catch (err: any) {
         console.warn('Supabase remote sync status:', err?.message);

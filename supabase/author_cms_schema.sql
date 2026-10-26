@@ -28,13 +28,15 @@ CREATE POLICY "Public Read Site Content"
   ON public.site_content FOR SELECT
   USING (true);
 
--- 5. RLS Policies: Only service role or authorized procedures can read/write author_security
+-- 5. RLS Policies: Strictly deny public reads of author_security (VULN-03 Hardening)
+-- Author credentials and password hashes must NEVER be exposed via public SELECT
 DROP POLICY IF EXISTS "Public Read Author Security" ON public.author_security;
-CREATE POLICY "Public Read Author Security"
-  ON public.author_security FOR SELECT
-  USING (true);
+CREATE POLICY "Deny Public Read Author Security"
+  ON public.author_security FOR ALL
+  TO anon
+  USING (false);
 
--- 6. RPC: Atomic update of site content
+-- 6. RPC: Atomic update of site content (VULN-02 Hardening: Cryptographic Hash Verification)
 CREATE OR REPLACE FUNCTION public.update_author_site_content(
   p_key TEXT,
   p_content JSONB,
@@ -46,15 +48,31 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  v_authorized BOOLEAN := FALSE;
   v_expected_hash TEXT;
 BEGIN
-  -- Verify author email
+  -- 1. Verify author identity
   IF LOWER(p_author_email) NOT IN ('rajnikantdodiya2@gmail.com', 'rajnikantdodiya@hmpenglish.com', 'rajnikantdodiyaphd@gmail.com') THEN
     RETURN jsonb_build_object('success', false, 'error', 'Unauthorized author identity');
   END IF;
 
-  -- Upsert content
+  -- 2. Verify master password hash against author_security table
+  SELECT master_hash INTO v_expected_hash
+  FROM public.author_security
+  WHERE email = LOWER(p_author_email);
+
+  -- Strictly reject update if master hash does not match
+  IF v_expected_hash IS NOT NULL THEN
+    IF p_master_hash IS NULL OR p_master_hash <> v_expected_hash THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Invalid master authentication credentials.');
+    END IF;
+  ELSE
+    -- Bootstrap mode: If no hash exists in table yet, require compliant non-empty hash
+    IF p_master_hash IS NULL OR length(p_master_hash) < 16 THEN
+      RETURN jsonb_build_object('success', false, 'error', 'Master authentication required.');
+    END IF;
+  END IF;
+
+  -- 3. Upsert validated content
   INSERT INTO public.site_content (key, content, updated_at, updated_by)
   VALUES (p_key, p_content, NOW(), LOWER(p_author_email))
   ON CONFLICT (key) DO UPDATE
