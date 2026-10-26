@@ -68,15 +68,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.18] tracking-tight break-words">
-              Master UGC-NET English & Education with{' '}
-              <span className="text-claret underline decoration-brass/40 decoration-wavy underline-offset-4 break-words">
-                {profile.name || PROFESSOR_INFO.name}
-              </span>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.15] tracking-tight break-words">
+              Dr. Rajnikant S. Dodiya
             </h1>
             
-            <p className="font-sans text-sm sm:text-base text-claret font-semibold leading-snug break-words">
-              {profile.title || PROFESSOR_INFO.title} • Ph.D. in Education (SPU, 2018)
+            <p className="font-sans text-base sm:text-lg text-claret font-semibold leading-snug break-words">
+              Assistant Professor · English Language Education & Teacher Education
             </p>
 
             {/* Short Bio */}
@@ -90,10 +87,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 Explore:
               </span>
               {[
-                { id: 'all', label: '🎯 All Batches & Passes' },
-                { id: 'ugc-net', label: '📘 UGC-NET English' },
-                { id: 'books', label: '📚 Kalam Monograph' },
-                { id: 'pedagogy', label: '🤖 AI in ELE & NEP' }
+                { id: 'all', label: 'All Batches & Passes' },
+                { id: 'ugc-net', label: 'UGC-NET English' },
+                { id: 'books', label: 'Kalam Monograph' },
+                { id: 'pedagogy', label: 'AI in ELE & NEP' }
               ].map((pill) => (
                 <button
                   key={pill.id}
@@ -199,7 +196,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               {/* Chip 4: Mid-Right (No bottom collision) */}
               <div className="absolute bottom-14 -right-5 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
                 <span className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
-                  <Star className="w-4 h-4 text-purple-600 fill-current" />
+                  <Award className="w-4 h-4 text-purple-600" />
                 </span>
                 <div>
                   <p className="text-[10px] text-ink-muted uppercase leading-none">Experience</p>
@@ -223,7 +220,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 <span className="font-semibold text-[11px] leading-tight">Ph.D. Education (SPU)</span>
               </div>
               <div className="floating-badge p-2 rounded-xl flex items-center gap-2 text-xs font-sans">
-                <Star className="w-4 h-4 text-purple-600 fill-current shrink-0" />
+                <Award className="w-4 h-4 text-purple-600 shrink-0" />
                 <span className="font-semibold text-[11px] leading-tight">15+ Yrs Teaching</span>
               </div>
             </div>
@@ -511,11 +508,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               className="pw-card p-5 rounded-2xl space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
-                <div className="flex items-center gap-1 text-amber-500">
-                  {Array.from({ length: item.rating }).map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                  ))}
-                </div>
                 <p className="text-xs text-ink leading-relaxed italic">
                   "{item.review}"
                 </p>

@@ -16,10 +16,10 @@
   --color-canvas: #FAF9F5;
   --color-canvas-card: #FFFFFF;
   --font-family-serif: 'Newsreader', Georgia, serif;
-  --font-family-display: 'Cinzel', 'Newsreader', serif;
-  --font-family-reading: 'Lora', Georgia, serif;
-  --font-family-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-size-base: 16px;
+  --font-family-display: 'Newsreader', Georgia, serif;
+  --font-family-reading: 'Source Sans 3', system-ui, sans-serif;
+  --font-family-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-size-base: 17px;
 }
 
 @layer base {
@@ -27,13 +27,84 @@
     scroll-behavior: smooth;
     color: #16191F;
     background-color: var(--color-canvas, #FAF9F5);
-    font-size: var(--font-size-base, 16px);
+    font-size: var(--font-size-base, 17px);
     overflow-x: hidden;
   }
   body {
     overflow-x: hidden;
     width: 100%;
+    font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    background-color: var(--color-canvas, #FAF9F5);
+    color: #16191F;
+    font-size-adjust: from-font;
   }
+
+  /* Newsreader for ALL headings */
+  h1, h2, h3, h4, h5, h6, .font-serif, .font-display {
+    font-family: 'Newsreader', Georgia, serif !important;
+    text-wrap: balance;
+  }
+
+  /* Body text, reading, and paragraphs: dynamic reading font with fallback */
+  p, li, blockquote, dd, dt, article, section, .font-reading {
+    font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif);
+    font-size-adjust: from-font;
+  }
+
+  /* Body text: 17px, line height 1.6 */
+  p, .font-reading {
+    font-size: 17px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  /* Menu, navigation, buttons, and inputs */
+  nav, nav *, button, button *, a, input, select, textarea {
+    font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif);
+  }
+}
+
+/* Floor rule: No text smaller than 14px anywhere */
+[class*="text-\[8px\]"],
+[class*="text-\[9px\]"],
+[class*="text-\[10px\]"],
+[class*="text-\[11px\]"],
+[class*="text-\[11.5px\]"],
+[class*="text-\[12px\]"],
+[class*="text-\[13px\]"],
+.text-2xs,
+.text-xs {
+  font-size: 14px !important;
+  line-height: 1.5;
+}
+
+/* Eliminate Space Mono everywhere: font-mono uses reading font */
+.font-mono {
+  font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif) !important;
+}
+
+/* Small labels: reading font, 14px, uppercase, with slight letter spacing */
+.font-mono.uppercase,
+span[class*="uppercase"],
+p[class*="uppercase"],
+div[class*="uppercase"],
+label,
+label[class*="uppercase"],
+[class*="tracking-wide"][class*="uppercase"],
+[class*="tracking-wider"],
+[class*="tracking-widest"],
+.label-small {
+  font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif) !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Headings use the dynamic display/serif font from Studio theme */
+h1, h2, h3, h4, h5, h6, .font-serif, .font-display {
+  font-family: var(--font-family-display, var(--font-family-serif, 'Newsreader', Georgia, serif)) !important;
 }
 
 /* Custom Academic & Bookish Scrollbar */

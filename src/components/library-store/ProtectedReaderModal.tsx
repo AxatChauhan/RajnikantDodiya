@@ -261,9 +261,9 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   }, [isOpen]);
 
   const FONT_FAMILY_MAP: Record<FontFamily, string> = {
-    serif: "'Lora', 'Newsreader', Georgia, 'Times New Roman', serif",
-    sans: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
-    mono: "'Space Mono', 'JetBrains Mono', 'Courier New', monospace"
+    serif: "'Newsreader', Georgia, 'Times New Roman', serif",
+    sans: "'Source Sans 3', system-ui, -apple-system, sans-serif",
+    mono: "'Source Sans 3', system-ui, -apple-system, sans-serif"
   };
 
   const FONT_SIZE_MAP: Record<FontSize, { fontSize: string; lineHeight: string }> = {

@@ -10,13 +10,13 @@ import { getActiveAuthorStudioSession } from '../lib/authorStudioAuth';
 
 export type FontPresetKey =
   | 'oxford-classical'
-  | 'royal-garamond'
-  | 'cambridge-caslon'
+  | 'instrument-editorial'
+  | 'modern-edtech'
+  | 'geist-grotesk'
+  | 'lexend-fluency'
+  | 'figtree-humanities'
   | 'modern-editorial'
-  | 'contemporary-sans'
-  | 'scholarly-archival'
-  | 'literary-humanist'
-  | 'tech-pedagogy';
+  | 'contemporary-sans';
 
 export interface FontPresetConfig {
   id: FontPresetKey;
@@ -38,37 +38,67 @@ export const FONT_PRESETS: Record<FontPresetKey, FontPresetConfig> = {
     serifFont: "'Newsreader', Georgia, serif",
     readingFont: "'Lora', Georgia, serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap',
-    description: 'Dignified British university press aesthetic with crisp serif hierarchy.'
+    description: 'Dignified British university press aesthetic with historic monumental headings and bookish serifs.'
   },
-  'royal-garamond': {
-    id: 'royal-garamond',
-    name: 'Royal Garamond',
-    tagline: 'Cormorant Garamond • EB Garamond',
-    displayFont: "'Cormorant Garamond', 'EB Garamond', Georgia, serif",
-    serifFont: "'EB Garamond', Georgia, serif",
-    readingFont: "'EB Garamond', Georgia, serif",
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap',
-    description: '16th-century humanist scholarly monograph with graceful italic flourishes.'
+  'instrument-editorial': {
+    id: 'instrument-editorial',
+    name: 'Instrument Editorial',
+    tagline: 'Instrument Serif • Geist',
+    displayFont: "'Instrument Serif', Georgia, serif",
+    serifFont: "'Instrument Serif', Georgia, serif",
+    readingFont: "'Geist', -apple-system, system-ui, sans-serif",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap',
+    description: 'Haute-academic editorial aesthetic with expressive serif titles and modern sans body.'
   },
-  'cambridge-caslon': {
-    id: 'cambridge-caslon',
-    name: 'Cambridge Caslon',
-    tagline: 'Libre Caslon Display • Lora',
-    displayFont: "'Libre Caslon Display', 'Lora', Georgia, serif",
-    serifFont: "'Libre Caslon Display', Georgia, serif",
-    readingFont: "'Lora', Georgia, serif",
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap',
-    description: 'Traditional academic research monograph with high contrast and legibility.'
+  'modern-edtech': {
+    id: 'modern-edtech',
+    name: 'Modern EdTech',
+    tagline: 'Outfit • Plus Jakarta Sans',
+    displayFont: "'Outfit', system-ui, sans-serif",
+    serifFont: "'Plus Jakarta Sans', system-ui, sans-serif",
+    readingFont: "'Plus Jakarta Sans', system-ui, sans-serif",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap',
+    description: 'Bold, approachable, hyper-modern EdTech styling optimized for exams and course tracks.'
+  },
+  'geist-grotesk': {
+    id: 'geist-grotesk',
+    name: 'Geist & Space Grotesk',
+    tagline: 'Space Grotesk • Geist',
+    displayFont: "'Space Grotesk', system-ui, sans-serif",
+    serifFont: "'Geist', -apple-system, system-ui, sans-serif",
+    readingFont: "'Geist', -apple-system, system-ui, sans-serif",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap',
+    description: 'Cutting-edge AI in education, computational linguistics, and technical research.'
+  },
+  'lexend-fluency': {
+    id: 'lexend-fluency',
+    name: 'Lexend Fluency',
+    tagline: 'Lexend • Source Serif 4',
+    displayFont: "'Lexend', system-ui, sans-serif",
+    serifFont: "'Source Serif 4', Georgia, serif",
+    readingFont: "'Lexend', system-ui, sans-serif",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap',
+    description: 'Cognitively tuned for enhanced reading fluency, ideal for students and long study sessions.'
+  },
+  'figtree-humanities': {
+    id: 'figtree-humanities',
+    name: 'Figtree Humanities',
+    tagline: 'Figtree • Newsreader',
+    displayFont: "'Figtree', system-ui, sans-serif",
+    serifFont: "'Newsreader', Georgia, serif",
+    readingFont: "'Newsreader', Georgia, serif",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap',
+    description: 'Warm, friendly contemporary geometric headings paired with classical bookish serif reading.'
   },
   'modern-editorial': {
     id: 'modern-editorial',
     name: 'Modern Editorial',
-    tagline: 'Playfair Display • Source Serif',
+    tagline: 'Playfair Display • Inter',
     displayFont: "'Playfair Display', Georgia, serif",
     serifFont: "'Playfair Display', Georgia, serif",
-    readingFont: "'Source Serif 4', Georgia, serif",
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap',
-    description: 'Crisp, high-contrast cultural journal & modern intellectual magazine.'
+    readingFont: "'Inter', system-ui, sans-serif",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap',
+    description: 'High-contrast intellectual review and literary commentary styling.'
   },
   'contemporary-sans': {
     id: 'contemporary-sans',
@@ -78,37 +108,7 @@ export const FONT_PRESETS: Record<FontPresetKey, FontPresetConfig> = {
     serifFont: "'Inter', system-ui, sans-serif",
     readingFont: "'Inter', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap',
-    description: 'Ultra-clean, hyper-modern digital institution and open-access portal.'
-  },
-  'scholarly-archival': {
-    id: 'scholarly-archival',
-    name: 'Scholarly Archival',
-    tagline: 'Newsreader Small-Caps • Newsreader',
-    displayFont: "'Newsreader', Georgia, serif",
-    serifFont: "'Newsreader', Georgia, serif",
-    readingFont: "'Newsreader', Georgia, serif",
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap',
-    description: 'Formal Oxford NAAC accreditation record and university archive.'
-  },
-  'literary-humanist': {
-    id: 'literary-humanist',
-    name: 'Literary Humanist',
-    tagline: 'Cinzel Decorative • Cormorant',
-    displayFont: "'Cinzel Decorative', 'Cinzel', serif",
-    serifFont: "'Cormorant Garamond', Georgia, serif",
-    readingFont: "'Cormorant Garamond', Georgia, serif",
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap',
-    description: 'Poetical, ornate philosophical and humanities literature styling.'
-  },
-  'tech-pedagogy': {
-    id: 'tech-pedagogy',
-    name: 'Tech Pedagogy',
-    tagline: 'Cinzel • Plus Jakarta Sans & Mono',
-    displayFont: "'Cinzel', serif",
-    serifFont: "'Plus Jakarta Sans', sans-serif",
-    readingFont: "'Plus Jakarta Sans', sans-serif",
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Mono&display=swap',
-    description: 'Cutting-edge AI in Education, NEP 2020 and digital curriculum tone.'
+    description: 'Ultra-clean, crisp open-access digital institution and portal aesthetics.'
   }
 };
 
@@ -582,11 +582,11 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     // Font Sizing Scale
     const fontSizeMap = {
-      standard: '16px',
-      relaxed: '17px',
-      generous: '18.5px'
+      standard: '17px',
+      relaxed: '18px',
+      generous: '19.5px'
     };
-    root.style.setProperty('--font-size-base', fontSizeMap[theme.fontSizeScale] || '16px');
+    root.style.setProperty('--font-size-base', fontSizeMap[theme.fontSizeScale] || '17px');
 
     // Header capitalization
     if (theme.headerCaps === 'small-caps') {

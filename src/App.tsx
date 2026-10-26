@@ -75,7 +75,7 @@ function AppInner() {
 
   useEffect(() => {
     const tabTitles: Record<MainTab, string> = {
-      home: `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`,
+      home: `${profile.name || PROFESSOR_INFO.name} | Assistant Professor · English Language Education & Teacher Education`,
       about: `About Dr. Rajnikant Dodiya | ${profile.name || PROFESSOR_INFO.name}`,
       research: `Research | ${profile.name || PROFESSOR_INFO.name}`,
       publications: `Publications & Books | ${profile.name || PROFESSOR_INFO.name}`,

@@ -76,7 +76,7 @@ export const SOCIAL_LINKS = {
 
 export const PROFESSOR_INFO = {
   name: "Dr. Rajnikant S. Dodiya",
-  title: "Assistant Professor of English Language Pedagogy and Education",
+  title: "Assistant Professor · English Language Education & Teacher Education",
   institution: "H. M. Patel Institute of English Training and Research (HMPIETR)",
   university: "Sardar Patel University",
   location: "Vallabh Vidyanagar, Anand, Gujarat, India",
@@ -86,7 +86,7 @@ export const PROFESSOR_INFO = {
   cvLastUpdated: "October 2026",
   
   // Word-for-Word from PDF 1 (Short bio ~60 words for Home page & talk invitations)
-  shortBio: "Dr. Rajnikant S. Dodiya is Assistant Professor of English Language Pedagogy and Education at H. M. Patel Institute of English Training and Research, Vallabh Vidyanagar, Gujarat. He holds a Ph.D. in Education and has qualified UGC-NET and GSET in both Education and English. His work focuses on English language education, teacher education, AI in education and NEP 2020.",
+  shortBio: "Dr. Rajnikant S. Dodiya is Assistant Professor · English Language Education & Teacher Education at H. M. Patel Institute of English Training and Research, Vallabh Vidyanagar, Gujarat. He holds a Ph.D. in Education and has qualified UGC-NET and GSET in both Education and English. His work focuses on English language education, teacher education, AI in education and NEP 2020.",
 
   // Word-for-Word from PDF 1 (Long bio ~250 words for About page)
   longBio: [

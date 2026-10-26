@@ -97,13 +97,13 @@ assert(validateMasterPasswordEntropy('SPU#Hmp_Research_2026').isValid, 'Accept s
 console.log('\n--- SUITE 4: Typography & Theme Presets Registry ---');
 const FONT_PRESET_IDS = [
   'oxford-classical',
-  'royal-garamond',
-  'cambridge-caslon',
+  'instrument-editorial',
+  'modern-edtech',
+  'geist-grotesk',
+  'lexend-fluency',
+  'figtree-humanities',
   'modern-editorial',
-  'contemporary-sans',
-  'scholarly-archival',
-  'literary-humanist',
-  'tech-pedagogy'
+  'contemporary-sans'
 ];
 assert(FONT_PRESET_IDS.length === 8, '8 distinct academic font presets available');
 FONT_PRESET_IDS.forEach(id => {
