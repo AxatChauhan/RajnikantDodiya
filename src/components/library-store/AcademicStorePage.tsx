@@ -74,6 +74,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
   const [isExamOpen, setIsExamOpen] = useState(false);
   const [isReaderSample, setIsReaderSample] = useState(false);
   const [isExamSample, setIsExamSample] = useState(false);
+  const [readerBook, setReaderBook] = useState<any>(null);
 
   // Quick Pass Restoration state
   const [restorePhone, setRestorePhone] = useState('');
@@ -345,23 +346,25 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
             <div className="pt-4 border-t border-deckle/60 space-y-2">
               <button
                 onClick={() => {
+                  setReaderBook(allBooks[0] as any);
                   setIsReaderSample(true);
                   setIsReaderOpen(true);
                 }}
                 className="w-full py-2 px-3 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-medium border border-deckle transition-all"
               >
-                Read Free Sample Preface
+                Read Free Sample Preface (Pages 1–20)
               </button>
 
               {isBookOwned ? (
                 <button
                   onClick={() => {
+                    setReaderBook(allBooks[0] as any);
                     setIsReaderSample(false);
                     setIsReaderOpen(true);
                   }}
                   className="w-full py-2.5 px-3 rounded-xl bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
                 >
-                  <BookOpen className="w-3.5 h-3.5" /> Read Unlocked Monograph
+                  <BookOpen className="w-3.5 h-3.5" /> Read Unlocked Monograph (324 Pages)
                 </button>
               ) : (
                 <button
@@ -603,6 +606,20 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                   {BOOK_SYNOPSES[book.isbn] || (book as any).details || (book as any).subtitle || 'Scholarly treatise published for university educators, researchers, and students.'}
                 </p>
 
+                <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                  <span className="text-[10px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full">
+                    {(book as any).pageCount || 320} Pages
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    {(book as any).previewPages || 20}p Free Sample
+                  </span>
+                  {(book as any).manuscriptFileName && (
+                    <span className="text-[10px] font-mono text-ink-muted bg-gray-100 px-2 py-0.5 rounded-full">
+                      PDF
+                    </span>
+                  )}
+                </div>
+
                 <div className="text-[11px] font-mono text-ink-faint flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 border-t border-deckle/40">
                   <span className="break-words">Publisher: {book.publisher}</span>
                   <span>•</span>
@@ -611,22 +628,37 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
               </div>
 
               <div className="pt-3 border-t border-deckle/60 flex flex-wrap items-center justify-between gap-2.5">
-                <button
-                  onClick={() =>
-                    setInspectedBook({
-                      title: book.title,
-                      year: book.year,
-                      publisher: book.publisher,
-                      isbn: book.isbn,
-                      type: book.type,
-                      synopsis: BOOK_SYNOPSES[book.isbn] || (book as any).details || 'Comprehensive scholarly research monograph.'
-                    })
-                  }
-                  className="text-xs font-mono text-claret hover:underline flex items-center gap-1.5 shrink-0 py-1"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Book Details & Citation</span>
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      setReaderBook(book as any);
+                      setIsReaderSample(true);
+                      setIsReaderOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-claret text-white hover:bg-claret-light text-xs font-medium transition-all shadow-2xs flex items-center gap-1.5 shrink-0"
+                    title={`Read free ${(book as any).previewPages || 20}-page sample`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-brass" />
+                    <span>Read Preview</span>
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setInspectedBook({
+                        title: book.title,
+                        year: book.year,
+                        publisher: book.publisher,
+                        isbn: book.isbn,
+                        type: book.type,
+                        synopsis: BOOK_SYNOPSES[book.isbn] || (book as any).details || 'Comprehensive scholarly research monograph.'
+                      })
+                    }
+                    className="text-xs font-mono text-claret hover:underline flex items-center gap-1 shrink-0 py-1"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Citation</span>
+                  </button>
+                </div>
 
                 <a
                   href={`https://wa.me/919825123456?text=${encodeURIComponent(
@@ -637,7 +669,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                   className="inline-flex items-center gap-1.5 text-[11px] font-sans font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3 py-1.5 rounded-lg transition-colors shrink-0"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Order Print Copy</span>
+                  <span>Order Print</span>
                 </a>
               </div>
             </div>
@@ -750,6 +782,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
             orderId={studentSession.orderId || 'HMP-DEMO-01'}
             isUnlocked={!isReaderSample && isBookOwned}
             onUnlockRequest={() => handleOpenCheckout(bookProduct)}
+            book={readerBook}
           />
         </Suspense>
       )}

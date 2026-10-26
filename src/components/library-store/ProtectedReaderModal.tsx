@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { getLicensedBookChapters, BookChapter } from '../../data/storeCatalogData';
+import { StudioBookItem } from '../../contexts/SiteContentContext';
+import {
+  saveReadingProgress,
+  getReadingProgress,
+  generateForensicWatermark
+} from '../../lib/bookStorageSecurity';
 import {
   X,
   BookOpen,
@@ -19,7 +25,9 @@ import {
   Pause,
   ArrowUp,
   SlidersHorizontal,
-  Quote
+  Quote,
+  Sparkles,
+  FileText
 } from 'lucide-react';
 
 interface ProtectedReaderModalProps {
@@ -30,6 +38,7 @@ interface ProtectedReaderModalProps {
   orderId: string;
   isUnlocked?: boolean;
   onUnlockRequest?: () => void;
+  book?: StudioBookItem | null;
 }
 
 type ReadingTheme = 'parchment' | 'sepia' | 'night' | 'sage';
@@ -213,8 +222,27 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   studentMobile,
   orderId,
   isUnlocked = false,
-  onUnlockRequest
+  onUnlockRequest,
+  book
 }) => {
+  const bookId = book?.id || 'monograph-kalam-doctoral';
+  const bookTitle = book?.title || 'The Humanistic Vision of Dr. A.P.J. Abdul Kalam';
+  const totalPages = Number(book?.pageCount) > 0 ? Number(book?.pageCount) : 320;
+  const previewPagesLimit = Number(book?.previewPages) > 0 ? Number(book?.previewPages) : 20;
+
+  // 300-Page Scrubber & Position State
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    try {
+      const saved = getReadingProgress(bookId);
+      if (saved?.lastPage) {
+        if (!isUnlocked && saved.lastPage > previewPagesLimit) return 1;
+        return Math.min(totalPages, Math.max(1, saved.lastPage));
+      }
+    } catch {}
+    return 1;
+  });
+
+  const [pageJumpInput, setPageJumpInput] = useState<string>('');
   const [currentChapterIdx, setCurrentChapterIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -248,6 +276,27 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   const bookChapters = useMemo(() => getLicensedBookChapters(Boolean(isUnlocked)), [isUnlocked]);
   const activeChapter: BookChapter = bookChapters[currentChapterIdx] || bookChapters[0];
   const currentTheme = THEME_CONFIG[readingTheme];
+
+  // Auto-save reading position per book
+  useEffect(() => {
+    if (isOpen && currentPage > 0) {
+      saveReadingProgress(bookId, currentPage, totalPages);
+    }
+  }, [isOpen, currentPage, bookId, totalPages]);
+
+  const handlePageChange = (newPage: number) => {
+    const clamped = Math.max(1, Math.min(totalPages, newPage));
+    setCurrentPage(clamped);
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const isPastPreview = !isUnlocked && currentPage > previewPagesLimit;
+  const forensicWatermark = useMemo(
+    () => generateForensicWatermark(studentName, studentMobile, orderId),
+    [studentName, studentMobile, orderId]
+  );
 
   // Lock background scrolling when reading portal is open
   useEffect(() => {
@@ -420,12 +469,13 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
       
       {/* Container - Expands to 100% edge-to-edge on mobile, or up to max-w-7xl on desktop */}
       <div
-        className={`flex flex-col justify-between overflow-hidden shadow-2xl border transition-all duration-300 ${
+        className={`protected-reader-container flex flex-col justify-between overflow-hidden shadow-2xl border transition-all duration-300 ${
           isFullscreen
             ? 'fixed inset-0 w-screen h-screen z-50 rounded-none'
             : 'w-full h-full sm:w-[98vw] sm:max-w-7xl sm:h-[95vh] rounded-none sm:rounded-3xl'
         } ${currentTheme.modalBg} ${currentTheme.border}`}
       >
+        <style>{`@media print { body { display: none !important; } .protected-reader-container { display: none !important; } }`}</style>
         
         {/* TOP COMPACT ACADEMIC CONTROL BAR */}
         <header className={`px-4 sm:px-6 py-2.5 sm:py-3 border-b flex items-center justify-between gap-3 shrink-0 ${currentTheme.headerBg} ${currentTheme.border}`}>
@@ -445,21 +495,24 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             <div className="h-5 w-px bg-black/10 hidden sm:block" />
 
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold truncate">
-                  Dr. Dodiya Monograph • SPU Ph.D.
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold truncate max-w-[150px] sm:max-w-xs">
+                  {bookTitle}
                 </span>
                 {isUnlocked ? (
                   <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.2 rounded-full font-bold">
                     <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
-                    <span>Unlocked License</span>
+                    <span>Unlocked ({totalPages}p)</span>
                   </span>
                 ) : (
                   <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-mono bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.2 rounded-full font-bold">
                     <Lock className="w-2.5 h-2.5 text-amber-700" />
-                    <span>Sample Mode</span>
+                    <span>Sample ({previewPagesLimit}p / {totalPages}p)</span>
                   </span>
                 )}
+                <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-black/5 text-ink font-semibold shrink-0">
+                  Page {currentPage} / {totalPages}
+                </span>
               </div>
               <h2 className={`font-serif text-sm sm:text-base font-normal truncate max-w-[200px] sm:max-w-md lg:max-w-xl ${currentTheme.textTitle}`}>
                 {activeChapter.title}
@@ -752,60 +805,108 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                   Table of Contents
                 </span>
                 <span className={`text-[10px] font-mono ${currentTheme.textMuted}`}>
-                  4 Chapters • {bookChapters.reduce((acc, c) => acc + (c.readingTimeMinutes || 6), 0)} min total
+                  {totalPages} Pages • {previewPagesLimit}p Free
                 </span>
               </div>
 
               <div className="space-y-2">
-                {bookChapters.map((ch, idx) => {
-                  const isActive = idx === currentChapterIdx;
-                  const isChapterLocked = !isUnlocked && idx > 0;
-                  const isBookmarked = bookmarkedChapters.includes(idx);
+                {book?.tableOfContents && book.tableOfContents.length > 0 ? (
+                  book.tableOfContents.map((ch, idx) => {
+                    const isActive = currentPage >= ch.pageStart && currentPage <= ch.pageEnd;
+                    const isChapterLocked = !isUnlocked && ch.pageStart > previewPagesLimit;
 
-                  return (
-                    <button
-                      key={ch.id}
-                      onClick={() => {
-                        setCurrentChapterIdx(idx);
-                        if (typeof window !== 'undefined' && window.innerWidth < 640) {
-                          setIsSidebarOpen(false);
-                        }
-                      }}
-                      className={`w-full text-left p-3.5 rounded-2xl text-xs transition-all relative border ${
-                        isActive
-                          ? 'bg-claret text-white font-medium shadow-xs border-claret'
-                          : `hover:bg-black/5 border-transparent opacity-85 ${currentTheme.textBody}`
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[10px] font-mono opacity-80 block">{ch.chapterNumber}</span>
-                        <div className="flex items-center gap-1.5">
-                          {isBookmarked && (
-                            <Bookmark className={`w-3 h-3 ${isActive ? 'fill-amber-300 text-amber-300' : 'fill-amber-500 text-amber-500'}`} />
-                          )}
-                          {isChapterLocked ? (
-                            <span className="inline-flex items-center gap-0.5 text-[9px] font-mono bg-claret/20 text-claret px-1.5 py-0.5 rounded font-bold">
-                              <Lock className="w-2.5 h-2.5" /> Locked
-                            </span>
-                          ) : (
-                            idx === 0 && !isUnlocked && (
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          handlePageChange(ch.pageStart);
+                          if (typeof window !== 'undefined' && window.innerWidth < 640) {
+                            setIsSidebarOpen(false);
+                          }
+                        }}
+                        className={`w-full text-left p-3.5 rounded-2xl text-xs transition-all relative border ${
+                          isActive
+                            ? 'bg-claret text-white font-medium shadow-xs border-claret'
+                            : `hover:bg-black/5 border-transparent opacity-85 ${currentTheme.textBody}`
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-mono opacity-80 block">
+                            Section {idx + 1}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {isChapterLocked ? (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-mono bg-claret/20 text-claret px-1.5 py-0.5 rounded font-bold">
+                                <Lock className="w-2.5 h-2.5" /> Locked
+                              </span>
+                            ) : (
                               <span className="text-[9px] font-mono bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
                                 Sample
                               </span>
-                            )
-                          )}
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      <span className="font-serif text-sm block leading-snug">{ch.title}</span>
-                      
-                      <div className="flex items-center justify-between mt-2 text-[10px] font-mono opacity-70">
-                        <span>{ch.pages}</span>
-                        <span>{ch.readingTimeMinutes || 6} min read</span>
-                      </div>
-                    </button>
-                  );
-                })}
+                        <span className="font-serif text-sm block leading-snug">{ch.title}</span>
+                        
+                        <div className="flex items-center justify-between mt-2 text-[10px] font-mono opacity-70">
+                          <span>pp. {ch.pageStart} – {ch.pageEnd}</span>
+                          <span>{ch.pageEnd - ch.pageStart + 1} pages</span>
+                        </div>
+                      </button>
+                    );
+                  })
+                ) : (
+                  bookChapters.map((ch, idx) => {
+                    const isActive = idx === currentChapterIdx;
+                    const isChapterLocked = !isUnlocked && idx > 0;
+                    const isBookmarked = bookmarkedChapters.includes(idx);
+
+                    return (
+                      <button
+                        key={ch.id}
+                        onClick={() => {
+                          setCurrentChapterIdx(idx);
+                          if (typeof window !== 'undefined' && window.innerWidth < 640) {
+                            setIsSidebarOpen(false);
+                          }
+                        }}
+                        className={`w-full text-left p-3.5 rounded-2xl text-xs transition-all relative border ${
+                          isActive
+                            ? 'bg-claret text-white font-medium shadow-xs border-claret'
+                            : `hover:bg-black/5 border-transparent opacity-85 ${currentTheme.textBody}`
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-mono opacity-80 block">{ch.chapterNumber}</span>
+                          <div className="flex items-center gap-1.5">
+                            {isBookmarked && (
+                              <Bookmark className={`w-3 h-3 ${isActive ? 'fill-amber-300 text-amber-300' : 'fill-amber-500 text-amber-500'}`} />
+                            )}
+                            {isChapterLocked ? (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-mono bg-claret/20 text-claret px-1.5 py-0.5 rounded font-bold">
+                                <Lock className="w-2.5 h-2.5" /> Locked
+                              </span>
+                            ) : (
+                              idx === 0 && !isUnlocked && (
+                                <span className="text-[9px] font-mono bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
+                                  Sample
+                                </span>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        <span className="font-serif text-sm block leading-snug">{ch.title}</span>
+                        
+                        <div className="flex items-center justify-between mt-2 text-[10px] font-mono opacity-70">
+                          <span>{ch.pages}</span>
+                          <span>{ch.readingTimeMinutes || 6} min read</span>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -879,27 +980,32 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
               </div>
 
               {/* Chapter Content or Lock Callout */}
-              {!isUnlocked && currentChapterIdx > 0 ? (
-                /* SAMPLE MODE PAYWALL CALLOUT */
-                <div className="space-y-6 relative z-10">
+              {isPastPreview || (!isUnlocked && currentChapterIdx > 0) ? (
+                /* 300-PAGE CURRICULAR PAYWALL CURTAIN */
+                <div className="space-y-6 relative z-10 animate-fade-in my-6">
                   <div className={`p-5 rounded-2xl border font-reading italic text-sm leading-relaxed ${currentTheme.blockquoteBg} ${currentTheme.border} ${currentTheme.textMuted}`}>
-                    "{activeChapter.excerptPreview}"
+                    "You are viewing Page {currentPage} of {totalPages} in Free Candidate Preview mode. Free sample access is granted for Pages 1 through {previewPagesLimit}."
                   </div>
 
                   <div className="relative rounded-3xl p-6 sm:p-10 border-2 border-dashed border-claret/30 bg-claret-soft/30 text-center space-y-4">
                     <div className="w-14 h-14 rounded-2xl bg-claret text-white flex items-center justify-center mx-auto shadow-md">
-                      <Lock className="w-7 h-7" />
+                      <Lock className="w-7 h-7 text-brass" />
                     </div>
                     <div className="space-y-2 max-w-lg mx-auto">
                       <span className="text-xs font-mono uppercase tracking-widest text-claret font-bold bg-claret-soft px-3 py-1 rounded-full border border-claret/20 inline-block">
-                        Chapter {currentChapterIdx + 1} Locked • Sample Reader Mode
+                        Free Sample Concluded (Pages 1–{previewPagesLimit} of {totalPages})
                       </span>
                       <h3 className={`font-serif text-2xl sm:text-3xl font-normal ${currentTheme.textTitle}`}>
-                        Unlock the Full 4-Chapter Scholarly Monograph
+                        Unlock All {totalPages} Pages of this Monograph
                       </h3>
                       <p className={`text-xs sm:text-sm font-reading leading-relaxed ${currentTheme.textMuted}`}>
-                        You are viewing the complimentary Preface & Prolegomena sample. Chapters I through III contain complete empirical tables, post-method pedagogy models, and Dr. Kalam's educational epistemologies. Acquire an authorized single-device pass at the Academic Learn Hub to read instantly.
+                        The full edition unlocks all remaining {totalPages - previewPagesLimit} pages: complete research findings, post-method pedagogical frameworks, classroom empirical data, and university citations.
                       </p>
+                      <div className="inline-flex items-center gap-2 p-2 px-4 rounded-xl bg-white border border-deckle text-xs font-mono">
+                        <span className="text-ink-muted">Single-Device Scholar License:</span>
+                        <strong className="text-claret font-bold text-sm">₹399</strong>
+                        <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-bold">Lifetime Cloud Pass</span>
+                      </div>
                     </div>
 
                     <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -910,14 +1016,14 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                         }}
                         className="px-8 py-3.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2 min-h-[44px]"
                       >
-                        <Lock className="w-4 h-4" />
+                        <Lock className="w-4 h-4 text-brass" />
                         <span>Acquire Full Monograph Pass (₹399)</span>
                       </button>
                       <button
-                        onClick={() => setCurrentChapterIdx(0)}
+                        onClick={() => handlePageChange(previewPagesLimit)}
                         className={`px-5 py-3 rounded-xl border text-xs font-mono min-h-[44px] ${currentTheme.btnBg} ${currentTheme.border}`}
                       >
-                        Back to Sample Preface
+                        Back to Sample (Page {previewPagesLimit})
                       </button>
                     </div>
                   </div>
@@ -1079,33 +1185,81 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
           </div>
         )}
 
-        {/* FOOTER NAVIGATION & METRICS BAR */}
-        <footer className={`px-4 sm:px-8 py-2.5 sm:py-3 border-t flex items-center justify-between shrink-0 text-xs font-mono ${currentTheme.headerBg} ${currentTheme.border}`}>
+        {/* FOOTER NAVIGATION & 300-PAGE SCRUBBER BAR */}
+        <footer className={`px-4 sm:px-8 py-2.5 sm:py-3 border-t flex flex-wrap items-center justify-between gap-3 shrink-0 text-xs font-mono ${currentTheme.headerBg} ${currentTheme.border}`}>
           
-          <button
-            disabled={currentChapterIdx === 0}
-            onClick={() => setCurrentChapterIdx(prev => Math.max(0, prev - 1))}
-            className={`px-3.5 py-1.5 rounded-xl disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 min-h-[38px] transition-colors ${currentTheme.btnBg}`}
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Previous Chapter</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              disabled={currentPage <= 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className={`px-3 py-1.5 rounded-xl disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1 min-h-[38px] transition-colors ${currentTheme.btnBg}`}
+              title="Previous Page (or Left Arrow)"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Prev Page</span>
+            </button>
+            <button
+              disabled={currentChapterIdx === 0}
+              onClick={() => setCurrentChapterIdx(prev => Math.max(0, prev - 1))}
+              className={`hidden md:flex px-2.5 py-1.5 rounded-xl disabled:opacity-30 disabled:pointer-events-none items-center gap-1 min-h-[38px] transition-colors ${currentTheme.btnBg}`}
+              title="Previous Chapter"
+            >
+              <span className="text-[10px]">Ch. Prev</span>
+            </button>
+          </div>
 
-          {/* Center Navigation Shortcuts */}
-          <div className="flex items-center gap-3 text-[11px] font-sans">
-            <span className={`hidden md:inline font-mono ${currentTheme.textMuted}`}>
-              Chapter {currentChapterIdx + 1} of {bookChapters.length}
-            </span>
+          {/* Center 300-Page Scrubber & Direct Page Jumper */}
+          <div className="flex items-center gap-2 sm:gap-4 text-[11px] font-sans flex-wrap justify-center">
+            {/* Scrubber slider */}
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={1}
+                max={totalPages}
+                value={currentPage}
+                onChange={e => handlePageChange(Number(e.target.value))}
+                className="w-20 sm:w-36 md:w-48 h-1.5 accent-claret cursor-pointer"
+                title={`Drag to scrub through ${totalPages} pages`}
+              />
+              <span className="text-[10px] font-mono text-ink-muted hidden sm:inline">
+                {Math.round((currentPage / totalPages) * 100)}%
+              </span>
+            </div>
+
+            {/* Direct Jump Input */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const target = Number(pageJumpInput);
+                if (target >= 1 && target <= totalPages) {
+                  handlePageChange(target);
+                  setPageJumpInput('');
+                }
+              }}
+              className="flex items-center gap-1"
+            >
+              <span className="text-[10px] font-mono text-ink-muted hidden sm:inline">Page</span>
+              <input
+                type="number"
+                min={1}
+                max={totalPages}
+                value={pageJumpInput}
+                onChange={(e) => setPageJumpInput(e.target.value)}
+                placeholder={String(currentPage)}
+                className="w-12 px-1.5 py-0.5 rounded border border-deckle text-center bg-white text-ink text-xs font-mono"
+              />
+              <span className="text-[10px] font-mono text-ink-muted">/{totalPages}</span>
+            </form>
 
             {/* Audio Companion Button */}
             <button
               onClick={() => setIsAudioPlaying(prev => !prev)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-sans transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-sans transition-all flex items-center gap-1.5 ${
                 isAudioPlaying ? 'bg-claret text-white shadow-2xs' : currentTheme.btnBg
               }`}
             >
               <Volume2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{isAudioPlaying ? 'Narration Active' : 'Listen'}</span>
+              <span className="hidden lg:inline">{isAudioPlaying ? 'Narration Active' : 'Listen'}</span>
             </button>
 
             {/* Top Scroll Shortcut */}
@@ -1118,14 +1272,25 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             </button>
           </div>
 
-          <button
-            disabled={currentChapterIdx === bookChapters.length - 1}
-            onClick={() => setCurrentChapterIdx(prev => Math.min(bookChapters.length - 1, prev + 1))}
-            className="px-4 py-1.5 rounded-xl bg-claret text-white hover:bg-claret-light disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 min-h-[38px] font-sans font-medium shadow-xs transition-all"
-          >
-            <span className="hidden sm:inline">Next Chapter</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              disabled={currentChapterIdx === bookChapters.length - 1}
+              onClick={() => setCurrentChapterIdx(prev => Math.min(bookChapters.length - 1, prev + 1))}
+              className={`hidden md:flex px-2.5 py-1.5 rounded-xl disabled:opacity-30 disabled:pointer-events-none items-center gap-1 min-h-[38px] transition-colors ${currentTheme.btnBg}`}
+              title="Next Chapter"
+            >
+              <span className="text-[10px]">Ch. Next</span>
+            </button>
+            <button
+              disabled={currentPage >= totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="px-3.5 py-1.5 rounded-xl bg-claret text-white hover:bg-claret-light disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1 min-h-[38px] font-sans font-medium shadow-xs transition-all"
+              title="Next Page (or Right Arrow)"
+            >
+              <span className="hidden sm:inline">Next Page</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </footer>
 
       </div>

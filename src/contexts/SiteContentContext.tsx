@@ -326,6 +326,21 @@ export interface StudioBookItem {
   details?: string;
   sampleExcerpt?: string;
   isActive: boolean;
+
+  // 300-Page Long-Form & Preview Engine Fields
+  pageCount: number;                 // Total monograph pages (e.g. 320)
+  previewPages: number;              // Free candidate preview limit (e.g. 20)
+  frontMatterOffset?: number;        // Roman-numeral front matter offset (e.g. 12)
+  manuscriptFileUrl?: string;        // Secure cloud / storage URL
+  samplePdfUrl?: string;             // Public sample preview URL
+  manuscriptFileName?: string;       // Original manuscript filename
+  manuscriptFileSizeMb?: number;     // File size in MB
+  tableOfContents?: {
+    title: string;
+    pageStart: number;
+    pageEnd: number;
+    isFreePreview?: boolean;
+  }[];
 }
 
 export const DEFAULT_STUDIO_BOOKS: StudioBookItem[] = BOOKS.map((b, idx) => ({
@@ -342,7 +357,20 @@ export const DEFAULT_STUDIO_BOOKS: StudioBookItem[] = BOOKS.map((b, idx) => ({
   whatsappInquiryUrl: `https://wa.me/919825123456?text=${encodeURIComponent(`Inquiry regarding book: ${b.title}`)}`,
   details: b.details || 'Scholarly treatise published for university educators, researchers, and students.',
   sampleExcerpt: 'Education in the twenty-first century stands at a profound philosophical inflection point...',
-  isActive: true
+  isActive: true,
+  pageCount: idx === 0 ? 324 : 280 + ((idx * 17) % 65),
+  previewPages: 20,
+  frontMatterOffset: 12,
+  manuscriptFileName: `${b.isbn.replace(/[^0-9]/g, '')}_monograph.pdf`,
+  manuscriptFileSizeMb: Number((18.4 + ((idx * 3.7) % 14.5)).toFixed(1)),
+  tableOfContents: [
+    { title: 'Preface & Prolegomena: Epistemology of Creative Inquiry', pageStart: 1, pageEnd: 18, isFreePreview: true },
+    { title: 'Chapter I: The Humanistic Vision of Dr. A.P.J. Abdul Kalam', pageStart: 19, pageEnd: 64, isFreePreview: true },
+    { title: 'Chapter II: Teacher as Moral Architect & Guru-Shishya Synthesis', pageStart: 65, pageEnd: 128, isFreePreview: false },
+    { title: 'Chapter III: Comparative Pedagogy & NEP 2020 Higher Education', pageStart: 129, pageEnd: 212, isFreePreview: false },
+    { title: 'Chapter IV: Empirical Survey Analysis & Classroom Directives', pageStart: 213, pageEnd: 298, isFreePreview: false },
+    { title: 'Bibliography, Institutional Citations & Research Appendices', pageStart: 299, pageEnd: 324, isFreePreview: false }
+  ]
 }));
 
 // ============================================================================
@@ -634,6 +662,26 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const addBook = useCallback((newBook: Omit<StudioBookItem, 'id'>) => {
     setBooksState(prev => {
       const sanitizedTitle = (newBook.title || 'Untitled Academic Publication').trim();
+      const pageCount = Number(newBook.pageCount) > 0 ? Number(newBook.pageCount) : 320;
+      const previewPages = Number(newBook.previewPages) > 0 ? Math.min(pageCount, Number(newBook.previewPages)) : 20;
+      const frontMatterOffset = Number(newBook.frontMatterOffset) >= 0 ? Number(newBook.frontMatterOffset) : 12;
+
+      // Anti-QuotaExceededError: Never allow huge raw base64 strings in local storage
+      const safeManuscriptUrl = (newBook.manuscriptFileUrl && newBook.manuscriptFileUrl.length < 50000)
+        ? newBook.manuscriptFileUrl
+        : undefined;
+      const safeSamplePdfUrl = (newBook.samplePdfUrl && newBook.samplePdfUrl.length < 50000)
+        ? newBook.samplePdfUrl
+        : safeManuscriptUrl;
+
+      const defaultToc = [
+        { title: 'Preface & Prolegomena', pageStart: 1, pageEnd: Math.min(18, previewPages), isFreePreview: true },
+        { title: 'Chapter I: Theoretical & Epistemological Framework', pageStart: Math.min(19, previewPages), pageEnd: Math.min(60, pageCount), isFreePreview: previewPages >= 60 },
+        { title: 'Chapter II: Pedagogical Architecture & Methods', pageStart: 61, pageEnd: Math.min(140, pageCount), isFreePreview: false },
+        { title: 'Chapter III: Empirical Evidence & Classroom Findings', pageStart: 141, pageEnd: Math.min(240, pageCount), isFreePreview: false },
+        { title: 'Conclusion, Institutional Bibliography & Citations', pageStart: 241, pageEnd: pageCount, isFreePreview: false }
+      ];
+
       const item: StudioBookItem = {
         title: sanitizedTitle,
         subtitle: (newBook.subtitle || '').trim(),
@@ -648,12 +696,22 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         sampleExcerpt: newBook.sampleExcerpt || 'Detailed academic sample available via institutional library circulation desk...',
         coverUrl: newBook.coverUrl || '/dr-rajnikant-dodiya.jpg',
         isActive: true,
+        pageCount,
+        previewPages,
+        frontMatterOffset,
+        manuscriptFileUrl: safeManuscriptUrl,
+        samplePdfUrl: safeSamplePdfUrl,
+        manuscriptFileName: (newBook.manuscriptFileName || `${sanitizedTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}.pdf`).trim(),
+        manuscriptFileSizeMb: Number(newBook.manuscriptFileSizeMb) || 18.5,
+        tableOfContents: newBook.tableOfContents && newBook.tableOfContents.length > 0 ? newBook.tableOfContents : defaultToc,
         id: `book-${Date.now()}`
       };
       const updated = [item, ...prev];
       try {
         localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(updated));
-      } catch {}
+      } catch (e) {
+        console.warn('LocalStorage save notice (prevented quota exceeded):', e);
+      }
       return updated;
     });
   }, []);
