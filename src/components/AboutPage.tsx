@@ -52,31 +52,33 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
       {/* ========================================================= */}
       {/* 1. BIOGRAPHY (SHORT & LONG BIO FROM PDF 1)               */}
       {/* ========================================================= */}
-      <section id="bio" className="folio-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-white border border-deckle shadow-book space-y-6">
+      <section id="bio" className="folio-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-white border border-deckle shadow-book space-y-6 min-w-0">
         
         {/* Short Bio Callout */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-parchment-warm/80 border border-deckle space-y-2">
+        <div className="p-4 sm:p-5 rounded-2xl bg-parchment-warm/80 border border-deckle space-y-2 min-w-0">
           <div className="flex items-center gap-2 text-claret">
             <Sparkles className="w-4 h-4 shrink-0" />
             <span className="text-xs font-mono font-bold uppercase tracking-wider">Short Bio (For Introductions & Talk Invitations)</span>
           </div>
-          <p className="text-xs sm:text-sm text-ink font-reading leading-relaxed">
+          <p className="text-xs sm:text-sm text-ink font-reading leading-relaxed break-words whitespace-pre-line">
             {shortBio}
           </p>
         </div>
 
         {/* Long Bio */}
-        <div className="space-y-4 pt-2">
+        <div className="space-y-4 pt-2 min-w-0">
           <div className="flex items-center gap-2 text-claret">
             <GraduationCap className="w-5 h-5 shrink-0" />
             <h2 className="font-serif text-xl sm:text-2xl text-ink font-normal">Full Biography</h2>
           </div>
-          <div className="space-y-3.5 text-xs sm:text-sm text-ink-muted font-reading font-light leading-relaxed">
-            {longBio.map((paragraph, idx) => (
-              <p key={idx} className="indent-4 sm:indent-6">
-                {paragraph}
-              </p>
-            ))}
+          <div className="space-y-3.5 text-xs sm:text-sm text-ink-muted font-reading font-light leading-relaxed min-w-0">
+            {longBio
+              .filter(p => typeof p === 'string' && p.trim().length > 0)
+              .map((paragraph, idx) => (
+                <p key={idx} className="indent-4 sm:indent-6 break-words leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
           </div>
         </div>
       </section>

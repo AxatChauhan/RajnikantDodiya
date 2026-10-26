@@ -39,6 +39,7 @@ import {
   Book
 } from 'lucide-react';
 import { MainTab } from './Navbar';
+import { useSiteContent } from '../contexts/SiteContentContext';
 
 // Lazily loaded interactive modals
 const CirculationDeskModal = lazy(() =>
@@ -62,6 +63,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
   onOpenAuthModal,
   onNavigate
 }) => {
+  const { profile } = useSiteContent();
   // Determine active track from subSection URL parameter or fallback to English
   const [activeTrackId, setActiveTrackId] = useState<StudyTrackId>(() => {
     if (subSection === 'net-vidya-education') return 'net-vidya-education';
@@ -353,7 +355,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
             </h1>
             <p className="text-xs sm:text-sm text-ink-muted font-reading font-light mt-1">
               Curated lecture notes, free demo PDF samplers, CBT online mock exams, and complete preparation bundles by{' '}
-              <span className="font-semibold text-ink">{PROFESSOR_INFO.name}</span>.
+              <span className="font-semibold text-ink">{profile.name || PROFESSOR_INFO.name}</span>.
             </p>
           </div>
 
@@ -821,7 +823,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
         </p>
 
         {/* BUNDLE CARDS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-1 auto-rows-fr">
           {currentTrack.bundles.map((bundle) => {
             const isOwned =
               (bundle.productType === 'book' && (isBookOwned || isBundleOwned)) ||
@@ -831,7 +833,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
             return (
               <div
                 key={bundle.id}
-                className={`pw-card p-6 sm:p-7 rounded-3xl flex flex-col justify-between space-y-5 relative transition-all ${
+                className={`pw-card p-6 sm:p-7 rounded-3xl flex flex-col justify-between space-y-5 relative transition-all h-full min-w-0 ${
                   bundle.isPopular
                     ? 'border-2 border-claret shadow-xl ring-4 ring-claret/5 bg-gradient-to-b from-white to-[#FAF7F2]'
                     : 'bg-white border border-gray-200'
@@ -844,21 +846,21 @@ export const LearnPage: React.FC<LearnPageProps> = ({
                   </div>
                 )}
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-[11px] font-bold text-claret bg-claret-soft px-2.5 py-0.5 rounded-full">
+                <div className="space-y-3 min-w-0">
+                  <div className="flex items-center justify-between text-xs font-mono gap-2 flex-wrap">
+                    <span className="text-[11px] font-bold text-claret bg-claret-soft px-2.5 py-0.5 rounded-full shrink-0">
                       {bundle.badge}
                     </span>
-                    <span className="discount-pill px-2 py-0.5 rounded-full text-[10px]">
+                    <span className="discount-pill px-2 py-0.5 rounded-full text-[10px] shrink-0">
                       Save {bundle.discountPercentage}%
                     </span>
                   </div>
 
-                  <div>
-                    <h3 className="font-serif text-xl text-ink font-semibold leading-tight">
+                  <div className="min-w-0">
+                    <h3 className="font-serif text-xl text-ink font-semibold leading-tight break-words">
                       {bundle.title}
                     </h3>
-                    <p className="text-xs text-ink-muted font-reading mt-1 leading-snug">
+                    <p className="text-xs text-ink-muted font-reading mt-1 leading-snug break-words">
                       {bundle.subtitle}
                     </p>
                   </div>

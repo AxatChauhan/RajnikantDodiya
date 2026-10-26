@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { PROFESSOR_INFO, Book as ProfessorBook } from '../data/professorData';
+import { PROFESSOR_INFO, Book as ProfessorBook, BOOKS } from '../data/professorData';
 import { FEATURED_BOOK_CHAPTERS, BookChapter } from '../data/storeCatalogData';
 import { getActiveAuthorStudioSession } from '../lib/authorStudioAuth';
 
@@ -328,56 +328,22 @@ export interface StudioBookItem {
   isActive: boolean;
 }
 
-export const DEFAULT_STUDIO_BOOKS: StudioBookItem[] = [
-  {
-    id: 'book-kalam',
-    year: 2021,
-    title: 'A Study of Educational Thoughts of Dr. A.P.J. Abdul Kalam',
-    subtitle: 'Doctoral Monograph on Humanistic Pedagogy & Scientific Temper',
-    publisher: 'International Academic Publishing House',
-    isbn: '978-81-937539-0-3',
-    type: 'authored',
-    price: 399,
-    coverUrl: '/dr-rajnikant-dodiya.jpg',
-    buyUrl: '#bookstore',
-    whatsappInquiryUrl: 'https://wa.me/919825000000?text=Inquiry%20regarding%20Dr.%20Dodiya%20Kalam%20Monograph',
-    details: 'Comprehensive empirical analysis of Dr. Kalam’s educational vision, ethics, and nation-building philosophy.',
-    sampleExcerpt: 'Education in the twenty-first century stands at a profound philosophical inflection point...',
-    isActive: true
-  },
-  {
-    id: 'book-nep-ai',
-    year: 2024,
-    title: 'AI in English Language Teaching & NEP 2020',
-    subtitle: 'Pedagogical Frameworks for Higher Education Classrooms',
-    publisher: 'HMPIETR Academic Series',
-    isbn: '978-93-85123-45-6',
-    type: 'authored',
-    price: 449,
-    coverUrl: '/dr-rajnikant-dodiya.jpg',
-    buyUrl: '#bookstore',
-    whatsappInquiryUrl: 'https://wa.me/919825000000?text=Inquiry%20regarding%20AI%20in%20ELE%20Book',
-    details: 'Practical classroom guide for teacher-educators integrating generative AI with communicative language learning.',
-    sampleExcerpt: 'Translanguaging and digital assistance empower rural and first-generation learners...',
-    isActive: true
-  },
-  {
-    id: 'book-ugc-net',
-    year: 2023,
-    title: 'UGC-NET English & Education Master Compendium',
-    subtitle: 'High-Yield Mock Tests & Rigorous Pedagogical Rationales',
-    publisher: 'Vidya Academic Press',
-    isbn: '978-81-95432-11-2',
-    type: 'authored',
-    price: 299,
-    coverUrl: '/dr-rajnikant-dodiya.jpg',
-    buyUrl: '#bookstore',
-    whatsappInquiryUrl: 'https://wa.me/919825000000?text=Inquiry%20regarding%20UGC%20NET%20Compendium',
-    details: '1,200 curated questions with verified scholarly explanations designed for JRF and Assistant Professorship aspirants.',
-    sampleExcerpt: 'Examinations test not rote recall, but conceptual synthesis across critical theories...',
-    isActive: true
-  }
-];
+export const DEFAULT_STUDIO_BOOKS: StudioBookItem[] = BOOKS.map((b, idx) => ({
+  id: `book-${idx + 1}-${b.isbn}`,
+  year: b.year,
+  title: b.title,
+  subtitle: b.type === 'authored' ? 'Authored Academic Monograph' : b.type === 'edited' ? 'Edited Scholarly Anthology' : 'Scholarly Book Chapter',
+  publisher: b.publisher,
+  isbn: b.isbn,
+  type: b.type,
+  price: 399,
+  coverUrl: '/dr-rajnikant-dodiya.jpg',
+  buyUrl: '#bookstore',
+  whatsappInquiryUrl: `https://wa.me/919825123456?text=${encodeURIComponent(`Inquiry regarding book: ${b.title}`)}`,
+  details: b.details || 'Scholarly treatise published for university educators, researchers, and students.',
+  sampleExcerpt: 'Education in the twenty-first century stands at a profound philosophical inflection point...',
+  isActive: true
+}));
 
 // ============================================================================
 // 4. LAYOUT & ALERT BANNER STATE
@@ -667,8 +633,21 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Books CRUD
   const addBook = useCallback((newBook: Omit<StudioBookItem, 'id'>) => {
     setBooksState(prev => {
+      const sanitizedTitle = (newBook.title || 'Untitled Academic Publication').trim();
       const item: StudioBookItem = {
-        ...newBook,
+        title: sanitizedTitle,
+        subtitle: (newBook.subtitle || '').trim(),
+        publisher: (newBook.publisher || 'HMPIETR Academic Series').trim(),
+        year: Number(newBook.year) || new Date().getFullYear(),
+        isbn: (newBook.isbn || `978-81-${Math.floor(1000000 + Math.random() * 9000000)}`).trim(),
+        type: newBook.type || 'authored',
+        price: Number(newBook.price) && !isNaN(Number(newBook.price)) ? Number(newBook.price) : 399,
+        buyUrl: newBook.buyUrl || '#bookstore',
+        whatsappInquiryUrl: newBook.whatsappInquiryUrl || `https://wa.me/919825123456?text=${encodeURIComponent(`Inquiry regarding book: ${sanitizedTitle}`)}`,
+        details: (newBook.details || 'Scholarly treatise published for university educators, researchers, and students.').trim(),
+        sampleExcerpt: newBook.sampleExcerpt || 'Detailed academic sample available via institutional library circulation desk...',
+        coverUrl: newBook.coverUrl || '/dr-rajnikant-dodiya.jpg',
+        isActive: true,
         id: `book-${Date.now()}`
       };
       const updated = [item, ...prev];

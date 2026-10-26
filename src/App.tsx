@@ -3,7 +3,7 @@ import { Navbar, MainTab } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { useScholarSession } from './hooks/useScholarSession';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from './data/professorData';
-import { Feather, ExternalLink, Archive, Download, UserCheck, Shield, Sparkles } from 'lucide-react';
+import { Feather, ExternalLink, Download } from 'lucide-react';
 import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary';
 import { handleGoogleAuthRedirect } from './lib/googleAuth';
 import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
@@ -283,14 +283,6 @@ function AppInner() {
             >
               <Download className="w-3 h-3" />
               <span>Download CV</span>
-            </button>
-            <button
-              onClick={openStudio}
-              className="hover:text-claret font-sans font-medium text-claret flex items-center gap-1 border border-claret/30 px-2 py-0.5 rounded-lg bg-claret-soft"
-              title="Professor Studio (Ctrl+Shift+S)"
-            >
-              <Shield className="w-3 h-3 text-brass" />
-              <span>Professor Studio</span>
             </button>
           </div>
         </div>

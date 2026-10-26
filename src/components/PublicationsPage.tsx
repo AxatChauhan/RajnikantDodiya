@@ -213,33 +213,38 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
           <span className="text-xs font-mono text-ink-muted">Monographs & Textbooks</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
           {authoredBooks.map((book, idx) => (
             <div
-              key={idx}
-              className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3"
+              key={(book as any).id || idx}
+              className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3 h-full min-w-0 hover:border-claret/50 transition-all"
             >
-              <div className="space-y-2">
+              <div className="space-y-2 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-claret font-bold bg-claret-soft px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-claret font-bold bg-claret-soft px-2 py-0.5 rounded shrink-0">
                     Sole Author
                   </span>
                   <span className="text-xs font-mono text-ink-muted">{book.year}</span>
                 </div>
-                <h3 className="font-serif text-base sm:text-lg text-ink font-medium leading-snug">
+                <h3 className="font-serif text-base sm:text-lg text-ink font-medium leading-snug break-words">
                   {book.title}
                 </h3>
-                <p className="text-xs text-ink-muted font-reading">
+                {(book as any).subtitle && (
+                  <p className="text-xs font-serif italic text-claret break-words">
+                    {(book as any).subtitle}
+                  </p>
+                )}
+                <p className="text-xs text-ink-muted font-reading break-words">
                   Publisher: <span className="font-medium text-ink">{book.publisher}</span>
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-deckle/60 flex items-center justify-between text-xs font-mono">
-                <span className="text-ink-faint text-[11px]">ISBN: {book.isbn}</span>
+              <div className="pt-2 border-t border-deckle/60 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <span className="text-ink-faint text-[11px] shrink-0">ISBN: {book.isbn}</span>
                 {onNavigate && (
                   <button
                     onClick={() => onNavigate('bookstore')}
-                    className="text-claret font-sans font-medium hover:underline flex items-center gap-1"
+                    className="text-claret font-sans font-medium hover:underline flex items-center gap-1 shrink-0"
                   >
                     View in Bookstore <ChevronRight className="w-3.5 h-3.5" />
                   </button>
@@ -264,33 +269,38 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
           <span className="text-xs font-mono text-ink-muted">Scholarly Anthologies & Volumes</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
           {editedBooks.map((book, idx) => (
             <div
-              key={idx}
-              className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3"
+              key={(book as any).id || idx}
+              className="p-5 rounded-2xl bg-white border border-deckle shadow-book flex flex-col justify-between space-y-3 h-full min-w-0 hover:border-blue-900/40 transition-all"
             >
-              <div className="space-y-2">
+              <div className="space-y-2 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded shrink-0">
                     Editor
                   </span>
                   <span className="text-xs font-mono text-ink-muted">{book.year}</span>
                 </div>
-                <h3 className="font-serif text-base sm:text-lg text-ink font-medium leading-snug">
+                <h3 className="font-serif text-base sm:text-lg text-ink font-medium leading-snug break-words">
                   {book.title}
                 </h3>
-                <p className="text-xs text-ink-muted font-reading">
+                {(book as any).subtitle && (
+                  <p className="text-xs font-serif italic text-blue-900 break-words">
+                    {(book as any).subtitle}
+                  </p>
+                )}
+                <p className="text-xs text-ink-muted font-reading break-words">
                   Publisher: <span className="font-medium text-ink">{book.publisher}</span>
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-deckle/60 flex items-center justify-between text-xs font-mono">
-                <span className="text-ink-faint text-[11px]">ISBN: {book.isbn}</span>
+              <div className="pt-2 border-t border-deckle/60 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <span className="text-ink-faint text-[11px] shrink-0">ISBN: {book.isbn}</span>
                 {onNavigate && (
                   <button
                     onClick={() => onNavigate('bookstore')}
-                    className="text-claret font-sans font-medium hover:underline flex items-center gap-1"
+                    className="text-claret font-sans font-medium hover:underline flex items-center gap-1 shrink-0"
                   >
                     View in Bookstore <ChevronRight className="w-3.5 h-3.5" />
                   </button>

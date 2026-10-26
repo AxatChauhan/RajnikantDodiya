@@ -14,8 +14,7 @@ import {
   Users,
   Mail,
   FileText,
-  ChevronRight,
-  Shield
+  ChevronRight
 } from 'lucide-react';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from '../data/professorData';
 import { useScholarSession } from '../hooks/useScholarSession';
@@ -134,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { session } = useScholarSession();
-  const { openStudio, profile, alertBanner, layoutSettings } = useSiteContent();
+  const { profile, alertBanner, layoutSettings } = useSiteContent();
 
   const isScholarActive = Boolean(
     session.unlockedItems && session.unlockedItems.length > 0 && session.mobile
@@ -348,16 +347,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )
             )}
 
-            {/* BUTTON 3: [🏛️ Author Studio] - Hidden on mobile (<sm) to prevent overflow */}
-            <button
-              onClick={openStudio}
-              className="hidden sm:inline-flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret-soft hover:bg-claret hover:text-white border border-claret/30 text-claret text-xs font-serif font-semibold transition-all items-center gap-1.5 shadow-2xs shrink-0 h-9 sm:h-10 min-h-[36px]"
-              title="Dedicated Author Studio for Dr. Rajnikant Dodiya"
-            >
-              <Shield className="w-3.5 h-3.5 text-brass shrink-0" />
-              <span>Studio</span>
-            </button>
-
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
@@ -545,17 +534,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 );
               })}
             </nav>
-
-            {/* Professor Studio Button in Mobile Drawer */}
-            <div className="pt-2 border-t border-deckle">
-              <button
-                onClick={() => { setMobileMenuOpen(false); openStudio(); }}
-                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-claret to-claret-light text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs min-h-[44px]"
-              >
-                <Shield className="w-4 h-4 text-brass" />
-                <span>🏛️ Professor Studio (Themes & Content)</span>
-              </button>
-            </div>
 
             {/* Social Channels in Mobile Menu */}
             <div className="pt-3 border-t border-deckle space-y-2">

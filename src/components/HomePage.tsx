@@ -38,11 +38,12 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium }) => {
-  const { profile, layoutSettings } = useSiteContent();
+  const { profile, layoutSettings, books } = useSiteContent();
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<'all' | 'ugc-net' | 'books' | 'pedagogy'>('all');
 
-  // Featured book: UGC NET English Literature or Kalam treatise
-  const featuredBook = BOOKS.find(b => b.title.includes("UGC NET")) || BOOKS[0];
+  // Featured book: Dynamic lookup from studio catalog first, fallback to BOOKS
+  const allAvailableBooks = books && books.length > 0 ? books : BOOKS;
+  const featuredBook = allAvailableBooks.find(b => b.title.includes("UGC NET") || b.title.includes("Kalam")) || allAvailableBooks[0] || BOOKS[0];
 
   return (
     <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2">
@@ -67,19 +68,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.18] tracking-tight">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.18] tracking-tight break-words">
               Master UGC-NET English & Education with{' '}
-              <span className="text-claret underline decoration-brass/40 decoration-wavy underline-offset-4">
+              <span className="text-claret underline decoration-brass/40 decoration-wavy underline-offset-4 break-words">
                 {profile.name || PROFESSOR_INFO.name}
               </span>
             </h1>
             
-            <p className="font-sans text-sm sm:text-base text-claret font-semibold leading-snug">
+            <p className="font-sans text-sm sm:text-base text-claret font-semibold leading-snug break-words">
               {profile.title || PROFESSOR_INFO.title} • Ph.D. in Education (SPU, 2018)
             </p>
 
             {/* Short Bio */}
-            <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed">
+            <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed break-words whitespace-pre-line">
               {profile.shortBio || PROFESSOR_INFO.shortBio}
             </p>
 
@@ -372,15 +373,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               </div>
 
               {/* Title & Description */}
-              <div className="space-y-1">
-                <h3 className="font-serif text-2xl sm:text-3xl text-ink font-bold leading-tight">
+              <div className="space-y-1 min-w-0">
+                <h3 className="font-serif text-2xl sm:text-3xl text-ink font-bold leading-tight break-words">
                   {featuredBook.title}
                 </h3>
-                <p className="text-xs sm:text-sm font-sans text-claret font-semibold">
+                <p className="text-xs sm:text-sm font-sans text-claret font-semibold break-words">
                   By {profile.name || PROFESSOR_INFO.name} • {featuredBook.publisher}
                 </p>
-                <p className="text-xs sm:text-sm text-ink-muted leading-relaxed pt-1">
-                  Empirical inquiry examining the humanistic vision, educational epistemology, and ethical nation-building philosophy of Dr. A.P.J. Abdul Kalam. Recommended for university scholars, research trainees, and UGC-NET Paper 1 & 2 aspirants.
+                <p className="text-xs sm:text-sm text-ink-muted leading-relaxed pt-1 break-words">
+                  {featuredBook.details || 'Empirical inquiry examining the humanistic vision, educational epistemology, and ethical nation-building philosophy of Dr. A.P.J. Abdul Kalam. Recommended for university scholars, research trainees, and UGC-NET Paper 1 & 2 aspirants.'}
                 </p>
               </div>
 
@@ -441,15 +442,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                   <BookOpen className="w-7 h-7 text-brass" />
                   <span className="text-[9px] font-mono tracking-widest uppercase mt-1">SPU</span>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="text-[10px] font-mono uppercase bg-claret-soft text-claret font-bold px-2 py-0.5 rounded-full inline-block">
-                    Authored Monograph
+                    {featuredBook.type === 'authored' ? 'Authored Monograph' : featuredBook.type === 'edited' ? 'Edited Volume' : 'Book Chapter'}
                   </span>
-                  <h4 className="font-serif text-sm font-bold text-ink mt-1.5 leading-snug">
-                    Educational Thoughts of Dr. Kalam
+                  <h4 className="font-serif text-sm font-bold text-ink mt-1.5 leading-snug break-words">
+                    {featuredBook.title}
                   </h4>
-                  <p className="text-[11px] text-ink-muted mt-1 font-mono">
-                    Dr. Rajnikant S. Dodiya
+                  <p className="text-[11px] text-ink-muted mt-1 font-mono break-words">
+                    {profile.name || PROFESSOR_INFO.name}
                   </p>
                 </div>
                 <div className="pt-2 border-t border-gray-100 flex items-center justify-center gap-1 text-[11px] text-emerald-700 font-semibold">

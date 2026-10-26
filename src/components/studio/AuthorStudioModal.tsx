@@ -20,7 +20,6 @@ import {
   Trash2,
   Edit3,
   ExternalLink,
-  Sparkles,
   Layers,
   ArrowRight,
   ShieldAlert,
@@ -76,7 +75,7 @@ export const AuthorStudioModal: React.FC = () => {
 
   // Authentication State
   const [session, setSession] = useState<AuthorStudioSession | null>(() => getActiveAuthorStudioSession());
-  const [emailInput, setEmailInput] = useState(PROFESSOR_INFO.email);
+  const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -180,12 +179,6 @@ export const AuthorStudioModal: React.FC = () => {
     } finally {
       setIsAuthenticating(false);
     }
-  };
-
-  // Quick fill helper for the professor's convenience
-  const handleQuickFillInitialKey = () => {
-    setEmailInput(PROFESSOR_INFO.email);
-    setPasswordInput('Dodiya@2026!Studio');
   };
 
   // Handle Sign Out
@@ -448,18 +441,6 @@ export const AuthorStudioModal: React.FC = () => {
                   </button>
                 </form>
               )}
-
-              {/* Initial Master Key Quick Access Note for Professor */}
-              <div className="pt-2 border-t border-deckle text-center">
-                <button
-                  type="button"
-                  onClick={handleQuickFillInitialKey}
-                  className="text-xs text-claret hover:underline font-serif inline-flex items-center gap-1"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-brass" />
-                  <span>Use Pre-Configured Master Key (Dodiya@2026!Studio)</span>
-                </button>
-              </div>
             </div>
           </div>
         ) : (
@@ -798,7 +779,28 @@ export const AuthorStudioModal: React.FC = () => {
 
                       <div className="space-y-3">
                         {profile.longBio.map((p, idx) => (
-                          <div key={idx} className="relative group">
+                          <div key={idx} className="relative group bg-parchment-warm/40 p-3 rounded-2xl border border-deckle space-y-1.5">
+                            <div className="flex items-center justify-between text-xs text-ink-muted">
+                              <span className="font-mono font-semibold text-claret">Paragraph {idx + 1}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] font-mono text-ink-faint">
+                                  {p.split(/\s+/).filter(Boolean).length} words
+                                </span>
+                                {profile.longBio.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const updated = profile.longBio.filter((_, i) => i !== idx);
+                                      setProfile({ longBio: updated });
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                    title="Remove Paragraph"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                             <textarea
                               rows={3}
                               value={p}
@@ -807,21 +809,9 @@ export const AuthorStudioModal: React.FC = () => {
                                 updated[idx] = e.target.value;
                                 setProfile({ longBio: updated });
                               }}
-                              className="w-full px-3.5 py-2 pr-10 rounded-xl border border-deckle text-sm focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-sm focus:ring-2 focus:ring-claret/20 focus:border-claret min-h-[85px] bg-white resize-y"
+                              placeholder="Write academic paragraph..."
                             />
-                            {profile.longBio.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = profile.longBio.filter((_, i) => i !== idx);
-                                  setProfile({ longBio: updated });
-                                }}
-                                className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
-                                title="Remove Paragraph"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -925,6 +915,16 @@ export const AuthorStudioModal: React.FC = () => {
                             className="w-full px-3 py-2 rounded-lg border border-deckle"
                           />
                         </div>
+                        <div className="sm:col-span-2">
+                          <label className="block text-ink-muted font-semibold mb-1">Book Synopsis / Academic Description</label>
+                          <textarea
+                            rows={2}
+                            placeholder="Enter a brief synopsis or overview of this volume..."
+                            value={newBookForm.details || ''}
+                            onChange={(e) => setNewBookForm({ ...newBookForm, details: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-deckle text-xs"
+                          />
+                        </div>
                       </div>
 
                       <div className="flex justify-end gap-2 pt-2">
@@ -941,8 +941,23 @@ export const AuthorStudioModal: React.FC = () => {
                             if (!newBookForm.title) return;
                             addBook(newBookForm);
                             setIsAddingNewBook(false);
+                            setNewBookForm({
+                              title: '',
+                              subtitle: '',
+                              publisher: 'HMPIETR Academic Series',
+                              year: new Date().getFullYear(),
+                              isbn: '978-81-',
+                              type: 'authored',
+                              price: 399,
+                              coverUrl: '/dr-rajnikant-dodiya.jpg',
+                              buyUrl: '#bookstore',
+                              whatsappInquiryUrl: 'https://wa.me/919825123456',
+                              details: '',
+                              sampleExcerpt: '',
+                              isActive: true
+                            });
                           }}
-                          className="px-4 py-1.5 rounded-lg bg-claret text-white text-xs font-semibold"
+                          className="px-4 py-1.5 rounded-lg bg-claret text-white text-xs font-semibold shadow-xs"
                         >
                           Add to Catalog
                         </button>
@@ -955,29 +970,34 @@ export const AuthorStudioModal: React.FC = () => {
                     {books.map((b) => (
                       <div
                         key={b.id}
-                        className="bg-white p-4 rounded-xl border border-deckle hover:border-claret/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                        className="bg-white p-4 sm:p-5 rounded-2xl border border-deckle hover:border-claret/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 min-w-0"
                       >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono uppercase bg-claret-soft text-claret font-bold px-2 py-0.5 rounded-full">
+                        <div className="space-y-1.5 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] font-mono uppercase bg-claret-soft text-claret font-bold px-2 py-0.5 rounded-full shrink-0">
                               {b.year} • {b.type}
                             </span>
                             <span className="text-xs font-mono text-ink-muted">
                               ISBN: {b.isbn}
                             </span>
                           </div>
-                          <h4 className="font-serif text-base font-bold text-ink">
+                          <h4 className="font-serif text-base font-bold text-ink break-words leading-snug">
                             {b.title}
                           </h4>
                           {b.subtitle && (
-                            <p className="text-xs text-ink-muted">{b.subtitle}</p>
+                            <p className="text-xs text-ink-muted break-words">{b.subtitle}</p>
                           )}
-                          <p className="text-xs text-ink-faint">
-                            {b.publisher} • <strong className="text-claret">₹{b.price}</strong>
+                          <p className="text-xs text-ink-faint break-words">
+                            {b.publisher} • <strong className="text-claret font-mono">₹{b.price}</strong>
                           </p>
+                          {b.details && (
+                            <p className="text-xs text-ink-muted font-reading line-clamp-2 break-words pt-1 border-t border-deckle/40">
+                              {b.details}
+                            </p>
+                          )}
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center flex-wrap">
                           <button
                             onClick={() => {
                               const newPrice = prompt('Enter new price (₹):', String(b.price));
@@ -985,7 +1005,7 @@ export const AuthorStudioModal: React.FC = () => {
                                 updateBook(b.id, { price: Number(newPrice) });
                               }
                             }}
-                            className="px-2.5 py-1 text-xs rounded-lg border border-deckle hover:bg-gray-50 flex items-center gap-1"
+                            className="px-3 py-1.5 text-xs rounded-xl border border-deckle hover:bg-gray-50 flex items-center gap-1.5 font-medium transition-colors"
                           >
                             <Edit3 className="w-3.5 h-3.5 text-claret" />
                             <span>Edit Price</span>
@@ -997,7 +1017,7 @@ export const AuthorStudioModal: React.FC = () => {
                                   deleteBook(b.id);
                                 }
                               }}
-                              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                              className="p-2 text-gray-400 hover:text-red-600 rounded-xl hover:bg-red-50 transition-colors"
                               title="Delete Book"
                             >
                               <Trash2 className="w-4 h-4" />
