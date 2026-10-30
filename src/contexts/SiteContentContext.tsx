@@ -696,16 +696,31 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [activeColorConfig, activeCanvasConfig, activeFontConfig, theme.fontSizeScale, theme.headerCaps]);
 
-  // Check URL hash for studio access (e.g., #studio or ?studio=true)
+  // Dedicated URL-Only Access for Author Studio (e.g. /studio, /#studio, or ?studio=true)
   useEffect(() => {
-    const checkHash = () => {
-      if (window.location.hash === '#studio' || window.location.pathname === '/studio' || window.location.search.includes('studio=true')) {
+    const checkStudioUrl = () => {
+      const hash = window.location.hash.toLowerCase();
+      const pathname = window.location.pathname.toLowerCase();
+      const search = window.location.search.toLowerCase();
+
+      const isStudioRoute = 
+        hash === '#studio' || 
+        pathname === '/studio' || 
+        pathname === '/studio/' || 
+        search.includes('studio=true');
+
+      if (isStudioRoute) {
         setIsStudioOpen(true);
       }
     };
-    checkHash();
-    window.addEventListener('hashchange', checkHash);
-    return () => window.removeEventListener('hashchange', checkHash);
+
+    checkStudioUrl();
+    window.addEventListener('hashchange', checkStudioUrl);
+    window.addEventListener('popstate', checkStudioUrl);
+    return () => {
+      window.removeEventListener('hashchange', checkStudioUrl);
+      window.removeEventListener('popstate', checkStudioUrl);
+    };
   }, []);
 
   // Update Theme Partial
@@ -1018,8 +1033,11 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         openStudio: () => setIsStudioOpen(true),
         closeStudio: () => {
           setIsStudioOpen(false);
-          if (window.location.hash === '#studio') {
-            window.history.replaceState(null, '', window.location.pathname);
+          const hash = window.location.hash.toLowerCase();
+          const pathname = window.location.pathname.toLowerCase();
+          const search = window.location.search.toLowerCase();
+          if (hash === '#studio' || pathname === '/studio' || pathname === '/studio/' || search.includes('studio=true')) {
+            window.history.replaceState(null, '', '/');
           }
         },
         isSyncing,

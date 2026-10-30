@@ -49,7 +49,7 @@ function AppInner() {
   const [isExamOpen, setIsExamOpen] = useState(false);
 
   const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
-  const { alertBanner, layoutSettings, openStudio, profile } = useSiteContent();
+  const { alertBanner, layoutSettings, profile } = useSiteContent();
 
   const handleNavigate = (tab: MainTab, subSection?: string) => {
     setActiveTab(tab);
@@ -60,18 +60,6 @@ function AppInner() {
   useEffect(() => {
     handleGoogleAuthRedirect();
   }, []);
-
-  // Keyboard shortcut for Author Studio: Ctrl + Shift + S
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's') {
-        e.preventDefault();
-        openStudio();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openStudio]);
 
   useEffect(() => {
     const tabTitles: Record<MainTab, string> = {
