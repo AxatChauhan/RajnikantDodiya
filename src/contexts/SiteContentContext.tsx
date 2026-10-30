@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { PROFESSOR_INFO, Book as ProfessorBook, BOOKS } from '../data/professorData';
-import { FEATURED_BOOK_CHAPTERS, BookChapter, MOCK_EXAM_QUESTIONS, ExamQuestion } from '../data/storeCatalogData';
+import { FEATURED_BOOK_CHAPTERS, BookChapter, MOCK_EXAM_QUESTIONS } from '../data/storeCatalogData';
+import { unmaskAnswer } from '../lib/security';
 import { getActiveAuthorStudioSession } from '../lib/authorStudioAuth';
+import { StudioExamTest, StudioExamQuestion } from '../types/examStudio';
+
+export * from '../types/examStudio';
 
 // ============================================================================
 // 1. THEME & TYPOGRAPHY SYSTEM
@@ -373,6 +377,35 @@ export const DEFAULT_STUDIO_BOOKS: StudioBookItem[] = BOOKS.map((b, idx) => ({
   ]
 }));
 
+export const DEFAULT_STUDIO_EXAMS: StudioExamTest[] = [
+  {
+    id: 'exam-ugc-mock-01',
+    title: 'UGC-NET English & Education Master Mock Exam',
+    subtitle: '25 Curated High-Yield MCQs with Detailed Solutions',
+    discipline: 'English Literature & Pedagogy',
+    durationMinutes: 60,
+    totalMarks: 50,
+    negativeMarking: 0,
+    passingScore: 20,
+    price: 299,
+    freeSampleCount: 3,
+    isActive: true,
+    sourceFileName: 'UGC_NET_Master_Questions_2026.pdf',
+    createdAt: '2026-10-26T00:00:00.000Z',
+    updatedAt: '2026-10-26T00:00:00.000Z',
+    questions: MOCK_EXAM_QUESTIONS.map(q => ({
+      id: q.id,
+      section: q.section,
+      question: q.question,
+      options: [q.options[0] || '', q.options[1] || '', q.options[2] || '', q.options[3] || ''],
+      correctAnswer: q.correctAnswer,
+      rawCorrectIndex: unmaskAnswer(q.correctAnswer),
+      explanation: q.explanation,
+      topicTag: q.topicTag
+    }))
+  }
+];
+
 // ============================================================================
 // 4. LAYOUT & ALERT BANNER STATE
 // ============================================================================
@@ -416,97 +449,7 @@ export const DEFAULT_LAYOUT_SETTINGS: LayoutSettingsState = {
 };
 
 // ============================================================================
-// 5. EDITABLE CBT EXAMS & MCQ QUESTION BANKS
-// ============================================================================
-
-export interface StudioExamQuestion {
-  id: number | string;
-  section: string;
-  question: string;
-  options: string[];
-  correctAnswer: number | string;
-  explanation: string;
-  topicTag: string;
-}
-
-export interface StudioExamTest {
-  id: string;
-  title: string;
-  subtitle: string;
-  discipline: string;
-  durationMinutes: number;
-  totalMarks: number;
-  negativeMarking: number;
-  passingScore: number;
-  price: number;
-  freeSampleCount: number;
-  isActive: boolean;
-  questions: StudioExamQuestion[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export const DEFAULT_STUDIO_EXAMS: StudioExamTest[] = [
-  {
-    id: 'exam-ugc-net-01',
-    title: 'UGC-NET / GSET English Paper II Full Mock Simulator',
-    subtitle: '25 Curated High-Yield MCQs spanning British Drama, Post-Method Pedagogy, and Critical Theory',
-    discipline: 'English Literature & Pedagogy',
-    durationMinutes: 60,
-    totalMarks: 50,
-    negativeMarking: 0,
-    passingScore: 25,
-    price: 299,
-    freeSampleCount: 3,
-    isActive: true,
-    questions: MOCK_EXAM_QUESTIONS
-  },
-  {
-    id: 'exam-pedagogy-02',
-    title: 'Paper I: Pedagogy & Research Methodology Drill',
-    subtitle: 'High-Yield Mock Questions on Teaching Aptitude, Research Ethics & NEP 2020 Frameworks',
-    discipline: 'Pedagogy & Research Aptitude',
-    durationMinutes: 30,
-    totalMarks: 20,
-    negativeMarking: 0,
-    passingScore: 10,
-    price: 199,
-    freeSampleCount: 2,
-    isActive: true,
-    questions: [
-      {
-        id: 'ped-1',
-        section: 'Paper I: Pedagogy & Research Aptitude',
-        question: 'Which of the following research designs is specifically focused on continuous classroom intervention and cyclic pedagogical reflection?',
-        options: ['Experimental Design', 'Action Research', 'Ex-Post Facto Research', 'Historical Analysis'],
-        correctAnswer: 1,
-        explanation: 'Action research is characterized by a reflective spiral of planning, acting, observing, and reflecting to improve educational practice.',
-        topicTag: 'Research Methodology'
-      },
-      {
-        id: 'ped-2',
-        section: 'Paper I: Pedagogy & Research Aptitude',
-        question: 'In Bloom’s Revised Cognitive Taxonomy (Anderson & Krathwohl, 2001), which cognitive process occupies the highest level of cognitive complexity?',
-        options: ['Evaluating', 'Analyzing', 'Creating', 'Applying'],
-        correctAnswer: 2,
-        explanation: 'In the 2001 revision, "Creating" replaced "Evaluation" as the highest order thinking skill in Bloom\'s taxonomy.',
-        topicTag: 'Teaching Aptitude & Learning Theories'
-      },
-      {
-        id: 'ped-3',
-        section: 'Paper I: Pedagogy & Research Aptitude',
-        question: 'Under the National Education Policy (NEP 2020), what is the foundational pedagogical framework that replaces the 10+2 structure?',
-        options: ['5+3+3+4', '5+4+3+2', '4+4+3+3', '3+3+4+4'],
-        correctAnswer: 0,
-        explanation: 'NEP 2020 restructured school education into Foundational (5), Preparatory (3), Middle (3), and Secondary (4).',
-        topicTag: 'NEP 2020 & Policy Frameworks'
-      }
-    ]
-  }
-];
-
-// ============================================================================
-// 6. CONTEXT INTERFACE
+// 5. CONTEXT INTERFACE
 // ============================================================================
 
 interface SiteContentContextType {
@@ -527,17 +470,11 @@ interface SiteContentContextType {
   updateBook: (id: string, updated: Partial<StudioBookItem>) => void;
   deleteBook: (id: string) => void;
 
-  // CBT Exams & MCQs
+  // Exams & MCQ Management
   exams: StudioExamTest[];
-  activeExamId: string;
-  setActiveExamId: (id: string) => void;
-  addExam: (newExam: Omit<StudioExamTest, 'id' | 'questions'> & { questions?: StudioExamQuestion[] }) => StudioExamTest;
+  addExam: (exam: Omit<StudioExamTest, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateExam: (id: string, updated: Partial<StudioExamTest>) => void;
   deleteExam: (id: string) => void;
-  addQuestionToExam: (examId: string, question: Omit<StudioExamQuestion, 'id'>) => void;
-  updateQuestionInExam: (examId: string, qId: number | string, updated: Partial<StudioExamQuestion>) => void;
-  deleteQuestionFromExam: (examId: string, qId: number | string) => void;
-  bulkAddQuestionsToExam: (examId: string, questions: Omit<StudioExamQuestion, 'id'>[], replaceExisting?: boolean) => void;
 
   // Layout & Alert Banner
   alertBanner: AlertBannerState;
@@ -564,6 +501,7 @@ const STORAGE_PREFIX = 'atheneum_cms_content_v1_';
 const STORAGE_KEY_THEME = `${STORAGE_PREFIX}theme`;
 const STORAGE_KEY_PROFILE = `${STORAGE_PREFIX}profile`;
 const STORAGE_KEY_BOOKS = `${STORAGE_PREFIX}books`;
+const STORAGE_KEY_EXAMS = `${STORAGE_PREFIX}exams`;
 const STORAGE_KEY_BANNER = `${STORAGE_PREFIX}banner`;
 const STORAGE_KEY_LAYOUT = `${STORAGE_PREFIX}layout`;
 
@@ -617,6 +555,16 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return sanitizeBooksForPublic(DEFAULT_STUDIO_BOOKS);
   });
 
+  const [exams, setExamsState] = useState<StudioExamTest[]>(() => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const cached = localStorage.getItem(STORAGE_KEY_EXAMS);
+        if (cached) return JSON.parse(cached);
+      }
+    } catch {}
+    return DEFAULT_STUDIO_EXAMS;
+  });
+
   const [alertBanner, setAlertBannerState] = useState<AlertBannerState>(() => {
     try {
       if (typeof localStorage !== 'undefined') {
@@ -667,6 +615,9 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
               const sanitizedRemoteBooks = sanitizeBooksForPublic(item.content);
               setBooksState(sanitizedRemoteBooks);
               localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(sanitizedRemoteBooks));
+            } else if (item.key === 'exams' && item.content) {
+              setExamsState(item.content);
+              localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(item.content));
             } else if (item.key === 'banner' && item.content) {
               setAlertBannerState(prev => ({ ...prev, ...item.content }));
               localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(item.content));
@@ -857,6 +808,49 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
   }, []);
 
+  // Exams CRUD
+  const addExam = useCallback((examData: Omit<StudioExamTest, 'id' | 'createdAt' | 'updatedAt'>) => {
+    setExamsState(prev => {
+      const nowIso = new Date().toISOString();
+      const newExam: StudioExamTest = {
+        ...examData,
+        id: `exam-${Date.now()}`,
+        createdAt: nowIso,
+        updatedAt: nowIso
+      };
+      const updated = [newExam, ...prev];
+      try {
+        localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(updated));
+      } catch (e) {
+        console.warn('LocalStorage save notice for exams:', e);
+      }
+      return updated;
+    });
+  }, []);
+
+  const updateExam = useCallback((id: string, updatedFields: Partial<StudioExamTest>) => {
+    setExamsState(prev => {
+      const updated = prev.map(exam =>
+        exam.id === id ? { ...exam, ...updatedFields, updatedAt: new Date().toISOString() } : exam
+      );
+      try {
+        localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }, []);
+
+  const deleteExam = useCallback((id: string) => {
+    setExamsState(prev => {
+      const updated = prev.filter(exam => exam.id !== id);
+      const safeUpdated = updated.length > 0 ? updated : DEFAULT_STUDIO_EXAMS;
+      try {
+        localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(safeUpdated));
+      } catch {}
+      return safeUpdated;
+    });
+  }, []);
+
   // Alert Banner & Layout
   const setAlertBanner = useCallback((banner: Partial<AlertBannerState>) => {
     setAlertBannerState(prev => {
@@ -892,6 +886,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         { key: 'theme', content: theme },
         { key: 'profile', content: profile },
         { key: 'books', content: publicBooks },
+        { key: 'exams', content: exams },
         { key: 'banner', content: alertBanner },
         { key: 'layout', content: layoutSettings }
       ];
@@ -900,6 +895,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
       localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(theme));
       localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
       localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(publicBooks));
+      localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(exams));
       localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(alertBanner));
       localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(layoutSettings));
 
@@ -954,6 +950,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setThemeState(DEFAULT_THEME_STATE);
     setProfileState(DEFAULT_AUTHOR_PROFILE);
     setBooksState(DEFAULT_STUDIO_BOOKS);
+    setExamsState(DEFAULT_STUDIO_EXAMS);
     setAlertBannerState(DEFAULT_ALERT_BANNER);
     setLayoutSettingsState(DEFAULT_LAYOUT_SETTINGS);
 
@@ -961,6 +958,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
       localStorage.removeItem(STORAGE_KEY_THEME);
       localStorage.removeItem(STORAGE_KEY_PROFILE);
       localStorage.removeItem(STORAGE_KEY_BOOKS);
+      localStorage.removeItem(STORAGE_KEY_EXAMS);
       localStorage.removeItem(STORAGE_KEY_BANNER);
       localStorage.removeItem(STORAGE_KEY_LAYOUT);
 
@@ -971,6 +969,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         { key: 'theme', content: DEFAULT_THEME_STATE },
         { key: 'profile', content: DEFAULT_AUTHOR_PROFILE },
         { key: 'books', content: DEFAULT_STUDIO_BOOKS },
+        { key: 'exams', content: DEFAULT_STUDIO_EXAMS },
         { key: 'banner', content: DEFAULT_ALERT_BANNER },
         { key: 'layout', content: DEFAULT_LAYOUT_SETTINGS }
       ];
@@ -1007,6 +1006,10 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         addBook,
         updateBook,
         deleteBook,
+        exams,
+        addExam,
+        updateExam,
+        deleteExam,
         alertBanner,
         setAlertBanner,
         layoutSettings,

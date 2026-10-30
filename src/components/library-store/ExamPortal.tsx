@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  getActiveExamQuestions,
-  evaluateExamSubmission,
   ActiveExamQuestion,
   ExamEvaluationResult
 } from '../../data/storeCatalogData';
+import { useSiteContent, StudioExamTest } from '../../contexts/SiteContentContext';
 import { unmaskAnswer } from '../../lib/security';
 import { Clock, CheckCircle2, AlertCircle, Bookmark, Award, X, RotateCcw, ChevronRight, ChevronLeft, ShieldCheck, FileText, Lock } from 'lucide-react';
 
@@ -27,7 +26,27 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
   isUnlocked = false,
   onUnlockRequest
 }) => {
-  const sessionKey = `cbt_exam_draft_${orderId || 'demo'}`;
+  const { exams } = useSiteContent();
+  const activeExams = useMemo(() => {
+    const act = exams.filter(e => e.isActive);
+    return act.length > 0 ? act : exams;
+  }, [exams]);
+
+  const [selectedExamId, setSelectedExamId] = useState<string>(() => {
+    return activeExams[0]?.id || 'exam-ugc-mock-01';
+  });
+
+  const currentExam: StudioExamTest = useMemo(() => {
+    return activeExams.find(e => e.id === selectedExamId) || activeExams[0] || exams[0];
+  }, [activeExams, exams, selectedExamId]);
+
+  useEffect(() => {
+    if (activeExams.length > 0 && !activeExams.some(e => e.id === selectedExamId)) {
+      setSelectedExamId(activeExams[0].id);
+    }
+  }, [activeExams, selectedExamId]);
+
+  const sessionKey = `cbt_exam_draft_${currentExam?.id || 'default'}_${orderId || 'demo'}`;
 
   // Restore draft state on mount if available
   const [currentIdx, setCurrentIdx] = useState<number>(() => {
@@ -63,6 +82,8 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
     return {};
   });
 
+  const examDurationSeconds = (currentExam?.durationMinutes || 60) * 60;
+
   const [timeLeft, setTimeLeft] = useState<number>(() => {
     try {
       const saved = sessionStorage.getItem(sessionKey);
@@ -71,7 +92,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
         if (typeof parsed.timeLeft === 'number' && parsed.timeLeft > 0) return parsed.timeLeft;
       }
     } catch {}
-    return 60 * 60; // 60 minutes
+    return examDurationSeconds;
   });
 
   const [examSubmitted, setExamSubmitted] = useState<boolean>(() => {
@@ -159,11 +180,35 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
 
   if (!isOpen) return null;
 
+  // Source questions for current exam
+  const sampleLimit = currentExam?.freeSampleCount || 3;
+  const candidateQuestions = useMemo(() => {
+    if (!currentExam || !currentExam.questions || currentExam.questions.length === 0) {
+      return [];
+    }
+    return isUnlocked ? currentExam.questions : currentExam.questions.slice(0, sampleLimit);
+  }, [currentExam, isUnlocked, sampleLimit]);
+
   // Scoped active questions (Zero answers/explanations exposed in active state)
-  const activeQuestions: ActiveExamQuestion[] = getActiveExamQuestions(isUnlocked);
+  const activeQuestions: ActiveExamQuestion[] = useMemo(() => {
+    return candidateQuestions.map(q => ({
+      id: q.id,
+      section: q.section,
+      question: q.question,
+      options: q.options,
+      topicTag: q.topicTag
+    }));
+  }, [candidateQuestions]);
+
   const totalQuestions = activeQuestions.length;
 
-  const currentQ: ActiveExamQuestion = activeQuestions[currentIdx] || activeQuestions[0];
+  const currentQ: ActiveExamQuestion = activeQuestions[currentIdx] || activeQuestions[0] || {
+    id: 1,
+    section: 'General',
+    question: 'Question not available',
+    options: ['', '', '', ''],
+    topicTag: 'General'
+  };
 
   // Helper formatting
   const formatTime = (seconds: number) => {
@@ -221,9 +266,60 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
 
   // Evaluation computed strictly upon submission
   const evaluation: ExamEvaluationResult | null = useMemo(() => {
-    if (!examSubmitted) return null;
-    return evaluateExamSubmission(answers, isUnlocked);
-  }, [examSubmitted, answers, isUnlocked]);
+    if (!examSubmitted || candidateQuestions.length === 0) return null;
+
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unattemptedCount = 0;
+
+    const detailedQuestions = candidateQuestions.map((q, idx) => {
+      const studentAns = answers[idx];
+      const correctIdx = typeof q.rawCorrectIndex === 'number' && q.rawCorrectIndex >= 0 && q.rawCorrectIndex <= 3
+        ? q.rawCorrectIndex
+        : unmaskAnswer(q.correctAnswer);
+      const isCorrect = studentAns === correctIdx;
+
+      if (studentAns === undefined) {
+        unattemptedCount++;
+      } else if (isCorrect) {
+        correctCount++;
+      } else {
+        incorrectCount++;
+      }
+
+      return {
+        id: q.id,
+        section: q.section,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        topicTag: q.topicTag,
+        correctIdx,
+        studentAns,
+        isCorrect
+      };
+    });
+
+    const totalQ = candidateQuestions.length;
+    const answeredCount = totalQ - unattemptedCount;
+    const totalScore = correctCount * 2;
+    const maxScore = totalQ * 2;
+    const accuracy = correctCount + incorrectCount > 0 ? Math.round((correctCount / (correctCount + incorrectCount)) * 100) : 0;
+    const percentile = Math.min(99.4, Math.max(45, Math.round((correctCount / totalQ) * 100 * 1.15 * 10) / 10));
+
+    return {
+      correctCount,
+      incorrectCount,
+      unattemptedCount,
+      answeredCount,
+      totalScore,
+      maxScore,
+      accuracy,
+      percentile,
+      detailedQuestions
+    };
+  }, [examSubmitted, candidateQuestions, answers]);
 
   const correctCount = evaluation?.correctCount || 0;
   const incorrectCount = evaluation?.incorrectCount || 0;
@@ -240,7 +336,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
     } catch {}
     setAnswers({});
     setStatuses({});
-    setTimeLeft(60 * 60);
+    setTimeLeft(examDurationSeconds);
     setCurrentIdx(0);
     setExamSubmitted(false);
     setReviewMode(false);
@@ -259,12 +355,44 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
             </div>
             <div>
               <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold block">
-                NTA UGC-NET / GSET Simulation
+                {currentExam?.discipline || 'NTA UGC-NET / GSET Simulation'}
               </span>
-              <h3 className="font-serif text-xs sm:text-base text-ink font-normal truncate max-w-[150px] xs:max-w-[200px] sm:max-w-md">
-                UGC-NET & GSET 2026
+              <h3 className="font-serif text-xs sm:text-base text-ink font-semibold truncate max-w-[150px] xs:max-w-[200px] sm:max-w-md">
+                {currentExam?.title || 'UGC-NET & GSET 2026'}
               </h3>
             </div>
+
+            {/* Test Selector Dropdown when multiple active tests exist */}
+            {activeExams.length > 1 && !examSubmitted && (
+              <div className="hidden md:flex items-center gap-1.5 ml-2 pl-3 border-l border-deckle">
+                <label className="text-xs font-mono uppercase text-ink-muted">Test:</label>
+                <select
+                  value={currentExam.id}
+                  onChange={(e) => {
+                    const nextId = e.target.value;
+                    setSelectedExamId(nextId);
+                    try {
+                      sessionStorage.removeItem(`cbt_exam_draft_${nextId}_${orderId || 'demo'}`);
+                    } catch {}
+                    const nextExam = activeExams.find(ex => ex.id === nextId);
+                    const nextDuration = (nextExam?.durationMinutes || 60) * 60;
+                    setTimeLeft(nextDuration);
+                    setAnswers({});
+                    setStatuses({});
+                    setCurrentIdx(0);
+                    setExamSubmitted(false);
+                    setReviewMode(false);
+                  }}
+                  className="px-2 py-1 rounded-lg border border-deckle bg-white text-xs font-sans text-ink font-medium focus:outline-none focus:ring-1 focus:ring-claret"
+                >
+                  {activeExams.map((ex) => (
+                    <option key={ex.id} value={ex.id}>
+                      {ex.title} ({ex.questions.length} MCQs)
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 sm:gap-6 text-xs font-mono">
@@ -288,7 +416,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
             ) : (
               <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-0.5 rounded-full font-bold">
                 <Lock className="w-3 h-3 text-amber-700" />
-                <span>Demo (3 Qs)</span>
+                <span>Demo ({sampleLimit} Qs)</span>
               </span>
             )}
 
@@ -341,7 +469,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
               onCopy={e => e.preventDefault()}
             >
               <div className="flex-1 p-4 sm:p-8 overflow-y-auto space-y-5">
-                {!isUnlocked && currentIdx >= 3 ? (
+                {!isUnlocked && currentIdx >= sampleLimit ? (
                   <div className="space-y-6 my-auto text-center max-w-lg mx-auto py-8">
                     <div className="w-14 h-14 rounded-2xl bg-claret text-white flex items-center justify-center mx-auto shadow-md">
                       <Lock className="w-7 h-7" />
@@ -351,10 +479,10 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                         Question {currentIdx + 1} Locked • Demo Mode
                       </span>
                       <h4 className="font-serif text-2xl sm:text-3xl text-ink font-normal">
-                        Full 25-Question UGC-NET/GSET CBT Simulation
+                        Full {currentExam?.questions?.length || 25}-Question CBT Simulation
                       </h4>
                       <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed">
-                        Questions 4 through 25 contain high-yield problems on British Literature, Post-Method Pedagogy, NEP 2020 frameworks, and Research Methodology. Enroll in the full exam to unlock all 25 questions, the 60-minute NTA countdown, and complete faculty rationales.
+                        Questions {sampleLimit + 1} through {currentExam?.questions?.length || 25} contain high-yield problems on {currentExam?.discipline || 'Literature & Pedagogy'}. Enroll in the full exam to unlock all questions, the {currentExam?.durationMinutes || 60}-minute NTA countdown, and complete faculty rationales.
                       </p>
                     </div>
                     <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -366,7 +494,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                         className="px-6 py-3 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2 min-h-[44px]"
                       >
                         <Lock className="w-4 h-4" />
-                        <span>Enroll in Full Exam (₹299)</span>
+                        <span>Enroll in Full Exam (₹{currentExam?.price || 299})</span>
                       </button>
                       <button
                         onClick={() => setCurrentIdx(0)}
@@ -375,6 +503,18 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                         Back to Question 1
                       </button>
                     </div>
+                  </div>
+                ) : totalQuestions === 0 ? (
+                  <div className="space-y-4 my-auto text-center max-w-md mx-auto py-12">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center mx-auto shadow-xs">
+                      <AlertCircle className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <h4 className="font-serif text-xl font-bold text-ink">
+                      Question Paper Initializing
+                    </h4>
+                    <p className="text-sm text-ink-muted leading-relaxed">
+                      No questions are currently available for this examination paper. Please select another exam from the dropdown above.
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -386,7 +526,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                             Question {currentIdx + 1} of {totalQuestions} {!isUnlocked && '(Demo)'}
                           </span>
                           <span className="text-xs font-mono text-ink-faint hidden sm:inline">
-                            • Marks: +2.0, -0.0
+                            • Marks: +{currentExam?.totalMarks && currentExam?.questions?.length ? (currentExam.totalMarks / currentExam.questions.length).toFixed(1) : '2.0'}, -{currentExam?.negativeMarking || '0.0'}
                           </span>
                         </div>
                         <span className="text-[11px] font-mono text-ink-muted bg-parchment-warm px-2 py-0.5 rounded border border-deckle">
@@ -429,7 +569,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
               </div>
 
               {/* Sticky Bottom Question Controls */}
-              {!(currentIdx >= 3 && !isUnlocked) && (
+              {!(currentIdx >= sampleLimit && !isUnlocked) && totalQuestions > 0 && (
                 <div className="p-3 sm:px-6 bg-white/95 backdrop-blur-xs border-t border-deckle flex items-center justify-between gap-2 text-xs font-sans shrink-0">
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <button
@@ -514,7 +654,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                   {activeQuestions.map((_, i) => {
                     const status = statuses[i] || 'unvisited';
                     const isCurrent = i === currentIdx;
-                    const isLocked = !isUnlocked && i >= 3;
+                    const isLocked = !isUnlocked && i >= sampleLimit;
 
                     let bgStyle = 'bg-slate-200 text-slate-700';
                     if (isLocked) {
@@ -602,7 +742,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                     {activeQuestions.map((_, i) => {
                       const status = statuses[i] || 'unvisited';
                       const isCurrent = i === currentIdx;
-                      const isLocked = !isUnlocked && i >= 3;
+                      const isLocked = !isUnlocked && i >= sampleLimit;
 
                       let bgStyle = 'bg-slate-200 text-slate-700';
                       if (isLocked) {
@@ -618,6 +758,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                       return (
                         <button
                           key={i}
+                          disabled={isLocked}
                           onClick={() => {
                             handleJumpTo(i);
                             setIsMobilePaletteOpen(false);
@@ -655,10 +796,10 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
           <div className="flex-1 p-6 sm:p-10 overflow-y-auto space-y-8">
             <div className="text-center space-y-2 max-w-xl mx-auto">
               <span className="text-xs font-mono font-bold uppercase tracking-widest text-claret bg-claret-soft px-3 py-1 rounded-full border border-claret/20">
-                {isUnlocked ? 'Official Examination Diagnostic Report' : 'Sample Diagnostic Preview Report (3 Questions)'}
+                {isUnlocked ? 'Official Examination Diagnostic Report' : `Sample Diagnostic Preview Report (${sampleLimit} Questions)`}
               </span>
               <h3 className="font-serif text-3xl sm:text-4xl text-ink font-normal">
-                {isUnlocked ? 'UGC-NET & GSET Performance Summary' : 'UGC-NET & GSET 3-Question Diagnostic Evaluation'}
+                {isUnlocked ? `${currentExam?.title || 'Examination'} Performance Summary` : `${currentExam?.title || 'Examination'} Diagnostic Evaluation`}
               </h3>
               <p className="text-xs text-ink-muted font-reading">
                 Candidate: <strong className="text-ink">{studentName}</strong> • {isUnlocked ? `Order #${orderId}` : 'Free Demo Preview Session'}

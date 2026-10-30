@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test:security": "node scripts/securityAuditTests.mjs",
     "test:simulation": "node scripts/simulateUserJourneys.mjs",
-    "test:all": "node scripts/securityAuditTests.mjs && node scripts/simulateUserJourneys.mjs"
+    "test:mcq": "node scripts/testMcqAuthoringSuite.mjs",
+    "test:all": "node scripts/securityAuditTests.mjs && node scripts/simulateUserJourneys.mjs && node scripts/testMcqAuthoringSuite.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

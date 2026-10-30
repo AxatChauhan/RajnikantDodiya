@@ -24,7 +24,7 @@ export interface BookChapter {
 
 export interface ExamQuestion {
   id: number;
-  section: 'Paper II: English Literature' | 'Paper I: Pedagogy & Research Aptitude' | 'Literary Theory & ELT';
+  section: string;
   question: string;
   options: string[];
   correctAnswer: number | string;
@@ -35,7 +35,7 @@ export interface ExamQuestion {
 // Sanitized question payload for active proctoring (Zero answer/explanation leaks)
 export interface ActiveExamQuestion {
   id: number;
-  section: 'Paper II: English Literature' | 'Paper I: Pedagogy & Research Aptitude' | 'Literary Theory & ELT';
+  section: string;
   question: string;
   options: string[];
   topicTag: string;
@@ -242,8 +242,7 @@ export function getLicensedBookChapters(isUnlocked: boolean): BookChapter[] {
 }
 
 // The 25-Question Curated CBT Mock Exam (UGC-NET / GSET Master Edition)
-// VULN-06 Hardening: Kept internal to module; only sanitized questions are surfaced for active testing
-const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
+export const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
   {
     id: 1,
     section: 'Paper II: English Literature',

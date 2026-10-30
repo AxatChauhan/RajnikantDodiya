@@ -29,7 +29,8 @@ import {
   Upload,
   FileUp,
   FileText,
-  Sparkles
+  Sparkles,
+  GraduationCap
 } from 'lucide-react';
 import {
   useSiteContent,
@@ -39,7 +40,9 @@ import {
   FontPresetKey,
   ColorPaletteKey,
   CanvasToneKey,
-  StudioBookItem
+  StudioBookItem,
+  StudioExamTest,
+  StudioExamQuestion
 } from '../../contexts/SiteContentContext';
 import {
   authenticateAuthorStudio,
@@ -55,10 +58,12 @@ import {
   validateManuscriptFile,
   MAX_MANUSCRIPT_SIZE_BYTES
 } from '../../lib/bookStorageSecurity';
+import { parseExamFromFile, ParseExamFileResult } from '../../lib/examFileParser';
+import { maskAnswer, unmaskAnswer } from '../../lib/security';
 import { PROFESSOR_INFO } from '../../data/professorData';
 import { ProfessorCrestIcon } from '../common/ProfessorCrestIcon';
 
-type StudioTab = 'theme' | 'profile' | 'books' | 'layout' | 'security';
+type StudioTab = 'theme' | 'profile' | 'books' | 'exams' | 'layout' | 'security';
 
 export const AuthorStudioModal: React.FC = () => {
   const {
@@ -72,6 +77,10 @@ export const AuthorStudioModal: React.FC = () => {
     addBook,
     updateBook,
     deleteBook,
+    exams,
+    addExam,
+    updateExam,
+    deleteExam,
     alertBanner,
     setAlertBanner,
     layoutSettings,
@@ -162,6 +171,232 @@ export const AuthorStudioModal: React.FC = () => {
     } else {
       setUploadError(res.error || 'Upload failed. Please try again.');
     }
+  };
+
+  // =========================================================================
+  // CBT EXAMS & MCQ MANAGEMENT STATE & HANDLERS
+  // =========================================================================
+  const [isAddingNewExam, setIsAddingNewExam] = useState(false);
+  const [isParsingExamFile, setIsParsingExamFile] = useState(false);
+  const [examParseError, setExamParseError] = useState<string | null>(null);
+  const [examParseSuccess, setExamParseSuccess] = useState<string | null>(null);
+  const [examFileName, setExamFileName] = useState<string>('');
+  const examFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Inspected exam for reviewing/editing questions
+  const [inspectingExamId, setInspectingExamId] = useState<string | null>(null);
+  const activeInspectingExam = exams.find(e => e.id === inspectingExamId) || null;
+
+  // New Exam Form State
+  const [newExamForm, setNewExamForm] = useState<{
+    title: string;
+    subtitle: string;
+    discipline: string;
+    durationMinutes: number;
+    totalMarks: number;
+    negativeMarking: number;
+    passingScore: number;
+    price: number;
+    freeSampleCount: number;
+    questions: StudioExamQuestion[];
+  }>({
+    title: '',
+    subtitle: '',
+    discipline: 'English Language & Literature',
+    durationMinutes: 60,
+    totalMarks: 50,
+    negativeMarking: 0,
+    passingScore: 20,
+    price: 299,
+    freeSampleCount: 3,
+    questions: []
+  });
+
+  const handleExamFileUpload = async (file: File) => {
+    setExamParseError(null);
+    setExamParseSuccess(null);
+    setExamFileName(file.name);
+    setIsParsingExamFile(true);
+
+    try {
+      const result: ParseExamFileResult = await parseExamFromFile(file);
+      if (!result.success || result.questions.length === 0) {
+        setExamParseError(result.error || 'Failed to extract questions from file. Please ensure questions have 4 options (A-D) and an answer key.');
+        setIsParsingExamFile(false);
+        return;
+      }
+
+      const parsedQuestions: StudioExamQuestion[] = result.questions.map((q, idx) => ({
+        id: idx + 1,
+        section: q.section || 'General Literature & Pedagogy',
+        question: q.question,
+        options: [q.options[0] || '', q.options[1] || '', q.options[2] || '', q.options[3] || ''],
+        correctAnswer: q.correctAnswer,
+        rawCorrectIndex: q.rawCorrectIndex,
+        explanation: q.explanation || '',
+        topicTag: q.topicTag || 'General'
+      }));
+
+      const cleanFileName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      const detectedTitle = cleanFileName.length > 3 ? cleanFileName : 'New Mock Exam';
+
+      setNewExamForm(prev => ({
+        ...prev,
+        title: prev.title || detectedTitle,
+        subtitle: prev.subtitle || `${parsedQuestions.length} Curated MCQs with Detailed Solutions`,
+        totalMarks: parsedQuestions.length * 2,
+        passingScore: Math.ceil((parsedQuestions.length * 2) * 0.4),
+        questions: parsedQuestions
+      }));
+
+      setExamParseSuccess(`Successfully parsed ${parsedQuestions.length} questions from "${file.name}"!`);
+    } catch (err: any) {
+      setExamParseError(err?.message || 'Error processing uploaded file.');
+    } finally {
+      setIsParsingExamFile(false);
+    }
+  };
+
+  const handleSaveNewExam = () => {
+    if (!newExamForm.title.trim()) {
+      alert('Please provide an exam title.');
+      return;
+    }
+    if (newExamForm.questions.length === 0) {
+      alert('Please upload a file or add at least one question before saving.');
+      return;
+    }
+
+    addExam({
+      title: newExamForm.title.trim(),
+      subtitle: newExamForm.subtitle.trim(),
+      discipline: newExamForm.discipline.trim(),
+      durationMinutes: Number(newExamForm.durationMinutes) || 60,
+      totalMarks: Number(newExamForm.totalMarks) || (newExamForm.questions.length * 2),
+      negativeMarking: Number(newExamForm.negativeMarking) || 0,
+      passingScore: Number(newExamForm.passingScore) || 20,
+      price: Number(newExamForm.price) || 299,
+      freeSampleCount: Number(newExamForm.freeSampleCount) || 3,
+      isActive: true,
+      sourceFileName: examFileName || 'uploaded_questions.pdf',
+      questions: newExamForm.questions
+    });
+
+    setNewExamForm({
+      title: '',
+      subtitle: '',
+      discipline: 'English Language & Literature',
+      durationMinutes: 60,
+      totalMarks: 50,
+      negativeMarking: 0,
+      passingScore: 20,
+      price: 299,
+      freeSampleCount: 3,
+      questions: []
+    });
+    setExamFileName('');
+    setExamParseSuccess(null);
+    setExamParseError(null);
+    setIsAddingNewExam(false);
+    setSaveToast('New MCQ Exam successfully created and added to catalog!');
+    setTimeout(() => setSaveToast(null), 4000);
+  };
+
+  const handleUpdateNewExamQuestion = (index: number, updatedFields: Partial<StudioExamQuestion>) => {
+    setNewExamForm(prev => {
+      const updated = [...prev.questions];
+      const current = updated[index];
+      if (!current) return prev;
+
+      let nextRawCorrectIndex = current.rawCorrectIndex;
+      let nextCorrectAnswer = current.correctAnswer;
+
+      if (typeof updatedFields.rawCorrectIndex === 'number') {
+        nextRawCorrectIndex = updatedFields.rawCorrectIndex;
+        nextCorrectAnswer = maskAnswer(nextRawCorrectIndex);
+      }
+
+      updated[index] = {
+        ...current,
+        ...updatedFields,
+        rawCorrectIndex: nextRawCorrectIndex,
+        correctAnswer: nextCorrectAnswer
+      };
+      return { ...prev, questions: updated };
+    });
+  };
+
+  const handleDeleteNewExamQuestion = (index: number) => {
+    setNewExamForm(prev => ({
+      ...prev,
+      questions: prev.questions.filter((_, idx) => idx !== index)
+    }));
+  };
+
+  const handleAddNewQuestionToForm = () => {
+    setNewExamForm(prev => ({
+      ...prev,
+      questions: [
+        ...prev.questions,
+        {
+          id: prev.questions.length + 1,
+          section: 'Paper II: English Literature',
+          question: 'New Question Text...',
+          options: ['Option A', 'Option B', 'Option C', 'Option D'],
+          correctAnswer: maskAnswer(0),
+          rawCorrectIndex: 0,
+          explanation: 'Explanation for correct answer...',
+          topicTag: 'General Pedagogy'
+        }
+      ]
+    }));
+  };
+
+  const handleUpdateInspectingExamQuestion = (qIndex: number, updatedFields: Partial<StudioExamQuestion>) => {
+    if (!activeInspectingExam) return;
+    const updatedQuestions = [...activeInspectingExam.questions];
+    const current = updatedQuestions[qIndex];
+    if (!current) return;
+
+    let nextRawCorrectIndex = current.rawCorrectIndex;
+    let nextCorrectAnswer = current.correctAnswer;
+    if (typeof updatedFields.rawCorrectIndex === 'number') {
+      nextRawCorrectIndex = updatedFields.rawCorrectIndex;
+      nextCorrectAnswer = maskAnswer(nextRawCorrectIndex);
+    }
+
+    updatedQuestions[qIndex] = {
+      ...current,
+      ...updatedFields,
+      rawCorrectIndex: nextRawCorrectIndex,
+      correctAnswer: nextCorrectAnswer
+    };
+
+    updateExam(activeInspectingExam.id, { questions: updatedQuestions });
+  };
+
+  const handleDeleteInspectingExamQuestion = (qIndex: number) => {
+    if (!activeInspectingExam) return;
+    const updatedQuestions = activeInspectingExam.questions.filter((_, idx) => idx !== qIndex);
+    updateExam(activeInspectingExam.id, { questions: updatedQuestions });
+  };
+
+  const handleAddQuestionToInspectingExam = () => {
+    if (!activeInspectingExam) return;
+    const updatedQuestions = [
+      ...activeInspectingExam.questions,
+      {
+        id: activeInspectingExam.questions.length + 1,
+        section: 'General Section',
+        question: 'New Question Text...',
+        options: ['Option A', 'Option B', 'Option C', 'Option D'] as [string, string, string, string],
+        correctAnswer: maskAnswer(0),
+        rawCorrectIndex: 0,
+        explanation: '',
+        topicTag: 'General'
+      }
+    ];
+    updateExam(activeInspectingExam.id, { questions: updatedQuestions });
   };
 
   // Password Change State
@@ -513,6 +748,7 @@ export const AuthorStudioModal: React.FC = () => {
                   { id: 'theme', label: 'Colors & Typography', icon: Palette },
                   { id: 'profile', label: 'About Me & Bio', icon: Type },
                   { id: 'books', label: 'My Books & Store', icon: BookOpen },
+                  { id: 'exams', label: 'CBT Exams & MCQs', icon: GraduationCap },
                   { id: 'layout', label: 'Layout & Alert Bar', icon: Bell },
                   { id: 'security', label: 'Master Password', icon: Shield }
                 ].map((item) => {
@@ -1222,6 +1458,683 @@ export const AuthorStudioModal: React.FC = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* TAB 3.5: CBT EXAMS & MCQ MANAGEMENT */}
+              {activeTab === 'exams' && (
+                <div className="max-w-4xl mx-auto space-y-8 animate-fade-in font-sans">
+                  {/* SUB-VIEW A: CREATE NEW EXAM VIA FILE UPLOAD */}
+                  {isAddingNewExam ? (
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl border border-deckle shadow-xs space-y-6">
+                      <div className="flex items-center justify-between pb-4 border-b border-deckle">
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsAddingNewExam(false);
+                              setExamParseError(null);
+                              setExamParseSuccess(null);
+                            }}
+                            className="text-sm font-semibold uppercase tracking-wider text-claret hover:underline flex items-center gap-1.5 mb-2"
+                          >
+                            <ArrowRight className="w-4 h-4 rotate-180" />
+                            <span>Back to Exam Catalog</span>
+                          </button>
+                          <h3 className="font-serif text-2xl font-bold text-ink">
+                            Upload & Create New MCQ Exam
+                          </h3>
+                          <p className="text-[17px] text-ink-muted mt-1 leading-relaxed">
+                            Upload a PDF, TXT, CSV, or JSON file. The system will automatically extract questions, options (A–D), answer keys, and explanations client-side.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* File Upload Zone */}
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted">
+                          Upload Exam Document (.pdf, .txt, .csv, .json)
+                        </label>
+
+                        <input
+                          type="file"
+                          ref={examFileInputRef}
+                          accept=".pdf,.txt,.csv,.json,.doc,.docx"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              handleExamFileUpload(e.target.files[0]);
+                            }
+                          }}
+                        />
+
+                        <div
+                          onClick={() => examFileInputRef.current?.click()}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                              handleExamFileUpload(e.dataTransfer.files[0]);
+                            }
+                          }}
+                          className="p-8 border-2 border-dashed border-claret/40 rounded-2xl hover:border-claret bg-[#FAF9F5] hover:bg-claret-soft/20 transition-all text-center cursor-pointer space-y-3 group"
+                        >
+                          <div className="w-14 h-14 mx-auto rounded-2xl bg-white border border-deckle flex items-center justify-center text-claret group-hover:scale-105 transition-transform shadow-xs">
+                            <Upload className="w-7 h-7" />
+                          </div>
+                          <div>
+                            <p className="text-lg font-bold text-ink">
+                              Click or drag and drop your exam file here
+                            </p>
+                            <p className="text-sm text-ink-muted mt-1 leading-relaxed">
+                              Supports PDF question papers, plain text files, CSV spreadsheets, and JSON question banks
+                            </p>
+                          </div>
+                          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-deckle text-sm font-semibold uppercase tracking-wider text-ink-muted">
+                            <Shield className="w-4 h-4 text-emerald-600" />
+                            <span>100% Client-Side Processing • Anti-Cheat Cryptographic Masking</span>
+                          </div>
+                        </div>
+
+                        {/* Parsing in progress */}
+                        {isParsingExamFile && (
+                          <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-900 flex items-center gap-3">
+                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                            <span>Extracting and parsing MCQs from {examFileName}... Please wait.</span>
+                          </div>
+                        )}
+
+                        {/* Parsing Error */}
+                        {examParseError && (
+                          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-800 space-y-1">
+                            <div className="flex items-center gap-2 font-bold">
+                              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                              <span>Parsing Notice</span>
+                            </div>
+                            <p className="text-sm">{examParseError}</p>
+                            <p className="text-sm text-red-700 pt-1">
+                              Ensure questions are numbered (e.g. 1., 2.), options start with A), B), C), D), and an Answer line exists (e.g. "Answer: B").
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Parsing Success */}
+                        {examParseSuccess && (
+                          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-900 flex items-center gap-2 font-semibold">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                            <span>{examParseSuccess}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Exam Metadata Configuration */}
+                      <div className="space-y-4 pt-4 border-t border-deckle">
+                        <h4 className="font-serif text-lg font-bold text-ink">
+                          Exam Parameters & Details
+                        </h4>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="sm:col-span-2">
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Exam Title
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={newExamForm.title}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, title: e.target.value }))}
+                              placeholder="e.g. UGC-NET Paper II English Master Practice Exam"
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-2">
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Subtitle / Description
+                            </label>
+                            <input
+                              type="text"
+                              value={newExamForm.subtitle}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, subtitle: e.target.value }))}
+                              placeholder="e.g. 25 Curated High-Yield MCQs with Detailed Solutions"
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Discipline / Subject
+                            </label>
+                            <input
+                              type="text"
+                              value={newExamForm.discipline}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, discipline: e.target.value }))}
+                              placeholder="e.g. English Literature & Pedagogy"
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Test Duration (Minutes)
+                            </label>
+                            <input
+                              type="number"
+                              min={5}
+                              max={300}
+                              value={newExamForm.durationMinutes}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, durationMinutes: Number(e.target.value) }))}
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Total Marks
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={newExamForm.totalMarks}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, totalMarks: Number(e.target.value) }))}
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Passing Score
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              value={newExamForm.passingScore}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, passingScore: Number(e.target.value) }))}
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Price (₹)
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              value={newExamForm.price}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, price: Number(e.target.value) }))}
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                              Free Sample Questions (Demo)
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={newExamForm.questions.length || 10}
+                              value={newExamForm.freeSampleCount}
+                              onChange={(e) => setNewExamForm(prev => ({ ...prev, freeSampleCount: Number(e.target.value) }))}
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-deckle text-base focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Review & Edit Extracted Questions */}
+                      <div className="space-y-4 pt-4 border-t border-deckle">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-serif text-lg font-bold text-ink">
+                              Questions ({newExamForm.questions.length})
+                            </h4>
+                            <p className="text-sm text-ink-muted">
+                              Select the radio button next to an option to designate the correct answer.
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleAddNewQuestionToForm}
+                            className="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-ink text-sm font-semibold flex items-center gap-1.5 transition-colors"
+                          >
+                            <Plus className="w-4 h-4 text-claret" />
+                            <span>Add Question</span>
+                          </button>
+                        </div>
+
+                        {newExamForm.questions.length === 0 ? (
+                          <div className="p-8 text-center border border-deckle rounded-2xl bg-[#FAF9F5] text-ink-muted text-sm">
+                            Upload a file above or click "+ Add Question" to manually write questions.
+                          </div>
+                        ) : (
+                          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                            {newExamForm.questions.map((q, qIdx) => (
+                              <div
+                                key={qIdx}
+                                className="p-4 sm:p-5 rounded-2xl border border-deckle bg-[#FAF9F5] space-y-3 text-sm"
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="w-8 h-8 rounded-lg bg-claret text-white font-bold text-sm flex items-center justify-center font-mono">
+                                      {qIdx + 1}
+                                    </span>
+                                    <input
+                                      type="text"
+                                      value={q.section}
+                                      onChange={(e) => handleUpdateNewExamQuestion(qIdx, { section: e.target.value })}
+                                      placeholder="Section Name"
+                                      className="px-3 py-1.5 rounded-lg border border-deckle text-sm font-semibold bg-white"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={q.topicTag}
+                                      onChange={(e) => handleUpdateNewExamQuestion(qIdx, { topicTag: e.target.value })}
+                                      placeholder="Topic Tag"
+                                      className="px-3 py-1.5 rounded-lg border border-deckle text-sm text-ink-muted bg-white"
+                                    />
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteNewExamQuestion(qIdx)}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                    title="Delete Question"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                                    Question Text
+                                  </label>
+                                  <textarea
+                                    rows={2}
+                                    value={q.question}
+                                    onChange={(e) => handleUpdateNewExamQuestion(qIdx, { question: e.target.value })}
+                                    className="w-full px-3 py-2 rounded-xl border border-deckle text-base font-sans bg-white focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                                  />
+                                </div>
+
+                                {/* Options with Radio Selection */}
+                                <div className="space-y-2">
+                                  <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted">
+                                    Options (Select Radio for Correct Answer)
+                                  </label>
+                                  {(['A', 'B', 'C', 'D'] as const).map((letter, optIdx) => {
+                                    const isCorrect = q.rawCorrectIndex === optIdx;
+                                    return (
+                                      <div
+                                        key={optIdx}
+                                        className={`flex items-center gap-2 p-2.5 rounded-xl border transition-all ${
+                                          isCorrect
+                                            ? 'bg-emerald-50 border-emerald-300 ring-1 ring-emerald-300'
+                                            : 'bg-white border-deckle'
+                                        }`}
+                                      >
+                                        <label className="flex items-center gap-2 cursor-pointer shrink-0">
+                                          <input
+                                            type="radio"
+                                            name={`new-exam-q-${qIdx}-ans`}
+                                            checked={isCorrect}
+                                            onChange={() => handleUpdateNewExamQuestion(qIdx, { rawCorrectIndex: optIdx })}
+                                            className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                                          />
+                                          <span className="font-mono font-bold text-sm text-ink w-5">
+                                            {letter})
+                                          </span>
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={q.options[optIdx] || ''}
+                                          onChange={(e) => {
+                                            const updatedOptions: [string, string, string, string] = [...q.options];
+                                            updatedOptions[optIdx] = e.target.value;
+                                            handleUpdateNewExamQuestion(qIdx, { options: updatedOptions });
+                                          }}
+                                          placeholder={`Option ${letter} text`}
+                                          className="flex-1 px-3 py-1.5 rounded-lg border border-deckle/60 text-sm bg-transparent focus:outline-none focus:bg-white"
+                                        />
+                                        {isCorrect && (
+                                          <span className="text-sm font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0">
+                                            Correct Key
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                                    Explanation & Solution
+                                  </label>
+                                  <textarea
+                                    rows={2}
+                                    value={q.explanation}
+                                    onChange={(e) => handleUpdateNewExamQuestion(qIdx, { explanation: e.target.value })}
+                                    placeholder="Explanation displayed to candidates after submission..."
+                                    className="w-full px-3 py-2 rounded-xl border border-deckle text-sm font-sans bg-white focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Submit Exam */}
+                      <div className="flex items-center justify-end gap-3 pt-4 border-t border-deckle">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAddingNewExam(false);
+                            setExamParseError(null);
+                            setExamParseSuccess(null);
+                          }}
+                          className="px-4 py-2.5 rounded-xl border border-deckle text-sm font-semibold text-ink-muted hover:text-ink hover:bg-gray-50 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveNewExam}
+                          disabled={newExamForm.questions.length === 0}
+                          className="px-6 py-2.5 rounded-xl bg-claret text-white text-sm font-semibold hover:bg-claret-light transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+                        >
+                          <Save className="w-4 h-4 text-brass" />
+                          <span>Save & Publish Exam</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : activeInspectingExam ? (
+                    /* SUB-VIEW B: INSPECT & EDIT EXISTING EXAM QUESTIONS */
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl border border-deckle shadow-xs space-y-6">
+                      <div className="flex items-center justify-between pb-4 border-b border-deckle">
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => setInspectingExamId(null)}
+                            className="text-sm font-semibold uppercase tracking-wider text-claret hover:underline flex items-center gap-1.5 mb-2"
+                          >
+                            <ArrowRight className="w-4 h-4 rotate-180" />
+                            <span>Back to Exam Catalog</span>
+                          </button>
+                          <h3 className="font-serif text-2xl font-bold text-ink">
+                            {activeInspectingExam.title}
+                          </h3>
+                          <p className="text-sm text-ink-muted mt-1">
+                            Editing {activeInspectingExam.questions.length} questions • Changes update live in the CBT portal upon saving.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleAddQuestionToInspectingExam}
+                          className="px-4 py-2 rounded-xl bg-claret text-white text-sm font-semibold hover:bg-claret-light transition-colors flex items-center gap-1.5 shadow-xs"
+                        >
+                          <Plus className="w-4 h-4 text-brass" />
+                          <span>Add Question</span>
+                        </button>
+                      </div>
+
+                      {/* Question list */}
+                      <div className="space-y-4 max-h-[700px] overflow-y-auto pr-1">
+                        {activeInspectingExam.questions.map((q, qIdx) => (
+                          <div
+                            key={q.id || qIdx}
+                            className="p-4 sm:p-5 rounded-2xl border border-deckle bg-[#FAF9F5] space-y-3 text-sm"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-8 h-8 rounded-lg bg-claret text-white font-bold text-sm flex items-center justify-center font-mono">
+                                  {qIdx + 1}
+                                </span>
+                                <input
+                                  type="text"
+                                  value={q.section}
+                                  onChange={(e) => handleUpdateInspectingExamQuestion(qIdx, { section: e.target.value })}
+                                  placeholder="Section Name"
+                                  className="px-3 py-1.5 rounded-lg border border-deckle text-sm font-semibold bg-white"
+                                />
+                                <input
+                                  type="text"
+                                  value={q.topicTag}
+                                  onChange={(e) => handleUpdateInspectingExamQuestion(qIdx, { topicTag: e.target.value })}
+                                  placeholder="Topic Tag"
+                                  className="px-3 py-1.5 rounded-lg border border-deckle text-sm text-ink-muted bg-white"
+                                />
+                              </div>
+
+                              {activeInspectingExam.questions.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteInspectingExamQuestion(qIdx)}
+                                  className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                  title="Delete Question"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                                Question Text
+                              </label>
+                              <textarea
+                                rows={2}
+                                value={q.question}
+                                onChange={(e) => handleUpdateInspectingExamQuestion(qIdx, { question: e.target.value })}
+                                className="w-full px-3 py-2 rounded-xl border border-deckle text-base font-sans bg-white focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                              />
+                            </div>
+
+                            {/* Options */}
+                            <div className="space-y-2">
+                              <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted">
+                                Options (Select Radio for Correct Answer)
+                              </label>
+                              {(['A', 'B', 'C', 'D'] as const).map((letter, optIdx) => {
+                                const currentCorrect = typeof q.rawCorrectIndex === 'number'
+                                  ? q.rawCorrectIndex
+                                  : unmaskAnswer(q.correctAnswer);
+                                const isCorrect = currentCorrect === optIdx;
+                                return (
+                                  <div
+                                    key={optIdx}
+                                    className={`flex items-center gap-2 p-2.5 rounded-xl border transition-all ${
+                                      isCorrect
+                                        ? 'bg-emerald-50 border-emerald-300 ring-1 ring-emerald-300'
+                                        : 'bg-white border-deckle'
+                                    }`}
+                                  >
+                                    <label className="flex items-center gap-2 cursor-pointer shrink-0">
+                                      <input
+                                        type="radio"
+                                        name={`inspect-q-${qIdx}-ans`}
+                                        checked={isCorrect}
+                                        onChange={() => handleUpdateInspectingExamQuestion(qIdx, { rawCorrectIndex: optIdx })}
+                                        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                                      />
+                                      <span className="font-mono font-bold text-sm text-ink w-5">
+                                        {letter})
+                                      </span>
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={q.options[optIdx] || ''}
+                                      onChange={(e) => {
+                                        const updatedOptions: [string, string, string, string] = [...q.options];
+                                        updatedOptions[optIdx] = e.target.value;
+                                        handleUpdateInspectingExamQuestion(qIdx, { options: updatedOptions });
+                                      }}
+                                      placeholder={`Option ${letter} text`}
+                                      className="flex-1 px-3 py-1.5 rounded-lg border border-deckle/60 text-sm bg-transparent focus:outline-none focus:bg-white"
+                                    />
+                                    {isCorrect && (
+                                      <span className="text-sm font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0">
+                                        Correct Key
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-semibold uppercase tracking-wider text-ink-muted mb-1">
+                                Explanation & Solution
+                              </label>
+                              <textarea
+                                rows={2}
+                                value={q.explanation}
+                                onChange={(e) => handleUpdateInspectingExamQuestion(qIdx, { explanation: e.target.value })}
+                                placeholder="Explanation displayed to candidates after submission..."
+                                className="w-full px-3 py-2 rounded-xl border border-deckle text-sm font-sans bg-white focus:ring-2 focus:ring-claret/20 focus:border-claret"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-end pt-4 border-t border-deckle">
+                        <button
+                          type="button"
+                          onClick={() => setInspectingExamId(null)}
+                          className="px-5 py-2 rounded-xl bg-claret text-white text-sm font-semibold hover:bg-claret-light transition-colors shadow-xs"
+                        >
+                          Done Editing
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* SUB-VIEW C: EXAMS CATALOG LIST */
+                    <div className="space-y-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h3 className="font-serif text-2xl font-bold text-ink">
+                            CBT Exams & MCQ Question Bank
+                          </h3>
+                          <p className="text-[17px] text-ink-muted mt-1 leading-relaxed">
+                            Manage online Computer-Based Test (CBT) question papers. Upload questions directly from a PDF or document.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAddingNewExam(true);
+                            setExamParseError(null);
+                            setExamParseSuccess(null);
+                          }}
+                          className="px-4 py-2.5 rounded-xl bg-claret text-white text-sm font-semibold hover:bg-claret-light transition-all flex items-center space-x-2 shadow-xs shrink-0"
+                        >
+                          <Plus className="w-4 h-4 text-brass" />
+                          <span>Add New Exam from File</span>
+                        </button>
+                      </div>
+
+                      {/* Exams list */}
+                      <div className="space-y-3.5">
+                        {exams.map((exam) => (
+                          <div
+                            key={exam.id}
+                            className="bg-white p-5 rounded-2xl border border-deckle hover:border-claret/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                          >
+                            <div className="space-y-2 min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span
+                                  className={`text-sm font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                                    exam.isActive
+                                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                      : 'bg-gray-100 text-gray-700 border border-gray-300'
+                                  }`}
+                                >
+                                  {exam.isActive ? 'Active on Site' : 'Draft / Hidden'}
+                                </span>
+                                <span className="text-sm font-semibold uppercase tracking-wider bg-claret-soft text-claret px-2.5 py-0.5 rounded-full">
+                                  {exam.questions.length} Questions
+                                </span>
+                                <span className="text-sm font-semibold uppercase tracking-wider bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                                  {exam.durationMinutes} Mins • {exam.totalMarks} Marks
+                                </span>
+                                <span className="text-sm font-semibold uppercase tracking-wider text-ink-muted">
+                                  Pass: {exam.passingScore}
+                                </span>
+                                {exam.sourceFileName && (
+                                  <span className="text-sm font-semibold uppercase tracking-wider text-ink-muted truncate max-w-[200px]" title={exam.sourceFileName}>
+                                    Doc: {exam.sourceFileName}
+                                  </span>
+                                )}
+                              </div>
+
+                              <h4 className="font-serif text-xl font-bold text-ink leading-snug">
+                                {exam.title}
+                              </h4>
+                              {exam.subtitle && (
+                                <p className="text-[17px] text-ink-muted">{exam.subtitle}</p>
+                              )}
+                              <p className="text-sm text-ink-muted">
+                                {exam.discipline} • <strong className="text-claret font-semibold">₹{exam.price}</strong> • Demo Preview: {exam.freeSampleCount || 3} Questions
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => setInspectingExamId(exam.id)}
+                                className="px-3.5 py-2 text-sm rounded-xl border border-deckle hover:bg-gray-50 flex items-center gap-1.5 font-semibold transition-colors"
+                              >
+                                <FileText className="w-4 h-4 text-claret" />
+                                <span>Edit Questions</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newPrice = prompt('Enter new exam price (₹):', String(exam.price));
+                                  if (newPrice && !isNaN(Number(newPrice))) {
+                                    updateExam(exam.id, { price: Number(newPrice) });
+                                  }
+                                }}
+                                className="px-3 py-2 text-sm rounded-xl border border-deckle hover:bg-gray-50 flex items-center gap-1.5 font-semibold transition-colors"
+                              >
+                                <Edit3 className="w-3.5 h-3.5 text-claret" />
+                                <span>Price</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => updateExam(exam.id, { isActive: !exam.isActive })}
+                                className="px-3 py-2 text-sm rounded-xl border border-deckle hover:bg-gray-50 font-semibold transition-colors"
+                              >
+                                {exam.isActive ? 'Hide' : 'Publish'}
+                              </button>
+
+                              {exams.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (confirm(`Remove "${exam.title}" from catalog?`)) {
+                                      deleteExam(exam.id);
+                                    }
+                                  }}
+                                  className="p-2 text-gray-400 hover:text-red-600 rounded-xl hover:bg-red-50 transition-colors"
+                                  title="Delete Exam"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
