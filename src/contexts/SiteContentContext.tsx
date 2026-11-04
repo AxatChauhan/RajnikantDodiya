@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { PROFESSOR_INFO, Book as ProfessorBook, BOOKS } from '../data/professorData';
-import { FEATURED_BOOK_CHAPTERS, BookChapter, MOCK_EXAM_QUESTIONS } from '../data/storeCatalogData';
+import { FEATURED_BOOK_CHAPTERS, BookChapter, getRawMockExamQuestions } from '../data/storeCatalogData';
 import { unmaskAnswer } from '../lib/security';
 import { getActiveAuthorStudioSession } from '../lib/authorStudioAuth';
 import { StudioExamTest, StudioExamQuestion } from '../types/examStudio';
@@ -393,7 +393,7 @@ export const DEFAULT_STUDIO_EXAMS: StudioExamTest[] = [
     sourceFileName: 'UGC_NET_Master_Questions_2026.pdf',
     createdAt: '2026-10-26T00:00:00.000Z',
     updatedAt: '2026-10-26T00:00:00.000Z',
-    questions: MOCK_EXAM_QUESTIONS.map(q => ({
+    questions: getRawMockExamQuestions().map(q => ({
       id: q.id,
       section: q.section,
       question: q.question,

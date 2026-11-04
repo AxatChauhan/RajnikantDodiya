@@ -242,7 +242,7 @@ export function getLicensedBookChapters(isUnlocked: boolean): BookChapter[] {
 }
 
 // The 25-Question Curated CBT Mock Exam (UGC-NET / GSET Master Edition)
-export const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
+const MOCK_EXAM_QUESTIONS: ExamQuestion[] = [
   {
     id: 1,
     section: 'Paper II: English Literature',
@@ -646,5 +646,9 @@ export function evaluateExamSubmission(
     percentile,
     detailedQuestions
   };
+}
+
+export function getRawMockExamQuestions(): ExamQuestion[] {
+  return MOCK_EXAM_QUESTIONS;
 }
 

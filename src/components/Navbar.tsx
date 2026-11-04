@@ -29,7 +29,8 @@ export type MainTab =
   | 'communities'
   | 'learn'
   | 'contact'
-  | 'bookstore';
+  | 'bookstore'
+  | 'store';
 
 export interface NavItemConfig {
   id: MainTab;
@@ -120,13 +121,15 @@ interface NavbarProps {
   setActiveTab: (tab: MainTab, subSection?: string) => void;
   onOpenCompendium?: () => void;
   onOpenAuthModal?: () => void;
+  onOpenStore?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   onOpenCompendium,
-  onOpenAuthModal
+  onOpenAuthModal,
+  onOpenStore
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -312,8 +315,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-serif">Bookstore</span>
             </button>
 
-            {/* BUTTON 2: [Student Login] */}
-            {onOpenAuthModal && (
+            {/* BUTTON 2: [Student Login / Store] */}
+            {onOpenStore ? (
+              <button
+                onClick={onOpenStore}
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-9 sm:h-10 min-h-[36px]"
+                title="Open NET Vidya Student Store & Login"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Student Login</span>
+                <span className="sm:hidden">Login</span>
+              </button>
+            ) : onOpenAuthModal && (
               isScholarActive ? (
                 <button
                   onClick={onOpenAuthModal}

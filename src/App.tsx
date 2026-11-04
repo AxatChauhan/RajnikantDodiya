@@ -7,6 +7,7 @@ import { Feather, ExternalLink } from 'lucide-react';
 import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary';
 import { handleGoogleAuthRedirect } from './lib/googleAuth';
 import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
+import { NetVidyaStoreProvider } from './contexts/NetVidyaStoreContext';
 
 // Lazily loaded 8 main tab views (Optimized for instant Initial Paint)
 const AboutPage = lazy(() => import('./components/AboutPage').then(m => ({ default: m.AboutPage })));
@@ -25,6 +26,7 @@ const DeviceTransferredModal = lazy(() => import('./components/library-store/Dev
 const ProtectedReaderModal = lazy(() => import('./components/library-store/ProtectedReaderModal').then(m => ({ default: m.ProtectedReaderModal })));
 const ExamPortal = lazy(() => import('./components/library-store/ExamPortal').then(m => ({ default: m.ExamPortal })));
 const AuthorStudioModal = lazy(() => import('./components/studio/AuthorStudioModal').then(m => ({ default: m.AuthorStudioModal })));
+const NetVidyaStoreLayout = lazy(() => import('./components/store/NetVidyaStoreLayout').then(m => ({ default: m.NetVidyaStoreLayout })));
 
 const AcademicLoadingFallback: React.FC = () => (
   <div className="min-h-[45vh] flex flex-col items-center justify-center p-8 space-y-3 text-center animate-fade-in">
@@ -59,6 +61,22 @@ function AppInner() {
 
   useEffect(() => {
     handleGoogleAuthRedirect();
+
+    const checkInitialRoute = () => {
+      const isStoreHost = typeof window !== 'undefined' && window.location.hostname.startsWith('store.');
+      const isStorePath = typeof window !== 'undefined' && (window.location.pathname.startsWith('/store') || window.location.pathname === '/store');
+      const isStoreHash = typeof window !== 'undefined' && (window.location.hash.startsWith('#store') || window.location.hash === '#store');
+      if (isStoreHost || isStorePath || isStoreHash) {
+        setActiveTab('store');
+      }
+    };
+    checkInitialRoute();
+    window.addEventListener('hashchange', checkInitialRoute);
+    window.addEventListener('popstate', checkInitialRoute);
+    return () => {
+      window.removeEventListener('hashchange', checkInitialRoute);
+      window.removeEventListener('popstate', checkInitialRoute);
+    };
   }, []);
 
   useEffect(() => {
@@ -71,7 +89,8 @@ function AppInner() {
       communities: `Communities & Initiatives | ${profile.name || PROFESSOR_INFO.name}`,
       learn: `Study Materials & Examination Passes | ${profile.name || PROFESSOR_INFO.name}`,
       bookstore: `Academic Bookstore & Study Passes | ${profile.name || PROFESSOR_INFO.name}`,
-      contact: `Contact & Collaboration | ${profile.name || PROFESSOR_INFO.name}`
+      contact: `Contact & Collaboration | ${profile.name || PROFESSOR_INFO.name}`,
+      store: 'NET Vidya English | GSET + UGC NET English Final Pack 2026'
     };
     document.title = tabTitles[activeTab] || `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`;
   }, [activeTab, profile.name]);
@@ -87,6 +106,16 @@ function AppInner() {
     }
   }, [activeTab, activeSubSection]);
 
+  if (activeTab === 'store') {
+    return (
+      <Suspense fallback={<AcademicLoadingFallback />}>
+        <NetVidyaStoreLayout
+          onBackToAcademicSite={() => handleNavigate('home')}
+        />
+      </Suspense>
+    );
+  }
+
   return (
     <div className="min-h-screen text-ink font-sans relative selection:bg-claret selection:text-white pb-24 lg:pb-20">
       
@@ -96,6 +125,7 @@ function AppInner() {
         setActiveTab={handleNavigate}
         onOpenCompendium={() => setIsCompendiumOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onOpenStore={() => handleNavigate('store')}
       />
 
       {/* Main Container */}
@@ -289,7 +319,9 @@ function AppInner() {
 export function App() {
   return (
     <SiteContentProvider>
-      <AppInner />
+      <NetVidyaStoreProvider>
+        <AppInner />
+      </NetVidyaStoreProvider>
     </SiteContentProvider>
   );
 }
