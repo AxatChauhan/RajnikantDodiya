@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { findUserByEmail, saveUser, DEFAULT_ACCESS_EXPIRY } from '../auth/auth-helper.js';
+import { findUserByEmail, saveUser, DEFAULT_ACCESS_EXPIRY } from '../../lib/auth-helper.js';
 
 /**
  * Vercel Serverless Function: Razorpay Webhook Handler

@@ -14,7 +14,7 @@ import {
   verifySessionToken,
   isEmailBuyer,
   DEFAULT_ACCESS_EXPIRY
-} from '../auth/auth-helper.js';
+} from '../../lib/auth-helper.js';
 
 export default async function handler(req, res) {
   try {

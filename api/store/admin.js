@@ -16,7 +16,7 @@ import {
   createSessionToken,
   verifySessionToken,
   extractBearerToken
-} from '../auth/auth-helper.js';
+} from '../../lib/auth-helper.js';
 import { sendPurchaseConfirmationEmail } from './email.js';
 import { DEFAULT_STORE_SETTINGS } from './price.js';
 

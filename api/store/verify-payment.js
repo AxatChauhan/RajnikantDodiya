@@ -5,7 +5,7 @@ import {
   saveUser,
   createSessionToken,
   DEFAULT_ACCESS_EXPIRY
-} from '../auth/auth-helper.js';
+} from '../../lib/auth-helper.js';
 
 /**
  * Vercel Serverless Function: Cryptographic Payment Verification & Buyer Enrollment

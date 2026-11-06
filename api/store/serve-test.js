@@ -15,7 +15,7 @@ import {
   verifySessionToken,
   isEmailBuyer,
   AUTHOR_EMAILS
-} from '../auth/auth-helper.js';
+} from '../../lib/auth-helper.js';
 
 // Master schedule of tests and release dates
 export const TEST_HALL_SCHEDULE = [
