@@ -81,18 +81,48 @@ function AppInner() {
 
   useEffect(() => {
     const tabTitles: Record<MainTab, string> = {
-      home: `${profile.name || PROFESSOR_INFO.name} | Assistant Professor · English Language Education & Teacher Education`,
-      about: `About Dr. Rajnikant Dodiya | ${profile.name || PROFESSOR_INFO.name}`,
-      research: `Research | ${profile.name || PROFESSOR_INFO.name}`,
-      publications: `Publications & Books | ${profile.name || PROFESSOR_INFO.name}`,
-      talks: `Talks & Events | ${profile.name || PROFESSOR_INFO.name}`,
-      communities: `Communities & Initiatives | ${profile.name || PROFESSOR_INFO.name}`,
-      learn: `Study Materials & Examination Passes | ${profile.name || PROFESSOR_INFO.name}`,
-      bookstore: `Academic Bookstore & Study Passes | ${profile.name || PROFESSOR_INFO.name}`,
-      contact: `Contact & Collaboration | ${profile.name || PROFESSOR_INFO.name}`,
-      store: 'NET Vidya English | GSET + UGC NET English Final Pack 2026'
+      home: `${profile.name || PROFESSOR_INFO.name} | Assistant Professor · English Language Education & NET Vidya English`,
+      about: `About Dr. Rajnikant Dodiya | Academic Background, Career & CV`,
+      research: `Research & Publications | Dr. Rajnikant Dodiya · APJ Abdul Kalam Monograph`,
+      publications: `Published Books & Monographs | Dr. Rajnikant Dodiya (10 Books)`,
+      talks: `Invited Talks & Keynotes | Dr. Rajnikant Dodiya`,
+      communities: `Communities & Forums | ELEF & CAIELE · Dr. Rajnikant Dodiya`,
+      learn: `Study Materials & Examination Prep | NET Vidya English`,
+      bookstore: `Academic Bookstore & Study Materials | Dr. Rajnikant Dodiya`,
+      contact: `Contact & Collaboration | Dr. Rajnikant Dodiya`,
+      store: 'GSET + UGC NET English Final Pack 2026 | NET Vidya English by Dr. Rajnikant Dodiya'
     };
-    document.title = tabTitles[activeTab] || `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & Academic Researcher`;
+
+    const tabDescriptions: Record<MainTab, string> = {
+      home: 'Official learning portal and academic repository of Dr. Rajnikant S. Dodiya, author of 10 books, 2× UGC-NET & GSET qualified scholar, and mentor for NET Vidya English.',
+      about: 'Learn about Dr. Rajnikant Dodiya, Assistant Professor of English Language Education, educational researcher, career journey from 2007, and academic credentials.',
+      research: 'Explore doctoral research on APJ Abdul Kalam educational epistemology, post-method pedagogy, and peer-reviewed papers by Dr. Rajnikant Dodiya.',
+      publications: 'Discover 10 authored and edited books by Dr. Rajnikant Dodiya, including monographs on Abdul Kalam and English language pedagogy.',
+      talks: 'Invited lectures, academic keynotes, and national conference addresses delivered by Dr. Rajnikant Dodiya.',
+      communities: 'Academic initiatives led by Dr. Rajnikant Dodiya, including the English Language Education Forum (ELEF) and CAIELE.',
+      learn: 'Comprehensive UGC NET & GSET English syllabus modules, mock test papers, and learning resources by Dr. Rajnikant Dodiya.',
+      bookstore: 'Browse published educational texts, monograph chapters, and research volumes authored by Dr. Rajnikant Dodiya.',
+      contact: 'Get in touch with Dr. Rajnikant Dodiya for academic collaboration, lecture invitations, and NET Vidya student inquiries.',
+      store: 'Enroll in the GSET + UGC NET English Final Pack 2026 for ₹799. 10 full NTA CBT mocks, model explanations, and revision dossiers by Dr. Rajnikant Dodiya.'
+    };
+
+    document.title = tabTitles[activeTab] || `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & NET Vidya English`;
+
+    // Dynamic Meta Description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc && tabDescriptions[activeTab]) {
+      metaDesc.setAttribute('content', tabDescriptions[activeTab]);
+    }
+
+    // Dynamic Canonical Link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    const canonicalUrl = activeTab === 'home' ? 'https://rajnikantdodiya.com/' : `https://rajnikantdodiya.com/#${activeTab}`;
+    canonical.setAttribute('href', canonicalUrl);
   }, [activeTab, profile.name]);
 
   useEffect(() => {

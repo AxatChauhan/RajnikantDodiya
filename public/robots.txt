@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /#store
+Allow: /#sample
+Allow: /dr-rajnikant-dodiya.jpg
+Allow: /sample-materials/
+Disallow: /api/
+Disallow: /api/store/admin
+Disallow: /test-hall/runner.html?mode=private
+
+# Sitemap Index
+Sitemap: https://rajnikantdodiya.com/sitemap.xml
+Host: https://rajnikantdodiya.com

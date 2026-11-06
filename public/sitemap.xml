@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- 1. Home / Official Academic Profile & Portal -->
+  <url>
+    <loc>https://rajnikantdodiya.com/</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg</image:loc>
+      <image:title>Dr. Rajnikant S. Dodiya</image:title>
+      <image:caption>Assistant Professor of English Language Education &amp; UGC-NET / GSET Mentor</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 2. Commercial Student Store: GSET + UGC NET English Final Pack 2026 -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#store</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- 3. Free Public Samples (Demo CBT Test & 25-Q Mini Mock PDF) -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#sample</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- 4. Published Books & Monographs (Kalam Monograph, ISBNs) -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#publications</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- 5. Academic Biography, Qualifications & CV -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#about</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- 6. Research Papers, Citations & Doctoral Dissertation -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#research</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- 7. Study Materials & Paper II Curriculum Tracks -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#learn</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- 8. Keynotes, Invited Lectures & Academic Talks -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#talks</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!-- 9. Communities, ELEF Forum & CAIELE Centre -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#communities</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!-- 10. Contact & Speaking Invitations -->
+  <url>
+    <loc>https://rajnikantdodiya.com/#contact</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+  </url>
+
+</urlset>
