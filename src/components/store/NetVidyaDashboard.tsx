@@ -9,11 +9,9 @@ import {
   CheckCircle2,
   AlertCircle,
   LogOut,
-  Calendar,
   Sparkles,
-  Layers,
-  Award,
-  ChevronRight
+  ShieldAlert,
+  ArrowRight
 } from 'lucide-react';
 import { useNetVidyaStore, ReadingFileItem, TestHallItem } from '../../contexts/NetVidyaStoreContext';
 import { NtaTestRunnerModal } from './NtaTestRunnerModal';
@@ -21,20 +19,23 @@ import { NtaTestRunnerModal } from './NtaTestRunnerModal';
 interface NetVidyaDashboardProps {
   onOpenCheckout: () => void;
   onOpenPolicies: () => void;
+  onOpenLogin?: () => void;
 }
 
 export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
   onOpenCheckout,
-  onOpenPolicies
+  onOpenPolicies,
+  onOpenLogin
 }) => {
-  const { buyerSession, logoutBuyer, readingFiles, tests } = useNetVidyaStore();
+  const { buyerSession, logoutBuyer, readingFiles, tests, currentServerPrice } = useNetVidyaStore();
 
   const [activeTab, setActiveTab] = useState<'reading' | 'tests'>('tests');
   const [activeTestToRun, setActiveTestToRun] = useState<TestHallItem | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [downloadNotice, setDownloadNotice] = useState<string | null>(null);
+  const [testNotice, setTestNotice] = useState<string | null>(null);
 
-  // If user is not logged in or not a buyer, show gated lock screen
+  // 1. Unauthenticated Visitor Prompt
   if (!buyerSession.isLoggedIn) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-6 animate-fade-in">
@@ -48,38 +49,147 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
           The Reading Files and NTA Test Hall are reserved exclusively for enrolled candidates of the <strong>"GSET + UGC NET English Final Pack 2026"</strong>.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          {onOpenLogin && (
+            <button
+              onClick={onOpenLogin}
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gray-900 hover:bg-black text-white text-xs sm:text-sm font-bold shadow-md transition-colors"
+            >
+              Sign In to Account
+            </button>
+          )}
           <button
             onClick={onOpenCheckout}
             className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-sm font-bold shadow-md transition-colors"
           >
-            Enroll Now (Early-Bird ₹799)
+            Enroll Now (Early-Bird ₹{currentServerPrice})
           </button>
         </div>
       </div>
     );
   }
 
-  // Handle protected PDF download via signed 10-minute URL
+  // 2. Authenticated Non-Buyer Barrier
+  if (!buyerSession.isBuyer) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12 space-y-8 animate-fade-in">
+        {/* Candidate Profile Bar */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono uppercase bg-amber-500/20 text-amber-300 border border-amber-400/30 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span>Registered Candidate • Enrollment Required</span>
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+              Welcome, {buyerSession.name}!
+            </h1>
+            <p className="text-xs text-slate-300">
+              Account: <strong className="text-white">{buyerSession.email}</strong>
+            </p>
+          </div>
+
+          <button
+            onClick={logoutBuyer}
+            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold transition-all flex items-center gap-2 border border-white/20"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+
+        {/* Locked Feature Card */}
+        <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-200 shadow-md text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center mx-auto shadow-xs">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-2 max-w-lg mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Complete Your Enrollment to Unlock Content
+            </h2>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Your student account is active. To access the <strong>High-Yield Reading Dossiers</strong> and <strong>NTA CBT Test Hall</strong>, enroll in the <strong>"GSET + UGC NET English Final Pack 2026"</strong>.
+            </p>
+          </div>
+
+          {/* Included Features List */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2">
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-1">
+              <span className="text-xs font-bold text-gray-900 block flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Revision Dossiers</span>
+              </span>
+              <p className="text-[11px] text-gray-500 leading-relaxed">
+                4+ Curated high-yield PDFs with 10-minute temporary signed links.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-1">
+              <span className="text-xs font-bold text-gray-900 block flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>NTA Test Hall</span>
+              </span>
+              <p className="text-[11px] text-gray-500 leading-relaxed">
+                10 Mock tests & unit quizzes with real countdown and timer.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-1">
+              <span className="text-xs font-bold text-gray-900 block flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Enrolled till Dec 2026</span>
+              </span>
+              <p className="text-[11px] text-gray-500 leading-relaxed">
+                Access valid through 31 Dec 2026 with no monthly renewal.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <button
+              onClick={onOpenCheckout}
+              className="px-8 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2"
+            >
+              <span>Enroll Now for ₹{currentServerPrice}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <p className="text-[11px] text-gray-400 mt-2">
+              Instant activation • 100% digital access delivered immediately.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Authenticated Active Paying Buyer: Unlocked Content
   const handleDownloadFile = async (file: ReadingFileItem) => {
     setDownloadingId(file.id);
     setDownloadNotice(null);
 
     try {
-      const res = await fetch(`/api/store/download-file?fileId=${file.id}&email=${encodeURIComponent(buyerSession.email)}&userToken=${buyerSession.token || ''}`);
+      const res = await fetch(`/api/store/download-file?fileId=${file.id}`, {
+        headers: {
+          Authorization: `Bearer ${buyerSession.token || ''}`
+        }
+      });
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Could not verify download entitlement.');
       }
 
-      // Generate secure download
-      const sampleBlobText = `%PDF-1.4\n% NET Vidya English Private Reading Material\n% ${file.title}\n% Authorized Scholar: ${buyerSession.name} (${buyerSession.email})\n% Order ID: ${buyerSession.orderId}\n% Access Valid through 31 Dec 2026\n\n[CONFIDENTIAL ENROLLED CANDIDATE COPY]\n${file.description}\n\n1. POST-METHOD PEDAGOGY & APPLIED LINGUISTICS\n- Dr. B. Kumaravadivelu: Macrostrategies for Language Teaching\n- Parameters: Particularity, Practicality, Possibility\n\n2. LITERARY THEORY HIGH-FREQUENCY FORMULAS\n- Structuralism: Saussure, Barthes, Genette\n- Deconstruction: Derrida (Différance, Pharmakon)\n- Cultural Studies: Stuart Hall, Raymond Williams\n\n© 2026 NET Vidya (Nilam Dodiya). All rights reserved.`;
+      if (!data.downloadUrl) {
+        throw new Error('Signed download URL not provided by server.');
+      }
 
-      const blob = new Blob([sampleBlobText], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+      // Download file using genuine signed URL
       const a = document.createElement('a');
-      a.href = url;
+      a.href = data.downloadUrl;
       a.download = `${file.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -90,6 +200,45 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
       setDownloadNotice(`Download error: ${err.message}`);
     } finally {
       setDownloadingId(null);
+    }
+  };
+
+  const handleLaunchTest = async (test: TestHallItem) => {
+    setTestNotice(null);
+    const now = new Date();
+    const releaseTime = new Date(test.releaseDate);
+    const formattedDate = releaseTime.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    if (now < releaseTime) {
+      setTestNotice(`Opens on ${formattedDate}`);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/store/serve-test?testId=${encodeURIComponent(test.id)}`, {
+        headers: {
+          Authorization: `Bearer ${buyerSession.token || ''}`
+        }
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.success) {
+        if (data.isLocked || res.status === 403) {
+          setTestNotice(data.error || `Opens on ${formattedDate}`);
+          return;
+        }
+        throw new Error(data.error || 'Unable to launch CBT test.');
+      }
+
+      const runnerUrl = data.runnerUrl || `/test-hall/runner.html?testId=${encodeURIComponent(test.id)}`;
+      window.open(runnerUrl, '_blank');
+      setActiveTestToRun(test);
+    } catch (err: any) {
+      setTestNotice(`Error: ${err.message}`);
     }
   };
 
@@ -104,13 +253,20 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
         </div>
       )}
 
+      {testNotice && (
+        <div className="fixed top-20 right-4 z-50 bg-amber-900 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-xs font-medium animate-fade-in border border-amber-700">
+          <AlertCircle className="w-4 h-4 text-amber-300" />
+          <span>{testNotice}</span>
+        </div>
+      )}
+
       {/* 1. Candidate Passport / Header */}
       <div className="bg-gradient-to-r from-[#1E3A8A] via-[#1E40AF] to-[#0F172A] rounded-3xl p-6 sm:p-8 text-white shadow-lg border border-blue-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono uppercase bg-emerald-500 text-white font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              <span>Verified Scholar Pass Active</span>
+              <span>Verified Student Account Active</span>
             </span>
             <span className="text-xs text-blue-200 font-mono">
               Order #{buyerSession.orderId || 'NV_VERIFIED'}
@@ -241,7 +397,7 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
                       </button>
                     ) : (
                       <button
-                        onClick={() => setActiveTestToRun(test)}
+                        onClick={() => handleLaunchTest(test)}
                         className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-2"
                       >
                         <Play className="w-3.5 h-3.5 fill-current" />

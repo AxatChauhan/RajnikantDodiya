@@ -16,9 +16,10 @@
   --color-canvas: #FAF9F5;
   --color-canvas-card: #FFFFFF;
   --font-family-serif: 'Newsreader', Georgia, serif;
-  --font-family-display: 'Newsreader', Georgia, serif;
-  --font-family-reading: 'Source Sans 3', system-ui, sans-serif;
-  --font-family-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-family-display: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-reading: 'Inter', 'Source Sans 3', system-ui, sans-serif;
+  --font-family-sans: 'Inter', 'Source Sans 3', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-size-base: 17px;
 }
 
@@ -33,7 +34,7 @@
   body {
     overflow-x: hidden;
     width: 100%;
-    font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Source Sans 3', system-ui, -apple-system, sans-serif;
     font-size: 17px;
     line-height: 1.6;
     background-color: var(--color-canvas, #FAF9F5);
@@ -41,15 +42,18 @@
     font-size-adjust: from-font;
   }
 
-  /* Newsreader for ALL headings */
-  h1, h2, h3, h4, h5, h6, .font-serif, .font-display {
-    font-family: 'Newsreader', Georgia, serif !important;
+  /* Modern sans-serif headings for clean, professional store presentation */
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-family-display, 'Inter', system-ui, sans-serif);
     text-wrap: balance;
+  }
+  .font-serif {
+    font-family: var(--font-family-serif, Georgia, serif);
   }
 
   /* Body text, reading, and paragraphs: dynamic reading font with fallback */
   p, li, blockquote, dd, dt, article, section, .font-reading {
-    font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif);
+    font-family: var(--font-family-reading, 'Inter', 'Source Sans 3', system-ui, -apple-system, sans-serif);
     font-size-adjust: from-font;
   }
 
@@ -62,7 +66,7 @@
 
   /* Menu, navigation, buttons, and inputs */
   nav, nav *, button, button *, a, input, select, textarea {
-    font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif);
+    font-family: var(--font-family-reading, 'Inter', 'Source Sans 3', system-ui, -apple-system, sans-serif);
   }
 }
 
@@ -80,13 +84,14 @@
   line-height: 1.5;
 }
 
-/* Eliminate Space Mono everywhere: font-mono uses reading font */
+/* Restore authentic monospace font with tabular figures for countdowns, timers, numbers & currency */
 .font-mono {
-  font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif) !important;
+  font-family: var(--font-family-mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace) !important;
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Small labels: reading font, 14px, uppercase, with slight letter spacing */
-.font-mono.uppercase,
 span[class*="uppercase"],
 p[class*="uppercase"],
 div[class*="uppercase"],
@@ -96,15 +101,9 @@ label[class*="uppercase"],
 [class*="tracking-wider"],
 [class*="tracking-widest"],
 .label-small {
-  font-family: var(--font-family-reading, 'Source Sans 3', system-ui, -apple-system, sans-serif) !important;
   font-size: 14px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-}
-
-/* Headings use the dynamic display/serif font from Studio theme */
-h1, h2, h3, h4, h5, h6, .font-serif, .font-display {
-  font-family: var(--font-family-display, var(--font-family-serif, 'Newsreader', Georgia, serif)) !important;
 }
 
 /* Custom Academic & Bookish Scrollbar */

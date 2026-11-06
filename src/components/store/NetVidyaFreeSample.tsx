@@ -27,13 +27,10 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
   const [downloadToast, setDownloadToast] = useState<string | null>(null);
 
   const handleDownloadSamplePdf = (filename: string, label: string) => {
-    // Generate sample PDF text blob download for demonstration
-    const sampleText = `%PDF-1.4\n% NET Vidya English Sample\n% ${label}\n% GSET + UGC NET English Final Pack 2026\n% Sold by NET Vidya (Nilam Dodiya)\n\n[Free Sample Study Material for Prospective Candidates]\n1. Post-Method Pedagogy: Kumaravadivelu's 3 Ps (Particularity, Practicality, Possibility)\n2. Shakespeare's The Tempest (Postcolonial Read: Caliban & Prospero)\n3. Coleridge: Willing suspension of disbelief (Biographia Literaria)\n4. Stuart Hall: Dominant, Negotiated, Oppositional decoding models.\n\nEnroll in the complete Final Pack to unlock all 10+ full mocks and complete reading files for ₹${currentServerPrice}.`;
-    
-    const blob = new Blob([sampleText], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
+    // Download real static PDF file directly from /sample-materials/
+    const filePath = `/sample-materials/${filename}`;
     const a = document.createElement('a');
-    a.href = url;
+    a.href = filePath;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -88,26 +85,32 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
             <ul className="text-xs text-gray-500 space-y-1.5 pt-1">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>8 Curated Paper II English MCQs</span>
+                <span>10 Authentic Paper II English MCQs</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Instant Scorecard + Accuracy %</span>
+                <span>NTA CBT Interface with Palette & 30-min Timer</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Zero login or phone number required</span>
+                <span>Instant Scorecard + Zero login required</span>
               </li>
             </ul>
           </div>
 
-          <div className="pt-6">
+          <div className="pt-6 space-y-2">
             <button
-              onClick={() => setIsDemoRunning(true)}
+              onClick={() => window.open('/sample-materials/demo-test.html', '_blank')}
               className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-sm"
             >
               <Play className="w-4 h-4 fill-current" />
-              <span>Launch Free Demo Test</span>
+              <span>Launch Free Demo CBT Test</span>
+            </button>
+            <button
+              onClick={() => setIsDemoRunning(true)}
+              className="w-full py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <span>Open in In-Page Modal</span>
             </button>
           </div>
         </div>

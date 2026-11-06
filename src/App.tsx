@@ -35,9 +35,9 @@ const AcademicLoadingFallback: React.FC = () => (
     </div>
     <div className="space-y-1">
       <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
-        HMPIETR • Sardar Patel University
+        NET Vidya English • Learning Portal
       </span>
-      <p className="font-serif text-base text-ink">Loading Academic Profile...</p>
+      <p className="font-sans text-base text-ink">Loading Portal...</p>
     </div>
   </div>
 );
@@ -274,7 +274,7 @@ function AppInner() {
           <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
             <Feather className="w-4 h-4 text-claret shrink-0" />
             <span className="font-serif font-medium text-ink text-sm">{profile.name || PROFESSOR_INFO.name}</span>
-            <span className="text-ink-faint">• Assistant Professor • {profile.institution || PROFESSOR_INFO.institution}</span>
+            <span className="text-ink-faint">• Assistant Professor · English Language Education</span>
           </div>
 
           {/* Social / Research Profile Links */}
@@ -308,7 +308,7 @@ function AppInner() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-deckle/60 text-[11px] text-ink-faint text-center sm:text-left">
           <span>© {new Date().getFullYear()} {profile.name || PROFESSOR_INFO.name} | All Academic Rights Reserved</span>
-          <span>{profile.institution || PROFESSOR_INFO.institution}, {profile.location || PROFESSOR_INFO.location}</span>
+          <span>NET Vidya English · {profile.location || PROFESSOR_INFO.location}</span>
         </div>
       </footer>
 

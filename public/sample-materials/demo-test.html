@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NET Vidya English — Free NTA CBT Demo Mock Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    
+    /* Top Header */
+    header {
+      background: #0f1d32;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #234168;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-badge {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .header-meta {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .timer-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #1e293b;
+      padding: 0.4rem 0.85rem;
+      border-radius: 0.5rem;
+      border: 1px solid #334155;
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 0.9rem;
+    }
+
+    /* Candidate Info Bar */
+    .candidate-bar {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+    .candidate-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .candidate-name { font-weight: 700; color: #0f172a; }
+    .exam-tag { background: #e0e7ff; color: #3730a3; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-weight: 600; font-size: 0.7rem; }
+
+    /* Main Test Layout */
+    .test-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 170px);
+      min-height: 500px;
+    }
+    .question-panel {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar {
+      width: 320px;
+      background: #f8fafc;
+      border-left: 1px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    /* Question Styling */
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 1.25rem;
+    }
+    .q-number {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0f2744;
+    }
+    .marks-badge {
+      font-size: 0.75rem;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      font-weight: 700;
+    }
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 0.625rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.15s ease-in-out;
+      background: #fff;
+    }
+    .option-item:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .option-item.selected {
+      border-color: #2563eb;
+      background: #dbeafe;
+      font-weight: 600;
+      color: #1e40af;
+    }
+    .option-item input[type="radio"] {
+      width: 1.15rem;
+      height: 1.15rem;
+      accent-color: #2563eb;
+    }
+
+    /* Control Buttons */
+    .control-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    .btn {
+      padding: 0.55rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.825rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-outline { background: #fff; border-color: #cbd5e1; color: #334155; }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-warning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .btn-warning:hover { background: #fde68a; }
+    .btn-danger { background: #fee2e2; color: #991b1b; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover { background: #059669; }
+
+    /* Palette Legend */
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      background: #fff;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+    .legend-chip {
+      width: 1.35rem;
+      height: 1.35rem;
+      border-radius: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: #fff;
+    }
+    .chip-answered { background: #10b981; }
+    .chip-not-answered { background: #ef4444; }
+    .chip-not-visited { background: #94a3b8; }
+    .chip-marked-review { background: #8b5cf6; }
+
+    /* Palette Grid */
+    .palette-box {
+      background: #fff;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      flex: 1;
+    }
+    .palette-title { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.6rem; color: #0f2744; }
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+    }
+    .p-btn {
+      aspect-ratio: 1;
+      border-radius: 0.375rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: none;
+      color: #fff;
+      transition: transform 0.1s;
+    }
+    .p-btn:hover { transform: scale(1.05); }
+    .p-btn.current { outline: 3px solid #2563eb; outline-offset: 1px; }
+
+    /* Bottom Enrollment Promo Bar */
+    .promo-banner {
+      background: linear-gradient(90deg, #0f1d32 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-top: 1px solid #3b82f6;
+    }
+    .promo-text strong { color: #60a5fa; }
+    .promo-cta {
+      background: #10b981;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+      transition: background 0.2s;
+    }
+    .promo-cta:hover { background: #059669; }
+
+    /* Score Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 1rem;
+      max-width: 500px;
+      width: 100%;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .score-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #eff6ff;
+      border: 4px solid #2563eb;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 900;
+      margin: 1rem auto;
+    }
+
+    @media (max-width: 768px) {
+      .test-container { flex-direction: column; height: auto; }
+      .sidebar { width: 100%; border-left: none; border-top: 1px solid #cbd5e1; }
+      .promo-banner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-brand">
+      <span class="brand-badge">NTA CBT</span>
+      <div>
+        <div class="header-title">NET Vidya English — Free Demo Mock Test</div>
+        <div class="header-meta">Paper II English Literature • Official Pattern Simulation</div>
+      </div>
+    </div>
+    <div class="timer-badge">
+      <span>⏱</span>
+      <span id="timerDisplay" class="font-mono">29:59</span>
+    </div>
+  </header>
+
+  <!-- Candidate Info Bar -->
+  <div class="candidate-bar">
+    <div class="candidate-info">
+      <div>Candidate: <span class="candidate-name">Guest Scholar (Free Demo)</span></div>
+      <span class="exam-tag">UGC-NET / GSET 2026</span>
+    </div>
+    <div style="font-size: 0.75rem; color: #64748b;">
+      Section: <strong>Paper II (English)</strong>
+    </div>
+  </div>
+
+  <!-- Test Interface -->
+  <div class="test-container">
+    
+    <!-- Question Pane -->
+    <div class="question-panel">
+      <div>
+        <div class="question-header">
+          <div class="q-number" id="qNumberLabel">Question 1 of 10</div>
+          <span class="marks-badge">+2 Marks (No Negative Marking)</span>
+        </div>
+        <div class="question-text" id="qText">Loading question...</div>
+        <div class="options-group" id="optionsContainer"></div>
+      </div>
+
+      <div class="control-actions">
+        <div>
+          <button class="btn btn-warning" id="btnMarkReview">Mark for Review & Next</button>
+          <button class="btn btn-outline" id="btnClearResponse">Clear Response</button>
+        </div>
+        <div>
+          <button class="btn btn-outline" id="btnPrev">« Previous</button>
+          <button class="btn btn-primary" id="btnSaveNext">Save & Next »</button>
+          <button class="btn btn-success" id="btnSubmitTest">Submit Test</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar Palette -->
+    <div class="sidebar">
+      
+      <!-- Legend -->
+      <div class="legend-grid">
+        <div class="legend-item"><div class="legend-chip chip-answered" id="countAnswered">0</div> Answered</div>
+        <div class="legend-item"><div class="legend-chip chip-not-answered" id="countNotAnswered">1</div> Not Answered</div>
+        <div class="legend-item"><div class="legend-chip chip-marked-review" id="countMarked">0</div> Marked Review</div>
+        <div class="legend-item"><div class="legend-chip chip-not-visited" id="countNotVisited">9</div> Not Visited</div>
+      </div>
+
+      <!-- Question Palette -->
+      <div class="palette-box">
+        <div class="palette-title">Question Palette (10 Questions)</div>
+        <div class="palette-grid" id="paletteGrid"></div>
+      </div>
+
+      <!-- Free Demo Note -->
+      <div style="background: #fff; border: 1px solid #cbd5e1; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; color: #475569;">
+        <strong>Free Demo Mode:</strong> Features 10 diagnostic questions from our 100-question full mocks. All 10+ mocks unlock in the Final Pack 2026.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Promo Banner -->
+  <div class="promo-banner">
+    <div class="promo-text">
+      <strong>Enroll in Final Pack 2026:</strong> Unlock 10+ Full Mocks, Unit Tests, Model Rationales & High-Yield PDFs.
+    </div>
+    <a href="/#store" class="promo-cta">Enroll Now in Final Pack →</a>
+  </div>
+
+  <!-- Score Modal -->
+  <div class="modal-overlay" id="scoreModal">
+    <div class="modal-card">
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #0f2744;">Test Evaluation Complete!</h2>
+      <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Diagnostic Scorecard (Paper II English Demo)</p>
+      
+      <div class="score-circle" id="scoreDisplay">0/20</div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1.25rem 0; font-size: 0.8rem;">
+        <div style="background: #ecfdf5; padding: 0.5rem; border-radius: 0.5rem;">
+          <strong style="color: #059669; font-size: 1.1rem; display: block;" id="correctCount">0</strong>
+          <span style="color: #065f46;">Correct</span>
+        </div>
+        <div style="background: #fee2e2; padding: 0.5rem; border-radius: 0.5rem;">
+          <strong style="color: #dc2626; font-size: 1.1rem; display: block;" id="incorrectCount">0</strong>
+          <span style="color: #991b1b;">Incorrect</span>
+        </div>
+        <div style="background: #f1f5f9; padding: 0.5rem; border-radius: 0.5rem;">
+          <strong style="color: #475569; font-size: 1.1rem; display: block;" id="accuracyDisplay">0%</strong>
+          <span style="color: #475569;">Accuracy</span>
+        </div>
+      </div>
+
+      <p style="font-size: 0.85rem; color: #334155; line-height: 1.5; margin-bottom: 1.5rem;">
+        Comprehensive model rationales and distractor breakdowns are included with our full test series.
+      </p>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-outline" onclick="location.reload()">Retake Demo</button>
+        <a href="/#store" class="btn btn-primary" style="text-decoration: none;">Enroll in Final Pack 2026</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        question: "B. Kumaravadivelu’s 'Post-Method Pedagogy' is structurally articulated around which triad of organizational parameters?",
+        options: [
+          "Particularity, Practicality, and Possibility",
+          "Grammar, Vocabulary, and Syntax",
+          "Proficiency, Performance, and Paradigm",
+          "Curriculum, Instruction, and Evaluation"
+        ],
+        correct: 0
+      },
+      {
+        id: 2,
+        question: "In Shakespeare’s The Tempest, which character utters the famous lines: 'You taught me language; and my profit on’t / Is, I know how to curse. The red plague rid you / For learning me your language!'?",
+        options: ["Ariel", "Caliban", "Ferdinand", "Trinculo"],
+        correct: 1
+      },
+      {
+        id: 3,
+        question: "Who formulated the critical concept 'Willing suspension of disbelief for the moment, which constitutes poetic faith'?",
+        options: ["William Wordsworth", "Samuel Taylor Coleridge", "Percy Bysshe Shelley", "John Keats"],
+        correct: 1
+      },
+      {
+        id: 4,
+        question: "Stuart Hall’s seminal 1973 model of television communication identifies which three decoding positions for audiences?",
+        options: [
+          "Dominant-Hegemonic, Negotiated, and Oppositional",
+          "Linear, Interactive, and Transactional",
+          "Cognitive, Affective, and Psychomotor",
+          "Literal, Metaphorical, and Allegorical"
+        ],
+        correct: 0
+      },
+      {
+        id: 5,
+        question: "Which Indian English poet authored the autobiographical three-part collection 'Rough Passage' (1977)?",
+        options: ["Nissim Ezekiel", "A.K. Ramanujan", "R. Parthasarathy", "Jayanta Mahapatra"],
+        correct: 2
+      },
+      {
+        id: 6,
+        question: "Who defined the 'Intentional Fallacy' and 'Affective Fallacy' in classic American New Criticism?",
+        options: [
+          "T.S. Eliot and I.A. Richards",
+          "W.K. Wimsatt Jr. and Monroe C. Beardsley",
+          "Cleanth Brooks and Robert Penn Warren",
+          "John Crowe Ransom and Allen Tate"
+        ],
+        correct: 1
+      },
+      {
+        id: 7,
+        question: "In 'Orientalism' (1978), Edward Said explicitly bases his methodology on which French philosopher’s notion of 'discourse' and power-knowledge?",
+        options: ["Jacques Derrida", "Michel Foucault", "Louis Althusser", "Roland Barthes"],
+        correct: 1
+      },
+      {
+        id: 8,
+        question: "In the MLA Handbook (9th Edition), what constitutes the fixed sequence of the universal core elements in a container citation?",
+        options: [
+          "Author. Title of source. Title of container, Other contributors, Version, Number, Publisher, Publication date, Location.",
+          "Author, Year, Title of source, Publisher, City of Publication, Pages.",
+          "Title of source, Author, Publisher, Year, Location, DOI.",
+          "Author. Title of source. Publisher, Year, Volume, Issue, Pages."
+        ],
+        correct: 0
+      },
+      {
+        id: 9,
+        question: "In 'Tradition and the Individual Talent' (1919), T.S. Eliot compares the poet’s mind to which catalyst in a chemical reaction?",
+        options: [
+          "A filament of platinum",
+          "A rod of incandescent copper",
+          "A drop of sulphuric acid",
+          "A prism of crystal quartz"
+        ],
+        correct: 0
+      },
+      {
+        id: 10,
+        question: "Which postcolonial theorist coined the interrelated concepts of 'Mimicry', 'Hybridity', and the 'Third Space' in The Location of Culture?",
+        options: ["Frantz Fanon", "Homi K. Bhabha", "Gayatri Chakravorty Spivak", "Achille Mbembe"],
+        correct: 1
+      }
+    ];
+
+    // State
+    let currentIndex = 0;
+    const userAnswers = new Array(questions.length).fill(null);
+    const reviewStatus = new Array(questions.length).fill(false);
+    const visitedStatus = new Array(questions.length).fill(false);
+    visitedStatus[0] = true;
+
+    // Timer (30 minutes)
+    let totalSeconds = 30 * 60;
+    const timerElem = document.getElementById('timerDisplay');
+    const timerInterval = setInterval(() => {
+      totalSeconds--;
+      if (totalSeconds <= 0) {
+        clearInterval(timerInterval);
+        submitTest();
+        return;
+      }
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      timerElem.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }, 1000);
+
+    function renderQuestion(index) {
+      currentIndex = index;
+      visitedStatus[index] = true;
+
+      const q = questions[index];
+      document.getElementById('qNumberLabel').textContent = 'Question ' + (index + 1) + ' of ' + questions.length;
+      document.getElementById('qText').textContent = q.question;
+
+      const optsContainer = document.getElementById('optionsContainer');
+      optsContainer.innerHTML = '';
+
+      q.options.forEach((optText, optIdx) => {
+        const item = document.createElement('label');
+        item.className = 'option-item' + (userAnswers[index] === optIdx ? ' selected' : '');
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'qOption';
+        radio.value = optIdx;
+        radio.checked = userAnswers[index] === optIdx;
+        radio.onchange = () => {
+          userAnswers[index] = optIdx;
+          renderQuestion(index);
+          updatePalette();
+        };
+
+        const label = document.createElement('span');
+        const letter = String.fromCharCode(65 + optIdx);
+        label.textContent = '(' + letter + ') ' + optText;
+
+        item.appendChild(radio);
+        item.appendChild(label);
+        optsContainer.appendChild(item);
+      });
+
+      updatePalette();
+    }
+
+    function updatePalette() {
+      const grid = document.getElementById('paletteGrid');
+      grid.innerHTML = '';
+
+      let answered = 0;
+      let notAnswered = 0;
+      let marked = 0;
+      let notVisited = 0;
+
+      for (let i = 0; i < questions.length; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'p-btn';
+        btn.textContent = i + 1;
+
+        if (i === currentIndex) {
+          btn.classList.add('current');
+        }
+
+        if (reviewStatus[i]) {
+          btn.classList.add('chip-marked-review');
+          marked++;
+        } else if (userAnswers[i] !== null) {
+          btn.classList.add('chip-answered');
+          answered++;
+        } else if (visitedStatus[i]) {
+          btn.classList.add('chip-not-answered');
+          notAnswered++;
+        } else {
+          btn.classList.add('chip-not-visited');
+          notVisited++;
+        }
+
+        btn.onclick = () => renderQuestion(i);
+        grid.appendChild(btn);
+      }
+
+      document.getElementById('countAnswered').textContent = answered;
+      document.getElementById('countNotAnswered').textContent = notAnswered;
+      document.getElementById('countMarked').textContent = marked;
+      document.getElementById('countNotVisited').textContent = notVisited;
+    }
+
+    // Handlers
+    document.getElementById('btnSaveNext').onclick = () => {
+      if (currentIndex < questions.length - 1) {
+        renderQuestion(currentIndex + 1);
+      }
+    };
+    document.getElementById('btnPrev').onclick = () => {
+      if (currentIndex > 0) {
+        renderQuestion(currentIndex - 1);
+      }
+    };
+    document.getElementById('btnClearResponse').onclick = () => {
+      userAnswers[currentIndex] = null;
+      renderQuestion(currentIndex);
+    };
+    document.getElementById('btnMarkReview').onclick = () => {
+      reviewStatus[currentIndex] = !reviewStatus[currentIndex];
+      if (currentIndex < questions.length - 1) {
+        renderQuestion(currentIndex + 1);
+      } else {
+        updatePalette();
+      }
+    };
+
+    function submitTest() {
+      clearInterval(timerInterval);
+      let correct = 0;
+      let incorrect = 0;
+      questions.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) {
+          correct++;
+        } else if (userAnswers[idx] !== null) {
+          incorrect++;
+        }
+      });
+
+      const totalScore = correct * 2;
+      const totalPossible = questions.length * 2;
+      const accuracy = (correct + incorrect) > 0 ? Math.round((correct / (correct + incorrect)) * 100) : 0;
+
+      document.getElementById('scoreDisplay').textContent = totalScore + '/' + totalPossible;
+      document.getElementById('correctCount').textContent = correct;
+      document.getElementById('incorrectCount').textContent = incorrect;
+      document.getElementById('accuracyDisplay').textContent = accuracy + '%';
+
+      document.getElementById('scoreModal').classList.add('open');
+    }
+
+    document.getElementById('btnSubmitTest').onclick = () => {
+      if (confirm('Are you sure you want to submit your Demo Mock Test?')) {
+        submitTest();
+      }
+    };
+
+    // Initial render
+    renderQuestion(0);
+  </script>
+</body>
+</html>

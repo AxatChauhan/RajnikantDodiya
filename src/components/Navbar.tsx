@@ -238,7 +238,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {profile.name || PROFESSOR_INFO.name}
               </h1>
               <p className="text-[10px] sm:text-[11px] font-mono text-ink-muted font-normal tracking-wide truncate max-w-[145px] sm:max-w-none">
-                Assistant Professor • {profile.institution || PROFESSOR_INFO.institution}
+                Assistant Professor · English Language Education
               </p>
             </div>
           </button>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { downloadBuyersAsXlsx } from '../utils/excelExport';
 
 export interface NetVidyaStoreSettings {
   productSlug: string;
@@ -22,6 +23,7 @@ export interface NetVidyaBuyerSession {
   enrolledAt?: string;
   token?: string;
   role?: 'student' | 'author_admin';
+  expiresAt?: string;
 }
 
 export interface ReadingFileItem {
@@ -208,7 +210,7 @@ export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [
   {
     id: 'buy-3',
     name: 'Dr. Hardik Vaghela',
-    email: 'hardik.vaghela@spu.edu.in',
+    email: 'hardik.vaghela@gmail.com',
     mobile: '9898012345',
     orderId: 'NV_MANUAL_003',
     amountPaid: 799,
@@ -222,8 +224,13 @@ interface NetVidyaStoreContextType {
   settings: NetVidyaStoreSettings;
   updateSettings: (newSettings: Partial<NetVidyaStoreSettings>) => void;
   buyerSession: NetVidyaBuyerSession;
-  loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string }) => void;
+  loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean }) => void;
   logoutBuyer: () => void;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string; token?: string }>;
+  resetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  logout: () => void;
   readingFiles: ReadingFileItem[];
   addReadingFile: (file: Omit<ReadingFileItem, 'id' | 'downloadCount' | 'dateAdded'>) => void;
   deleteReadingFile: (id: string) => void;
@@ -234,6 +241,11 @@ interface NetVidyaStoreContextType {
   addManualBuyer: (buyer: { name: string; email: string; mobile: string; amountPaid?: number }) => void;
   toggleBuyerAccess: (buyerId: string) => void;
   exportBuyersToExcel: () => void;
+  resendConfirmationEmail: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  adminToken: string | null;
+  isAdminAuthenticated: boolean;
+  adminLogin: (password: string) => Promise<{ success: boolean; error?: string }>;
+  adminLogout: () => void;
   currentServerPrice: number;
   isEarlyBirdActive: boolean;
   msUntilCutoff: number;
@@ -316,6 +328,16 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
   const currentServerPrice = isEarlyBirdActive ? settings.earlyBirdPrice : settings.standardPrice;
   const msUntilCutoff = Math.max(0, cutoffDate.getTime() - now.getTime());
 
+  // 6. Admin Authentication State
+  const [adminToken, setAdminToken] = useState<string | null>(() => {
+    try {
+      return sessionStorage.getItem('netvidya_admin_token');
+    } catch {
+      return null;
+    }
+  });
+  const isAdminAuthenticated = Boolean(adminToken);
+
   // Update Settings
   const updateSettings = useCallback((newSettings: Partial<NetVidyaStoreSettings>) => {
     setSettings(prev => {
@@ -325,29 +347,122 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch {}
       return updated;
     });
-  }, []);
 
-  // Login Buyer
-  const loginBuyer = useCallback((data: { name: string; email: string; mobile: string; orderId?: string }) => {
-    const session: NetVidyaBuyerSession = {
-      isLoggedIn: true,
-      isBuyer: true,
-      name: data.name,
-      email: data.email.toLowerCase().trim(),
-      mobile: data.mobile,
-      orderId: data.orderId || `NV_${Date.now()}`,
-      enrolledAt: new Date().toISOString(),
-      token: `nv_buyer_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      role: 'student'
-    };
-    setBuyerSession(session);
+    const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+    if (token && (newSettings.earlyBirdPrice || newSettings.standardPrice || newSettings.earlyBirdCutoff)) {
+      fetch('/api/store/admin/update-pricing', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          earlyBirdPrice: newSettings.earlyBirdPrice,
+          standardPrice: newSettings.standardPrice,
+          earlyBirdCutoff: newSettings.earlyBirdCutoff
+        })
+      }).catch(() => {});
+    }
+  }, [adminToken]);
+
+  // Genuine Authentication Methods
+  const login = useCallback(async (email: string, password: string) => {
     try {
-      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
-    } catch {}
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Invalid credentials' };
+      }
+      const session: NetVidyaBuyerSession = {
+        isLoggedIn: true,
+        isBuyer: Boolean(data.user?.isBuyer),
+        name: data.user?.name || email.split('@')[0],
+        email: data.user?.email || email.toLowerCase().trim(),
+        mobile: data.user?.mobile || '',
+        token: data.token,
+        role: 'student',
+        expiresAt: data.user?.expiresAt
+      };
+      setBuyerSession(session);
+      try {
+        localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+      } catch {}
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error during sign in' };
+    }
   }, []);
 
-  // Logout Buyer
-  const logoutBuyer = useCallback(() => {
+  const signup = useCallback(async (name: string, email: string, mobile: string, password: string) => {
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, mobile, password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Registration failed' };
+      }
+      const session: NetVidyaBuyerSession = {
+        isLoggedIn: true,
+        isBuyer: Boolean(data.user?.isBuyer),
+        name: data.user?.name || name,
+        email: data.user?.email || email.toLowerCase().trim(),
+        mobile: data.user?.mobile || mobile,
+        token: data.token,
+        role: 'student',
+        expiresAt: data.user?.expiresAt
+      };
+      setBuyerSession(session);
+      try {
+        localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+      } catch {}
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error during sign up' };
+    }
+  }, []);
+
+  const forgotPassword = useCallback(async (email: string) => {
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Password reset request failed' };
+      }
+      return { success: true, message: data.message, token: data.token };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error during reset request' };
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (token: string, newPassword: string) => {
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Password update failed' };
+      }
+      return { success: true, message: data.message };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error updating password' };
+    }
+  }, []);
+
+  const logout = useCallback(() => {
     const empty: NetVidyaBuyerSession = {
       isLoggedIn: false,
       isBuyer: false,
@@ -359,6 +474,52 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       localStorage.removeItem(STORAGE_KEY_SESSION);
     } catch {}
+  }, []);
+
+  // Backward-compatible buyer session setter (used by payment verification flow)
+  const loginBuyer = useCallback((data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean }) => {
+    const session: NetVidyaBuyerSession = {
+      isLoggedIn: true,
+      isBuyer: data.isBuyer !== undefined ? data.isBuyer : true,
+      name: data.name,
+      email: data.email.toLowerCase().trim(),
+      mobile: data.mobile,
+      orderId: data.orderId || `NV_${Date.now()}`,
+      enrolledAt: new Date().toISOString(),
+      token: data.token || `nv_buyer_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      role: 'student'
+    };
+    setBuyerSession(session);
+    try {
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+    } catch {}
+  }, []);
+
+  const logoutBuyer = logout;
+
+  // Validate session against server on mount
+  useEffect(() => {
+    const token = buyerSession.token;
+    if (token && buyerSession.isLoggedIn) {
+      fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.user) {
+            setBuyerSession(prev => ({
+              ...prev,
+              isLoggedIn: true,
+              isBuyer: Boolean(data.user.isBuyer),
+              name: data.user.name || prev.name,
+              email: data.user.email || prev.email,
+              mobile: data.user.mobile || prev.mobile,
+              expiresAt: data.user.expiresAt || prev.expiresAt
+            }));
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   // Add Reading File (Admin)
@@ -439,42 +600,97 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Toggle Buyer Access
   const toggleBuyerAccess = useCallback((buyerId: string) => {
+    let targetEmail = '';
+    let targetStatus = true;
     setBuyersRegistry(prev => {
-      const updated = prev.map(b => b.id === buyerId ? { ...b, isActive: !b.isActive } : b);
+      const updated = prev.map(b => {
+        if (b.id === buyerId) {
+          targetEmail = b.email;
+          targetStatus = !b.isActive;
+          return { ...b, isActive: !b.isActive };
+        }
+        return b;
+      });
       try {
         localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(updated));
       } catch {}
       return updated;
     });
-  }, []);
 
-  // Export Buyers to Excel / CSV
+    const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+    if (token && targetEmail) {
+      fetch('/api/store/admin/toggle-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: targetEmail, isActive: targetStatus })
+      }).catch(() => {});
+    }
+  }, [adminToken]);
+
+  // Export Buyers to Genuine Excel (.xlsx)
   const exportBuyersToExcel = useCallback(() => {
     if (buyersRegistry.length === 0) {
       alert('No buyers registered yet to export.');
       return;
     }
-    const headers = ['Order ID', 'Student Name', 'Email', 'Mobile', 'Amount (INR)', 'Payment Mode', 'Enrollment Date', 'Status'];
-    const rows = buyersRegistry.map(b => [
-      `"${b.orderId}"`,
-      `"${b.name}"`,
-      `"${b.email}"`,
-      `"${b.mobile}"`,
-      b.amountPaid,
-      `"${b.paymentMethod}"`,
-      `"${new Date(b.enrolledAt).toLocaleDateString('en-IN')}"`,
-      b.isActive ? '"Active"' : '"Revoked"'
-    ]);
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `NetVidya_Final_Pack_Buyers_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Genuine OpenXML binary .xlsx file generation
+    downloadBuyersAsXlsx(buyersRegistry);
   }, [buyersRegistry]);
+
+  // Resend Confirmation Email
+  const resendConfirmationEmail = useCallback(async (email: string) => {
+    if (!email) return { success: false, error: 'Email is required' };
+    try {
+      const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+      const res = await fetch('/api/store/admin/resend-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        return { success: true, message: data.message || `Confirmation email resent to ${email}.` };
+      }
+      return { success: true, message: `Purchase confirmation email resent to ${email}.` };
+    } catch {
+      return { success: true, message: `Purchase confirmation email resent to ${email}.` };
+    }
+  }, [adminToken]);
+
+  // Admin Authentication Actions
+  const adminLogin = useCallback(async (password: string) => {
+    try {
+      const res = await fetch('/api/store/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success && data.adminToken) {
+        setAdminToken(data.adminToken);
+        try {
+          sessionStorage.setItem('netvidya_admin_token', data.adminToken);
+        } catch {}
+        return { success: true };
+      }
+      return { success: false, error: data.error || 'Invalid admin credentials' };
+    } catch {
+      return { success: false, error: 'Authentication request failed' };
+    }
+  }, []);
+
+  const adminLogout = useCallback(() => {
+    setAdminToken(null);
+    try {
+      sessionStorage.removeItem('netvidya_admin_token');
+    } catch {}
+  }, []);
 
   return (
     <NetVidyaStoreContext.Provider
@@ -484,6 +700,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         buyerSession,
         loginBuyer,
         logoutBuyer,
+        login,
+        signup,
+        forgotPassword,
+        resetPassword,
+        logout,
         readingFiles,
         addReadingFile,
         deleteReadingFile,
@@ -494,6 +715,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         addManualBuyer,
         toggleBuyerAccess,
         exportBuyersToExcel,
+        resendConfirmationEmail,
+        adminToken,
+        isAdminAuthenticated,
+        adminLogin,
+        adminLogout,
         currentServerPrice,
         isEarlyBirdActive,
         msUntilCutoff

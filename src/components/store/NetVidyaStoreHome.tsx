@@ -72,7 +72,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
     },
     {
       q: 'How long do I have access to the Test Hall and Reading Files?',
-      a: 'Your digital pass is active continuously through 31 December 2026. You can retake practice tests and review explanations anytime from your phone, tablet, or laptop.'
+      a: 'Your student account is active continuously through 31 December 2026. Login anytime with your registered email and password to access the Test Hall and download your Reading Files from your phone, tablet, or laptop.'
     },
     {
       q: 'How does the online mock test interface work?',
@@ -92,48 +92,86 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
     <div className="space-y-16 sm:space-y-24 animate-fade-in pb-12">
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-6 sm:pt-12 text-center max-w-4xl mx-auto px-4 space-y-6">
+      <section className="relative pt-6 sm:pt-10 max-w-5xl mx-auto px-4 space-y-8">
         
         {/* Early-Bird Countdown Badge */}
-        {isEarlyBirdActive ? (
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Early-Bird Offer: ₹799</span>
-            <span className="text-emerald-700 font-mono">
-              (Ends in {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s)
-            </span>
-          </div>
-        ) : (
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
-            <span>Standard Enrollment Open • Access till 31 Dec 2026</span>
-          </div>
-        )}
+        <div className="text-center">
+          {isEarlyBirdActive ? (
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Early-Bird Offer: ₹799</span>
+              <span className="text-emerald-700 font-mono">
+                (Ends in {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s)
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
+              <span>Standard Enrollment Open • Access till 31 Dec 2026</span>
+            </div>
+          )}
+        </div>
 
-        {/* Main Headline */}
-        <div className="space-y-3">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight">
+        {/* Main Headline & Subtitle */}
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
             GSET + UGC NET English <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 bg-clip-text text-transparent">
               Final Pack 2026
             </span>
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            The definitive all-in-one preparation bundle: NTA-style CBT test simulations, comprehensive analytical explanations, and downloadable high-yield revision dossiers.
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            The definitive all-in-one preparation bundle: authentic NTA computer-based test simulations, comprehensive pedagogical explanations, and downloadable high-yield revision dossiers.
           </p>
         </div>
 
-        {/* Pricing Card Banner */}
+        {/* Author Spotlight & Verified Credentials Card */}
+        <div className="bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/50 rounded-3xl p-5 sm:p-7 border border-blue-100 shadow-sm max-w-3xl mx-auto flex flex-col sm:flex-row items-center gap-5 sm:gap-6 text-center sm:text-left">
+          <div className="relative shrink-0">
+            <img
+              src="/dr-rajnikant-dodiya.jpg"
+              alt="Dr. Rajnikant Dodiya"
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-blue-200 shadow-md ring-4 ring-white"
+            />
+            <div className="absolute -bottom-2 -right-2 bg-emerald-600 text-white p-1 rounded-lg shadow-xs" title="Verified Author">
+              <Award className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100/80 text-blue-800 text-[11px] font-bold tracking-wide uppercase">
+              <GraduationCap className="w-3.5 h-3.5 text-blue-700" />
+              <span>Academic Mentor & Content Creator</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              Dr. Rajnikant Dodiya
+            </h2>
+            <p className="text-xs sm:text-sm font-semibold text-blue-900">
+              Ph.D. in English • 2× UGC NET & GSET Qualified
+            </p>
+            <p className="text-xs text-gray-600 leading-relaxed max-w-xl">
+              Personally curated and validated 100% of the mock questions, analytical model rationales, and high-yield reading files to help candidates excel in the upcoming examinations.
+            </p>
+          </div>
+        </div>
+
+        {/* Pricing & Enrollment Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg mx-auto border border-blue-200 shadow-xl space-y-5 relative overflow-hidden">
-          <div className="flex items-baseline justify-center gap-3">
-            <span className="text-4xl sm:text-5xl font-black text-blue-950">₹{currentServerPrice}</span>
-            <span className="text-xs sm:text-sm font-semibold text-gray-400 line-through">₹1,499</span>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-              {isEarlyBirdActive ? 'Save ₹700 Today' : 'Best Value'}
-            </span>
+          <div className="flex flex-col items-center justify-center gap-1.5">
+            <div className="flex items-baseline justify-center gap-3">
+              <span className="text-4xl sm:text-5xl font-black text-blue-950 font-mono">₹{currentServerPrice}</span>
+              {isEarlyBirdActive ? (
+                <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  Early-Bird Price (Standard ₹999 after 10 Nov)
+                </span>
+              ) : (
+                <span className="text-xs font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-full">
+                  Standard Enrollment Fee
+                </span>
+              )}
+            </div>
           </div>
 
-          <p className="text-xs text-gray-500">
-            One-time payment • No recurring fees • Access valid through <strong>31 December 2026</strong>
+          <p className="text-xs text-gray-500 text-center">
+            One-time enrollment fee • Server-verified pricing • Continuous access through <strong>31 December 2026</strong>
           </p>
 
           {/* Primary Action Buttons */}
@@ -167,7 +205,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
         </div>
 
         {/* Mini Trust Row */}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500 pt-2">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500 pt-1">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Instant Digital Access</span>

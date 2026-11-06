@@ -60,10 +60,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
           {/* Left Column: High-Impact EdTech Intro */}
           <div className="md:col-span-7 space-y-4 sm:space-y-5">
             
-            {/* SPU Institutional Live Trust Badge */}
+            {/* Professional Qualification Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-xs font-mono font-semibold shadow-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Sardar Patel University • HMPIETR | CAIELE & IQAC Lead</span>
+              <span>2× UGC NET & GSET Qualified • NET Vidya English Mentor</span>
             </div>
 
             {/* Main Headline */}
@@ -86,7 +86,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                 Explore:
               </span>
               {[
-                { id: 'all', label: 'All Batches & Passes' },
+                { id: 'all', label: 'All Batches & Materials' },
                 { id: 'ugc-net', label: 'UGC-NET English' },
                 { id: 'books', label: 'Kalam Monograph' },
                 { id: 'pedagogy', label: 'AI in ELE & NEP' }
@@ -95,7 +95,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                   key={pill.id}
                   onClick={() => {
                     setActiveCategoryFilter(pill.id as any);
-                    if (pill.id === 'ugc-net') onNavigate('learn');
+                    if (pill.id === 'ugc-net') onNavigate('store');
                     if (pill.id === 'books') onNavigate('bookstore');
                     if (pill.id === 'pedagogy') onNavigate('research');
                   }}
@@ -113,11 +113,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             {/* Primary Action Buttons */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
-                onClick={() => onNavigate('bookstore')}
-                className="w-full sm:w-auto justify-center px-5 py-3 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px]"
+                onClick={() => onNavigate('store')}
+                className="w-full sm:w-auto justify-center px-5 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px]"
               >
-                <Zap className="w-4 h-4 text-brass" />
-                <span>Explore Study Passes & Books</span>
+                <Zap className="w-4 h-4 text-amber-300" />
+                <span>GSET + UGC NET Final Pack 2026</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </button>
 
@@ -353,7 +353,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                   Bestseller Monograph
                 </span>
                 <span className="text-[11px] font-mono uppercase tracking-wider bg-claret text-white font-semibold px-2.5 py-0.5 rounded-full">
-                  SPU Doctoral Series
+                  Doctoral Research Series
                 </span>
                 <span className="text-[11px] font-mono text-ink-muted">
                   ISBN: {featuredBook.isbn} ({featuredBook.year})
@@ -377,7 +377,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
                 {[
                   `Complete Doctoral Monograph (${featuredBook.pageCount || 320}+ Pages)`,
-                  'Instant Digital 2-Device Pass (Phone + Laptop)',
+                  'Instant Student Digital Access (Phone + Laptop)',
                   'Direct WhatsApp Author Inquiry & Hard Copy Orders',
                   `Free Public Academic Sample (First ${featuredBook.previewPages || 20} Pages)`
                 ].map((feat, i) => (
@@ -396,11 +396,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                   <span className="text-2xl sm:text-3xl font-serif font-bold text-claret">
                     ₹399
                   </span>
-                  <span className="text-sm text-gray-400 line-through font-mono">
-                    ₹799
-                  </span>
-                  <span className="discount-pill text-[11px] px-2 py-0.5 rounded-full font-mono">
-                    50% SAVINGS
+                  <span className="text-xs font-mono text-gray-500">
+                    Standard Academic Price
                   </span>
                 </div>
 
@@ -416,7 +413,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                     className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-semibold shadow-md flex items-center justify-center gap-1.5"
                   >
                     <Zap className="w-3.5 h-3.5 text-brass" />
-                    <span>Get Instant Pass</span>
+                    <span>Get Instant Access</span>
                   </button>
                 </div>
               </div>
@@ -475,16 +472,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             {
               name: 'Priya Sharma',
               qualification: 'UGC-NET English Aspirant',
-              university: 'Sardar Patel University',
+              university: 'Gujarat University',
               rating: 5,
               review: 'Dr. Dodiya’s pedagogical frameworks and research methodology breakdowns transformed how I approached critical theory and Paper 1 questions. Highly recommended!'
             },
             {
               name: 'Aarav Patel',
               qualification: 'M.Ed. Research Scholar',
-              university: 'HMPIETR, Vallabh Vidyanagar',
+              university: 'Anand, Gujarat',
               rating: 5,
-              review: 'The doctoral treatise on Dr. Kalam’s educational thought offers profound philosophical clarity. The 2-device digital study pass is smooth and instant on phone and laptop.'
+              review: 'The doctoral treatise on Dr. Kalam’s educational thought offers profound philosophical clarity. The student login system is smooth and instant on phone and laptop.'
             },
             {
               name: 'Meera Trivedi',

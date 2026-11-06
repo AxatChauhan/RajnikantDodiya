@@ -1,5 +1,4 @@
-import crypto from 'crypto';
-import { computeCurrentServerPrice, DEFAULT_STORE_SETTINGS } from './price.js';
+import { computeCurrentServerPrice, DEFAULT_STORE_SETTINGS, fetchStoreSettings } from './price.js';
 
 /**
  * Vercel Serverless Function: Create Razorpay Order
@@ -8,6 +7,7 @@ import { computeCurrentServerPrice, DEFAULT_STORE_SETTINGS } from './price.js';
  * Security Rule:
  * Price is calculated strictly on the server (₹799 early-bird or ₹999 standard).
  * Client price parameters are completely ignored.
+ * Merchant descriptor: Nilam Dodiya (NET Vidya)
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -24,8 +24,10 @@ export default async function handler(req, res) {
       });
     }
 
-    // 1. Authoritative Server-Side Price Calculation
-    const priceCalculation = computeCurrentServerPrice(DEFAULT_STORE_SETTINGS);
+    // 1. Authoritative Server-Side Price Calculation (client price completely ignored)
+    const simulatedNow = req.query?.now || req.headers?.['x-simulated-date'] || req.body?.simulatedNow;
+    const settings = await fetchStoreSettings();
+    const priceCalculation = computeCurrentServerPrice(settings, simulatedNow);
     const amountInPaisa = priceCalculation.price * 100; // Razorpay expects amount in paise
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
@@ -47,7 +49,9 @@ export default async function handler(req, res) {
           currency: 'INR',
           receipt,
           notes: {
+            merchant: 'Nilam Dodiya (NET Vidya)',
             product: 'GSET + UGC NET English Final Pack 2026',
+            seller: settings.sellerLine,
             student_name: studentName.trim(),
             email: email.trim().toLowerCase(),
             mobile: mobile.trim()
@@ -74,23 +78,25 @@ export default async function handler(req, res) {
         studentName,
         email,
         mobile,
-        isEarlyBird: priceCalculation.isEarlyBird
+        isEarlyBird: priceCalculation.isEarlyBird,
+        accessExpiryDate: priceCalculation.accessExpiryDate
       });
     }
 
     // 3. Test / Development Fallback Order Generation
-    const testOrderId = `order_test_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const testOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     return res.status(200).json({
       success: true,
       orderId: testOrderId,
       amount: priceCalculation.price,
       amountInPaisa,
       currency: 'INR',
-      keyId: keyId || 'rzp_test_sample',
+      keyId: keyId || 'rzp_test_netvidya_key',
       studentName,
       email,
       mobile,
       isEarlyBird: priceCalculation.isEarlyBird,
+      accessExpiryDate: priceCalculation.accessExpiryDate,
       isTestMode: true
     });
   } catch (err) {

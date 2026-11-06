@@ -4,7 +4,6 @@ import {
   BookOpen,
   KeyRound,
   ShieldCheck,
-  ExternalLink,
   Menu,
   X,
   Lock,
@@ -138,9 +137,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {/* Buy CTA Button */}
             <button
               onClick={() => setIsCheckoutOpen(true)}
-              className="px-3.5 sm:px-4 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+              className="px-2.5 sm:px-4 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0"
             >
-              <span>Buy Final Pack (₹{currentServerPrice})</span>
+              <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
+              <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
@@ -241,17 +241,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.
               </p>
             </div>
-
-            {/* Back to Academic Portfolio Link */}
-            {onBackToAcademicSite && (
-              <button
-                onClick={onBackToAcademicSite}
-                className="px-3.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
-              >
-                <span>Dr. Rajnikant Dodiya Academic CV</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
 
           {/* Mandatory Policy Links (Razorpay Compliance) */}

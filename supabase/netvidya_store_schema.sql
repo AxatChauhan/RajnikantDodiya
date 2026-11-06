@@ -36,6 +36,36 @@ CREATE TABLE IF NOT EXISTS public.netvidya_buyers (
     expires_at TIMESTAMPTZ DEFAULT '2026-12-31 23:59:59+05:30'
 );
 
+-- 2.1 Student User Accounts & Authentication Credentials
+CREATE TABLE IF NOT EXISTS public.netvidya_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    mobile TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
+    is_buyer BOOLEAN DEFAULT false,
+    order_id TEXT UNIQUE,
+    razorpay_payment_id TEXT,
+    razorpay_order_id TEXT,
+    amount_paid NUMERIC DEFAULT 0,
+    payment_method TEXT DEFAULT 'none', -- 'razorpay' | 'manual_upi' | 'admin_grant' | 'none'
+    is_active BOOLEAN DEFAULT true,
+    enrolled_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ DEFAULT '2026-12-31 23:59:59+05:30',
+    reset_token_hash TEXT,
+    reset_token_expires_at TIMESTAMPTZ,
+    role TEXT DEFAULT 'student', -- 'student' | 'admin'
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indices for high-performance authentication and access control lookups
+CREATE INDEX IF NOT EXISTS idx_netvidya_users_email ON public.netvidya_users (lower(email));
+CREATE INDEX IF NOT EXISTS idx_netvidya_users_buyer ON public.netvidya_users (is_buyer, is_active);
+CREATE INDEX IF NOT EXISTS idx_netvidya_users_reset ON public.netvidya_users (reset_token_hash);
+
+
 -- 3. Reading Files Catalog (Private PDFs)
 CREATE TABLE IF NOT EXISTS public.netvidya_reading_files (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -67,6 +97,7 @@ CREATE TABLE IF NOT EXISTS public.netvidya_tests (
 -- ==============================================================================
 ALTER TABLE public.netvidya_store_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.netvidya_buyers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.netvidya_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.netvidya_reading_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.netvidya_tests ENABLE ROW LEVEL SECURITY;
 
@@ -80,6 +111,13 @@ CREATE POLICY "Public Read NetVidya Settings"
 DROP POLICY IF EXISTS "Deny Public Read NetVidya Buyers" ON public.netvidya_buyers;
 CREATE POLICY "Deny Public Read NetVidya Buyers"
     ON public.netvidya_buyers FOR SELECT
+    TO anon
+    USING (false);
+
+-- Deny raw public select on users credentials table (strictly protected)
+DROP POLICY IF EXISTS "Deny Public Read NetVidya Users" ON public.netvidya_users;
+CREATE POLICY "Deny Public Read NetVidya Users"
+    ON public.netvidya_users FOR SELECT
     TO anon
     USING (false);
 

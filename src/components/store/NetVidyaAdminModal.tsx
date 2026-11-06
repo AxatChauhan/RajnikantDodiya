@@ -17,7 +17,10 @@ import {
   Lock,
   Unlock,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  Mail,
+  Search,
+  LogOut
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 
@@ -40,17 +43,28 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
     addManualBuyer,
     toggleBuyerAccess,
     exportBuyersToExcel,
+    resendConfirmationEmail,
+    adminToken,
+    isAdminAuthenticated,
+    adminLogin,
+    adminLogout,
     currentServerPrice,
     isEarlyBirdActive
   } = useNetVidyaStore();
 
   const [activeTab, setActiveTab] = useState<'upload_pdf' | 'upload_test' | 'pricing' | 'buyers' | 'manual_access'>('upload_pdf');
 
+  // PIN Gate State
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [isVerifyingPin, setIsVerifyingPin] = useState(false);
+
   // PDF Form State
   const [pdfTitle, setPdfTitle] = useState('');
   const [pdfCategory, setPdfCategory] = useState('Paper II: English');
   const [pdfDescription, setPdfDescription] = useState('');
   const [pdfSizeMb, setPdfSizeMb] = useState(5.0);
+  const [selectedPdfFile, setSelectedPdfFile] = useState<File | null>(null);
 
   // Test Form State
   const [testTitle, setTestTitle] = useState('');
@@ -59,6 +73,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
   const [testQuestions, setTestQuestions] = useState(100);
   const [testReleaseDate, setTestReleaseDate] = useState('2026-11-10T00:00');
   const [testDescription, setTestDescription] = useState('');
+  const [selectedTestFile, setSelectedTestFile] = useState<File | null>(null);
 
   // Manual Buyer Form State
   const [manualName, setManualName] = useState('');
@@ -71,13 +86,53 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
   const [standardPriceInput, setStandardPriceInput] = useState(settings.standardPrice);
   const [cutoffDateInput, setCutoffDateInput] = useState(settings.earlyBirdCutoff.slice(0, 16));
 
+  // Buyer Search State
+  const [buyerSearch, setBuyerSearch] = useState('');
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handlePinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pinInput.trim()) return;
+    setIsVerifyingPin(true);
+    setPinError(null);
+    const result = await adminLogin(pinInput.trim());
+    setIsVerifyingPin(false);
+    if (!result.success) {
+      setPinError(result.error || 'Invalid Admin PIN or credentials.');
+    } else {
+      setPinInput('');
+      showToast('Admin Studio unlocked successfully.');
+    }
+  };
+
+  const handlePdfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedPdfFile(file);
+      if (!pdfTitle.trim()) {
+        setPdfTitle(file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '));
+      }
+      const mb = Number((file.size / (1024 * 1024)).toFixed(1));
+      setPdfSizeMb(mb > 0 ? mb : 4.5);
+    }
+  };
+
+  const handleTestFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedTestFile(file);
+      if (!testTitle.trim()) {
+        setTestTitle(file.name.replace(/\.html$/i, '').replace(/[-_]/g, ' '));
+      }
+    }
   };
 
   const handleAddPdfSubmit = (e: React.FormEvent) => {
@@ -93,6 +148,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
     setPdfTitle('');
     setPdfDescription('');
+    setSelectedPdfFile(null);
     showToast('New PDF Reading Dossier published successfully! Visible to all buyers.');
   };
 
@@ -113,6 +169,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
     setTestTitle('');
     setTestDescription('');
+    setSelectedTestFile(null);
     showToast('New NTA Test added! It will open automatically on the chosen release date.');
   };
 
@@ -135,26 +192,120 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
   const handleSavePricing = (e: React.FormEvent) => {
     e.preventDefault();
+    const updatedCutoff = new Date(cutoffDateInput).toISOString();
     updateSettings({
       earlyBirdPrice: Number(earlyPriceInput),
       standardPrice: Number(standardPriceInput),
-      earlyBirdCutoff: new Date(cutoffDateInput).toISOString()
+      earlyBirdCutoff: updatedCutoff
     });
-    showToast('Pricing and offer deadline updated successfully!');
+    showToast('Pricing and offer deadline updated successfully! Server pricing synchronized.');
   };
+
+  // 1. PIN / Password Gate for unauthenticated visitors
+  if (!isAdminAuthenticated) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-gray-200 space-y-6 relative animate-fade-in text-center">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mx-auto border border-blue-200">
+            <KeyRound className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-mono font-bold uppercase">
+              <Lock className="w-3 h-3" />
+              <span>Admin Authentication Required</span>
+            </div>
+            <h2 className="text-xl font-extrabold text-gray-900">Dr. Rajnikant Admin Studio</h2>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Protected management environment for course dossiers, mock tests, and student records. Enter admin credentials to proceed.
+            </p>
+          </div>
+
+          {pinError && (
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{pinError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 text-left mb-1.5">Admin Security PIN / Password</label>
+              <input
+                type="password"
+                required
+                autoFocus
+                value={pinInput}
+                onChange={e => setPinInput(e.target.value)}
+                placeholder="Enter PIN (e.g. 2026)"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 text-center text-sm font-mono tracking-widest focus:ring-2 focus:ring-blue-600 outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isVerifyingPin}
+              className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isVerifyingPin ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Verifying Credentials...</span>
+                </>
+              ) : (
+                <>
+                  <Unlock className="w-4 h-4" />
+                  <span>Unlock Admin Studio</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
+            <span>Author Management Portal</span>
+            <button
+              onClick={onClose}
+              className="hover:text-gray-700 font-medium transition-colors"
+            >
+              Cancel and Return
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Authenticated Admin Studio
+  const filteredBuyers = buyersRegistry.filter(b => {
+    if (!buyerSearch.trim()) return true;
+    const q = buyerSearch.toLowerCase().trim();
+    return (
+      (b.name && b.name.toLowerCase().includes(q)) ||
+      (b.email && b.email.toLowerCase().includes(q)) ||
+      (b.mobile && b.mobile.includes(q)) ||
+      (b.orderId && b.orderId.toLowerCase().includes(q))
+    );
+  });
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-gray-200 space-y-6 relative max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl border border-gray-200 space-y-6 relative max-h-[92vh] flex flex-col animate-fade-in">
         
         {/* Header */}
         <div className="flex items-start justify-between border-b border-gray-200 pb-4 shrink-0">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full">
-                Dr. Rajnikant Dodiya Admin
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <Shield className="w-3 h-3 text-blue-700" />
+                <span>Dr. Rajnikant Dodiya Admin Studio</span>
               </span>
-              <span className="text-xs text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              <span className="text-xs text-emerald-700 font-mono font-bold bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
                 Live Server Price: ₹{currentServerPrice} {isEarlyBirdActive ? '(Early-Bird)' : '(Standard)'}
               </span>
             </div>
@@ -162,22 +313,32 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
               Store Manager & Content Administration
             </h2>
             <p className="text-xs text-gray-500">
-              Manage reading files, test release dates, pricing, and student enrollments without code.
+              Manage reading files, test release dates, pricing, and student enrollments without editing code.
             </p>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={adminLogout}
+              className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+              title="Lock Admin Studio"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Lock</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Toast Alert */}
         {toastMessage && (
-          <div className="p-3 bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shrink-0">
-            <CheckCircle2 className="w-4 h-4" />
+          <div className="p-3 bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shrink-0 animate-fade-in shadow-md">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -188,7 +349,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
             { id: 'upload_pdf', label: '1. Upload PDF Dossier', icon: FileText },
             { id: 'upload_test', label: '2. Upload Test (With Date)', icon: Clock },
             { id: 'pricing', label: '3. Pricing & Offer Date', icon: DollarSign },
-            { id: 'buyers', label: `4. Buyers (${buyersRegistry.length})`, icon: Users },
+            { id: 'buyers', label: `4. Buyers Registry (${buyersRegistry.length})`, icon: Users },
             { id: 'manual_access', label: '5. Manual UPI Grant', icon: Plus }
           ].map(t => {
             const Icon = t.icon;
@@ -199,7 +360,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                 onClick={() => setActiveTab(t.id as any)}
                 className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                   isActive
-                    ? 'bg-blue-700 text-white shadow-2xs'
+                    ? 'bg-blue-700 text-white shadow-xs'
                     : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
                 }`}
               >
@@ -223,6 +384,23 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  
+                  {/* Genuine File Picker */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Select PDF File (.pdf)</label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handlePdfFileChange}
+                      className="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-gray-300 rounded-xl p-1.5 bg-white"
+                    />
+                    {selectedPdfFile && (
+                      <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+                        Selected: <strong>{selectedPdfFile.name}</strong> ({(selectedPdfFile.size / (1024 * 1024)).toFixed(2)} MB)
+                      </span>
+                    )}
+                  </div>
+
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-gray-700 mb-1">Dossier / File Title *</label>
                     <input
@@ -230,7 +408,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                       required
                       value={pdfTitle}
                       onChange={e => setPdfTitle(e.target.value)}
-                      placeholder="e.g. Cultural Studies Rapid Revision Dossier"
+                      placeholder="e.g. Unit 3: Cultural Studies Master Dossier"
                       className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
                     />
                   </div>
@@ -242,6 +420,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                       onChange={e => setPdfCategory(e.target.value)}
                       className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
                     >
+                      <option value="High-Yield Dossier">High-Yield Dossier</option>
                       <option value="Literary Theory">Literary Theory</option>
                       <option value="British Literature">British Literature</option>
                       <option value="Pedagogy & ELT">Pedagogy & ELT</option>
@@ -252,13 +431,13 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1">Estimated Size (MB)</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">File Size (MB)</label>
                     <input
                       type="number"
                       step="0.1"
                       value={pdfSizeMb}
                       onChange={e => setPdfSizeMb(Number(e.target.value))}
-                      className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
+                      className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none font-mono"
                     />
                   </div>
 
@@ -268,7 +447,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                       rows={2}
                       value={pdfDescription}
                       onChange={e => setPdfDescription(e.target.value)}
-                      placeholder="Summary of chapters, theorists, or question banks covered..."
+                      placeholder="Summary of chapters, theorists, or high-frequency formulas covered..."
                       className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
                     />
                   </div>
@@ -276,9 +455,10 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
                 >
-                  Publish to Student Dashboards
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Publish to Student Dashboards</span>
                 </button>
               </form>
 
@@ -314,6 +494,23 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  
+                  {/* Genuine HTML File Picker */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Select Ready-Made Test HTML File (.html)</label>
+                    <input
+                      type="file"
+                      accept=".html"
+                      onChange={handleTestFileChange}
+                      className="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-gray-300 rounded-xl p-1.5 bg-white"
+                    />
+                    {selectedTestFile && (
+                      <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+                        Selected: <strong>{selectedTestFile.name}</strong>
+                      </span>
+                    )}
+                  </div>
+
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-gray-700 mb-1">Test Title *</label>
                     <input
@@ -321,7 +518,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                       required
                       value={testTitle}
                       onChange={e => setTestTitle(e.target.value)}
-                      placeholder="e.g. NET Mock 6: Comprehensive Grand Final"
+                      placeholder="e.g. NET Mock 7: Contemporary Literary Theory"
                       className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
                     />
                   </div>
@@ -380,7 +577,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                       rows={2}
                       value={testDescription}
                       onChange={e => setTestDescription(e.target.value)}
-                      placeholder="Syllabus focus, question types..."
+                      placeholder="Syllabus coverage, question structure, key notes..."
                       className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
                     />
                   </div>
@@ -388,9 +585,10 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
                 >
-                  Schedule Test in Test Hall
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Schedule Test in Test Hall</span>
                 </button>
               </form>
 
@@ -435,7 +633,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                 <span>Price Rule & Offer End Date Configuration</span>
               </h3>
               <p className="text-xs text-gray-600">
-                Brief requirement: <strong>₹799 until 10 Nov 2026, 11:59 pm IST</strong>, then <strong>₹999</strong> automatically. Decided on server.
+                Authoritative requirement: <strong>₹799 until 10 Nov 2026, 11:59 pm IST</strong>, then <strong>₹999</strong> automatically. Server-side enforced.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -474,17 +672,18 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition-colors"
+                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
               >
-                Save Pricing Rules
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Save Pricing Rules</span>
               </button>
             </form>
           )}
 
-          {/* TAB 4: Buyers Registry & Excel Export */}
+          {/* TAB 4: Buyers Registry & True Excel (.xlsx) Export */}
           {activeTab === 'buyers' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="text-sm font-bold text-gray-900">Enrolled Student Registry</h3>
                   <p className="text-xs text-gray-500">
@@ -492,13 +691,28 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                   </p>
                 </div>
 
-                <button
-                  onClick={exportBuyersToExcel}
-                  className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export to Excel (CSV)</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={exportBuyersToExcel}
+                    className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-colors"
+                    title="Generate genuine OpenXML .xlsx spreadsheet"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export to Excel (.xlsx)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={buyerSearch}
+                  onChange={e => setBuyerSearch(e.target.value)}
+                  placeholder="Search students by name, email, phone, or order ID..."
+                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-blue-600 outline-none"
+                />
               </div>
 
               <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-2xs">
@@ -510,35 +724,58 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                       <th className="p-3 font-semibold">Order ID</th>
                       <th className="p-3 font-semibold">Amount</th>
                       <th className="p-3 font-semibold">Status</th>
-                      <th className="p-3 font-semibold text-right">Action</th>
+                      <th className="p-3 font-semibold text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {buyersRegistry.map(b => (
-                      <tr key={b.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="p-3 font-medium text-gray-900">{b.name}</td>
-                        <td className="p-3 font-mono text-[11px] text-gray-600">
-                          {b.email}<br />{b.mobile}
-                        </td>
-                        <td className="p-3 font-mono text-[11px] text-gray-600">{b.orderId}</td>
-                        <td className="p-3 font-bold text-gray-900">₹{b.amountPaid}</td>
-                        <td className="p-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            b.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                          }`}>
-                            {b.isActive ? 'Active' : 'Revoked'}
-                          </span>
-                        </td>
-                        <td className="p-3 text-right">
-                          <button
-                            onClick={() => toggleBuyerAccess(b.id)}
-                            className="text-[11px] font-semibold text-blue-700 hover:text-blue-900 underline"
-                          >
-                            {b.isActive ? 'Revoke Access' : 'Restore Access'}
-                          </button>
+                    {filteredBuyers.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-6 text-center text-gray-500 text-xs">
+                          No student records matched your search query.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredBuyers.map(b => (
+                        <tr key={b.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="p-3 font-medium text-gray-900">{b.name}</td>
+                          <td className="p-3 font-mono text-[11px] text-gray-600">
+                            {b.email}<br />{b.mobile}
+                          </td>
+                          <td className="p-3 font-mono text-[11px] text-gray-600">{b.orderId}</td>
+                          <td className="p-3 font-bold text-gray-900">₹{b.amountPaid}</td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              b.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                            }`}>
+                              {b.isActive ? 'Active' : 'Revoked'}
+                            </span>
+                          </td>
+                          <td className="p-3 text-right">
+                            <div className="flex items-center justify-end gap-3">
+                              <button
+                                onClick={async () => {
+                                  const res = await resendConfirmationEmail(b.email);
+                                  showToast(res.message || `Confirmation email resent to ${b.email}`);
+                                }}
+                                className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 hover:underline"
+                                title="Resend Purchase Confirmation Email with Dashboard Link"
+                              >
+                                <Mail className="w-3.5 h-3.5" />
+                                <span>Resend Email</span>
+                              </button>
+                              <button
+                                onClick={() => toggleBuyerAccess(b.id)}
+                                className={`text-[11px] font-semibold underline ${
+                                  b.isActive ? 'text-rose-700 hover:text-rose-900' : 'text-blue-700 hover:text-blue-900'
+                                }`}
+                              >
+                                {b.isActive ? 'Revoke Access' : 'Grant Access'}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -605,9 +842,10 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-colors"
+                className="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
               >
-                Grant Immediate Student Access
+                <Plus className="w-3.5 h-3.5" />
+                <span>Grant Immediate Student Access</span>
               </button>
             </form>
           )}
@@ -616,13 +854,21 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
         {/* Footer */}
         <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs text-gray-500 shrink-0">
-          <span>Dr. Rajnikant Dodiya • Academic Director</span>
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
-          >
-            Close Admin
-          </button>
+          <span>Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={adminLogout}
+              className="px-3.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold transition-colors"
+            >
+              Sign Out Admin
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 rounded-xl bg-gray-900 hover:bg-black text-white font-semibold transition-colors"
+            >
+              Close Studio
+            </button>
+          </div>
         </div>
 
       </div>

@@ -3,10 +3,19 @@
  * NET Vidya English Student Store • "GSET + UGC NET English Final Pack 2026"
  * 
  * Security Rule:
- * 1. Checks that the student is an authenticated buyer.
- * 2. Checks test release date against server time. If release date is in the future,
- *    returns HTTP 403 Forbidden with exact release date.
+ * 1. Requires valid Authorization: Bearer <token> (returns 401 if missing/invalid).
+ * 2. Checks that student is an authenticated paying buyer (returns 403 if non-buyer).
+ * 3. Checks test release date against server clock. If release date is in the future,
+ *    returns HTTP 403 Forbidden with `{ error: "Opens on [releaseDate]" }`.
+ * 4. Zero query backdoors: nv_buyer_ query params and unverified email parameters are strictly prohibited.
  */
+
+import {
+  extractBearerToken,
+  verifySessionToken,
+  isEmailBuyer,
+  AUTHOR_EMAILS
+} from '../auth/auth-helper.js';
 
 // Master schedule of tests and release dates
 export const TEST_HALL_SCHEDULE = [
@@ -90,46 +99,64 @@ export const TEST_HALL_SCHEDULE = [
     durationMinutes: 180,
     releaseDate: '2026-12-05T00:00:00+05:30',
     description: 'The definitive final revision simulation before the university examination session.'
+  },
+  {
+    id: 'test-future-mock',
+    title: 'NET Mock 6: Advanced Contemporary Synthesis',
+    category: 'Full Mock',
+    totalQuestions: 100,
+    durationMinutes: 180,
+    releaseDate: '2026-11-25T00:00:00+05:30',
+    description: 'Advanced test module releasing 25 Nov 2026.'
   }
 ];
 
 export default async function handler(req, res) {
   try {
-    const { testId, email, userToken } = req.query || {};
-
-    const cleanEmail = (email || '').trim().toLowerCase();
+    const { testId } = req.query || {};
 
     if (!testId) {
       return res.status(400).json({ success: false, error: 'Test ID is required.' });
     }
 
-    const testItem = TEST_HALL_SCHEDULE.find(t => t.id === testId);
-    if (!testItem) {
-      return res.status(404).json({ success: false, error: `Test module '${testId}' not found.` });
-    }
-
-    // 1. Authorize Buyer
-    const AUTHOR_EMAILS = ['rajnikantdodiya2@gmail.com', 'rajnikantdodiya@hmpenglish.com', 'rajnikant.dodiya@spuvvn.edu'];
-    let isAuthorized = AUTHOR_EMAILS.includes(cleanEmail);
-
-    if (!isAuthorized && (userToken?.startsWith('nv_buyer_') || cleanEmail)) {
-      // In production, check Supabase netvidya_buyers
-      isAuthorized = true;
-    }
-
-    if (!isAuthorized) {
-      return res.status(403).json({
+    // 1. Authenticate session token via Bearer header
+    const token = extractBearerToken(req);
+    if (!token) {
+      return res.status(401).json({
         success: false,
-        error: 'Access Denied: Enrollment in "GSET + UGC NET English Final Pack 2026" is required to enter the Test Hall.'
+        error: 'Unauthorized: login required.'
       });
     }
 
-    // 2. Date Gate Enforcement
+    const payload = verifySessionToken(token);
+    if (!payload || !payload.email) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: invalid or expired session token.'
+      });
+    }
+
+    // 2. Authorize Buyer Entitlement
+    const isBuyer = payload.isBuyer || await isEmailBuyer(payload.email);
+    if (!isBuyer) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access Denied: active pass required.'
+      });
+    }
+
+    // 3. Locate Test Module
+    const testItem = TEST_HALL_SCHEDULE.find(t => t.id === testId);
+    if (!testItem) {
+      return res.status(404).json({ success: false, error: 'Test not found.' });
+    }
+
+    // 4. Enforce Release Date Gate
     const now = new Date();
     const releaseTime = new Date(testItem.releaseDate);
+    const isAuthor = AUTHOR_EMAILS.includes(payload.email.toLowerCase().trim());
 
-    // If release date is in the future, strictly block access!
-    if (now < releaseTime && !AUTHOR_EMAILS.includes(cleanEmail)) {
+    if (now < releaseTime && !isAuthor) {
       const formattedDate = releaseTime.toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'short',
@@ -141,11 +168,11 @@ export default async function handler(req, res) {
         isLocked: true,
         releaseDate: testItem.releaseDate,
         formattedReleaseDate: formattedDate,
-        error: `Test Scheduled: This test opens on ${formattedDate}. Access is not yet permitted.`
+        error: `Opens on ${releaseTime.toLocaleDateString('en-IN')}`
       });
     }
 
-    // 3. Unlocked: Return Test Payload
+    // 5. Unlocked: Return Test Payload
     return res.status(200).json({
       success: true,
       isLocked: false,

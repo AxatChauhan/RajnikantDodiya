@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NET Vidya English — NTA CBT Computer-Based Mock Test Runner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+    /* Top Official NTA Exam Header */
+    header {
+      background: #0f1d32;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #234168;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .brand-badge {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .header-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .header-meta {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .timer-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #1e293b;
+      padding: 0.45rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #334155;
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 0.95rem;
+    }
+
+    /* Candidate Info Bar */
+    .candidate-bar {
+      background: #ffffff;
+      border-bottom: 1px solid #cbd5e1;
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.825rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .candidate-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .candidate-name { font-weight: 700; color: #0f172a; }
+    .exam-tag {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.375rem;
+      font-weight: 700;
+      font-size: 0.725rem;
+    }
+
+    /* Main CBT Canvas Layout */
+    .test-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 120px);
+      min-height: 580px;
+    }
+    .question-panel {
+      flex: 1;
+      padding: 1.75rem;
+      overflow-y: auto;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar {
+      width: 360px;
+      background: #f8fafc;
+      border-left: 1px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 1.25rem;
+      gap: 1rem;
+    }
+
+    /* Question Panel Elements */
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 1.25rem;
+    }
+    .q-number {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f2744;
+    }
+    .q-section-badge {
+      font-size: 0.75rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .marks-badge {
+      font-size: 0.75rem;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.375rem;
+      font-weight: 700;
+    }
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1.15rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 0.625rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.15s ease-in-out;
+      background: #fff;
+    }
+    .option-item:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .option-item.selected {
+      border-color: #2563eb;
+      background: #dbeafe;
+      font-weight: 600;
+      color: #1e40af;
+    }
+    .option-item input[type="radio"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: #2563eb;
+      cursor: pointer;
+    }
+    .option-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      background: #f1f5f9;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #475569;
+    }
+    .option-item.selected .option-key {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    /* Action Control Buttons */
+    .control-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 0.6rem 1.1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-outline { background: #fff; border-color: #cbd5e1; color: #334155; }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-warning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .btn-warning:hover { background: #fde68a; }
+    .btn-purple { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    .btn-purple:hover { background: #ddd6fe; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover { background: #059669; }
+
+    /* Palette Legend & Grid */
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      font-size: 0.725rem;
+      background: #fff;
+      padding: 0.85rem;
+      border-radius: 0.625rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; }
+    .legend-chip {
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+    .chip-answered { background: #10b981; }
+    .chip-not-answered { background: #ef4444; }
+    .chip-marked-review { background: #8b5cf6; }
+    .chip-not-visited { background: #94a3b8; }
+
+    .palette-box {
+      background: #fff;
+      padding: 0.85rem;
+      border-radius: 0.625rem;
+      border: 1px solid #e2e8f0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .palette-title {
+      font-size: 0.825rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      color: #0f2744;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.45rem;
+      overflow-y: auto;
+      max-height: 380px;
+      padding-right: 0.25rem;
+    }
+    .p-btn {
+      aspect-ratio: 1;
+      border-radius: 0.375rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      color: #fff;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .p-btn:hover { transform: scale(1.08); }
+    .p-btn.current {
+      outline: 3px solid #2563eb;
+      outline-offset: 1px;
+      font-weight: 900;
+    }
+    .p-btn.answered { background: #10b981; }
+    .p-btn.not-answered { background: #ef4444; }
+    .p-btn.marked-review { background: #8b5cf6; }
+    .p-btn.not-visited { background: #94a3b8; }
+
+    /* Score Summary Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 1.25rem;
+      max-width: 620px;
+      width: 100%;
+      padding: 2.25rem;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .score-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: #eff6ff;
+      border: 5px solid #2563eb;
+      color: #1e3a8a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1.25rem auto;
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+    }
+    .score-val { font-size: 2rem; font-weight: 900; line-height: 1; }
+    .score-max { font-size: 0.75rem; font-weight: 700; color: #64748b; }
+    .stat-badge {
+      padding: 0.75rem;
+      border-radius: 0.625rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .syllabus-grid {
+      text-align: left;
+      margin: 1.25rem 0;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      font-size: 0.775rem;
+    }
+    .unit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .unit-row:last-child { border-bottom: none; }
+    .unit-bar-bg {
+      width: 120px;
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-left: 0.5rem;
+    }
+    .unit-bar-fill {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 860px) {
+      .test-container { flex-direction: column; height: auto; }
+      .sidebar { width: 100%; border-left: none; border-top: 2px solid #cbd5e1; }
+      .palette-grid { max-height: 240px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Official NTA CBT Header -->
+  <header>
+    <div class="header-brand">
+      <span class="brand-badge">NTA CBT</span>
+      <div>
+        <div class="header-title" id="testTitleDisplay">NET Vidya English — Full-Length CBT Test Simulation</div>
+        <div class="header-meta">UGC-NET / GSET Paper II English Literature • Official Pattern 100 MCQs</div>
+      </div>
+    </div>
+    <div class="timer-badge">
+      <span>⏱</span>
+      <span id="timerDisplay" class="font-mono">03:00:00</span>
+    </div>
+  </header>
+
+  <!-- Candidate Info Bar -->
+  <div class="candidate-bar">
+    <div class="candidate-info">
+      <div>Candidate: <span class="candidate-name" id="candidateName">Enrolled Scholar</span></div>
+      <span class="exam-tag">UGC-NET / GSET 2026</span>
+      <span style="font-size: 0.75rem; color: #64748b;">Roll No: <strong id="rollNumber">NV-2026-ENG-8491</strong></span>
+    </div>
+    <div style="font-size: 0.8rem; color: #475569;">
+      Module: <strong id="moduleCode">Paper II: English (100 Questions)</strong>
+    </div>
+  </div>
+
+  <!-- Test Interface -->
+  <div class="test-container">
+    
+    <!-- Question Pane -->
+    <div class="question-panel">
+      <div>
+        <div class="question-header">
+          <div style="display: flex; align-items: center;">
+            <div class="q-number" id="qNumberLabel">Question 1 of 100</div>
+            <span class="q-section-badge" id="qSectionTag">Unit 1: Drama</span>
+          </div>
+          <span class="marks-badge">+2.00 Marks (No Negative Marking)</span>
+        </div>
+        <div class="question-text" id="qText">Loading question...</div>
+        <div class="options-group" id="optionsContainer"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="control-actions">
+        <div class="btn-group">
+          <button class="btn btn-purple" id="btnMarkReview">Mark for Review & Next</button>
+          <button class="btn btn-outline" id="btnClearResponse">Clear Response</button>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-outline" id="btnPrev">« Previous</button>
+          <button class="btn btn-primary" id="btnSaveNext">Save & Next »</button>
+          <button class="btn btn-success" id="btnSubmitTest">Submit Test</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar Palette -->
+    <div class="sidebar">
+      
+      <!-- 4 State Badges Legend -->
+      <div class="legend-grid">
+        <div class="legend-item"><div class="legend-chip chip-answered" id="countAnswered">0</div> Answered</div>
+        <div class="legend-item"><div class="legend-chip chip-not-answered" id="countNotAnswered">1</div> Not Answered</div>
+        <div class="legend-item"><div class="legend-chip chip-marked-review" id="countMarked">0</div> Marked Review</div>
+        <div class="legend-item"><div class="legend-chip chip-not-visited" id="countNotVisited">99</div> Not Visited</div>
+      </div>
+
+      <!-- 100-Question Palette Grid -->
+      <div class="palette-box">
+        <div class="palette-title">
+          <span>Question Palette</span>
+          <span style="font-size: 0.725rem; color: #64748b;">100 Questions</span>
+        </div>
+        <div class="palette-grid" id="paletteGrid"></div>
+      </div>
+
+      <!-- Syllabus & Integrity Note -->
+      <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; color: #475569;">
+        <strong>NTA Navigation Rule:</strong> Click any palette box to navigate directly to that question. Questions answered and marked for review are evaluated in official UGC NET computation.
+      </div>
+    </div>
+  </div>
+
+  <!-- Score Summary Modal -->
+  <div class="modal-overlay" id="scoreModal">
+    <div class="modal-card">
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: #0f2744;">CBT Examination Completed!</h2>
+      <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">NTA Paper II English Literature Evaluation Summary</p>
+      
+      <div class="score-circle">
+        <span class="score-val" id="scoreDisplay">0</span>
+        <span class="score-max">/ 200 Marks</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin: 1.25rem 0; font-size: 0.8rem;">
+        <div class="stat-badge" style="background: #ecfdf5;">
+          <strong style="color: #059669; font-size: 1.2rem;" id="correctCount">0</strong>
+          <span style="color: #065f46; font-size: 0.725rem;">Correct (+2)</span>
+        </div>
+        <div class="stat-badge" style="background: #fee2e2;">
+          <strong style="color: #dc2626; font-size: 1.2rem;" id="incorrectCount">0</strong>
+          <span style="color: #991b1b; font-size: 0.725rem;">Incorrect</span>
+        </div>
+        <div class="stat-badge" style="background: #f1f5f9;">
+          <strong style="color: #64748b; font-size: 1.2rem;" id="unattemptedCount">0</strong>
+          <span style="color: #475569; font-size: 0.725rem;">Unattempted</span>
+        </div>
+        <div class="stat-badge" style="background: #eff6ff;">
+          <strong style="color: #2563eb; font-size: 1.2rem;" id="accuracyDisplay">0%</strong>
+          <span style="color: #1e40af; font-size: 0.725rem;">Accuracy</span>
+        </div>
+      </div>
+
+      <!-- Syllabus Breakdown -->
+      <div class="syllabus-grid">
+        <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; font-size: 0.825rem;">
+          Syllabus Unit Performance Breakdown
+        </div>
+        <div id="unitBreakdownContainer"></div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem;">
+        <button class="btn btn-outline" id="btnReviewAnswers" onclick="reviewAllAnswers()">Review Answers</button>
+        <button class="btn btn-primary" id="btnBackDashboard" onclick="returnToDashboard()">Return to Dashboard (/#dashboard)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------------------
+    // 100-Question Comprehensive UGC NET / GSET English Question Bank
+    // -------------------------------------------------------------------------
+    const QUESTIONS = [
+      // Unit 1: Drama (1-10)
+      { id: 1, unit: 'Unit 1: Drama', q: "In Shakespeare's King Lear, who assumes the disguise of 'Poor Tom', a Bedlam beggar?", options: ["Edgar", "Edmund", "Kent", "Albany"], answer: 0, explanation: "Edgar disguises himself as Poor Tom to escape his father Gloucester's murderous pursuit." },
+      { id: 2, unit: 'Unit 1: Drama', q: "Which play by Christopher Marlowe dramatizes the Machiavellian desire for infinite wealth and villainy in Mediterranean commerce?", options: ["The Jew of Malta", "Doctor Faustus", "Tamburlaine the Great", "Edward II"], answer: 0, explanation: "The Jew of Malta centers on Barabas and the prologue spoken by Machevill." },
+      { id: 3, unit: 'Unit 1: Drama', q: "In Ben Jonson's Volpone, which bird of prey represents the legacy hunter Corvino?", options: ["The Raven", "The Crow", "The Vulture", "The Buzzard"], answer: 0, explanation: "Corvino is the Crow; Voltore is the Vulture; Corbaccio is the Raven." },
+      { id: 4, unit: 'Unit 1: Drama', q: "John Webster's The Duchess of Malfi is based on a novella from which Italian Renaissance collection?", options: ["Matteo Bandello's Novelle (via William Painter's Palace of Pleasure)", "Boccaccio's Decameron", "Castiglione's The Courtier", "Ariosto's Orlando Furioso"], answer: 0, explanation: "Webster drew the Duchess story from Painter's translation of Bandello." },
+      { id: 5, unit: 'Unit 1: Drama', q: "In Samuel Beckett's Waiting for Godot, what do Vladimir and Estragon repeatedly attempt to hang themselves with?", options: ["A piece of rope", "Estragon's trousers cord", "A tree branch belt", "A leather strap"], answer: 1, explanation: "In Act II, Estragon takes off the cord holding up his trousers to test hanging themselves from the willow tree." },
+      { id: 6, unit: 'Unit 1: Drama', q: "Which Harold Pinter drama portrays the unsettling birthday party of Stanley Webber in a seaside boarding house?", options: ["The Birthday Party", "The Caretaker", "The Homecoming", "Betrayal"], answer: 0, explanation: "The Birthday Party (1957) is Pinter's classic comedy of menace featuring Goldberg and McCann." },
+      { id: 7, unit: 'Unit 1: Drama', q: "John Osborne's 1956 play Look Back in Anger established which generational archetype in British post-war theatre?", options: ["The Angry Young Man", "The Decadent Aesthete", "The Victorian Patriarch", "The Lost Generation Rebel"], answer: 0, explanation: "Jimmy Porter became the quintessential archetype of the Angry Young Man." },
+      { id: 8, unit: 'Unit 1: Drama', q: "In Arthur Miller's Death of a Salesman, what is the symbolic object Linda Loman finds behind the fuse box?", options: ["A rubber hose attached to the gas pipe", "A hidden will", "A stolen gold pen", "An insurance policy"], answer: 0, explanation: "The rubber hose indicates Willy Loman's contemplation of suicide." },
+      { id: 9, unit: 'Unit 1: Drama', q: "Tom Stoppard's Rosencrantz and Guildenstern Are Dead opens with what improbable probabilistic occurrence?", options: ["A coin spinning and landing heads eighty-five times consecutively", "A skull speaking", "A clock running backwards", "An invisible player"], answer: 0, explanation: "Rosencrantz bets on heads, and it comes up heads 92 consecutive times, defying the laws of probability." },
+      { id: 10, unit: 'Unit 1: Drama', q: "In Bernard Shaw's Pygmalion, what test phrase does Eliza Doolittle recite at Mrs. Higgins's at-home tea party?", options: ["The rain in Spain stays mainly in the plain", "How do you do, Mrs. Higgins?", "It is my belief that they done the old woman in", "What a lovely day!"], answer: 2, explanation: "Eliza shocks the tea party with her sensational cockney colloquialisms pronounced with pristine phonetics." },
+
+      // Unit 2: Poetry (11-20)
+      { id: 11, unit: 'Unit 2: Poetry', q: "Geoffrey Chaucer's General Prologue to The Canterbury Tales begins in which month?", options: ["April", "March", "May", "June"], answer: 0, explanation: "'Whan that Aprill with his shoures soote...'" },
+      { id: 12, unit: 'Unit 2: Poetry', q: "Edmund Spenser's The Faerie Queene introduces which 9-line stanza form?", options: ["Spenserian Stanza (ababbcbcc)", "Ottava Rima (abababcc)", "Terza Rima (aba bcb cdc)", "Rhyme Royal (ababbcc)"], answer: 0, explanation: "Spenserian stanza comprises eight iambic pentameter lines followed by a 12-syllable Alexandrine." },
+      { id: 13, unit: 'Unit 2: Poetry', q: "In John Donne's 'A Valediction: Forbidding Mourning', what everyday scientific instrument symbolizes the lovers' souls?", options: ["A pair of stiff twin compasses", "A telescope", "An hourglass", "A sundial"], answer: 0, explanation: "The famous metaphysical conceit compares the two souls to the twin feet of a draughtsman's compass." },
+      { id: 14, unit: 'Unit 2: Poetry', q: "John Milton begins Paradise Lost by stating his epic poetic purpose as:", options: ["To justify the ways of God to men", "To celebrate heroic arms and the man", "To mourn the fall of angels", "To instruct the English commonwealth"], answer: 0, explanation: "Milton invokes the Heavenly Muse 'that to the height of this great argument / I may assert Eternal Providence, / And justify the ways of God to men.'" },
+      { id: 15, unit: 'Unit 2: Poetry', q: "Alexander Pope's The Rape of the Lock was composed to reconcile a quarrel between which two prominent Catholic families?", options: ["The Petres and the Fermors", "The Montagues and the Capulets", "The Howards and the Talbots", "The Blounts and the Swifts"], answer: 0, explanation: "Lord Petre cut a lock of Arabella Fermor's hair, prompting Pope's friend John Caryll to suggest writing a mock-epic." },
+      { id: 16, unit: 'Unit 2: Poetry', q: "William Wordsworth and S.T. Coleridge published the revolutionary Lyrical Ballads in which year?", options: ["1798", "1789", "1800", "1802"], answer: 0, explanation: "Lyrical Ballads was published in 1798; the famous Preface was added to the 1800 second edition." },
+      { id: 17, unit: 'Unit 2: Poetry', q: "John Keats describes which aesthetic capability as 'when man is capable of being in uncertainties, Mysteries, doubts, without any irritable reaching after fact & reason'?", options: ["Negative Capability", "Egotistical Sublime", "Poetic Faith", "Primary Imagination"], answer: 0, explanation: "Keats coined 'Negative Capability' in a letter to his brothers George and Thomas in December 1817." },
+      { id: 18, unit: 'Unit 2: Poetry', q: "In Tennyson's 'Ulysses', what heroic line concludes the monologue?", options: ["To strive, to seek, to find, and not to yield", "I will drink life to the lees", "Made weak by time and fate, but strong in will", "Tis not too late to seek a newer world"], answer: 0, explanation: "The final line of Tennyson's dramatic monologue is 'To strive, to seek, to find, and not to yield.'" },
+      { id: 19, unit: 'Unit 2: Poetry', q: "Which W.B. Yeats poem prophesies the arrival of a 'rough beast, its hour come round at last' slouching towards Bethlehem?", options: ["The Second Coming", "Sailing to Byzantium", "Easter, 1916", "Leda and the Swan"], answer: 0, explanation: "The Second Coming (1919) envisions cyclical historic disintegration through gyres." },
+      { id: 20, unit: 'Unit 2: Poetry', q: "T.S. Eliot's The Waste Land concludes with which sacred Upanishadic benediction?", options: ["Shantih shantih shantih", "Om tat sat", "Aham Brahmasmi", "Satyam eva jayate"], answer: 0, explanation: "The Waste Land ends with 'Datta. Dayadhvam. Damyata. / Shantih shantih shantih' from the Brihadaranyaka Upanishad." },
+
+      // Unit 3: Fiction (21-30)
+      { id: 21, unit: 'Unit 3: Fiction', q: "Who wrote the 1719 epistolary travel narrative Robinson Crusoe, often credited as an inaugural work of realist prose fiction in English?", options: ["Daniel Defoe", "Jonathan Swift", "Samuel Richardson", "Henry Fielding"], answer: 0, explanation: "Daniel Defoe published Robinson Crusoe in 1719." },
+      { id: 22, unit: 'Unit 3: Fiction', q: "In Jane Austen's Pride and Prejudice, what is the name of Mr. Darcy's majestic ancestral estate in Derbyshire?", options: ["Pemberley", "Longbourn", "Rosings Park", "Netherfield Park"], answer: 0, explanation: "Elizabeth Bennet's visit to Pemberley marks a turning point in her feelings toward Darcy." },
+      { id: 23, unit: 'Unit 3: Fiction', q: "Mary Shelley's 1818 masterpiece Frankenstein carries which revealing subtitle?", options: ["The Modern Prometheus", "A Tale of Gothic Terror", "The Alchemist's Doom", "The Monster of Geneva"], answer: 0, explanation: "The full title is Frankenstein; or, The Modern Prometheus." },
+      { id: 24, unit: 'Unit 3: Fiction', q: "In Charlotte Bronte's Jane Eyre, who is revealed as Rochester's hidden wife locked in the attic of Thornfield Hall?", options: ["Bertha Mason", "Blanche Ingram", "Celine Varens", "Grace Poole"], answer: 0, explanation: "Bertha Mason, the Creole heiress from Spanish Town, Jamaica, is Rochester's 'madwoman in the attic'." },
+      { id: 25, unit: 'Unit 3: Fiction', q: "Charles Dickens's Bleak House revolves around which endless, soul-crushing Court of Chancery lawsuit?", options: ["Jarndyce and Jarndyce", "Bardell v. Pickwick", "Tulkinghorn v. Dedlock", "Krook v. Smallweed"], answer: 0, explanation: "The satirical Court of Chancery suit in Bleak House is Jarndyce and Jarndyce." },
+      { id: 26, unit: 'Unit 3: Fiction', q: "In George Eliot's Middlemarch, Dorothea Brooke marries which elderly scholar whose grand work is the unfinished 'Key to all Mythologies'?", options: ["Edward Casaubon", "Will Ladislaw", "Tertius Lydgate", "Arthur Brooke"], answer: 0, explanation: "Dorothea marries the pedantic clergyman Edward Casaubon." },
+      { id: 27, unit: 'Unit 3: Fiction', q: "Thomas Hardy's Tess of the d'Urbervilles bears which provocative authorial subtitle?", options: ["A Pure Woman Faithfully Presented", "A Fallen Maiden's Tragedy", "A Tale of Wessex Fate", "The Sinner's Redemption"], answer: 0, explanation: "Hardy shocked Victorian society by subtitling the novel 'A Pure Woman Faithfully Presented'." },
+      { id: 28, unit: 'Unit 3: Fiction', q: "Virginia Woolf's Mrs Dalloway takes place over the course of a single day in which city in June 1923?", options: ["London", "Paris", "Edinburgh", "Dublin"], answer: 0, explanation: "Mrs Dalloway chronicles Clarissa Dalloway and Septimus Warren Smith over one day in post-WWI London." },
+      { id: 29, unit: 'Unit 3: Fiction', q: "James Joyce's Ulysses is structurally modelled upon which classical epic?", options: ["Homer's Odyssey", "Virgil's Aeneid", "Dante's Inferno", "Ovid's Metamorphoses"], answer: 0, explanation: "Joyce models Leopold Bloom's Dublin wanderings on Odysseus's homeward journey in Homer's Odyssey." },
+      { id: 30, unit: 'Unit 3: Fiction', q: "In George Orwell's 1984, what horrific torture chamber in the Ministry of Love confronts prisoners with their worst individual fears?", options: ["Room 101", "Cell 42", "The Telescreen Chamber", "Memory Hole Zero"], answer: 0, explanation: "Room 101 contains 'the worst thing in the world'—for Winston Smith, carnivorous cage rats." },
+
+      // Unit 4: Non-Fictional Prose (31-40)
+      { id: 31, unit: 'Unit 4: Non-Fictional Prose', q: "Francis Bacon's essays are famously characterized by which rhetorical style?", options: ["Aphoristic and pithy prose", "Loose and meandering digression", "Gothic melodrama", "Colloquial dialect"], answer: 0, explanation: "Bacon's essays (e.g. 'Of Studies', 'Of Truth') are celebrated for their concise, aphoristic wisdom." },
+      { id: 32, unit: 'Unit 4: Non-Fictional Prose', q: "Joseph Addison and Richard Steele co-founded which influential 18th-century periodical promoting polite civic discourse?", options: ["The Spectator", "The Rambler", "The Gentleman's Magazine", "The Edinburgh Review"], answer: 0, explanation: "The Spectator (1711–1712) introduced Mr. Spectator and the Spectator Club (Sir Roger de Coverley)." },
+      { id: 33, unit: 'Unit 4: Non-Fictional Prose', q: "Charles Lamb published his whimsical autobiographical essays under which pseudonym?", options: ["Elia", "Isaac Bickerstaff", "Boz", "The Opium-Eater"], answer: 0, explanation: "Lamb wrote his celebrated Essays of Elia under the pen name Elia." },
+      { id: 34, unit: 'Unit 4: Non-Fictional Prose', q: "Who authored the 1821 autobiographical confession Confessions of an English Opium-Eater?", options: ["Thomas De Quincey", "William Hazlitt", "Leigh Hunt", "S.T. Coleridge"], answer: 0, explanation: "Thomas De Quincey published Confessions of an English Opium-Eater in the London Magazine." },
+      { id: 35, unit: 'Unit 4: Non-Fictional Prose', q: "Thomas Carlyle's Sartor Resartus translates literally to:", options: ["The Tailor Re-tailored (or The Patcher Repatched)", "The Master Weaver", "The Philosophy of Clothes", "The Eternal No"], answer: 0, explanation: "Sartor Resartus is Latin for 'The Tailor Re-tailored', presenting Diogenes Teufelsdröckh's philosophy of clothes." },
+      { id: 36, unit: 'Unit 4: Non-Fictional Prose', q: "John Ruskin's Unto This Last profoundly influenced Mahatma Gandhi's philosophy of:", options: ["Sarvodaya (the welfare of all)", "Ahimsa (non-violence)", "Satyagraha (truth force)", "Swadeshi (self-reliance)"], answer: 0, explanation: "Gandhi translated Ruskin's Unto This Last into Gujarati under the title Sarvodaya." },
+      { id: 37, unit: 'Unit 4: Non-Fictional Prose', q: "In Culture and Anarchy (1869), Matthew Arnold categorizes English social classes into:", options: ["Barbarians, Philistines, and Populace", "Aristocrats, Bourgeoisie, and Proletariat", "Upper, Middle, and Working", "Knights, Burghers, and Serfs"], answer: 0, explanation: "Arnold labels the aristocracy 'Barbarians', the middle class 'Philistines', and the working class 'Populace'." },
+      { id: 38, unit: 'Unit 4: Non-Fictional Prose', q: "Virginia Woolf's A Room of One's Own (1929) invents which fictional sister of Shakespeare to illustrate the plight of female genius in history?", options: ["Judith Shakespeare", "Susanna Shakespeare", "Anne Shakespeare", "Mary Shakespeare"], answer: 0, explanation: "Woolf imagines Judith Shakespeare, gifted with her brother's talent but thwarted by gender oppression." },
+      { id: 39, unit: 'Unit 4: Non-Fictional Prose', q: "In 'Shooting an Elephant' (1936), George Orwell reflects on the psychological paradox of imperialism during his service as a police officer in:", options: ["Burma (Myanmar)", "India", "South Africa", "Nigeria"], answer: 0, explanation: "Orwell served in the Indian Imperial Police in Burma from 1922 to 1927." },
+      { id: 40, unit: 'Unit 4: Non-Fictional Prose', q: "Who authored 'Politics and the English Language' (1946), decrying stale metaphors and political obfuscation?", options: ["George Orwell", "Aldous Huxley", "E.M. Forster", "C.S. Lewis"], answer: 0, explanation: "Orwell provides his famous six rules for clear, honest writing in 'Politics and the English Language'." },
+
+      // Unit 5: Language & Pedagogy (41-50)
+      { id: 41, unit: 'Unit 5: Language & Pedagogy', q: "Ferdinand de Saussure distinguishes between the abstract language system and individual speech acts as:", options: ["Langue and Parole", "Competence and Performance", "Signifier and Signified", "Diachronic and Synchronic"], answer: 0, explanation: "Saussure distinguishes 'langue' (system/grammar) from 'parole' (actual utterance/execution)." },
+      { id: 42, unit: 'Unit 5: Language & Pedagogy', q: "Noam Chomsky countered B.F. Skinner's behaviorism by proposing which innate mental faculty for syntax?", options: ["Language Acquisition Device (LAD)", "Tabula Rasa", "Critical Period Hypothesis", "Operant Conditioning Unit"], answer: 0, explanation: "Chomsky proposed the LAD and Universal Grammar against behaviorist stimulus-response models." },
+      { id: 43, unit: 'Unit 5: Language & Pedagogy', q: "In English phonetics, how many phonemes (vowels and consonants) are recognized in standard Received Pronunciation (RP)?", options: ["44 phonemes (20 vowel sounds + 24 consonant sounds)", "26 phonemes", "52 phonemes", "36 phonemes"], answer: 0, explanation: "Standard RP has 44 phonemes: 12 monophthongs, 8 diphthongs, and 24 consonants." },
+      { id: 44, unit: 'Unit 5: Language & Pedagogy', q: "Which linguistic law describes the systematic sound shift from Proto-Indo-European voiceless stops to Germanic voiceless fricatives?", options: ["Grimm's Law", "Verner's Law", "Grassmann's Law", "Brugmann's Law"], answer: 0, explanation: "Grimm's Law (First Germanic Sound Shift) formulated by Jacob Grimm explains PIE *p, *t, *k becoming Germanic *f, *th, *h." },
+      { id: 45, unit: 'Unit 5: Language & Pedagogy', q: "Dell Hymes formulated the concept of 'Communicative Competence' to emphasize:", options: ["Knowing when and how to say what to whom in social context", "Pristine grammatical accuracy in written essays", "Rapid phonemic transcription", "Chomskyan idealized speaker-listener knowledge"], answer: 0, explanation: "Hymes countered Chomsky by emphasizing social appropriacy alongside grammatical knowledge." },
+      { id: 46, unit: 'Unit 5: Language & Pedagogy', q: "Stephen Krashen's Second Language Acquisition Theory distinguishes fundamentally between:", options: ["Acquisition (subconscious) and Learning (conscious)", "Grammar and Vocabulary", "Phonics and Whole Language", "Input and Output"], answer: 0, explanation: "Krashen's Acquisition-Learning hypothesis separates natural acquisition from conscious classroom learning." },
+      { id: 47, unit: 'Unit 5: Language & Pedagogy', q: "What does the pedagogical acronym 'CLIL' stand for in contemporary language teaching?", options: ["Content and Language Integrated Learning", "Communicative Language Instructional Logistics", "Comprehensive Linguistic Immersion Laboratory", "Contextual Literacy and Interactive Listening"], answer: 0, explanation: "CLIL refers to teaching subjects such as science or history through a second language." },
+      { id: 48, unit: 'Unit 5: Language & Pedagogy', q: "In sociolinguistics, a stable linguistic variety that develops when two mutually unintelligible languages combine and become a community's mother tongue is a:", options: ["Creole", "Pidgin", "Lingua Franca", "Idiolect"], answer: 0, explanation: "A pidgin has no native speakers; once it is learned as a first language by children, it becomes a creole." },
+      { id: 49, unit: 'Unit 5: Language & Pedagogy', q: "B. Kumaravadivelu's 'Post-Method Pedagogy' centers on which three overarching parameters?", options: ["Particularity, Practicality, and Possibility", "Purpose, Process, and Product", "Pedagogy, Philosophy, and Performance", "Proficiency, Paradigm, and Practice"], answer: 0, explanation: "Kumaravadivelu's 3 Ps: Particularity (contextual), Practicality (teacher autonomy), and Possibility (empowerment)." },
+      { id: 50, unit: 'Unit 5: Language & Pedagogy', q: "Which ELT approach eliminates the native language entirely from classroom instruction, associating meaning directly with objects and actions?", options: ["The Direct Method (Reform Method)", "Grammar-Translation Method", "Audio-Lingual Method", "Silent Way"], answer: 0, explanation: "The Direct Method prohibits L1 translation and relies exclusively on target language immersion." },
+
+      // Unit 6: English in India (51-60)
+      { id: 51, unit: 'Unit 6: English in India', q: "Thomas Babington Macaulay presented his notorious 'Minute on Indian Education' in which year?", options: ["1835", "1813", "1854", "1857"], answer: 0, explanation: "Macaulay's Minute of February 2, 1835 led to Lord William Bentinck's English Education Act of 1835." },
+      { id: 52, unit: 'Unit 6: English in India', q: "Wood's Despatch (1854) is widely recognized as the 'Magna Carta of English Education in India' because it recommended:", options: ["The establishment of universities at Calcutta, Bombay, and Madras", "The total abolition of vernacular schools", "Compulsory military training", "The replacement of Hindi with Persian"], answer: 0, explanation: "Charles Wood's Despatch of 1854 established modern universities at Calcutta, Bombay, and Madras in 1857." },
+      { id: 53, unit: 'Unit 6: English in India', q: "Raja Rao's famous Foreword to Kanthapura (1938) articulates which crucial artistic dilemma for the Indian English novelist?", options: ["We cannot write like the English. We should not. We cannot write only as Indians.", "English is the master's tongue and must be discarded completely.", "Only Sanskrit can capture the soul of the village.", "Novels must adopt the strict tripartite Victorian structure."], answer: 0, explanation: "Raja Rao declared: 'One has to convey in a language that is not one's own the spirit that is one's own.'" },
+      { id: 54, unit: 'Unit 6: English in India', q: "The trio of founding fathers who inaugurated the realist Indian English novel in the 1930s comprises:", options: ["Mulk Raj Anand, R.K. Narayan, and Raja Rao", "Rabindranath Tagore, Toru Dutt, and Sarojini Naidu", "Nissim Ezekiel, A.K. Ramanujan, and Jayanta Mahapatra", "Salman Rushdie, Amitav Ghosh, and Vikram Seth"], answer: 0, explanation: "Mulk Raj Anand (Untouchable), R.K. Narayan (Swami and Friends), and Raja Rao (Kanthapura) are the founding triumvirate." },
+      { id: 55, unit: 'Unit 6: English in India', q: "Which Indian poet published the landmark post-independence modernist collection A Time to Change (Fortune Press, 1952)?", options: ["Nissim Ezekiel", "A.K. Ramanujan", "Keki N. Daruwalla", "Dom Moraes"], answer: 0, explanation: "Nissim Ezekiel's A Time to Change in 1952 is acknowledged as the starting point of modernist Indian English poetry." },
+      { id: 56, unit: 'Unit 6: English in India', q: "In A.K. Ramanujan's poem 'A River', which city on the river Vaigai is the setting for the flood narrative?", options: ["Madurai", "Tanjore", "Kanchi", "Mysore"], answer: 0, explanation: "'In Madurai, city of temples and poets, who sang of the cities and temples...'" },
+      { id: 57, unit: 'Unit 6: English in India', q: "Salman Rushdie's Midnight's Children (1981) features protagonist Saleem Sinai, born at which exact historical moment?", options: ["Midnight, August 15, 1947 (India's Independence)", "Midnight, January 26, 1950 (Republic Day)", "August 9, 1942 (Quit India Movement)", "March 12, 1930 (Salt March)"], answer: 0, explanation: "Saleem Sinai is born at the stroke of midnight on August 15, 1947, handcuffed to history." },
+      { id: 58, unit: 'Unit 6: English in India', q: "Braj B. Kachru's 'Three Circles of English' model places India in which category?", options: ["The Outer Circle (ESL)", "The Inner Circle (ENL)", "The Expanding Circle (EFL)", "The Peripheral Circle"], answer: 0, explanation: "Kachru places native varieties in the Inner Circle, postcolonial institutional varieties (India, Nigeria) in the Outer Circle." },
+      { id: 59, unit: 'Unit 6: English in India', q: "Under the Official Languages Act 1963 and the Indian Constitution, what is the constitutional status of English in India?", options: ["Associate Official Language of the Union", "National Language of India", "Sole Official Language for Interstate Commerce", "Foreign Educational Medium"], answer: 0, explanation: "Hindi is the official language of the Union, and English serves as the subsidiary/associate official language." },
+      { id: 60, unit: 'Unit 6: English in India', q: "National Education Policy (NEP) 2020 explicitly advocates for which pedagogical orientation in foundational school education?", options: ["Mother tongue / regional language as medium of instruction up to Grade 5", "Compulsory English medium from Nursery", "Exclusively Sanskrit instruction in all government schools", "Bilingual Latin-English curriculum"], answer: 0, explanation: "NEP 2020 recommends instruction in home language/mother tongue/regional language wherever possible until Grade 5." },
+
+      // Unit 7: Cultural Studies (61-70)
+      { id: 61, unit: 'Unit 7: Cultural Studies', q: "The Centre for Contemporary Cultural Studies (CCCS) was founded in 1964 at which British university?", options: ["University of Birmingham", "Oxford University", "Cambridge University", "University of Leeds"], answer: 0, explanation: "Richard Hoggart founded the CCCS at the University of Birmingham in 1964." },
+      { id: 62, unit: 'Unit 7: Cultural Studies', q: "Richard Hoggart's foundational 1957 book examining the decline of working-class communal culture is titled:", options: ["The Uses of Literacy", "Culture and Society", "The Making of the English Working Class", "Subculture: The Meaning of Style"], answer: 0, explanation: "Richard Hoggart wrote The Uses of Literacy: Aspects of Working-Class Life." },
+      { id: 63, unit: 'Unit 7: Cultural Studies', q: "Raymond Williams defines culture as 'a whole way of life' and insists that:", options: ["Culture is ordinary", "Culture is the preserve of high art", "Culture is an illusion of the bourgeoisie", "Culture is biological inheritance"], answer: 0, explanation: "In his seminal 1958 essay, Raymond Williams declared: 'Culture is ordinary: that is the first fact.'" },
+      { id: 64, unit: 'Unit 7: Cultural Studies', q: "Stuart Hall's 1973 model 'Encoding and Decoding in the Television Discourse' identifies which three interpretive positions?", options: ["Dominant-Hegemonic, Negotiated, and Oppositional", "Passive, Active, and Resistant", "Cognitive, Evaluative, and Affective", "Linear, Interactive, and Transactional"], answer: 0, explanation: "Stuart Hall identifies: 1) Dominant/Hegemonic, 2) Negotiated, and 3) Oppositional decoding positions." },
+      { id: 65, unit: 'Unit 7: Cultural Studies', q: "Who authored Subculture: The Meaning of Style (1979), analyzing British youth subcultures like Punks, Mods, and Teddy Boys?", options: ["Dick Hebdige", "Paul Gilroy", "Angela McRobbie", "Tony Bennett"], answer: 0, explanation: "Dick Hebdige analyzed subcultural semiotics, bricolage, and style resistance." },
+      { id: 66, unit: 'Unit 7: Cultural Studies', q: "The term 'Culture Industry' (Kulturindustrie) was coined by which Frankfurt School critical theorists in Dialectic of Enlightenment (1944)?", options: ["Theodor Adorno and Max Horkheimer", "Walter Benjamin and Herbert Marcuse", "Jürgen Habermas and Leo Lowenthal", "Karl Marx and Friedrich Engels"], answer: 0, explanation: "Adorno and Horkheimer coined 'Culture Industry' to critique commodified mass culture and mass deception." },
+      { id: 67, unit: 'Unit 7: Cultural Studies', q: "Walter Benjamin's 1935 essay 'The Work of Art in the Age of Mechanical Reproduction' argues that reproducibility destroys the artwork's:", options: ["Aura", "Economic value", "Political utility", "Material composition"], answer: 0, explanation: "Benjamin argues that mechanical reproduction detaches the reproduction from the domain of tradition, decaying its 'aura'." },
+      { id: 68, unit: 'Unit 7: Cultural Studies', q: "Paul Gilroy's 1993 study of transnational hybrid identities across Africa, the Caribbean, America, and Britain is titled:", options: ["The Black Atlantic: Modernity and Double Consciousness", "There Ain't No Black in the Union Jack", "Empire Strikes Back", "Postcolonial Melancholia"], answer: 0, explanation: "The Black Atlantic explores counterculture of modernity crossing the Atlantic trade routes." },
+      { id: 69, unit: 'Unit 7: Cultural Studies', q: "Antonio Gramsci's Prison Notebooks introduced which concept explaining how the ruling class secures voluntary consent from subordinate classes?", options: ["Hegemony", "Base and Superstructure", "Interpellation", "False Consciousness"], answer: 0, explanation: "Gramsci's cultural hegemony refers to ideological leadership and consent through civil society institutions." },
+      { id: 70, unit: 'Unit 7: Cultural Studies', q: "Louis Althusser distinguishes between Repressive State Apparatuses (RSAs) and:", options: ["Ideological State Apparatuses (ISAs)", "Economic State Foundations", "Juridical Panopticons", "Discursive Formations"], answer: 0, explanation: "Althusser distinguishes violent RSAs (police, military) from ideological ISAs (schools, media, church)." },
+
+      // Unit 8: Literary Criticism (71-80)
+      { id: 71, unit: 'Unit 8: Literary Criticism', q: "In Poetics, Aristotle defines 'Hamartia' as:", options: ["Tragic error in judgment or misstep", "Moral depravity or evil character", "Sudden reversal of fortune", "Emotional purgation and pity"], answer: 0, explanation: "Hamartia is an intellectual mistake, error of judgment, or fatal misstep, not inherently sin or moral depravity." },
+      { id: 72, unit: 'Unit 8: Literary Criticism', q: "Who authored the classical treatise On the Sublime (Peri Hupsous), identifying five sources of sublime expression?", options: ["Longinus (Pseudo-Longinus)", "Horace", "Quintilian", "Plato"], answer: 0, explanation: "Longinus identified grandeur of thought, capacity for strong emotion, figures of speech, noble diction, and dignified composition." },
+      { id: 73, unit: 'Unit 8: Literary Criticism', q: "Sir Philip Sidney's An Apology for Poetry (Defence of Poesie) was written in direct response to Stephen Gosson's attack titled:", options: ["The Schoole of Abuse", "The Anatomy of Melancholy", "Toxophilus", "A Mirror for Magistrates"], answer: 0, explanation: "Stephen Gosson dedicated The Schoole of Abuse (1579) to Sidney, provoking Sidney's famous defence." },
+      { id: 74, unit: 'Unit 8: Literary Criticism', q: "In An Essay of Dramatic Poesy (1668), which speaker serves as John Dryden's persona defending modern English drama?", options: ["Neander", "Crites", "Eugenius", "Lisideius"], answer: 0, explanation: "Neander (the 'new man') speaks for Dryden, praising Shakespeare and English variety against French rule-bound drama." },
+      { id: 75, unit: 'Unit 8: Literary Criticism', q: "In the Preface to Lyrical Ballads (1800), Wordsworth famously defines poetry as:", options: ["The spontaneous overflow of powerful feelings recollected in tranquility", "The best words in the best order", "A criticism of life under poetic laws", "Speaking pictures designed to delight and teach"], answer: 0, explanation: "Wordsworth defined poetry as: 'the spontaneous overflow of powerful feelings: it takes its origin from emotion recollected in tranquillity.'" },
+      { id: 76, unit: 'Unit 8: Literary Criticism', q: "In Biographia Literaria (Chapter XIII), S.T. Coleridge distinguishes between:", options: ["Primary Imagination and Secondary Imagination", "Fancy and Logic", "Egotistical Sublime and Negative Capability", "Invention and Fancy"], answer: 0, explanation: "Coleridge defines Primary Imagination as the living power of perception, and Secondary as the creative, dissolving synthetic power." },
+      { id: 77, unit: 'Unit 8: Literary Criticism', q: "Matthew Arnold proposed which critical method of comparing lines from great masters (Homer, Dante, Shakespeare, Milton) to evaluate contemporary poetry?", options: ["The Touchstone Method", "The Historical Method", "The Biographical Estimate", "The Affective Fallacy"], answer: 0, explanation: "Arnold introduced the 'Touchstone Method' in 'The Study of Poetry' (1880)." },
+      { id: 78, unit: 'Unit 8: Literary Criticism', q: "In 'Tradition and the Individual Talent' (1919), T.S. Eliot compares the poet's mind in creation to:", options: ["A shred of platinum catalyst in a chemical reaction", "A mirror held up to nature", "An Aeolian harp stirred by wind", "An incandescent candle"], answer: 0, explanation: "Eliot uses the chemical catalyst analogy: platinum accelerates the combination of oxygen and sulfur dioxide while remaining unaffected." },
+      { id: 79, unit: 'Unit 8: Literary Criticism', q: "Who authored Practical Criticism (1929), giving Cambridge undergraduate students uncredited, anonymous poems to read and critique?", options: ["I.A. Richards", "F.R. Leavis", "William Empson", "T.S. Eliot"], answer: 0, explanation: "I.A. Richards analyzed the reading errors of students, founding empirical practical criticism." },
+      { id: 80, unit: 'Unit 8: Literary Criticism', q: "Which New Critic authored The Well Wrought Urn (1947), arguing that poetic meaning cannot be separated from its structure ('The Heresy of Paraphrase')?", options: ["Cleanth Brooks", "John Crowe Ransom", "Allen Tate", "Robert Penn Warren"], answer: 0, explanation: "Cleanth Brooks argued that paraphrase destroys the essential paradox and irony of a poem." },
+
+      // Unit 9: Post-WWII Theory (81-90)
+      { id: 81, unit: 'Unit 9: Literary Theory', q: "In 'The Death of the Author' (1967), Roland Barthes declares that:", options: ["The birth of the reader must be ransomed by the death of the Author", "Authors are the sole custodians of textual meaning", "All literary criticism must serve authorial biography", "Language is an authorial property"], answer: 0, explanation: "Barthes proclaimed: 'the birth of the reader must be at the cost of the death of the Author.'" },
+      { id: 82, unit: 'Unit 9: Literary Theory', q: "Jacques Derrida's coined neologism 'Différance' intentionally combines which two French verbs?", options: ["Differ (to be distinct) and Defer (to postpone/delay)", "Define and Defy", "Difference and Distance", "Desire and Delay"], answer: 0, explanation: "Différance blends 'to differ' (spatial difference) and 'to defer' (temporal delay)." },
+      { id: 83, unit: 'Unit 9: Literary Theory', q: "Michel Foucault's Discipline and Punish (1975) adopts Jeremy Bentham's architectural design of which surveillance apparatus?", options: ["The Panopticon", "The Iron Maiden", "The Labyrinth", "The Oubliette"], answer: 0, explanation: "Foucault uses the Panopticon as a metaphor for modern disciplinary surveillance and self-policing subjects." },
+      { id: 84, unit: 'Unit 9: Literary Theory', q: "In The Second Sex (1949), Simone de Beauvoir famously wrote:", options: ["One is not born, but rather becomes, a woman", "Women are biologically ordained to maternal solitude", "Femininity is an invariant genetic condition", "Man is the Other, woman the Subject"], answer: 0, explanation: "'On ne naît pas femme: on le devient' (One is not born, but rather becomes, a woman)." },
+      { id: 85, unit: 'Unit 9: Literary Theory', q: "Elaine Showalter identifies three historical phases of women's writing in 'Toward a Feminist Poetics':", options: ["Feminine (1840-80), Feminist (1880-1920), and Female (1920 onwards)", "Submissive, Rebellious, and Autonomous", "Victorian, Modernist, and Postmodern", "Patriarchal, Radical, and Gynocentric"], answer: 0, explanation: "Showalter coined 'gynocritics' and mapped the Feminine, Feminist, and Female phases." },
+      { id: 86, unit: 'Unit 9: Literary Theory', q: "In Orientalism (1978), Edward Said argues that European imperialism constructed the Orient through:", options: ["Discursive knowledge-power structures as analyzed by Michel Foucault", "Innocent ethnographic curiosity", "Pure linguistic accidental translations", "Objective historical cartography"], answer: 0, explanation: "Said drew directly on Foucault's notion of discourse to analyze how the West produced the Orient ideologically." },
+      { id: 87, unit: 'Unit 9: Literary Theory', q: "Homi K. Bhabha's The Location of Culture (1994) explores postcolonial concepts including:", options: ["Mimicry, Hybridity, Ambivalence, and the Third Space", "Subalternity and Elite Hegemony", "Orientalism and Occident", "Comprador and Caliban"], answer: 0, explanation: "Bhabha formulated mimicry ('almost the same, but not quite') and the Third Space of cultural enunciation." },
+      { id: 88, unit: 'Unit 9: Literary Theory', q: "Gayatri Chakravorty Spivak's 1988 landmark essay asks which question regarding subaltern agency?", options: ["Can the Subaltern Speak?", "Who Fears the Subaltern?", "Where is the Subaltern Voice?", "Why Did the Subaltern Weep?"], answer: 0, explanation: "Spivak's 'Can the Subaltern Speak?' examines Sati and the epistemic violence silencing the subaltern woman." },
+      { id: 89, unit: 'Unit 9: Literary Theory', q: "Judith Butler's Gender Trouble (1990) argues that gender is fundamentally:", options: ["Performative—produced through stylized, repetitive corporeal acts", "A fixed biological binary inscribed at birth", "An innate psychological essence", "Determined exclusively by chromosomal genetics"], answer: 0, explanation: "Butler defines gender as performative: an ongoing repetition of acts rather than an essential natural fact." },
+      { id: 90, unit: 'Unit 9: Literary Theory', q: "Cheryll Glotfelty co-founded ASLE and defined Ecocriticism as:", options: ["The study of the relationship between literature and the physical environment", "The historical economics of forestry", "The biological analysis of poetic meter", "The political lobbying for clean energy in academia"], answer: 0, explanation: "In The Ecocriticism Reader (1996), Glotfelty defined ecocriticism as the study of literature and physical environment." },
+
+      // Unit 10: Research Methods (91-100)
+      { id: 91, unit: 'Unit 10: Research Methods', q: "In MLA 9th Edition style, what punctuation mark follows the author's name in a Works Cited entry?", options: ["Period (.)", "Comma (,)", "Colon (:)", "Semicolon (;)"], answer: 0, explanation: "MLA 9th requires: Author Last, First. Title of Source. (followed by a period)." },
+      { id: 92, unit: 'Unit 10: Research Methods', q: "In academic literary research, an original literary text (such as Hamlet or Jane Eyre) is classified as a:", options: ["Primary Source", "Secondary Source", "Tertiary Source", "Incidental Source"], answer: 0, explanation: "The text under analysis is the primary source; scholarly articles analyzing it are secondary sources." },
+      { id: 93, unit: 'Unit 10: Research Methods', q: "What is a 'Peer-Reviewed' journal in scholarly academic publishing?", options: ["A journal where articles are evaluated by independent subject experts prior to publication", "A journal edited solely by university students", "A journal open to public Wikipedia-style edits", "A non-academic commercial review"], answer: 0, explanation: "Peer review requires blind review by recognized subject specialists before editorial acceptance." },
+      { id: 94, unit: 'Unit 10: Research Methods', q: "What does the Latin scholarly abbreviation 'ibid.' (ibidem) mean when encountered in older citation footnotes?", options: ["In the same place (referring to the immediately preceding citation)", "In another work", "Compare with", "Consult appendix"], answer: 0, explanation: "Ibid. stands for 'ibidem', meaning 'in the same place/work'." },
+      { id: 95, unit: 'Unit 10: Research Methods', q: "Which ethical violation occurs when a researcher uses another author's language or ideas without proper citation?", options: ["Plagiarism", "Copyright Assignment", "Peer Retraction", "Open Access"], answer: 0, explanation: "Plagiarism is the uncredited representation of another author's thoughts, ideas, or words as one's own." },
+      { id: 96, unit: 'Unit 10: Research Methods', q: "In MLA 9th Edition, what is the core element container for an article published inside an academic journal?", options: ["Title of Container (italicized)", "Author of journal", "City of publication", "Series number"], answer: 0, explanation: "The journal name is the container: Title of Container (italicized), followed by volume, number, and year." },
+      { id: 97, unit: 'Unit 10: Research Methods', q: "In quantitative literary research, which digital humanities method analyzes word frequency and syntactic patterns across large electronic text corpora?", options: ["Stylometry / Distant Reading", "Hermeneutic Circle", "Close Reading", "Deconstructive Aporia"], answer: 0, explanation: "Franco Moretti coined 'distant reading'; stylometry computationally measures stylistic signatures across corpora." },
+      { id: 98, unit: 'Unit 10: Research Methods', q: "What constitutes a 'working hypothesis' in a literary research dissertation?", options: ["A testable, provisional proposition or thesis statement guiding research inquiry", "A final bibliography list", "A signed declaration against plagiarism", "A summary of the supervisor's biography"], answer: 0, explanation: "A working hypothesis is the central interpretive argument that guides evidence gathering." },
+      { id: 99, unit: 'Unit 10: Research Methods', q: "In scholarly publishing, what does a DOI (Digital Object Identifier) provide?", options: ["A permanent, persistent alphanumeric link to an electronic scholarly publication", "An annual subscription fee voucher", "A copyright registration receipt", "The author's personal phone code"], answer: 0, explanation: "A DOI provides a permanent, stable URL link to digital scholarly content." },
+      { id: 100, unit: 'Unit 10: Research Methods', q: "Which standard citation style is most commonly mandated across university departments of English literature?", options: ["MLA (Modern Language Association) Style", "IEEE Engineering Style", "Vancouver Medical Style", "Bluebook Legal Style"], answer: 0, explanation: "MLA Handbook is the global standard for language and literature research citation." }
+    ];
+
+    // State Variables
+    let currentIdx = 0;
+    const userAnswers = {}; // { questionIdx: optionIdx }
+    const markedForReview = {}; // { questionIdx: true }
+    const visitedQuestions = { 0: true };
+    let timerSeconds = 180 * 60; // 3 Hours (180 minutes)
+    let timerInterval = null;
+    let isTestSubmitted = false;
+
+    // Parse testId from URL query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const testId = urlParams.get('testId') || 'test-net-mock-1';
+
+    const testTitles = {
+      'test-net-mock-1': 'NET Mock 1: Full-Length Paper II NTA Simulation (100 Qs)',
+      'test-unit-1': 'Unit Test 1: British Drama & Elizabethan Poetry',
+      'test-bonus-practice-1': 'Bonus Practice Mock A: Quick Speed Revision',
+      'test-net-mock-2': 'NET Mock 2: Full-Length Literature & Literary Theory',
+      'test-net-mock-3': 'NET Mock 3: Grand Mid-Term Diagnostic Mock',
+      'test-net-mock-4': 'NET Mock 4: Cultural Studies & English in India',
+      'test-net-mock-5': 'NET Mock 5: Research Methods & Pedagogy Master Mock',
+      'test-gset-special-1': 'GSET Special Simulation Exam 1',
+      'test-grand-final-booster': 'Grand Final Rank Booster Exam 2026'
+    };
+
+    if (testTitles[testId]) {
+      document.getElementById('testTitleDisplay').textContent = testTitles[testId];
+    }
+
+    // Try reading student name from local session
+    try {
+      const rawSession = localStorage.getItem('netvidya_buyer_session_v1');
+      if (rawSession) {
+        const sess = JSON.parse(rawSession);
+        if (sess && sess.name) {
+          document.getElementById('candidateName').textContent = sess.name;
+          if (sess.email) {
+            document.getElementById('rollNumber').textContent = 'NV-2026-' + Math.abs(sess.email.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)).toString().slice(0, 6);
+          }
+        }
+      }
+    } catch (e) {}
+
+    // Initialize Timer
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timerSeconds <= 0) {
+          clearInterval(timerInterval);
+          submitTest();
+          return;
+        }
+        timerSeconds--;
+        renderTimer();
+      }, 1000);
+    }
+
+    function renderTimer() {
+      const h = Math.floor(timerSeconds / 3600);
+      const m = Math.floor((timerSeconds % 3600) / 60);
+      const s = timerSeconds % 60;
+      const fmt = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      document.getElementById('timerDisplay').textContent = fmt;
+    }
+
+    // Palette Badge State Computation
+    function getQuestionState(idx) {
+      const hasAnswer = userAnswers[idx] !== undefined;
+      const isMarked = markedForReview[idx] === true;
+      const isVis = visitedQuestions[idx] === true;
+
+      if (isMarked) return 'marked-review';
+      if (hasAnswer) return 'answered';
+      if (isVis) return 'not-answered';
+      return 'not-visited';
+    }
+
+    function updatePaletteCounts() {
+      let countAns = 0;
+      let countNotAns = 0;
+      let countMarked = 0;
+      let countNotVis = 0;
+
+      for (let i = 0; i < QUESTIONS.length; i++) {
+        const state = getQuestionState(i);
+        if (state === 'answered') countAns++;
+        else if (state === 'not-answered') countNotAns++;
+        else if (state === 'marked-review') countMarked++;
+        else countNotVis++;
+      }
+
+      document.getElementById('countAnswered').textContent = countAns;
+      document.getElementById('countNotAnswered').textContent = countNotAns;
+      document.getElementById('countMarked').textContent = countMarked;
+      document.getElementById('countNotVisited').textContent = countNotVis;
+    }
+
+    // Render Question Palette Grid
+    function renderPaletteGrid() {
+      const grid = document.getElementById('paletteGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < QUESTIONS.length; i++) {
+        const btn = document.createElement('button');
+        const state = getQuestionState(i);
+        btn.className = `p-btn ${state}` + (i === currentIdx ? ' current' : '');
+        btn.textContent = (i + 1);
+        btn.title = `Question ${i + 1} (${state.replace('-', ' ')})`;
+        btn.onclick = () => {
+          goToQuestion(i);
+        };
+        grid.appendChild(btn);
+      }
+      updatePaletteCounts();
+    }
+
+    // Render Active Question
+    function renderQuestion(idx) {
+      currentIdx = idx;
+      visitedQuestions[idx] = true;
+      const item = QUESTIONS[idx];
+
+      document.getElementById('qNumberLabel').textContent = `Question ${idx + 1} of ${QUESTIONS.length}`;
+      document.getElementById('qSectionTag').textContent = item.unit;
+      document.getElementById('qText').textContent = item.q;
+
+      const optsContainer = document.getElementById('optionsContainer');
+      optsContainer.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const selected = userAnswers[idx];
+
+      item.options.forEach((opt, optIdx) => {
+        const label = document.createElement('label');
+        label.className = 'option-item' + (selected === optIdx ? ' selected' : '');
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = `option_q_${idx}`;
+        radio.value = optIdx;
+        radio.checked = selected === optIdx;
+        radio.onchange = () => {
+          userAnswers[idx] = optIdx;
+          renderQuestion(idx);
+          renderPaletteGrid();
+        };
+
+        const keySpan = document.createElement('span');
+        keySpan.className = 'option-key';
+        keySpan.textContent = letters[optIdx];
+
+        const textSpan = document.createElement('span');
+        textSpan.style.flex = '1';
+        textSpan.textContent = opt;
+
+        label.appendChild(radio);
+        label.appendChild(keySpan);
+        label.appendChild(textSpan);
+        optsContainer.appendChild(label);
+      });
+
+      renderPaletteGrid();
+    }
+
+    function goToQuestion(idx) {
+      if (idx < 0 || idx >= QUESTIONS.length) return;
+      renderQuestion(idx);
+    }
+
+    // Button Handlers
+    document.getElementById('btnSaveNext').onclick = () => {
+      // If currently selected, answer is recorded
+      if (currentIdx < QUESTIONS.length - 1) {
+        goToQuestion(currentIdx + 1);
+      } else {
+        renderPaletteGrid();
+      }
+    };
+
+    document.getElementById('btnClearResponse').onclick = () => {
+      delete userAnswers[currentIdx];
+      renderQuestion(currentIdx);
+    };
+
+    document.getElementById('btnMarkReview').onclick = () => {
+      markedForReview[currentIdx] = true;
+      if (currentIdx < QUESTIONS.length - 1) {
+        goToQuestion(currentIdx + 1);
+      } else {
+        renderPaletteGrid();
+      }
+    };
+
+    document.getElementById('btnPrev').onclick = () => {
+      if (currentIdx > 0) {
+        goToQuestion(currentIdx - 1);
+      }
+    };
+
+    document.getElementById('btnSubmitTest').onclick = () => {
+      const ansCount = Object.keys(userAnswers).length;
+      const unansCount = QUESTIONS.length - ansCount;
+      const confirmed = window.confirm(
+        `Are you sure you want to submit your CBT examination?\n\n` +
+        `• Total Questions: ${QUESTIONS.length}\n` +
+        `• Answered: ${ansCount}\n` +
+        `• Unanswered: ${unansCount}\n` +
+        `• Marked for Review: ${Object.keys(markedForReview).length}\n\n` +
+        `Click OK to calculate your official score and syllabus breakdown.`
+      );
+      if (confirmed) {
+        submitTest();
+      }
+    };
+
+    // Test Evaluation and Score Summary Modal
+    function submitTest() {
+      if (isTestSubmitted) return;
+      isTestSubmitted = true;
+      clearInterval(timerInterval);
+
+      let correct = 0;
+      let incorrect = 0;
+      let unattempted = 0;
+
+      const unitStats = {};
+
+      QUESTIONS.forEach((q, i) => {
+        if (!unitStats[q.unit]) {
+          unitStats[q.unit] = { total: 0, correct: 0 };
+        }
+        unitStats[q.unit].total++;
+
+        const userAns = userAnswers[i];
+        if (userAns === undefined) {
+          unattempted++;
+        } else if (userAns === q.answer) {
+          correct++;
+          unitStats[q.unit].correct++;
+        } else {
+          incorrect++;
+        }
+      });
+
+      const totalScore = correct * 2; // +2 per question in UGC NET
+      const accuracy = (correct + incorrect > 0) ? Math.round((correct / (correct + incorrect)) * 100) : 0;
+
+      document.getElementById('scoreDisplay').textContent = totalScore;
+      document.getElementById('correctCount').textContent = correct;
+      document.getElementById('incorrectCount').textContent = incorrect;
+      document.getElementById('unattemptedCount').textContent = unattempted;
+      document.getElementById('accuracyDisplay').textContent = `${accuracy}%`;
+
+      // Render Syllabus Breakdown
+      const unitContainer = document.getElementById('unitBreakdownContainer');
+      unitContainer.innerHTML = '';
+
+      Object.entries(unitStats).forEach(([unitName, s]) => {
+        const pct = Math.round((s.correct / s.total) * 100);
+        const row = document.createElement('div');
+        row.className = 'unit-row';
+        row.innerHTML = `
+          <span style="font-weight: 600; color: #334155; flex: 1;">${unitName}</span>
+          <span style="font-family: monospace; font-weight: 700; color: #0f172a;">${s.correct}/${s.total} (${pct}%)</span>
+          <div class="unit-bar-bg">
+            <div class="unit-bar-fill" style="width: ${pct}%;"></div>
+          </div>
+        `;
+        unitContainer.appendChild(row);
+      });
+
+      document.getElementById('scoreModal').classList.add('open');
+    }
+
+    function returnToDashboard() {
+      window.location.href = '/#dashboard';
+    }
+
+    function reviewAllAnswers() {
+      document.getElementById('scoreModal').classList.remove('open');
+      // Highlight correct vs wrong answers in question view
+      const item = QUESTIONS[currentIdx];
+      renderQuestion(currentIdx);
+      alert('Review Mode Active: You can now navigate through all 100 questions to examine your responses.');
+    }
+
+    // Initialize Page
+    renderQuestion(0);
+    startTimer();
+  </script>
+</body>
+</html>

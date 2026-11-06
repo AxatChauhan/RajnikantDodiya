@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import {
   X,
+  LogIn,
+  UserPlus,
   KeyRound,
   Mail,
   Lock,
+  User,
+  Phone,
   ArrowRight,
   AlertCircle,
   CheckCircle2,
-  Sparkles
+  HelpCircle
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 
@@ -18,109 +22,164 @@ interface NetVidyaStudentLoginModalProps {
   onLoginSuccess: () => void;
 }
 
+type TabType = 'login' | 'signup' | 'forgot';
+
 export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps> = ({
   isOpen,
   onClose,
   onOpenCheckout,
   onLoginSuccess
 }) => {
-  const { loginBuyer, buyersRegistry } = useNetVidyaStore();
+  const { login, signup, forgotPassword, resetPassword } = useNetVidyaStore();
 
-  const [authMode, setAuthMode] = useState<'password' | 'otp'>('password');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('login');
+  
+  // Login form fields
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  // Sign up form fields
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupMobile, setSignupMobile] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+
+  // Forgot / Reset password fields
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isResetStep, setIsResetStep] = useState(false);
+
+  // Status and messages
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handlePasswordSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setSuccessMessage(null);
 
-    const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes('@')) {
+    const cleanEmail = loginEmail.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       setErrorMessage('Please enter a valid email address.');
       return;
     }
 
-    if (!password || password.length < 4) {
+    if (!loginPassword || loginPassword.length < 4) {
       setErrorMessage('Please enter your password.');
       return;
     }
 
     setIsSubmitting(true);
+    const result = await login(cleanEmail, loginPassword);
+    setIsSubmitting(false);
 
-    // Check if user is in buyers registry
-    const match = buyersRegistry.find(b => b.email.toLowerCase() === cleanEmail);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      if (match && match.isActive) {
-        loginBuyer({
-          name: match.name,
-          email: match.email,
-          mobile: match.mobile,
-          orderId: match.orderId
-        });
-        onLoginSuccess();
-        onClose();
-      } else {
-        // Allow general student login or invite to buy
-        loginBuyer({
-          name: cleanEmail.split('@')[0],
-          email: cleanEmail,
-          mobile: '9876543210',
-          orderId: `NV_SCHOLAR_${Date.now().toString().slice(-6)}`
-        });
-        onLoginSuccess();
-        onClose();
-      }
-    }, 500);
+    if (result.success) {
+      onLoginSuccess();
+      onClose();
+    } else {
+      setErrorMessage(result.error || 'Invalid email or password.');
+    }
   };
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setSuccessMessage(null);
 
-    const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes('@')) {
-      setErrorMessage('Please enter your registered email address.');
+    const cleanName = signupName.trim();
+    const cleanEmail = signupEmail.trim().toLowerCase();
+    const cleanMobile = signupMobile.trim();
+
+    if (!cleanName) {
+      setErrorMessage('Please enter your full name.');
+      return;
+    }
+
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+
+    if (!cleanMobile || cleanMobile.replace(/\D/g, '').length < 10) {
+      setErrorMessage('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    if (!signupPassword || signupPassword.length < 6) {
+      setErrorMessage('Password must be at least 6 characters long.');
       return;
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsOtpSent(true);
-      setSuccessMessage(`A 6-digit access code has been generated for ${cleanEmail}. (Demo code: 123456)`);
-    }, 600);
+    const result = await signup(cleanName, cleanEmail, cleanMobile, signupPassword);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      onLoginSuccess();
+      onClose();
+    } else {
+      setErrorMessage(result.error || 'Registration could not be completed.');
+    }
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setSuccessMessage(null);
 
-    if (otpCode.trim() !== '123456' && otpCode.trim().length !== 6) {
-      setErrorMessage('Invalid verification code. For this preview, use 123456.');
+    const cleanEmail = forgotEmail.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setErrorMessage('Please enter a valid email address.');
       return;
     }
 
-    const cleanEmail = email.trim().toLowerCase();
-    const match = buyersRegistry.find(b => b.email.toLowerCase() === cleanEmail);
+    setIsSubmitting(true);
+    const result = await forgotPassword(cleanEmail);
+    setIsSubmitting(false);
 
-    loginBuyer({
-      name: match ? match.name : cleanEmail.split('@')[0],
-      email: cleanEmail,
-      mobile: match ? match.mobile : '9876543210',
-      orderId: match ? match.orderId : `NV_OTP_${Date.now().toString().slice(-6)}`
-    });
+    if (result.success) {
+      setIsResetStep(true);
+      if (result.token) {
+        setResetToken(result.token);
+      }
+      setSuccessMessage(result.message || 'Password reset token has been issued.');
+    } else {
+      setErrorMessage(result.error || 'Failed to process password reset request.');
+    }
+  };
 
-    onLoginSuccess();
-    onClose();
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    if (!resetToken.trim()) {
+      setErrorMessage('Please provide the reset token.');
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      setErrorMessage('New password must be at least 6 characters long.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await resetPassword(resetToken.trim(), newPassword);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      setSuccessMessage('Password reset successful! You may now sign in.');
+      setIsResetStep(false);
+      setActiveTab('login');
+      setLoginEmail(forgotEmail);
+      setLoginPassword('');
+    } else {
+      setErrorMessage(result.error || 'Invalid or expired reset token.');
+    }
   };
 
   return (
@@ -142,40 +201,54 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             <KeyRound className="w-5 h-5" />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-            Student Portal Sign In
+            NET Vidya Student Portal
           </h2>
           <p className="text-xs text-gray-500">
-            Access your Reading Files & Test Hall for the Final Pack 2026.
+            Access your GSET & UGC NET English Reading Files & Test Hall.
           </p>
         </div>
 
-        {/* Toggle Mode */}
+        {/* Navigation Tabs */}
         <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold">
           <button
             type="button"
-            onClick={() => { setAuthMode('password'); setIsOtpSent(false); setErrorMessage(null); }}
-            className={`flex-1 py-2 rounded-lg transition-all ${
-              authMode === 'password'
+            onClick={() => { setActiveTab('login'); setErrorMessage(null); setSuccessMessage(null); }}
+            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'login'
                 ? 'bg-white text-blue-900 shadow-2xs font-bold'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Password Sign In
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In</span>
           </button>
           <button
             type="button"
-            onClick={() => { setAuthMode('otp'); setErrorMessage(null); }}
-            className={`flex-1 py-2 rounded-lg transition-all ${
-              authMode === 'otp'
+            onClick={() => { setActiveTab('signup'); setErrorMessage(null); setSuccessMessage(null); }}
+            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'signup'
                 ? 'bg-white text-blue-900 shadow-2xs font-bold'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Email OTP
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Create Account</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setSuccessMessage(null); }}
+            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'forgot'
+                ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Forgot?</span>
           </button>
         </div>
 
-        {/* Error / Success Notice */}
+        {/* Error / Success Feedback */}
         {errorMessage && (
           <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
@@ -190,42 +263,57 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
           </div>
         )}
 
-        {/* Form Body */}
-        {authMode === 'password' ? (
-          <form onSubmit={handlePasswordSignIn} className="space-y-4">
+        {/* 1. SIGN IN TAB */}
+        {activeTab === 'login' && (
+          <form onSubmit={handleSignIn} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Registered Email *
               </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="e.g. aarav@gmail.com"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
-              />
+              <div className="relative">
+                <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type="email"
+                  required
+                  value={loginEmail}
+                  onChange={e => setLoginEmail(e.target.value)}
+                  placeholder="e.g. scholar@gmail.com"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Password *
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
-              />
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-gray-700">
+                  Password *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => { setActiveTab('forgot'); setErrorMessage(null); }}
+                  className="text-[11px] text-blue-700 hover:text-blue-900 font-medium"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type="password"
+                  required
+                  value={loginPassword}
+                  onChange={e => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                />
+              </div>
             </div>
 
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>Signing In...</span>
@@ -238,58 +326,200 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               </button>
             </div>
           </form>
-        ) : (
-          !isOtpSent ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
+        )}
+
+        {/* 2. SIGN UP TAB */}
+        {activeTab === 'signup' && (
+          <form onSubmit={handleSignUp} className="space-y-3.5">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Full Name *
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type="text"
+                  required
+                  value={signupName}
+                  onChange={e => setSignupName(e.target.value)}
+                  placeholder="e.g. Priya Sharma"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Email Address *
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type="email"
+                  required
+                  value={signupEmail}
+                  onChange={e => setSignupEmail(e.target.value)}
+                  placeholder="e.g. priya.sharma@gmail.com"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Mobile Number *
+              </label>
+              <div className="relative">
+                <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type="tel"
+                  required
+                  value={signupMobile}
+                  onChange={e => setSignupMobile(e.target.value)}
+                  placeholder="e.g. 9876543210"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Password *
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                <input
+                  type="password"
+                  required
+                  value={signupPassword}
+                  onChange={e => setSignupPassword(e.target.value)}
+                  placeholder="Minimum 6 characters"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span>Registering Account...</span>
+                ) : (
+                  <>
+                    <span>Create Student Account</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* 3. FORGOT / RESET PASSWORD TAB */}
+        {activeTab === 'forgot' && (
+          !isResetStep ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Registered Email Address *
                 </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="e.g. priya@gmail.com"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
-                />
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  <input
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={e => setForgotEmail(e.target.value)}
+                    placeholder="e.g. scholar@gmail.com"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  />
+                </div>
+                <p className="text-[11px] text-gray-500 mt-1">
+                  We will issue a secure 1-hour reset token to update your password.
+                </p>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col gap-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <span>Send 6-Digit Code</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {isSubmitting ? (
+                    <span>Issuing Token...</span>
+                  ) : (
+                    <>
+                      <span>Send Password Reset Token</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsResetStep(true)}
+                  className="text-xs text-blue-700 hover:text-blue-900 text-center py-1 font-medium"
+                >
+                  Already have a reset token? Enter here →
                 </button>
               </div>
             </form>
           ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Enter 6-Digit Code *
+                  32-Byte Reset Token *
                 </label>
                 <input
                   type="text"
                   required
-                  maxLength={6}
-                  value={otpCode}
-                  onChange={e => setOtpCode(e.target.value)}
-                  placeholder="123456"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-center font-mono text-lg tracking-widest focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  value={resetToken}
+                  onChange={e => setResetToken(e.target.value)}
+                  placeholder="Paste 64-character token"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 font-mono text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                 />
               </div>
 
-              <div className="pt-2">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  New Password *
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  <input
+                    type="password"
+                    required
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col gap-2">
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <span>Verify Code & Enter</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {isSubmitting ? (
+                    <span>Updating Password...</span>
+                  ) : (
+                    <>
+                      <span>Set New Password</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsResetStep(false)}
+                  className="text-xs text-gray-500 hover:text-gray-700 text-center py-1"
+                >
+                  ← Back to request reset token
                 </button>
               </div>
             </form>

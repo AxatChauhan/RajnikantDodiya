@@ -82,6 +82,18 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         throw new Error(orderData.error || 'Failed to initiate order. Please try again.');
       }
 
+      // Ensure Razorpay SDK script is loaded
+      if (typeof window !== 'undefined' && !window.Razorpay) {
+        await new Promise<void>(resolve => {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.async = true;
+          script.onload = () => resolve();
+          script.onerror = () => resolve();
+          document.body.appendChild(script);
+        });
+      }
+
       // 2. Launch Razorpay Standard Checkout Popup
       if (typeof window !== 'undefined' && window.Razorpay && orderData.keyId && !orderData.isTestMode) {
         const options = {
@@ -118,11 +130,18 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
 
               const verifyData = await verifyRes.json();
               if (verifyRes.ok && verifyData.success) {
+                if (verifyData.token) {
+                  try {
+                    localStorage.setItem('netvidya_auth_token_v1', verifyData.token);
+                  } catch {}
+                }
                 loginBuyer({
                   name: cleanName,
                   email: cleanEmail,
                   mobile: cleanMobile,
-                  orderId: orderData.orderId
+                  orderId: orderData.orderId,
+                  token: verifyData.token,
+                  isBuyer: true
                 });
                 setIsProcessing(false);
                 onSuccess({
@@ -159,7 +178,8 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
             name: cleanName,
             email: cleanEmail,
             mobile: cleanMobile,
-            orderId: orderData.orderId || `NV_DEV_${Date.now()}`
+            orderId: orderData.orderId || `NV_DEV_${Date.now()}`,
+            isBuyer: true
           });
           setIsProcessing(false);
           onSuccess({
