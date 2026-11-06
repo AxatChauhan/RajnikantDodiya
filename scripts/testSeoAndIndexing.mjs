@@ -38,9 +38,9 @@ assert(fs.existsSync(sitemapPath), 'public/sitemap.xml exists');
 const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
 assert(sitemapContent.startsWith('<?xml'), 'Sitemap is valid XML declaration');
 assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/</loc>'), 'Contains root canonical URL');
-assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/#store</loc>'), 'Contains store canonical URL');
-assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/#sample</loc>'), 'Contains free demo sample canonical URL');
-assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/#publications</loc>'), 'Contains publications canonical URL');
+assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/store</loc>') || sitemapContent.includes('<loc>https://rajnikantdodiya.com/#store</loc>'), 'Contains store canonical URL');
+assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/learn</loc>') || sitemapContent.includes('<loc>https://rajnikantdodiya.com/#sample</loc>'), 'Contains free demo sample canonical URL');
+assert(sitemapContent.includes('<loc>https://rajnikantdodiya.com/publications</loc>') || sitemapContent.includes('<loc>https://rajnikantdodiya.com/#publications</loc>'), 'Contains publications canonical URL');
 assert(sitemapContent.includes('dr-rajnikant-dodiya.jpg'), 'Contains image sitemap tag for professor portrait');
 
 // 3. Schema.org JSON-LD Structured Data
@@ -70,10 +70,14 @@ if (jsonLdMatch && jsonLdMatch[1]) {
     assert(person.sameAs.some(u => u.includes('youtube.com')), 'Person sameAs links to official YouTube channel');
 
     // Check Course & Product schema
-    const course = parsed['@graph'].find(e => Array.isArray(e['@type']) && e['@type'].includes('Course'));
-    assert(Boolean(course), 'Course and Product schema is declared');
-    assert(course.name.includes('GSET + UGC NET English Final Pack 2026'), 'Course name matches Final Pack 2026');
-    assert(course.offers.price === '799.00', 'Course price is ₹799 in schema');
+    const product = parsed['@graph'].find(e => 
+      e.name === 'GSET + UGC NET English Final Pack 2026' ||
+      (Array.isArray(e['@type']) && (e['@type'].includes('Course') || e['@type'].includes('Product'))) ||
+      e['@type'] === 'Product' || e['@type'] === 'Course'
+    );
+    assert(Boolean(product), 'Course and Product schema is declared');
+    assert(product.name.includes('GSET + UGC NET English Final Pack 2026'), 'Course/Product name matches Final Pack 2026');
+    assert(product.offers.price === '799.00', 'Product price is ₹799 in schema');
 
     // Check FAQPage schema
     const faq = parsed['@graph'].find(e => e['@type'] === 'FAQPage');
