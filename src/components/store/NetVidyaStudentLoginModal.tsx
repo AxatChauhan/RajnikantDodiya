@@ -189,7 +189,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       }}
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
     >
-      <div className="relative w-full max-w-md my-auto bg-white rounded-3xl p-5 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-4 sm:space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <div className="relative w-full max-w-md my-auto bg-white rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-4 sm:space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto">
         
         {/* Close Button */}
         <button
@@ -237,7 +237,8 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" />
-            <span>Create Account</span>
+            <span className="hidden min-[380px]:inline">Create Account</span>
+            <span className="min-[380px]:hidden">Register</span>
           </button>
           <button
             type="button"

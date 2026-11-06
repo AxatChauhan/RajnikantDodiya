@@ -95,17 +95,19 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
       <section className="relative pt-6 sm:pt-10 max-w-5xl mx-auto px-4 space-y-8">
         
         {/* Early-Bird Countdown Badge */}
-        <div className="text-center">
+        <div className="text-center px-2">
           {isEarlyBirdActive ? (
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Early-Bird Offer: ₹799</span>
-              <span className="text-emerald-700 font-mono">
+            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-[11px] sm:text-xs font-semibold shadow-xs max-w-full">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Early-Bird Offer: ₹799</span>
+              </div>
+              <span className="text-emerald-700 font-mono font-bold">
                 (Ends in {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s)
               </span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
               <span>Standard Enrollment Open • Access till 31 Dec 2026</span>
             </div>
           )}
@@ -154,9 +156,9 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
         </div>
 
         {/* Pricing & Enrollment Card */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg mx-auto border border-blue-200 shadow-xl space-y-5 relative overflow-hidden">
-          <div className="flex flex-col items-center justify-center gap-1.5">
-            <div className="flex items-baseline justify-center gap-3">
+        <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-lg mx-auto border border-blue-200 shadow-xl space-y-5 relative overflow-hidden">
+          <div className="flex flex-col items-center justify-center gap-2 text-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
               <span className="text-4xl sm:text-5xl font-black text-blue-950 font-mono">₹{currentServerPrice}</span>
               {isEarlyBirdActive ? (
                 <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
@@ -289,19 +291,19 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             { date: '28 Nov 2026', title: 'GSET Special Simulation Exam 1', status: 'Upcoming', color: 'blue' },
             { date: '5 Dec 2026', title: 'Grand Final Rank Booster Exam 2026', status: 'Upcoming', color: 'blue' }
           ].map((item, idx) => (
-            <div key={idx} className="p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div key={idx} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                   item.status === 'Ready Now' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
                 }`}>
                   {idx + 1}
                 </div>
-                <div>
-                  <strong className="text-gray-900 block font-semibold">{item.title}</strong>
-                  <span className="text-xs text-gray-500 font-mono">Scheduled: {item.date}</span>
+                <div className="min-w-0">
+                  <strong className="text-gray-900 block font-semibold text-xs sm:text-sm">{item.title}</strong>
+                  <span className="text-[11px] sm:text-xs text-gray-500 font-mono">Scheduled: {item.date}</span>
                 </div>
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold shrink-0 ${
+              <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold self-start sm:self-auto shrink-0 ${
                 item.status === 'Ready Now'
                   ? 'bg-emerald-100 text-emerald-800'
                   : 'bg-blue-50 text-blue-700'

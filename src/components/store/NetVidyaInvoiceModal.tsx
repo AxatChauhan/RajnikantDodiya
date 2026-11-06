@@ -43,18 +43,19 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
     >
       <div className="bg-white rounded-2xl max-w-2xl w-full my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl border border-gray-100 print:shadow-none print:border-none print:max-w-none">
         {/* Top Control Bar (Hidden when printing) */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200 print:hidden">
-          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
-            <span>Official Student Fee Receipt / Tax Invoice</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200 print:hidden">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 min-w-0">
+            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
+            <span className="truncate">Student Fee Receipt / Invoice</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handlePrint}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-colors"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print / Save as PDF</span>
+              <Printer className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Print / Save as PDF</span>
+              <span className="sm:hidden">Print PDF</span>
             </button>
             <button
               onClick={onClose}
@@ -66,7 +67,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
         </div>
 
         {/* Invoice Body */}
-        <div className="p-8 sm:p-10 space-y-8 font-sans text-gray-800 print:p-6" id="invoice-printable-area">
+        <div className="p-5 sm:p-10 space-y-6 sm:space-y-8 font-sans text-gray-800 print:p-6" id="invoice-printable-area">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-gray-200 pb-6">
             <div>

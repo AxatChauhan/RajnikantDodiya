@@ -16,10 +16,10 @@ export const NetVidyaWhatsAppWidget: React.FC<NetVidyaWhatsAppWidgetProps> = ({
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`;
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end print:hidden">
+    <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-40 flex flex-col items-end print:hidden max-w-[calc(100vw-2rem)]">
       {/* Floating Prompt Card */}
       {!isDismissed && !isOpen && (
-        <div className="mb-2 bg-white rounded-xl shadow-lg border border-emerald-100 p-3 max-w-xs flex items-start gap-2.5 animate-bounce-subtle">
+        <div className="mb-2 bg-white rounded-xl shadow-lg border border-emerald-100 p-3 max-w-[270px] sm:max-w-xs flex items-start gap-2.5 animate-bounce-subtle">
           <div className="p-1.5 rounded-full bg-emerald-100 text-emerald-700 shrink-0">
             <MessageCircle className="w-4 h-4" />
           </div>
@@ -53,7 +53,7 @@ export const NetVidyaWhatsAppWidget: React.FC<NetVidyaWhatsAppWidgetProps> = ({
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp with NET Vidya Support"
-        className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="group relative flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
       >
         <span className="relative flex h-3 w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>

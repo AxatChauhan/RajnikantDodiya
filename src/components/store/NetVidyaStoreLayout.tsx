@@ -55,26 +55,26 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       
       {/* 1. TOP COMMERCIAL HEADER BAR */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-15 sm:h-18 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Brand Logo & Title */}
           <button
             onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="flex items-center gap-2.5 text-left group shrink-0"
+            className="flex items-center gap-2 sm:gap-2.5 text-left group min-w-0 flex-1 sm:flex-initial"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex items-center justify-center font-bold shadow-xs">
-              <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex items-center justify-center font-bold shadow-xs shrink-0">
+              <GraduationCap className="w-4 h-4 sm:w-6 sm:h-6" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h1 className="font-bold text-sm sm:text-base text-gray-900 group-hover:text-blue-700 transition-colors leading-tight">
-                  NET Vidya English
+                <h1 className="font-bold text-xs sm:text-base text-gray-900 group-hover:text-blue-700 transition-colors leading-tight truncate">
+                  NET Vidya
                 </h1>
-                <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">
+                <span className="text-[9px] sm:text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0">
                   Store
                 </span>
               </div>
-              <p className="text-[10px] sm:text-[11px] text-gray-500 font-normal truncate">
+              <p className="text-[10px] sm:text-[11px] text-gray-500 font-normal truncate hidden sm:block">
                 GSET + UGC NET English Final Pack 2026
               </p>
             </div>
@@ -110,45 +110,55 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>My Dashboard</span>
               </button>
             )}
+            {onBackToAcademicSite && (
+              <button
+                onClick={onBackToAcademicSite}
+                className="px-3 py-1.5 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                title="Return to Academic Portfolio"
+              >
+                Academic Site →
+              </button>
+            )}
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             
             {/* Student Login / Dashboard Button */}
             {buyerSession.isLoggedIn ? (
               <button
                 onClick={() => { setCurrentView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs"
+                className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1 sm:gap-1.5 shadow-2xs"
+                title="Open Student Dashboard"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="truncate max-w-[90px] sm:max-w-[120px]">{buyerSession.name}</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="truncate max-w-[65px] sm:max-w-[120px]">{buyerSession.name}</span>
               </button>
             ) : (
               <button
                 onClick={() => setIsLoginOpen(true)}
-                className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1.5"
+                className="px-2 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1 sm:gap-1.5"
+                title="Student Login"
               >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Student Login</span>
-                <span className="sm:hidden">Login</span>
+                <KeyRound className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-xs">Login</span>
               </button>
             )}
 
             {/* Buy CTA Button */}
             <button
               onClick={() => setIsCheckoutOpen(true)}
-              className="px-2.5 sm:px-4 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0"
+              className="px-2 sm:px-4 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0"
             >
-              <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
-              <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Buy Final Pack (₹{currentServerPrice})</span>
+              <span className="sm:hidden">Buy ₹{currentServerPrice}</span>
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             </button>
 
-            {/* Admin Trigger Button */}
+            {/* Admin Trigger Button - Desktop only to preserve mobile bar width */}
             <button
               onClick={() => setIsAdminOpen(true)}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xs font-mono"
+              className="hidden sm:inline-flex p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xs font-mono"
               title="Dr. Rajnikant Admin Studio"
             >
               <Lock className="w-4 h-4" />
@@ -157,7 +167,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {/* Mobile Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
-              className="md:hidden p-1.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              aria-label="Toggle Navigation Menu"
+              className="md:hidden p-1.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -166,34 +177,112 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white p-4 space-y-2 text-xs font-semibold shadow-md animate-fade-in">
-            <button
-              onClick={() => { setCurrentView('home'); setMobileMenuOpen(false); }}
-              className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 block"
-            >
-              Overview & Syllabus
-            </button>
-            <button
-              onClick={() => { setCurrentView('sample'); setMobileMenuOpen(false); }}
-              className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 text-emerald-700 font-bold flex items-center gap-2"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Free Demo Test & Samples</span>
-            </button>
-            {buyerSession.isLoggedIn && (
-              <button
-                onClick={() => { setCurrentView('dashboard'); setMobileMenuOpen(false); }}
-                className="w-full text-left p-2.5 rounded-lg bg-blue-50 text-blue-900 font-bold block"
-              >
-                My Dashboard (Test Hall & PDFs)
-              </button>
+          <div className="md:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
+            {/* Student Account Card inside Mobile Drawer */}
+            {buyerSession.isLoggedIn ? (
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-bold text-emerald-950 truncate">{buyerSession.name}</p>
+                    <p className="text-[11px] text-emerald-700 font-mono truncate">{buyerSession.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setCurrentView('dashboard'); setMobileMenuOpen(false); }}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] shrink-0 hover:bg-emerald-700"
+                >
+                  Dashboard
+                </button>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-bold text-gray-900 text-xs">Enrolled Candidate?</p>
+                  <p className="text-[11px] text-gray-500 truncate">Sign in to open your Test Hall & PDFs.</p>
+                </div>
+                <button
+                  onClick={() => { setIsLoginOpen(true); setMobileMenuOpen(false); }}
+                  className="px-3 py-1.5 rounded-lg bg-blue-700 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-xs hover:bg-blue-800"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>Student Login</span>
+                </button>
+              </div>
             )}
-            <button
-              onClick={() => { handleOpenPolicies('contact'); setMobileMenuOpen(false); }}
-              className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 block text-gray-600"
-            >
-              Contact & Support
-            </button>
+
+            {/* Drawer Navigation Links */}
+            <div className="space-y-1 pt-1">
+              <button
+                onClick={() => { setCurrentView('home'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
+                  currentView === 'home' ? 'bg-blue-50 text-blue-900 font-bold' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                <span>Overview & Syllabus</span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+              <button
+                onClick={() => { setCurrentView('sample'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
+                  currentView === 'sample' ? 'bg-blue-50 text-blue-900 font-bold' : 'hover:bg-gray-100 text-emerald-700 font-bold'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Free Demo Test & Samples</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+              {buyerSession.isLoggedIn && (
+                <button
+                  onClick={() => { setCurrentView('dashboard'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
+                    currentView === 'dashboard' ? 'bg-blue-50 text-blue-900 font-bold' : 'hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-blue-700" />
+                    <span>My Dashboard (Test Hall & PDFs)</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </button>
+              )}
+              <button
+                onClick={() => { handleOpenPolicies('contact'); setMobileMenuOpen(false); }}
+                className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-gray-600"
+              >
+                <span>Contact & Support Desk</span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+              {onBackToAcademicSite && (
+                <button
+                  onClick={() => { onBackToAcademicSite(); setMobileMenuOpen(false); }}
+                  className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-blue-700"
+                >
+                  <span>Academic Portfolio (Dr. Rajnikant Dodiya)</span>
+                  <ChevronRight className="w-4 h-4 text-blue-500" />
+                </button>
+              )}
+            </div>
+
+            {/* Quick Action in Drawer */}
+            <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
+              <button
+                onClick={() => { setIsCheckoutOpen(true); setMobileMenuOpen(false); }}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+              >
+                <span>Buy Final Pack (₹{currentServerPrice})</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => { setIsAdminOpen(true); setMobileMenuOpen(false); }}
+                className="p-2.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                title="Admin Studio"
+              >
+                <Lock className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
       </header>
@@ -242,6 +331,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.
               </p>
             </div>
+            {onBackToAcademicSite && (
+              <button
+                onClick={onBackToAcademicSite}
+                className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
+              >
+                <span>← Back to Academic Portfolio (Dr. Rajnikant Dodiya)</span>
+              </button>
+            )}
           </div>
 
           {/* Mandatory Policy Links (Razorpay Compliance) */}

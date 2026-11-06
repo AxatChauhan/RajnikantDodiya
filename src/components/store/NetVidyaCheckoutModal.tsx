@@ -230,7 +230,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       }}
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
     >
-      <div className="relative w-full max-w-lg my-auto bg-white rounded-3xl p-5 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <div className="relative w-full max-w-lg my-auto bg-white rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto">
         
         {/* Close Button */}
         <button
@@ -262,7 +262,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         </div>
 
         {/* Price Box */}
-        <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <span className="text-xs text-blue-800 font-medium block">Payable Enrollment Fee</span>
             <div className="flex items-baseline gap-2 mt-0.5">
@@ -281,7 +281,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               </span>
             )}
           </div>
-          <div className="text-right text-xs text-blue-800">
+          <div className="text-left sm:text-right text-xs text-blue-800">
             <span className="font-semibold block">Valid through</span>
             <strong className="text-blue-950 font-bold">31 Dec 2026</strong>
           </div>
@@ -398,7 +398,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               ) : (
                 <>
                   <Lock className="w-4 h-4" />
-                  <span>Proceed to Pay ₹{currentServerPrice}</span>
+                  <span>Proceed to Pay ₹{finalPayablePrice}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -407,7 +407,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         </form>
 
         {/* Trust Badges */}
-        <div className="pt-2 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-500">
+        <div className="pt-2 border-t border-gray-200 flex flex-wrap items-center justify-center sm:justify-between gap-2.5 text-[11px] text-gray-500">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>256-Bit SSL Encrypted</span>
