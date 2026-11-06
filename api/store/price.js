@@ -17,7 +17,7 @@ export const DEFAULT_STORE_SETTINGS = {
   accessExpiryDate: '2026-12-31T23:59:59+05:30',
   sellerLine: 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.',
   supportEmail: 'netvidyaenglish@gmail.com',
-  supportPhone: '+91 98251 23456'
+  supportPhone: '+91 96387 16634'
 };
 
 export function computeCurrentServerPrice(settings = DEFAULT_STORE_SETTINGS, simulatedNow = null) {

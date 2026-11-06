@@ -81,7 +81,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
               <p className="text-xs text-gray-500">
                 Academic Direction & Mentorship: <strong>Dr. Rajnikant S. Dodiya</strong>
               </p>
-              <p className="text-xs text-gray-500">netvidyaenglish@gmail.com • +91 98251 23456</p>
+              <p className="text-xs text-gray-500">netvidyaenglish@gmail.com • +91 96387 16634</p>
             </div>
 
             <div className="sm:text-right space-y-1">

@@ -661,7 +661,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                 </div>
 
                 <a
-                  href={`https://wa.me/919825123456?text=${encodeURIComponent(
+                  href={`https://wa.me/919638716634?text=${encodeURIComponent(
                     `Hello Dr. Dodiya, I am interested in ordering a physical print copy of your book: "${book.title}" (ISBN: ${book.isbn}, Publisher: ${book.publisher}). Please guide me on availability.`
                   )}`}
                   target="_blank"
@@ -749,7 +749,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                 Close
               </button>
               <a
-                href={`https://wa.me/919825123456?text=${encodeURIComponent(
+                href={`https://wa.me/919638716634?text=${encodeURIComponent(
                   `Hello Dr. Dodiya, I would like to inquire about ordering a copy of: "${inspectedBook.title}" (ISBN: ${inspectedBook.isbn}).`
                 )}`}
                 target="_blank"

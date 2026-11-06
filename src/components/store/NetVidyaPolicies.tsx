@@ -174,7 +174,7 @@ export const NetVidyaPolicies: React.FC<NetVidyaPoliciesProps> = ({
                 </p>
                 <p className="text-xs text-gray-800 flex items-center gap-2">
                   <Phone className="w-4 h-4 text-blue-700" />
-                  <span>+91 98251 23456 (WhatsApp & Call)</span>
+                  <span>+91 96387 16634 (WhatsApp & Call)</span>
                 </p>
                 <p className="text-xs text-gray-500">Support Hours: 9:00 AM – 8:00 PM IST</p>
               </div>

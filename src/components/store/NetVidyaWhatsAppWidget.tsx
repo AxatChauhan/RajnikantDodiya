@@ -7,7 +7,7 @@ interface NetVidyaWhatsAppWidgetProps {
 }
 
 export const NetVidyaWhatsAppWidget: React.FC<NetVidyaWhatsAppWidgetProps> = ({
-  phoneNumber = '919825123456',
+  phoneNumber = '919638716634',
   defaultMessage = 'Hello NET Vidya, I am preparing for GSET / UGC NET English 2026 and have a query about the Final Pack.'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
