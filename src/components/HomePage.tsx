@@ -38,7 +38,6 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium }) => {
   const { profile, layoutSettings, books } = useSiteContent();
-  const [activeCategoryFilter, setActiveCategoryFilter] = useState<'all' | 'ugc-net' | 'books' | 'pedagogy'>('all');
 
   // Featured book: Dynamic lookup from studio catalog first, fallback to BOOKS
   const allAvailableBooks = books && books.length > 0 ? books : BOOKS;
@@ -88,36 +87,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
           <p className="text-[15px] sm:text-[17px] text-ink-muted font-sans leading-[1.6] break-words whitespace-pre-line max-w-4xl">
             {profile.shortBio || PROFESSOR_INFO.shortBio}
           </p>
-
-          {/* Quick Category Filter Pills */}
-          <div className="pt-0.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="text-xs sm:text-[14px] font-sans uppercase tracking-wider text-ink-muted mr-1 font-semibold">
-              Explore:
-            </span>
-            {[
-              { id: 'all', label: 'All Batches & Materials' },
-              { id: 'ugc-net', label: 'UGC-NET English' },
-              { id: 'books', label: 'Kalam Monograph' },
-              { id: 'pedagogy', label: 'AI in ELE & NEP' }
-            ].map((pill) => (
-              <button
-                key={pill.id}
-                onClick={() => {
-                  setActiveCategoryFilter(pill.id as any);
-                  if (pill.id === 'ugc-net') onNavigate('store');
-                  if (pill.id === 'books') onNavigate('bookstore');
-                  if (pill.id === 'pedagogy') onNavigate('research');
-                }}
-                className={`text-xs sm:text-[14px] px-3 sm:px-4 py-1.5 rounded-full border transition-all min-h-[38px] flex items-center justify-center ${
-                  activeCategoryFilter === pill.id
-                    ? 'bg-claret text-white border-claret shadow-xs font-semibold'
-                    : 'bg-white hover:bg-gray-50 text-ink-muted border-gray-200'
-                }`}
-              >
-                {pill.label}
-              </button>
-            ))}
-          </div>
 
           {/* Primary Action Buttons */}
           <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
