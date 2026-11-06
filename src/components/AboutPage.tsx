@@ -39,13 +39,26 @@ export const AboutPage: React.FC<AboutPageProps> = ({ subSection, onOpenCompendi
   return (
     <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2 sm:pt-4">
       
-      {/* Page Title & Breadcrumb Header */}
-      <div className="pb-4 border-b border-deckle">
-        <span className="text-xs font-mono uppercase tracking-widest text-claret font-semibold">Faculty Profile</span>
-        <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1">About {professorName}</h1>
-        <p className="text-xs sm:text-sm text-ink-muted font-reading font-light mt-1">
-          {professorTitle} • {professorInstitution}
-        </p>
+      {/* Page Title & Breadcrumb Header with Official Faculty Portrait */}
+      <div className="pb-6 border-b border-deckle flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <span className="text-[14px] font-sans uppercase tracking-widest text-claret font-semibold">Faculty Profile</span>
+          <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1">About {professorName}</h1>
+          <p className="text-[14px] sm:text-[15px] text-ink-muted font-sans font-light mt-1">
+            {professorTitle} • {professorInstitution}
+          </p>
+        </div>
+
+        {/* Dignified Institutional Portrait (Contextually placed on official Faculty About page) */}
+        <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border border-deckle shadow-sm bg-white ring-4 ring-claret/5">
+          <img
+            src={profile.photoUrl || PROFESSOR_INFO.photoUrl}
+            alt={professorName}
+            width={112}
+            height={112}
+            className="w-full h-full object-cover object-[center_18%]"
+          />
+        </div>
       </div>
 
       {/* ========================================================= */}

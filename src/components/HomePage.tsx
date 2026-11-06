@@ -48,7 +48,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
     <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2">
       
       {/* ========================================================= */}
-      {/* 1. HERO SECTION: EDITORIAL JOURNAL BYLINE (OPTION 3)       */}
+      {/* 1. HERO SECTION: ACADEMIC SCHOLARSHIP FIRST (WAY 4)       */}
       {/* ========================================================= */}
       <section className="edtech-hero-glow rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden">
         {/* Subtle Decorative Ambient Glow Elements */}
@@ -57,27 +57,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
         <div className="relative z-10 space-y-6 sm:space-y-7">
           
-          {/* Author Byline Header: Dignified Compact Portrait Integrated with Headline & Affiliation */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
+          {/* Author Headline & Institutional Emblem (Zero foreground photo highlight) */}
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-5">
             
-            {/* Tasteful Academic Portrait (Subtle, modest footprint) */}
-            <div className="relative shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-deckle shadow-sm bg-white ring-4 ring-claret/5">
-              <img
-                src={profile.photoUrl || PROFESSOR_INFO.photoUrl}
-                alt={profile.name || PROFESSOR_INFO.name}
-                fetchPriority="high"
-                loading="eager"
-                decoding="async"
-                width={96}
-                height={96}
-                className="w-full h-full object-cover object-[center_18%] filter contrast-[1.02]"
-              />
+            {/* Academic Insignia Crest Seal */}
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-claret-soft/90 border border-claret/20 flex items-center justify-center text-claret shadow-xs shrink-0 ring-4 ring-claret/5">
+              <ProfessorCrestIcon className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
 
             {/* Name, Subtitle, and Institutional Badge */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 flex-1 min-w-0">
               {/* Professional Qualification Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-[14px] font-sans font-semibold shadow-2xs">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-[14px] font-sans font-semibold shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="uppercase tracking-wide">2× UGC NET & GSET Qualified • NET Vidya English Mentor</span>
               </div>
@@ -206,24 +197,44 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
       </section>
 
       {/* ========================================================= */}
-      {/* 2. "THE DR. DODIYA ADVANTAGE" (PW-STYLE 4 FEATURE PILLARS) */}
+      {/* 2. "THE DR. DODIYA ADVANTAGE" (WITH ARCHIVAL BACKGROUND WATERMARK) */}
       {/* ========================================================= */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-deckle">
+      <section className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-white via-parchment-warm/30 to-white border border-deckle shadow-sm overflow-hidden space-y-6">
+        
+        {/* Archival Background Watermark: Blended portrait behind "Why Prepare With Dr. Dodiya" */}
+        <div className="absolute right-0 top-0 bottom-0 w-full sm:w-1/2 md:w-5/12 pointer-events-none overflow-hidden select-none z-0">
+          <img
+            src={profile.photoUrl || PROFESSOR_INFO.photoUrl}
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-[center_20%] filter grayscale contrast-125 opacity-[0.07] mix-blend-multiply"
+            style={{
+              maskImage: 'radial-gradient(ellipse at 80% 30%, black 20%, transparent 80%), linear-gradient(to left, black 10%, transparent 90%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at 80% 30%, black 20%, transparent 80%), linear-gradient(to left, black 10%, transparent 90%)',
+              WebkitMaskComposite: 'source-in',
+              maskComposite: 'intersect'
+            }}
+          />
+        </div>
+
+        {/* Section Header */}
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-deckle/80 gap-2">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
+            <span className="text-[14px] font-sans uppercase tracking-wider text-claret font-bold">
               Why Prepare With Dr. Dodiya
             </span>
-            <h2 className="font-serif text-xl sm:text-2xl text-ink font-bold">
+            <h2 className="font-serif text-2xl sm:text-3xl text-ink font-bold mt-0.5">
               The Academic Pedagogy Advantage
             </h2>
           </div>
-          <span className="hidden sm:inline-block text-xs font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full font-semibold">
-            ✓ Institutional Rigor
+          <span className="self-start sm:self-auto inline-flex items-center gap-1.5 text-[14px] font-sans text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-3.5 py-1 rounded-full font-semibold">
+            <span>✓</span>
+            <span>Institutional Rigor</span>
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 4 Cards Grid - with soft translucent background so watermark gently whispers through */}
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
               icon: Award,
@@ -258,19 +269,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             return (
               <div
                 key={idx}
-                className="pw-card p-5 space-y-3 flex flex-col justify-between"
+                className="pw-card p-5 space-y-3 flex flex-col justify-between bg-white/90 backdrop-blur-xs border border-deckle hover:border-claret/30 transition-all shadow-xs"
               >
                 <div className="space-y-2">
-                  <div className={`w-10 h-10 rounded-xl ${item.iconBg} flex items-center justify-center font-bold shadow-xs`}>
+                  <div className={`w-10 h-10 rounded-xl ${item.iconBg} flex items-center justify-center font-bold shadow-2xs`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="font-serif text-base font-bold text-ink leading-snug">
+                  <h3 className="font-serif text-lg font-bold text-ink leading-snug">
                     {item.title}
                   </h3>
-                  <p className="text-[11px] font-mono text-claret font-semibold">
+                  <p className="text-[14px] font-sans text-claret font-semibold">
                     {item.subtitle}
                   </p>
-                  <p className="text-xs text-ink-muted leading-relaxed">
+                  <p className="text-[14px] font-sans text-ink-muted leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
