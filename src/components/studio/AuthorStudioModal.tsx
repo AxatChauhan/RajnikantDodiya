@@ -528,7 +528,7 @@ export const AuthorStudioModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="authorStudioTitle"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-ink/75 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-ink/75 backdrop-blur-md animate-fade-in overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           closeStudio();
@@ -537,7 +537,7 @@ export const AuthorStudioModal: React.FC = () => {
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-5xl h-[92vh] max-h-[850px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#D5CDC2]"
+        className="w-full max-w-5xl my-auto h-[92vh] max-h-[850px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#D5CDC2]"
       >
         {/* ================================================================= */}
         {/* TOP BAR / INSTITUTIONAL HEADER */}

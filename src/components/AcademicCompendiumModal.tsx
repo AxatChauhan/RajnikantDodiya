@@ -29,8 +29,13 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/60 backdrop-blur-sm animate-fade-in">
-      <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full p-4 sm:p-8 shadow-book-xl border border-deckle max-h-[92dvh] flex flex-col justify-between overflow-hidden">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+    >
+      <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full my-auto p-4 sm:p-8 shadow-book-xl border border-deckle max-h-[92dvh] flex flex-col justify-between overflow-hidden">
         
         {/* Header */}
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-deckle shrink-0">

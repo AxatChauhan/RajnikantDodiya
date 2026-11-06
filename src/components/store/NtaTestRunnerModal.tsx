@@ -144,6 +144,17 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
   const [timeLeftSeconds, setTimeLeftSeconds] = useState(isFreeDemo ? 30 * 60 : 180 * 60); // 30 min for demo, 180 min for full mock
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+  const [paletteFilter, setPaletteFilter] = useState<'all' | 'answered' | 'marked' | 'unanswered'>('all');
+
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+      setIsFullscreen(false);
+    }
+  };
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const questions = SAMPLE_NTA_QUESTIONS;
@@ -261,15 +272,25 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
     let correct = 0;
     let wrong = 0;
     let unattempted = 0;
+    const unitBreakdown: Record<string, { total: number; correct: number; wrong: number; unattempted: number }> = {};
 
     questions.forEach((q, idx) => {
+      const section = q.section || 'General Paper II';
+      if (!unitBreakdown[section]) {
+        unitBreakdown[section] = { total: 0, correct: 0, wrong: 0, unattempted: 0 };
+      }
+      unitBreakdown[section].total++;
+
       const ans = selectedAnswers[idx];
       if (ans === undefined) {
         unattempted++;
+        unitBreakdown[section].unattempted++;
       } else if (ans === q.correctAnswer) {
         correct++;
+        unitBreakdown[section].correct++;
       } else {
         wrong++;
+        unitBreakdown[section].wrong++;
       }
     });
 
@@ -277,7 +298,7 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
     const maxMarks = questions.length * 2;
     const accuracy = correct + wrong > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
 
-    return { correct, wrong, unattempted, totalMarks, maxMarks, accuracy };
+    return { correct, wrong, unattempted, totalMarks, maxMarks, accuracy, unitBreakdown };
   }, [isSubmitted, selectedAnswers, questions]);
 
   if (!isOpen) return null;
@@ -285,6 +306,15 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#F3F4F6] text-[#1F2937] font-sans overflow-hidden">
       
+      {/* Subtle Forensic Watermark Layer */}
+      <div className="absolute inset-0 pointer-events-none select-none z-10 overflow-hidden flex flex-col justify-around opacity-[0.03] rotate-[-25deg] text-base sm:text-xl font-mono font-black text-gray-900 leading-loose text-center">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="whitespace-nowrap py-3">
+            {candidateName} • Candidate Verified Session • NET Vidya English • {candidateName}
+          </div>
+        ))}
+      </div>
+
       {/* 1. NTA Header Bar */}
       <header className="bg-[#1E3A8A] text-white px-4 py-2.5 flex items-center justify-between border-b border-[#1E40AF] shadow-sm shrink-0">
         <div className="flex items-center gap-3">
@@ -314,7 +344,7 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
           </div>
 
           <button
-            onClick={() => setIsFullscreen(prev => !prev)}
+            onClick={handleToggleFullscreen}
             className="p-1.5 rounded hover:bg-white/10 text-blue-200 hover:text-white transition-colors hidden sm:block"
             title="Toggle Fullscreen"
           >
@@ -364,6 +394,45 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Unit-Wise Diagnostic Performance Breakdown */}
+          {scoreResults.unitBreakdown && Object.keys(scoreResults.unitBreakdown).length > 0 && (
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+              <h4 className="text-base font-bold text-gray-900 flex items-center gap-2 border-b pb-2.5">
+                <Award className="w-5 h-5 text-blue-700" />
+                <span>Unit-Wise Diagnostic Mastery (UGC-NET / GSET Paper II Syllabus)</span>
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {Object.entries(scoreResults.unitBreakdown).map(([section, data]) => {
+                  const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+                  return (
+                    <div key={section} className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-xs text-gray-900 truncate">{section}</span>
+                        <span className={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                          pct >= 70 ? 'bg-emerald-100 text-emerald-800' : pct >= 40 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
+                        }`}>
+                          {pct}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-[11px] text-gray-500">
+                        <span>Correct: {data.correct}/{data.total}</span>
+                        <span>Wrong: {data.wrong}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-rose-500'
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Detailed Question Review with Explanations */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-6">
@@ -569,11 +638,37 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
 
             {/* Question Numbers Grid */}
             <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-2xs overflow-y-auto">
-              <span className="font-bold text-xs text-gray-900 block mb-2">Question Grid</span>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-xs text-gray-900">Question Grid</span>
+                <span className="text-[10px] text-gray-400 font-mono">Filter:</span>
+              </div>
+
+              {/* Status Filter Buttons */}
+              <div className="flex items-center gap-1 pb-2 mb-2.5 border-b border-gray-100 text-[10px]">
+                {(['all', 'answered', 'marked', 'unanswered'] as const).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setPaletteFilter(f)}
+                    className={`px-2 py-0.5 rounded font-semibold capitalize transition-all ${
+                      paletteFilter === f
+                        ? 'bg-blue-800 text-white shadow-2xs'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid grid-cols-5 gap-2">
                 {questions.map((_, idx) => {
                   const status = getQuestionStatus(idx);
                   const isCurrent = currentIdx === idx;
+
+                  // Apply palette filter
+                  if (paletteFilter === 'answered' && status !== 'answered' && status !== 'marked_answered') return null;
+                  if (paletteFilter === 'marked' && status !== 'marked' && status !== 'marked_answered') return null;
+                  if (paletteFilter === 'unanswered' && status !== 'not_answered' && status !== 'not_visited') return null;
 
                   let bgClass = 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300';
                   if (status === 'answered') bgClass = 'bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-700';
@@ -600,8 +695,13 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
 
       {/* 3. Submit Confirmation Modal */}
       {showConfirmSubmit && (
-        <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 space-y-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowConfirmSubmit(false);
+          }}
+          className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4 overflow-y-auto"
+        >
+          <div className="bg-white rounded-2xl max-w-md w-full my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 shadow-2xl border border-gray-200 space-y-4">
             <h4 className="text-lg font-bold text-gray-900">Confirm Exam Submission</h4>
             <p className="text-xs text-gray-600">
               Are you sure you want to conclude and submit your exam? Once submitted, your answers will be evaluated immediately.

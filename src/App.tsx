@@ -8,6 +8,7 @@ import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary
 import { handleGoogleAuthRedirect } from './lib/googleAuth';
 import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
 import { NetVidyaStoreProvider } from './contexts/NetVidyaStoreContext';
+import { NetVidyaWhatsAppWidget } from './components/store/NetVidyaWhatsAppWidget';
 
 // Lazily loaded 8 main tab views (Optimized for instant Initial Paint)
 const AboutPage = lazy(() => import('./components/AboutPage').then(m => ({ default: m.AboutPage })));
@@ -49,6 +50,18 @@ function AppInner() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isExamOpen, setIsExamOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
   const { alertBanner, layoutSettings, profile } = useSiteContent();
@@ -149,6 +162,14 @@ function AppInner() {
   return (
     <div className="min-h-screen text-ink font-sans relative selection:bg-claret selection:text-white pb-24 lg:pb-20">
       
+      {/* Offline Connectivity Status Alert */}
+      {!isOnline && (
+        <div className="bg-amber-700 text-white text-xs font-semibold px-4 py-2 text-center flex items-center justify-center gap-2 sticky top-0 z-50 shadow-md">
+          <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
+          <span>You are currently in offline mode. Previously loaded revision notes remain accessible.</span>
+        </div>
+      )}
+
       {/* 8-Tab Navigation Bar */}
       <Navbar
         activeTab={activeTab}
@@ -341,6 +362,9 @@ function AppInner() {
           <span>NET Vidya English · {profile.location || PROFESSOR_INFO.location}</span>
         </div>
       </footer>
+
+      {/* Floating WhatsApp Student Desk */}
+      <NetVidyaWhatsAppWidget />
 
     </div>
   );

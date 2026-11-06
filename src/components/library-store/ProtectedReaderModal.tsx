@@ -238,11 +238,11 @@ const CitationModal: React.FC<{ isOpen: boolean; onClose: () => void }> = React.
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 transition-opacity"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/60 transition-opacity overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-deckle space-y-4 text-ink select-text"
+        className="bg-white rounded-2xl max-w-lg w-full my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto p-5 sm:p-6 shadow-2xl border border-deckle space-y-4 text-ink select-text"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-start justify-between border-b border-deckle pb-3">

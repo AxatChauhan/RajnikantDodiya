@@ -22,6 +22,7 @@ import { NetVidyaCheckoutModal } from './NetVidyaCheckoutModal';
 import { NetVidyaStudentLoginModal } from './NetVidyaStudentLoginModal';
 import { NetVidyaPolicies, PolicyTab } from './NetVidyaPolicies';
 import { NetVidyaAdminModal } from './NetVidyaAdminModal';
+import { NetVidyaWhatsAppWidget } from './NetVidyaWhatsAppWidget';
 
 export type StoreView = 'home' | 'sample' | 'dashboard' | 'policies';
 

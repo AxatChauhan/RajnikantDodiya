@@ -297,8 +297,13 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/80 backdrop-blur-xs animate-fade-in">
-      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl border border-deckle max-h-[94vh] overflow-y-auto space-y-6">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/80 backdrop-blur-xs animate-fade-in overflow-y-auto"
+    >
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full my-auto p-5 sm:p-8 shadow-2xl border border-deckle max-h-[calc(100dvh-2rem)] overflow-y-auto space-y-6">
         
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-deckle pb-4">

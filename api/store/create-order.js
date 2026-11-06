@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { studentName, email, mobile } = req.body || {};
+    const { studentName, email, mobile, couponCode } = req.body || {};
 
     if (!studentName || !email || !mobile) {
       return res.status(400).json({
@@ -28,7 +28,18 @@ export default async function handler(req, res) {
     const simulatedNow = req.query?.now || req.headers?.['x-simulated-date'] || req.body?.simulatedNow;
     const settings = await fetchStoreSettings();
     const priceCalculation = computeCurrentServerPrice(settings, simulatedNow);
-    const amountInPaisa = priceCalculation.price * 100; // Razorpay expects amount in paise
+
+    // Server-enforced coupon code validation
+    const VALID_COUPONS = {
+      'GSET50': 50,
+      'NET100': 100,
+      'SCHOLAR150': 150,
+      'EARLYBIRD': 50
+    };
+    const cleanCoupon = (couponCode || '').toString().trim().toUpperCase();
+    const discount = VALID_COUPONS[cleanCoupon] || 0;
+    const finalPrice = Math.max(1, priceCalculation.price - discount);
+    const amountInPaisa = finalPrice * 100; // Razorpay expects amount in paise
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;

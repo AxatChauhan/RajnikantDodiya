@@ -138,8 +138,13 @@ export const VirtualBookshelf: React.FC<VirtualBookshelfProps> = ({ onNavigate }
 
       {/* Reading Room Modal Drawer */}
       {selectedBook && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-pure/60 backdrop-blur-sm animate-fade-in">
-          <div className="folio-card bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-book-xl border border-deckle max-h-[90vh] overflow-y-auto space-y-6">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedBook(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-pure/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+        >
+          <div className="folio-card bg-white rounded-3xl max-w-2xl w-full my-auto p-5 sm:p-8 shadow-book-xl border border-deckle max-h-[calc(100dvh-2rem)] overflow-y-auto space-y-6">
             
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-4 pb-4 border-b border-deckle">

@@ -375,6 +375,42 @@ export const ContactPage: React.FC<ContactPageProps> = ({ subSection }) => {
                 </div>
               </div>
 
+              {formData.category === 'Speaker Invitation' && (
+                <div className="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 space-y-3 text-xs">
+                  <span className="font-semibold text-blue-900 block flex items-center gap-1.5">
+                    <Mic className="w-3.5 h-3.5 text-blue-700" />
+                    <span>Speaker / Resource Person Event Parameters</span>
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-gray-700 font-medium block mb-1">Event Type & Format</label>
+                      <select
+                        onChange={e => setFormData({ ...formData, subject: `[${e.target.value}] ${formData.subject || 'Keynote Speaker Invitation'}` })}
+                        className="w-full px-3 py-2 rounded-lg bg-white border border-gray-300 text-xs focus:ring-1 focus:ring-blue-600 outline-none"
+                      >
+                        <option value="National Conference Keynote">National / International Conference Keynote</option>
+                        <option value="UGC Refresher Course / HRDC">UGC Refresher Course / HRDC Resource Person</option>
+                        <option value="Faculty Development Program (FDP)">Faculty Development Program (FDP)</option>
+                        <option value="Invited Guest Lecture / Webinar">Invited Guest Lecture / Webinar</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-gray-700 font-medium block mb-1">Keynote Topic Domain</label>
+                      <select
+                        className="w-full px-3 py-2 rounded-lg bg-white border border-gray-300 text-xs focus:ring-1 focus:ring-blue-600 outline-none"
+                        onChange={e => setFormData({ ...formData, message: `Preferred Topic: ${e.target.value}\n${formData.message}` })}
+                      >
+                        <option value="AI in English Language Education (CAIELE)">AI in English Language Education (CAIELE)</option>
+                        <option value="Post-Method Pedagogy & Context-Sensitive Teaching">Post-Method Pedagogy & Context-Sensitive Teaching</option>
+                        <option value="NEP 2020: Multilingual Pedagogy & Translanguaging">NEP 2020: Multilingual Pedagogy & Translanguaging</option>
+                        <option value="UGC NET / GSET Curriculum & Exam Strategy">UGC NET / GSET Curriculum & Exam Strategy</option>
+                        <option value="Teacher Competencies & NAAC Quality Benchmarks">Teacher Competencies & NAAC Quality Benchmarks</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="text-ink font-medium block mb-1">Subject *</label>
                 <input

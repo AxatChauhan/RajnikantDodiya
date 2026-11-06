@@ -34,8 +34,34 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   const [studentName, setStudentName] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number; message: string } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const finalPayablePrice = Math.max(1, currentServerPrice - (appliedDiscount?.amount || 0));
+
+  const handleApplyCoupon = () => {
+    setCouponError(null);
+    const code = couponCode.trim().toUpperCase();
+    if (!code) {
+      setCouponError('Please enter a coupon code.');
+      return;
+    }
+    const coupons: Record<string, { amount: number; message: string }> = {
+      'GSET50': { amount: 50, message: '₹50 GSET Aspirant discount applied!' },
+      'NET100': { amount: 100, message: '₹100 NET Candidate scholarship discount applied!' },
+      'SCHOLAR150': { amount: 150, message: '₹150 Special Scholar discount applied!' },
+      'EARLYBIRD': { amount: 50, message: '₹50 Early Bird discount applied!' }
+    };
+    if (coupons[code]) {
+      setAppliedDiscount({ code, ...coupons[code] });
+      setCouponError(null);
+    } else {
+      setCouponError('Invalid or expired coupon code.');
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -72,7 +98,8 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         body: JSON.stringify({
           studentName: cleanName,
           email: cleanEmail,
-          mobile: cleanMobile
+          mobile: cleanMobile,
+          couponCode: appliedDiscount?.code || ''
         })
       });
 
@@ -197,13 +224,18 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-gray-200 space-y-6 animate-scale-up relative">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
+    >
+      <div className="relative w-full max-w-lg my-auto bg-white rounded-3xl p-5 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors z-10"
           title="Close Checkout"
         >
           <X className="w-5 h-5" />
@@ -234,9 +266,20 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           <div>
             <span className="text-xs text-blue-800 font-medium block">Payable Enrollment Fee</span>
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-3xl font-extrabold text-blue-950">₹{currentServerPrice}</span>
+              <span className="text-3xl font-extrabold text-blue-950">₹{finalPayablePrice}</span>
+              {appliedDiscount && (
+                <span className="text-xs text-gray-400 line-through font-medium">
+                  ₹{currentServerPrice}
+                </span>
+              )}
               <span className="text-xs text-blue-700 font-medium">INR (All Inclusive)</span>
             </div>
+            {appliedDiscount && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold mt-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Saved ₹{appliedDiscount.amount} with code {appliedDiscount.code}</span>
+              </span>
+            )}
           </div>
           <div className="text-right text-xs text-blue-800">
             <span className="font-semibold block">Valid through</span>
@@ -303,6 +346,41 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 className="w-full px-4 py-2.5 rounded-r-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none font-mono"
               />
             </div>
+          </div>
+
+          {/* Optional Coupon Code Input */}
+          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-gray-700">Have a Scholarship / Referral Code?</span>
+              <span className="text-[11px] text-gray-400 font-mono">Optional</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                placeholder="e.g. GSET50 or NET100"
+                className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono uppercase focus:ring-2 focus:ring-blue-600 outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                className="px-3 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-bold transition-colors"
+              >
+                Apply
+              </button>
+            </div>
+            {appliedDiscount && (
+              <p className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>{appliedDiscount.message} (Code: {appliedDiscount.code})</span>
+              </p>
+            )}
+            {couponError && (
+              <p className="text-[11px] text-rose-600 font-medium">
+                {couponError}
+              </p>
+            )}
           </div>
 
           {/* Secure Payment Trigger Button */}

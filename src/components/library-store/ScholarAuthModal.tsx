@@ -139,8 +139,13 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/70 backdrop-blur-xs animate-fade-in">
-      <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-6 sm:p-8 shadow-book-xl border border-deckle relative">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-ink-pure/70 backdrop-blur-xs animate-fade-in overflow-y-auto"
+    >
+      <div className="folio-card bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto p-5 sm:p-8 shadow-book-xl border border-deckle relative">
         
         {/* Close Button */}
         <button

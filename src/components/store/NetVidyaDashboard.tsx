@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNetVidyaStore, ReadingFileItem, TestHallItem } from '../../contexts/NetVidyaStoreContext';
 import { NtaTestRunnerModal } from './NtaTestRunnerModal';
+import { NetVidyaInvoiceModal } from './NetVidyaInvoiceModal';
 
 interface NetVidyaDashboardProps {
   onOpenCheckout: () => void;
@@ -34,6 +35,32 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [downloadNotice, setDownloadNotice] = useState<string | null>(null);
   const [testNotice, setTestNotice] = useState<string | null>(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+
+  // Student progress tracking in localStorage
+  const [completedItems, setCompletedItems] = useState<{ files: string[]; tests: string[]; lastItem?: string }>(() => {
+    try {
+      const saved = localStorage.getItem(`netvidya_progress_${buyerSession.email || 'guest'}`);
+      return saved ? JSON.parse(saved) : { files: [], tests: [] };
+    } catch {
+      return { files: [], tests: [] };
+    }
+  });
+
+  const markItemCompleted = (id: string, type: 'file' | 'test', title: string) => {
+    setCompletedItems(prev => {
+      const next = {
+        ...prev,
+        lastItem: title,
+        files: type === 'file' && !prev.files.includes(id) ? [...prev.files, id] : prev.files,
+        tests: type === 'test' && !prev.tests.includes(id) ? [...prev.tests, id] : prev.tests
+      };
+      try {
+        localStorage.setItem(`netvidya_progress_${buyerSession.email || 'guest'}`, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // 1. Unauthenticated Visitor Prompt
   if (!buyerSession.isLoggedIn) {
@@ -194,6 +221,7 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
       a.click();
       document.body.removeChild(a);
 
+      markItemCompleted(file.id, 'file', file.title);
       setDownloadNotice(`Generated secure download for "${file.title}" (Link valid for 10 minutes).`);
       setTimeout(() => setDownloadNotice(null), 4000);
     } catch (err: any) {
@@ -236,6 +264,7 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
 
       const runnerUrl = data.runnerUrl || `/test-hall/runner.html?testId=${encodeURIComponent(test.id)}`;
       window.open(runnerUrl, '_blank');
+      markItemCompleted(test.id, 'test', test.title);
       setActiveTestToRun(test);
     } catch (err: any) {
       setTestNotice(`Error: ${err.message}`);
@@ -281,14 +310,55 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsInvoiceOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-blue-100 hover:text-white text-xs font-semibold transition-all flex items-center gap-1.5 border border-white/20 shadow-xs"
+            title="View & Download official fee receipt"
+          >
+            <FileText className="w-4 h-4 text-emerald-300" />
+            <span>Fee Receipt / Invoice</span>
+          </button>
           <button
             onClick={logoutBuyer}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-blue-100 hover:text-white text-xs font-semibold transition-all flex items-center gap-2 border border-white/20"
+            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-blue-100 hover:text-white text-xs font-semibold transition-all flex items-center gap-1.5 border border-white/20"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </button>
+        </div>
+      </div>
+
+      {/* 1.5 Student Preparation Progress & Resume Tracker */}
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-gray-900 text-sm">Study Preparation Progress</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-100 text-blue-800">
+                {Math.round(((completedItems.files.length + completedItems.tests.length) / Math.max(1, readingFiles.length + tests.length)) * 100)}% Complete
+              </span>
+            </div>
+            <p className="text-gray-500 text-[11px] mt-0.5">
+              Completed {completedItems.files.length + completedItems.tests.length} of {readingFiles.length + tests.length} syllabus modules ({completedItems.tests.length} tests attempted, {completedItems.files.length} reading files reviewed)
+            </p>
+          </div>
+          {completedItems.lastItem && (
+            <div className="inline-flex items-center gap-2 text-blue-900 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
+              <Sparkles className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+              <span className="text-[11px]">Last Studied: <strong className="font-semibold text-gray-900">{completedItems.lastItem}</strong></span>
+            </div>
+          )}
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 rounded-full transition-all duration-500"
+            style={{
+              width: `${Math.min(100, Math.round(((completedItems.files.length + completedItems.tests.length) / Math.max(1, readingFiles.length + tests.length)) * 100))}%`
+            }}
+          />
         </div>
       </div>
 
@@ -488,6 +558,14 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
           candidateName={buyerSession.name}
         />
       )}
+
+      {/* 6. Official Fee Receipt / Tax Invoice Modal */}
+      <NetVidyaInvoiceModal
+        isOpen={isInvoiceOpen}
+        onClose={() => setIsInvoiceOpen(false)}
+        buyerSession={buyerSession}
+        amount={currentServerPrice}
+      />
     </div>
   );
 };

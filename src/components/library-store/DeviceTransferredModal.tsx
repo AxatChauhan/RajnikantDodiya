@@ -28,8 +28,13 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
   const currentType = detectDeviceType();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-pure/75 backdrop-blur-xs animate-fade-in">
-      <div className="folio-card bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-book-xl border-2 border-amber-300 text-center space-y-5 relative overflow-hidden">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-pure/75 backdrop-blur-xs animate-fade-in overflow-y-auto"
+    >
+      <div className="folio-card bg-white rounded-3xl max-w-md w-full my-auto p-6 sm:p-8 shadow-book-xl border-2 border-amber-300 text-center space-y-5 relative max-h-[calc(100dvh-2rem)] overflow-y-auto">
         
         {/* Close Button */}
         <button

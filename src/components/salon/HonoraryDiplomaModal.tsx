@@ -37,8 +37,13 @@ export const HonoraryDiplomaModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/70 backdrop-blur-xs animate-fade-in">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-book-xl border-4 border-deckle-dark p-6 sm:p-10 space-y-6">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink/70 backdrop-blur-xs animate-fade-in overflow-y-auto"
+    >
+      <div className="relative w-full max-w-3xl my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white rounded-3xl shadow-book-xl border-4 border-deckle-dark p-5 sm:p-8 space-y-5">
         
         {/* Close button */}
         <button

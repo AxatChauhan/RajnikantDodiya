@@ -681,8 +681,13 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
       {/* 5. PHYSICAL BOOK DETAIL & CITATION MODAL                  */}
       {/* ========================================================= */}
       {inspectedBook && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-lg bg-white rounded-3xl border border-deckle shadow-2xl p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setInspectedBook(null);
+          }}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+        >
+          <div className="w-full max-w-lg my-auto bg-white rounded-3xl border border-deckle shadow-2xl p-5 sm:p-7 space-y-5 max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <div className="flex items-start justify-between gap-4 border-b border-deckle pb-4">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-claret font-bold bg-claret-soft px-2 py-0.5 rounded">

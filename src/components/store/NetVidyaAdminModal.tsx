@@ -204,8 +204,13 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
   // 1. PIN / Password Gate for unauthenticated visitors
   if (!isAdminAuthenticated) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-gray-200 space-y-6 relative animate-fade-in text-center">
+      <div
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      >
+        <div className="bg-white rounded-3xl max-w-md w-full my-auto p-5 sm:p-7 shadow-2xl border border-gray-200 space-y-5 relative animate-fade-in text-center max-h-[calc(100dvh-2rem)] overflow-y-auto">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
@@ -294,8 +299,13 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl border border-gray-200 space-y-6 relative max-h-[92vh] flex flex-col animate-fade-in">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+    >
+      <div className="bg-white rounded-3xl max-w-5xl w-full my-auto p-5 sm:p-8 shadow-2xl border border-gray-200 space-y-5 relative max-h-[92dvh] flex flex-col animate-fade-in">
         
         {/* Header */}
         <div className="flex items-start justify-between border-b border-gray-200 pb-4 shrink-0">
