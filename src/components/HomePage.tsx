@@ -48,180 +48,157 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
     <div className="space-y-12 sm:space-y-16 animate-fade-in pt-2">
       
       {/* ========================================================= */}
-      {/* 1. HERO SECTION: MODERN EDTECH WITH AMBIENT GLOW & CHIPS */}
+      {/* 1. HERO SECTION: EDITORIAL JOURNAL BYLINE (OPTION 3)       */}
       {/* ========================================================= */}
       <section className="edtech-hero-glow rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden">
         {/* Subtle Decorative Ambient Glow Elements */}
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+        <div className="relative z-10 space-y-6 sm:space-y-7">
           
-          {/* Left Column: High-Impact EdTech Intro */}
-          <div className="md:col-span-7 space-y-4 sm:space-y-5">
+          {/* Author Byline Header: Dignified Compact Portrait Integrated with Headline & Affiliation */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
             
-            {/* Professional Qualification Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-xs font-mono font-semibold shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>2× UGC NET & GSET Qualified • NET Vidya English Mentor</span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.15] tracking-tight break-words">
-              Dr. Rajnikant S. Dodiya
-            </h1>
-            
-            <p className="font-sans text-base sm:text-lg text-claret font-semibold leading-snug break-words">
-              Assistant Professor · English Language Education & Teacher Education
-            </p>
-
-            {/* Short Bio */}
-            <p className="text-xs sm:text-sm text-ink-muted font-reading leading-relaxed break-words whitespace-pre-line">
-              {profile.shortBio || PROFESSOR_INFO.shortBio}
-            </p>
-
-            {/* Quick Category Filter Pills (PW-Style) */}
-            <div className="pt-1 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-ink-muted mr-1 font-semibold">
-                Explore:
-              </span>
-              {[
-                { id: 'all', label: 'All Batches & Materials' },
-                { id: 'ugc-net', label: 'UGC-NET English' },
-                { id: 'books', label: 'Kalam Monograph' },
-                { id: 'pedagogy', label: 'AI in ELE & NEP' }
-              ].map((pill) => (
-                <button
-                  key={pill.id}
-                  onClick={() => {
-                    setActiveCategoryFilter(pill.id as any);
-                    if (pill.id === 'ugc-net') onNavigate('store');
-                    if (pill.id === 'books') onNavigate('bookstore');
-                    if (pill.id === 'pedagogy') onNavigate('research');
-                  }}
-                  className={`text-xs px-3 py-1 rounded-full border transition-all ${
-                    activeCategoryFilter === pill.id
-                      ? 'bg-claret text-white border-claret shadow-xs font-semibold'
-                      : 'bg-white hover:bg-gray-50 text-ink-muted border-gray-200'
-                  }`}
-                >
-                  {pill.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Primary Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <button
-                onClick={() => onNavigate('store')}
-                className="w-full sm:w-auto justify-center px-5 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px]"
-              >
-                <Zap className="w-4 h-4 text-amber-300" />
-                <span>GSET + UGC NET Final Pack 2026</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-1" />
-              </button>
-
-              <a
-                href={SOCIAL_LINKS.whatsappChannelEnglish}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full sm:w-auto justify-center px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-2xs transition-all flex items-center gap-1.5 min-h-[46px]"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp Mentor</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Right Column: Professor Photo with 4 Floating Achievement Badges */}
-          <div className="md:col-span-5 relative w-full max-w-[320px] sm:max-w-[360px] md:max-w-none mx-auto">
-            <div className="relative rounded-3xl overflow-hidden border-2 border-claret/20 shadow-2xl bg-white group aspect-square ring-8 ring-claret/5">
+            {/* Tasteful Academic Portrait (Subtle, modest footprint) */}
+            <div className="relative shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-deckle shadow-sm bg-white ring-4 ring-claret/5">
               <img
                 src={profile.photoUrl || PROFESSOR_INFO.photoUrl}
                 alt={profile.name || PROFESSOR_INFO.name}
                 fetchPriority="high"
                 loading="eager"
                 decoding="async"
-                width={420}
-                height={420}
-                className="w-full h-full object-cover object-[center_18%] filter contrast-[1.02] transition-transform duration-700 group-hover:scale-105"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover object-[center_18%] filter contrast-[1.02]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-claret/60 via-transparent to-transparent opacity-30" />
             </div>
 
-            {/* 4 Floating Achievement Chips - Desktop Positioned Overlay (Floats along left & right flanks) */}
-            <div className="hidden lg:block pointer-events-none">
-              {/* Chip 1: Top-Left */}
-              <div className="absolute top-4 -left-6 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
-                <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                  <Award className="w-4 h-4" />
-                </span>
-                <div>
-                  <p className="text-[10px] text-ink-muted uppercase leading-none">Qualified</p>
-                  <p className="text-xs font-bold leading-tight">2× NET & GSET</p>
-                </div>
+            {/* Name, Subtitle, and Institutional Badge */}
+            <div className="space-y-1.5">
+              {/* Professional Qualification Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-[14px] font-sans font-semibold shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="uppercase tracking-wide">2× UGC NET & GSET Qualified • NET Vidya English Mentor</span>
               </div>
 
-              {/* Chip 2: Mid-Left (No bottom collision) */}
-              <div className="absolute bottom-14 -left-6 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
-                <span className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-                  <GraduationCap className="w-4 h-4" />
-                </span>
-                <div>
-                  <p className="text-[10px] text-ink-muted uppercase leading-none">Doctorate</p>
-                  <p className="text-xs font-bold leading-tight">Ph.D. Kalam Inquiry</p>
-                </div>
-              </div>
+              {/* Main Headline */}
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.15] tracking-tight break-words">
+                {profile.name || PROFESSOR_INFO.name}
+              </h1>
+              
+              <p className="font-sans text-base sm:text-lg text-claret font-semibold leading-snug break-words">
+                Assistant Professor · English Language Education & Teacher Education
+              </p>
 
-              {/* Chip 3: Top-Right */}
-              <div className="absolute top-4 -right-5 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
-                <span className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                  <BookOpen className="w-4 h-4" />
+              <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[14px] text-ink-muted font-sans">
+                <span className="inline-flex items-center gap-1.5 font-medium">
+                  <ProfessorCrestIcon className="w-4 h-4 text-claret" />
+                  <span>Sardar Patel University, Vallabh Vidyanagar</span>
                 </span>
-                <div>
-                  <p className="text-[10px] text-ink-muted uppercase leading-none">Catalog</p>
-                  <p className="text-xs font-bold leading-tight">10 Published Books</p>
-                </div>
+                <span className="hidden sm:inline text-gray-300">•</span>
+                <span className="text-ink-muted">HMPIETR Faculty of Education</span>
               </div>
+            </div>
+          </div>
 
-              {/* Chip 4: Mid-Right (No bottom collision) */}
-              <div className="absolute bottom-14 -right-5 floating-badge px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-sans font-semibold text-ink pointer-events-auto">
-                <span className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
-                  <Award className="w-4 h-4 text-purple-600" />
-                </span>
-                <div>
-                  <p className="text-[10px] text-ink-muted uppercase leading-none">Experience</p>
-                  <p className="text-xs font-bold leading-tight">15+ Yrs Academic Rigor</p>
-                </div>
+          {/* Short Bio */}
+          <p className="text-[17px] text-ink-muted font-sans leading-[1.6] break-words whitespace-pre-line max-w-4xl">
+            {profile.shortBio || PROFESSOR_INFO.shortBio}
+          </p>
+
+          {/* Quick Category Filter Pills */}
+          <div className="pt-1 flex flex-wrap items-center gap-2">
+            <span className="text-[14px] font-sans uppercase tracking-wider text-ink-muted mr-1 font-semibold">
+              Explore:
+            </span>
+            {[
+              { id: 'all', label: 'All Batches & Materials' },
+              { id: 'ugc-net', label: 'UGC-NET English' },
+              { id: 'books', label: 'Kalam Monograph' },
+              { id: 'pedagogy', label: 'AI in ELE & NEP' }
+            ].map((pill) => (
+              <button
+                key={pill.id}
+                onClick={() => {
+                  setActiveCategoryFilter(pill.id as any);
+                  if (pill.id === 'ugc-net') onNavigate('store');
+                  if (pill.id === 'books') onNavigate('bookstore');
+                  if (pill.id === 'pedagogy') onNavigate('research');
+                }}
+                className={`text-[14px] px-4 py-1.5 rounded-full border transition-all ${
+                  activeCategoryFilter === pill.id
+                    ? 'bg-claret text-white border-claret shadow-xs font-semibold'
+                    : 'bg-white hover:bg-gray-50 text-ink-muted border-gray-200'
+                }`}
+              >
+                {pill.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Primary Action Buttons */}
+          <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button
+              onClick={() => onNavigate('store')}
+              className="w-full sm:w-auto justify-center px-6 py-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-[14px] font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[48px]"
+            >
+              <Zap className="w-4 h-4 text-amber-300" />
+              <span>GSET + UGC NET Final Pack 2026</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </button>
+
+            <a
+              href={SOCIAL_LINKS.whatsappChannelEnglish}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full sm:w-auto justify-center px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[14px] font-semibold shadow-2xs transition-all flex items-center gap-2 min-h-[48px]"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>WhatsApp Mentor</span>
+            </a>
+          </div>
+
+          {/* Editorial 4-Pillar Academic Credentials Strip */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-deckle/60">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/60 text-emerald-700 flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[14px] font-sans font-bold text-ink leading-tight">2× NET & GSET</p>
+                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Qualified</p>
               </div>
             </div>
 
-            {/* Mobile / Tablet Friendly 2x2 Achievement Grid (Clean Spacing, No Overlap) */}
-            <div className="lg:hidden grid grid-cols-2 gap-2 mt-4">
-              <div className="floating-badge p-2 rounded-xl flex items-center gap-2 text-xs font-sans">
-                <Award className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-[11px] leading-tight">2× NET & GSET</span>
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-700 flex items-center justify-center shrink-0">
+                <GraduationCap className="w-5 h-5" />
               </div>
-              <div className="floating-badge p-2 rounded-xl flex items-center gap-2 text-xs font-sans">
-                <BookOpen className="w-4 h-4 text-blue-600 shrink-0" />
-                <span className="font-semibold text-[11px] leading-tight">10 Published Books</span>
-              </div>
-              <div className="floating-badge p-2 rounded-xl flex items-center gap-2 text-xs font-sans">
-                <GraduationCap className="w-4 h-4 text-amber-600 shrink-0" />
-                <span className="font-semibold text-[11px] leading-tight">Ph.D. Education (SPU)</span>
-              </div>
-              <div className="floating-badge p-2 rounded-xl flex items-center gap-2 text-xs font-sans">
-                <Award className="w-4 h-4 text-purple-600 shrink-0" />
-                <span className="font-semibold text-[11px] leading-tight">15+ Yrs Teaching</span>
+              <div>
+                <p className="text-[14px] font-sans font-bold text-ink leading-tight">Ph.D. Education</p>
+                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Doctorate (SPU)</p>
               </div>
             </div>
 
-            {/* Dignified Academic Caption Below (Clean Margin, Zero Overlap on All Devices) */}
-            <div className="mt-6 text-center">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-deckle shadow-2xs text-[11px] font-mono font-semibold uppercase tracking-wider text-claret">
-                <ProfessorCrestIcon className="w-3.5 h-3.5" />
-                <span>Faculty • Academic Researcher • Mentor</span>
-              </span>
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-700 flex items-center justify-center shrink-0">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[14px] font-sans font-bold text-ink leading-tight">10 Published</p>
+                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Books & Catalog</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200/60 text-purple-700 flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-[14px] font-sans font-bold text-ink leading-tight">15+ Years</p>
+                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Academic Rigor</p>
+              </div>
             </div>
           </div>
 
