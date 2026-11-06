@@ -28,6 +28,7 @@ import {
   Flame
 } from 'lucide-react';
 import { MainTab } from './Navbar';
+import { ProfessorCrestIcon } from './common/ProfessorCrestIcon';
 import { useSiteContent } from '../contexts/SiteContentContext';
 
 interface HomePageProps {
@@ -74,8 +75,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
             </p>
 
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs sm:text-[14px] text-ink-muted font-sans">
-              <span className="inline-flex items-center gap-1.5 font-medium">
-                <GraduationCap className="w-4 h-4 text-claret shrink-0" />
+              <span className="inline-flex items-center gap-2 font-medium">
+                <ProfessorCrestIcon size={28} className="w-7 h-7 shrink-0" />
                 <span>Sardar Patel University, Vallabh Vidyanagar</span>
               </span>
               <span className="hidden sm:inline text-gray-300">•</span>
