@@ -48,6 +48,7 @@ type FontSize = 'compact' | 'standard' | 'large' | 'grand';
 type LineSpacing = 'standard' | 'relaxed';
 
 // Comprehensive, High-Contrast Theme System
+// Comprehensive, High-Contrast Theme System
 const THEME_CONFIG: Record<ReadingTheme, {
   name: string;
   modalBg: string;
@@ -56,6 +57,7 @@ const THEME_CONFIG: Record<ReadingTheme, {
   canvasBg: string;
   paperBg: string;
   border: string;
+  divider: string;
   textTitle: string;
   textBody: string;
   textMuted: string;
@@ -64,74 +66,153 @@ const THEME_CONFIG: Record<ReadingTheme, {
   surfaceBorder: string;
   blockquoteBg: string;
   btnBg: string;
+  accentText: string;
+  accentBg: string;
+  accentBorder: string;
+  sidebarActiveBg: string;
+  sidebarHoverBg: string;
+  lockedBadge: string;
+  sampleBadge: string;
+  lockBannerBg: string;
+  lockBannerBorder: string;
+  lockBannerTag: string;
+  lockBannerBox: string;
+  progressBarColor: string;
+  cardBg: string;
+  inputBg: string;
+  counterPill: string;
 }> = {
   parchment: {
     name: 'Parchment',
     modalBg: 'bg-[#FAF7F2]',
     headerBg: 'bg-[#FAF7F2]',
     sidebarBg: 'bg-[#F4EFE6]',
-    canvasBg: 'bg-[#FAF7F2]', // Unified, seamless academic parchment
+    canvasBg: 'bg-[#FAF7F2]',
     paperBg: 'bg-[#FAF7F2]',
     border: 'border-[#E5DDD0]',
+    divider: 'border-[#E5DDD0]',
     textTitle: 'text-[#1C1917]',
     textBody: 'text-[#292524]',
     textMuted: 'text-[#78716C]',
-    watermarkColor: 'text-[#6B1D2F]/[0.10]',
+    watermarkColor: 'text-[#6B1D2F]/[0.08]',
     tagBg: 'bg-[#6B1D2F]/10 text-[#6B1D2F]',
     surfaceBorder: 'border-[#E5DDD0]',
-    blockquoteBg: 'bg-[#F2ECE1]',
-    btnBg: 'bg-black/5 hover:bg-black/10 text-[#1C1917]'
+    blockquoteBg: 'bg-[#F2ECE1] border-l-[#6B1D2F]',
+    btnBg: 'bg-black/5 hover:bg-black/10 text-[#1C1917]',
+    accentText: 'text-[#8C2E42]',
+    accentBg: 'bg-[#8C2E42] text-white',
+    accentBorder: 'border-[#8C2E42]',
+    sidebarActiveBg: 'bg-[#8C2E42] text-white shadow-xs border-[#8C2E42]',
+    sidebarHoverBg: 'hover:bg-black/5',
+    lockedBadge: 'bg-[#8C2E42]/10 text-[#8C2E42] border border-[#8C2E42]/20',
+    sampleBadge: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+    lockBannerBg: 'bg-gradient-to-b from-[#8C2E42]/5 to-[#8C2E42]/10',
+    lockBannerBorder: 'border-[#8C2E42]/30',
+    lockBannerTag: 'bg-[#8C2E42]/10 text-[#8C2E42] border border-[#8C2E42]/20',
+    lockBannerBox: 'bg-white border-[#E5DDD0] text-[#1C1917]',
+    progressBarColor: 'bg-[#8C2E42]',
+    cardBg: 'bg-white text-[#1C1917] border-[#E5DDD0]',
+    inputBg: 'bg-white text-ink border-deckle',
+    counterPill: 'bg-black/5 text-ink'
   },
   sepia: {
     name: 'Sepia',
     modalBg: 'bg-[#F5EDE0]',
     headerBg: 'bg-[#F5EDE0]',
     sidebarBg: 'bg-[#ECE0CD]',
-    canvasBg: 'bg-[#F5EDE0]', // Warm antiquarian page
+    canvasBg: 'bg-[#F5EDE0]',
     paperBg: 'bg-[#F5EDE0]',
     border: 'border-[#DFCDB6]',
+    divider: 'border-[#DFCDB6]',
     textTitle: 'text-[#2C1C0F]',
     textBody: 'text-[#3D2918]',
     textMuted: 'text-[#7C634E]',
-    watermarkColor: 'text-[#8C3D28]/[0.12]',
+    watermarkColor: 'text-[#8C3D28]/[0.08]',
     tagBg: 'bg-[#8C3D28]/15 text-[#8C3D28]',
     surfaceBorder: 'border-[#DFCDB6]',
-    blockquoteBg: 'bg-[#EDE2D1]',
-    btnBg: 'bg-[#7C634E]/10 hover:bg-[#7C634E]/20 text-[#2C1C0F]'
+    blockquoteBg: 'bg-[#EDE2D1] border-l-[#8C3D28]',
+    btnBg: 'bg-[#7C634E]/10 hover:bg-[#7C634E]/20 text-[#2C1C0F]',
+    accentText: 'text-[#8C3D28]',
+    accentBg: 'bg-[#8C3D28] text-white',
+    accentBorder: 'border-[#8C3D28]',
+    sidebarActiveBg: 'bg-[#8C3D28] text-white shadow-xs border-[#8C3D28]',
+    sidebarHoverBg: 'hover:bg-[#7C634E]/10',
+    lockedBadge: 'bg-[#8C3D28]/10 text-[#8C3D28] border border-[#8C3D28]/20',
+    sampleBadge: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+    lockBannerBg: 'bg-gradient-to-b from-[#8C3D28]/5 to-[#8C3D28]/10',
+    lockBannerBorder: 'border-[#8C3D28]/30',
+    lockBannerTag: 'bg-[#8C3D28]/15 text-[#8C3D28] border border-[#8C3D28]/20',
+    lockBannerBox: 'bg-[#FAF4EC] border-[#DFCDB6] text-[#2C1C0F]',
+    progressBarColor: 'bg-[#8C3D28]',
+    cardBg: 'bg-[#FAF4EC] text-[#2C1C0F] border-[#DFCDB6]',
+    inputBg: 'bg-[#FAF4EC] text-[#2C1C0F] border-[#DFCDB6]',
+    counterPill: 'bg-[#7C634E]/10 text-[#2C1C0F]'
   },
   sage: {
     name: 'Sage',
     modalBg: 'bg-[#EDF4EC]',
     headerBg: 'bg-[#EDF4EC]',
     sidebarBg: 'bg-[#DFECE0]',
-    canvasBg: 'bg-[#EDF4EC]', // Tranquil herbal tea leaf
+    canvasBg: 'bg-[#EDF4EC]',
     paperBg: 'bg-[#EDF4EC]',
     border: 'border-[#C2D6C0]',
+    divider: 'border-[#C2D6C0]',
     textTitle: 'text-[#112316]',
     textBody: 'text-[#1B3322]',
     textMuted: 'text-[#486B52]',
-    watermarkColor: 'text-[#1B4D2E]/[0.12]',
+    watermarkColor: 'text-[#1B4D2E]/[0.08]',
     tagBg: 'bg-[#1B4D2E]/15 text-[#1B4D2E]',
     surfaceBorder: 'border-[#C2D6C0]',
-    blockquoteBg: 'bg-[#DFEDE0]',
-    btnBg: 'bg-[#1B4D2E]/10 hover:bg-[#1B4D2E]/20 text-[#112316]'
+    blockquoteBg: 'bg-[#DFEDE0] border-l-[#1B4D2E]',
+    btnBg: 'bg-[#1B4D2E]/10 hover:bg-[#1B4D2E]/20 text-[#112316]',
+    accentText: 'text-[#1B4D2E]',
+    accentBg: 'bg-[#1B4D2E] text-white',
+    accentBorder: 'border-[#1B4D2E]',
+    sidebarActiveBg: 'bg-[#1B4D2E] text-white shadow-xs border-[#1B4D2E]',
+    sidebarHoverBg: 'hover:bg-[#1B4D2E]/10',
+    lockedBadge: 'bg-[#1B4D2E]/10 text-[#1B4D2E] border border-[#1B4D2E]/20',
+    sampleBadge: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+    lockBannerBg: 'bg-gradient-to-b from-[#1B4D2E]/5 to-[#1B4D2E]/10',
+    lockBannerBorder: 'border-[#1B4D2E]/30',
+    lockBannerTag: 'bg-[#1B4D2E]/15 text-[#1B4D2E] border border-[#1B4D2E]/20',
+    lockBannerBox: 'bg-[#F4FAF3] border-[#C2D6C0] text-[#112316]',
+    progressBarColor: 'bg-[#1B4D2E]',
+    cardBg: 'bg-[#F4FAF3] text-[#112316] border-[#C2D6C0]',
+    inputBg: 'bg-[#F4FAF3] text-[#112316] border-[#C2D6C0]',
+    counterPill: 'bg-[#1B4D2E]/10 text-[#112316]'
   },
   night: {
     name: 'Night',
     modalBg: 'bg-[#121212]',
-    headerBg: 'bg-[#121212]',
-    sidebarBg: 'bg-[#181818]',
-    canvasBg: 'bg-[#121212]', // OLED dark
+    headerBg: 'bg-[#161616]',
+    sidebarBg: 'bg-[#191919]',
+    canvasBg: 'bg-[#121212]',
     paperBg: 'bg-[#121212]',
-    border: 'border-[#2A2826]',
+    border: 'border-[#2E2A27]',
+    divider: 'border-[#2E2A27]',
     textTitle: 'text-[#F5EFEB]',
     textBody: 'text-[#E5DFD5]',
-    textMuted: 'text-[#A0988A]',
-    watermarkColor: 'text-[#C5A059]/[0.14]',
-    tagBg: 'bg-[#C5A059]/20 text-[#E0C070]',
-    surfaceBorder: 'border-[#2A2826]',
-    blockquoteBg: 'bg-[#1E1C1A]',
-    btnBg: 'bg-white/10 hover:bg-white/15 text-[#F5EFEB]'
+    textMuted: 'text-[#B0A798]',
+    watermarkColor: 'text-[#C5A059]/[0.10]',
+    tagBg: 'bg-[#C5A059]/20 text-[#F0D590] border border-[#C5A059]/30',
+    surfaceBorder: 'border-[#2E2A27]',
+    blockquoteBg: 'bg-[#1C1A18] border-l-[#C5A059]',
+    btnBg: 'bg-white/10 hover:bg-white/15 text-[#F5EFEB]',
+    accentText: 'text-[#F0D590]',
+    accentBg: 'bg-[#8C2E42] text-white',
+    accentBorder: 'border-[#C5A059]',
+    sidebarActiveBg: 'bg-[#2A2320] text-[#F5EFEB] shadow-md border-[#C5A059] ring-1 ring-[#C5A059]/40',
+    sidebarHoverBg: 'hover:bg-white/[0.08]',
+    lockedBadge: 'bg-[#3A241C] text-[#F0B878] border border-[#8C5832]/60',
+    sampleBadge: 'bg-[#132A1C] text-[#7EE7A6] border border-[#235836]/60',
+    lockBannerBg: 'bg-[#1A1816]',
+    lockBannerBorder: 'border-[#3D352E]',
+    lockBannerTag: 'bg-[#C5A059]/20 text-[#F0D590] border border-[#C5A059]/30',
+    lockBannerBox: 'bg-[#221F1C] border-[#38322B] text-[#F5EFEB]',
+    progressBarColor: 'bg-[#C5A059]',
+    cardBg: 'bg-[#1E1C1A] text-[#F5EFEB] border-[#2E2A27]',
+    inputBg: 'bg-[#221F1C] text-[#F5EFEB] border-[#38322B]',
+    counterPill: 'bg-white/10 text-[#F5EFEB]'
   }
 };
 
@@ -488,7 +569,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
               title={isSidebarOpen ? 'Collapse Table of Contents' : 'Expand Table of Contents'}
               aria-label="Toggle sidebar"
             >
-              {isSidebarOpen ? <PanelLeftClose className="w-4 h-4 text-claret" /> : <PanelLeft className="w-4 h-4 text-claret" />}
+              {isSidebarOpen ? <PanelLeftClose className={`w-4 h-4 ${currentTheme.accentText}`} /> : <PanelLeft className={`w-4 h-4 ${currentTheme.accentText}`} />}
               <span className="hidden lg:inline text-[11px] font-sans font-medium">Contents</span>
             </button>
 
@@ -496,7 +577,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold truncate max-w-[150px] sm:max-w-xs">
+                <span className={`text-[10px] font-mono uppercase tracking-widest font-bold truncate max-w-[150px] sm:max-w-xs ${currentTheme.accentText}`}>
                   {bookTitle}
                 </span>
                 {isUnlocked ? (
@@ -510,7 +591,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                     <span>Sample ({previewPagesLimit}p / {totalPages}p)</span>
                   </span>
                 )}
-                <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-black/5 text-ink font-semibold shrink-0">
+                <span className={`text-[10px] font-mono px-2 py-0.2 rounded-full font-semibold shrink-0 ${currentTheme.counterPill}`}>
                   Page {currentPage} / {totalPages}
                 </span>
               </div>
@@ -566,7 +647,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
               title="Scholarly Citation (APA, MLA, Chicago, BibTeX)"
               aria-label="Cite monograph"
             >
-              <Quote className="w-4 h-4 text-claret" />
+              <Quote className={`w-4 h-4 ${currentTheme.accentText}`} />
               <span className="hidden xl:inline text-xs font-sans font-medium">Cite</span>
             </button>
 
@@ -605,7 +686,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
 
               {/* Preferences Dropdown Panel */}
               {isPreferencesOpen && (
-                <div className="absolute right-0 top-12 z-50 w-72 sm:w-80 p-4 rounded-2xl bg-white shadow-2xl border border-deckle space-y-4 animate-fade-in text-ink">
+                <div className={`absolute right-0 top-12 z-50 w-72 sm:w-80 p-4 rounded-2xl shadow-2xl border space-y-4 animate-fade-in ${currentTheme.cardBg}`}>
                   <div className="flex items-center justify-between border-b border-deckle pb-2">
                     <span className="text-xs font-mono uppercase font-bold text-claret">Reading Aesthetics</span>
                     <button onClick={() => setIsPreferencesOpen(false)} className="text-xs text-ink-muted hover:text-claret">✕</button>
@@ -744,7 +825,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
         {/* READING PROGRESS BAR */}
         <div className="w-full bg-black/5 h-1 shrink-0 overflow-hidden">
           <div
-            className="h-full bg-claret transition-all duration-150 ease-out"
+            className={`h-full ${currentTheme.progressBarColor} transition-all duration-150 ease-out`}
             style={{ width: `${scrollProgress}%` }}
           />
         </div>
@@ -801,7 +882,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-claret font-bold">
+                <span className={`text-[11px] font-mono uppercase tracking-wider font-bold ${currentTheme.accentText}`}>
                   Table of Contents
                 </span>
                 <span className={`text-[10px] font-mono ${currentTheme.textMuted}`}>
@@ -826,8 +907,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                         }}
                         className={`w-full text-left p-3.5 rounded-2xl text-xs transition-all relative border ${
                           isActive
-                            ? 'bg-claret text-white font-medium shadow-xs border-claret'
-                            : `hover:bg-black/5 border-transparent opacity-85 ${currentTheme.textBody}`
+                            ? currentTheme.sidebarActiveBg
+                            : `${currentTheme.sidebarHoverBg} border-transparent opacity-90 ${currentTheme.textBody}`
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -836,11 +917,11 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                           </span>
                           <div className="flex items-center gap-1.5">
                             {isChapterLocked ? (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-mono bg-claret/20 text-claret px-1.5 py-0.5 rounded font-bold">
+                              <span className={`inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${currentTheme.lockedBadge}`}>
                                 <Lock className="w-2.5 h-2.5" /> Locked
                               </span>
                             ) : (
-                              <span className="text-[9px] font-mono bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
+                              <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${currentTheme.sampleBadge}`}>
                                 Sample
                               </span>
                             )}
@@ -873,8 +954,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                         }}
                         className={`w-full text-left p-3.5 rounded-2xl text-xs transition-all relative border ${
                           isActive
-                            ? 'bg-claret text-white font-medium shadow-xs border-claret'
-                            : `hover:bg-black/5 border-transparent opacity-85 ${currentTheme.textBody}`
+                            ? currentTheme.sidebarActiveBg
+                            : `${currentTheme.sidebarHoverBg} border-transparent opacity-90 ${currentTheme.textBody}`
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -884,12 +965,12 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                               <Bookmark className={`w-3 h-3 ${isActive ? 'fill-amber-300 text-amber-300' : 'fill-amber-500 text-amber-500'}`} />
                             )}
                             {isChapterLocked ? (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-mono bg-claret/20 text-claret px-1.5 py-0.5 rounded font-bold">
+                              <span className={`inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${currentTheme.lockedBadge}`}>
                                 <Lock className="w-2.5 h-2.5" /> Locked
                               </span>
                             ) : (
                               idx === 0 && !isUnlocked && (
-                                <span className="text-[9px] font-mono bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
+                                <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${currentTheme.sampleBadge}`}>
                                   Sample
                                 </span>
                               )
@@ -911,7 +992,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             </div>
 
             {/* Sidebar Security & Candidate Badge */}
-            <div className={`pt-4 border-t border-black/10 mt-6 space-y-2 text-[11px] font-mono ${currentTheme.textMuted}`}>
+            <div className={`pt-4 border-t ${currentTheme.divider} mt-6 space-y-2 text-[11px] font-mono ${currentTheme.textMuted}`}>
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                 <span className="truncate">Candidate: {studentName || 'Scholar Pass'}</span>
@@ -948,7 +1029,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
             <article className={`w-full ${columnWidthClass} mx-auto space-y-8 relative z-10 pb-16`}>
 
               {/* Chapter Meta Header */}
-              <div className="border-b border-black/10 pb-6 space-y-2 relative z-10">
+              <div className={`border-b ${currentTheme.divider} pb-6 space-y-2 relative z-10`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className={`text-xs font-mono uppercase tracking-widest font-bold ${currentTheme.tagBg} px-2.5 py-0.5 rounded`}>
                     {activeChapter.chapterNumber}
@@ -969,9 +1050,9 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                 {/* Chapter Epigraph if available */}
                 {activeChapter.epigraph && (
                   <div className="pt-3">
-                    <blockquote className={`p-4 rounded-xl border-l-3 border-claret text-xs sm:text-sm font-reading italic leading-relaxed ${currentTheme.blockquoteBg} ${currentTheme.textMuted}`}>
+                    <blockquote className={`p-4 rounded-xl border-l-4 text-xs sm:text-sm font-reading italic leading-relaxed ${currentTheme.blockquoteBg} ${currentTheme.textBody}`}>
                       "{activeChapter.epigraph.quote}"
-                      <footer className="text-right not-italic font-mono text-[11px] text-claret mt-1.5 font-bold">
+                      <footer className={`text-right not-italic font-mono text-[11px] mt-1.5 font-bold ${currentTheme.accentText}`}>
                         — {activeChapter.epigraph.author}
                       </footer>
                     </blockquote>
@@ -987,12 +1068,12 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                     "You are viewing Page {currentPage} of {totalPages} in Free Candidate Preview mode. Free sample access is granted for Pages 1 through {previewPagesLimit}."
                   </div>
 
-                  <div className="relative rounded-3xl p-6 sm:p-10 border-2 border-dashed border-claret/30 bg-claret-soft/30 text-center space-y-4">
-                    <div className="w-14 h-14 rounded-2xl bg-claret text-white flex items-center justify-center mx-auto shadow-md">
+                  <div className={`relative rounded-3xl p-6 sm:p-10 border-2 border-dashed ${currentTheme.lockBannerBorder} ${currentTheme.lockBannerBg} text-center space-y-4`}>
+                    <div className={`w-14 h-14 rounded-2xl ${currentTheme.accentBg} flex items-center justify-center mx-auto shadow-md`}>
                       <Lock className="w-7 h-7 text-brass" />
                     </div>
                     <div className="space-y-2 max-w-lg mx-auto">
-                      <span className="text-xs font-mono uppercase tracking-widest text-claret font-bold bg-claret-soft px-3 py-1 rounded-full border border-claret/20 inline-block">
+                      <span className={`text-xs font-mono uppercase tracking-widest font-bold px-3 py-1 rounded-full border inline-block ${currentTheme.lockBannerTag}`}>
                         Free Sample Concluded (Pages 1–{previewPagesLimit} of {totalPages})
                       </span>
                       <h3 className={`font-serif text-2xl sm:text-3xl font-normal ${currentTheme.textTitle}`}>
@@ -1001,9 +1082,9 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                       <p className={`text-xs sm:text-sm font-reading leading-relaxed ${currentTheme.textMuted}`}>
                         The full edition unlocks all remaining {totalPages - previewPagesLimit} pages: complete research findings, post-method pedagogical frameworks, classroom empirical data, and university citations.
                       </p>
-                      <div className="inline-flex items-center gap-2 p-2 px-4 rounded-xl bg-white border border-deckle text-xs font-mono">
+                      <div className={`inline-flex items-center gap-2 p-2 px-4 rounded-xl border text-xs font-mono ${currentTheme.lockBannerBox}`}>
                         <span className="text-ink-muted">Single-Device Scholar License:</span>
-                        <strong className="text-claret font-bold text-sm">₹399</strong>
+                        <strong className={`font-bold text-sm ${currentTheme.accentText}`}>₹399</strong>
                         <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-bold">Lifetime Cloud Pass</span>
                       </div>
                     </div>
@@ -1014,7 +1095,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                           onClose();
                           onUnlockRequest?.();
                         }}
-                        className="px-8 py-3.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2 min-h-[44px]"
+                        className={`px-8 py-3.5 rounded-xl ${currentTheme.accentBg} hover:opacity-90 text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2 min-h-[44px]`}
                       >
                         <Lock className="w-4 h-4 text-brass" />
                         <span>Acquire Full Monograph Pass (₹399)</span>
@@ -1050,11 +1131,11 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
 
                   {/* Sample Excerpt Concluded Callout for Chapter 0 in Sample Mode */}
                   {!isUnlocked && (
-                    <div className="mt-8 p-6 sm:p-8 rounded-2xl border-2 border-dashed border-claret/30 bg-claret-soft/30 text-center space-y-3">
-                      <div className="w-10 h-10 rounded-xl bg-claret text-white flex items-center justify-center mx-auto shadow-xs">
+                    <div className={`mt-8 p-6 sm:p-8 rounded-2xl border-2 border-dashed ${currentTheme.lockBannerBorder} ${currentTheme.lockBannerBg} text-center space-y-3`}>
+                      <div className={`w-10 h-10 rounded-xl ${currentTheme.accentBg} flex items-center justify-center mx-auto shadow-xs`}>
                         <Lock className="w-5 h-5" />
                       </div>
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold bg-claret-soft px-3 py-1 rounded-full border border-claret/20 inline-block">
+                      <span className={`text-[10px] font-mono uppercase tracking-widest font-bold px-3 py-1 rounded-full border inline-block ${currentTheme.lockBannerTag}`}>
                         Sample Excerpt Concluded
                       </span>
                       <h3 className={`font-serif text-lg sm:text-xl font-normal ${currentTheme.textTitle}`}>
@@ -1069,7 +1150,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                             onClose();
                             onUnlockRequest?.();
                           }}
-                          className="px-6 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2"
+                          className={`px-6 py-2.5 rounded-xl ${currentTheme.accentBg} hover:opacity-90 text-xs font-medium shadow-xs transition-all inline-flex items-center gap-2`}
                         >
                           <Lock className="w-3.5 h-3.5" />
                           <span>Acquire Full Monograph Pass (₹399)</span>
@@ -1082,7 +1163,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                   {activeChapter.subsections && activeChapter.subsections.length > 0 && (
                     <div className="space-y-8 pt-4">
                       {activeChapter.subsections.map((sub, sIdx) => (
-                        <section key={sIdx} className="space-y-3.5 pt-4 border-t border-black/5">
+                        <section key={sIdx} className={`space-y-3.5 pt-4 border-t ${currentTheme.divider}`}>
                           <h3 className={`font-serif text-lg sm:text-xl font-normal ${currentTheme.textTitle}`}>
                             {renderParagraphWithHighlights(sub.subtitle)}
                           </h3>
@@ -1100,8 +1181,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
 
                   {/* Scholarly Footnotes Section */}
                   {activeChapter.footnotes && activeChapter.footnotes.length > 0 && (
-                    <div className={`pt-8 mt-10 border-t border-black/10 text-xs font-mono space-y-2 ${currentTheme.textMuted}`}>
-                      <span className="text-[10px] uppercase font-bold text-claret block tracking-wider">
+                    <div className={`pt-8 mt-10 border-t ${currentTheme.divider} text-xs font-mono space-y-2 ${currentTheme.textMuted}`}>
+                      <span className={`text-[10px] uppercase font-bold block tracking-wider ${currentTheme.accentText}`}>
                         Scholarly Footnotes & Citations
                       </span>
                       {activeChapter.footnotes.map((fn, fIdx) => (
@@ -1113,7 +1194,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                   )}
 
                   {/* End of Chapter Colophon & Forensic Stamp */}
-                  <div className={`pt-8 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono ${currentTheme.textMuted}`}>
+                  <div className={`pt-8 border-t ${currentTheme.divider} flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono ${currentTheme.textMuted}`}>
                     <span className="italic">
                       End of {activeChapter.chapterNumber} • Dr. Rajnikant S. Dodiya
                     </span>
@@ -1131,7 +1212,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                           setCurrentChapterIdx(prev => prev + 1);
                           scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="px-6 py-2.5 rounded-xl bg-claret text-white hover:bg-claret-light text-xs font-medium transition-all shadow-xs inline-flex items-center gap-2 min-h-[42px]"
+                        className={`px-6 py-2.5 rounded-xl ${currentTheme.accentBg} hover:opacity-90 text-xs font-medium transition-all shadow-xs inline-flex items-center gap-2 min-h-[42px]`}
                       >
                         <span>Continue to {bookChapters[currentChapterIdx + 1]?.title}</span>
                         <ChevronRight className="w-4 h-4" />
@@ -1246,7 +1327,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
                 value={pageJumpInput}
                 onChange={(e) => setPageJumpInput(e.target.value)}
                 placeholder={String(currentPage)}
-                className="w-12 px-1.5 py-0.5 rounded border border-deckle text-center bg-white text-ink text-xs font-mono"
+                className={`w-12 px-1.5 py-0.5 rounded border text-center text-xs font-mono ${currentTheme.inputBg}`}
               />
               <span className="text-[10px] font-mono text-ink-muted">/{totalPages}</span>
             </form>
