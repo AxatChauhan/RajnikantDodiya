@@ -28,7 +28,6 @@ import {
   Flame
 } from 'lucide-react';
 import { MainTab } from './Navbar';
-import { ProfessorCrestIcon } from './common/ProfessorCrestIcon';
 import { useSiteContent } from '../contexts/SiteContentContext';
 
 interface HomePageProps {
@@ -50,57 +49,48 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
       {/* ========================================================= */}
       {/* 1. HERO SECTION: ACADEMIC SCHOLARSHIP FIRST (WAY 4)       */}
       {/* ========================================================= */}
-      <section className="edtech-hero-glow rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden">
+      <section className="edtech-hero-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 relative overflow-hidden">
         {/* Subtle Decorative Ambient Glow Elements */}
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-6 sm:space-y-7">
+        <div className="relative z-10 space-y-5 sm:space-y-7">
           
-          {/* Author Headline & Institutional Emblem (Zero foreground photo highlight) */}
-          <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-5">
-            
-            {/* Academic Insignia Crest Seal */}
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-claret-soft/90 border border-claret/20 flex items-center justify-center text-claret shadow-xs shrink-0 ring-4 ring-claret/5">
-              <ProfessorCrestIcon className="w-7 h-7 sm:w-8 sm:h-8" />
+          {/* Author Headline & Institutional Affiliation (Zero foreground photo highlight) */}
+          <div className="space-y-2.5">
+            {/* Professional Qualification Badge */}
+            <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-xs sm:text-[14px] font-sans font-semibold shadow-2xs max-w-full">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="uppercase tracking-wide break-words">2× UGC NET & GSET Qualified • NET Vidya English Mentor</span>
             </div>
 
-            {/* Name, Subtitle, and Institutional Badge */}
-            <div className="space-y-1.5 flex-1 min-w-0">
-              {/* Professional Qualification Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-claret-soft/90 border border-claret/20 text-claret text-[14px] font-sans font-semibold shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="uppercase tracking-wide">2× UGC NET & GSET Qualified • NET Vidya English Mentor</span>
-              </div>
+            {/* Main Headline */}
+            <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.18] sm:leading-[1.15] tracking-tight break-words pt-0.5">
+              {profile.name || PROFESSOR_INFO.name}
+            </h1>
+            
+            <p className="font-sans text-sm sm:text-base lg:text-lg text-claret font-semibold leading-snug break-words">
+              Assistant Professor · English Language Education & Teacher Education
+            </p>
 
-              {/* Main Headline */}
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-bold leading-[1.15] tracking-tight break-words">
-                {profile.name || PROFESSOR_INFO.name}
-              </h1>
-              
-              <p className="font-sans text-base sm:text-lg text-claret font-semibold leading-snug break-words">
-                Assistant Professor · English Language Education & Teacher Education
-              </p>
-
-              <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[14px] text-ink-muted font-sans">
-                <span className="inline-flex items-center gap-1.5 font-medium">
-                  <ProfessorCrestIcon className="w-4 h-4 text-claret" />
-                  <span>Sardar Patel University, Vallabh Vidyanagar</span>
-                </span>
-                <span className="hidden sm:inline text-gray-300">•</span>
-                <span className="text-ink-muted">HMPIETR Faculty of Education</span>
-              </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs sm:text-[14px] text-ink-muted font-sans">
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <GraduationCap className="w-4 h-4 text-claret shrink-0" />
+                <span>Sardar Patel University, Vallabh Vidyanagar</span>
+              </span>
+              <span className="hidden sm:inline text-gray-300">•</span>
+              <span className="text-ink-muted">HMPIETR Faculty of Education</span>
             </div>
           </div>
 
           {/* Short Bio */}
-          <p className="text-[17px] text-ink-muted font-sans leading-[1.6] break-words whitespace-pre-line max-w-4xl">
+          <p className="text-[15px] sm:text-[17px] text-ink-muted font-sans leading-[1.6] break-words whitespace-pre-line max-w-4xl">
             {profile.shortBio || PROFESSOR_INFO.shortBio}
           </p>
 
           {/* Quick Category Filter Pills */}
-          <div className="pt-1 flex flex-wrap items-center gap-2">
-            <span className="text-[14px] font-sans uppercase tracking-wider text-ink-muted mr-1 font-semibold">
+          <div className="pt-0.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="text-xs sm:text-[14px] font-sans uppercase tracking-wider text-ink-muted mr-1 font-semibold">
               Explore:
             </span>
             {[
@@ -117,7 +107,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
                   if (pill.id === 'books') onNavigate('bookstore');
                   if (pill.id === 'pedagogy') onNavigate('research');
                 }}
-                className={`text-[14px] px-4 py-1.5 rounded-full border transition-all ${
+                className={`text-xs sm:text-[14px] px-3 sm:px-4 py-1.5 rounded-full border transition-all min-h-[38px] flex items-center justify-center ${
                   activeCategoryFilter === pill.id
                     ? 'bg-claret text-white border-claret shadow-xs font-semibold'
                     : 'bg-white hover:bg-gray-50 text-ink-muted border-gray-200'
@@ -129,66 +119,66 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
           </div>
 
           {/* Primary Action Buttons */}
-          <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
             <button
               onClick={() => onNavigate('store')}
-              className="w-full sm:w-auto justify-center px-6 py-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-[14px] font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[48px]"
+              className="w-full sm:w-auto justify-center px-6 py-3 sm:py-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-[14px] font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px] sm:min-h-[48px]"
             >
-              <Zap className="w-4 h-4 text-amber-300" />
+              <Zap className="w-4 h-4 text-amber-300 shrink-0" />
               <span>GSET + UGC NET Final Pack 2026</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
+              <ArrowRight className="w-4 h-4 ml-1 shrink-0" />
             </button>
 
             <a
               href={SOCIAL_LINKS.whatsappChannelEnglish}
               target="_blank"
               rel="noreferrer"
-              className="w-full sm:w-auto justify-center px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[14px] font-semibold shadow-2xs transition-all flex items-center gap-2 min-h-[48px]"
+              className="w-full sm:w-auto justify-center px-5 py-3 sm:py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-[14px] font-semibold shadow-2xs transition-all flex items-center gap-2 min-h-[46px] sm:min-h-[48px]"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4 shrink-0" />
               <span>WhatsApp Mentor</span>
             </a>
           </div>
 
           {/* Editorial 4-Pillar Academic Credentials Strip */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-deckle/60">
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/60 text-emerald-700 flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-deckle/60">
+            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-50 border border-emerald-200/60 text-emerald-700 flex items-center justify-center shrink-0">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <p className="text-[14px] font-sans font-bold text-ink leading-tight">2× NET & GSET</p>
-                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Qualified</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-700 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[14px] font-sans font-bold text-ink leading-tight">Ph.D. Education</p>
-                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Doctorate (SPU)</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-[14px] font-sans font-bold text-ink leading-tight truncate">2× NET & GSET</p>
+                <p className="text-[11px] sm:text-[13px] font-sans text-ink-muted uppercase tracking-wide truncate">Qualified</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-700 flex items-center justify-center shrink-0">
-                <BookOpen className="w-5 h-5" />
+            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-50 border border-amber-200/60 text-amber-700 flex items-center justify-center shrink-0">
+                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <p className="text-[14px] font-sans font-bold text-ink leading-tight">10 Published</p>
-                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Books & Catalog</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-[14px] font-sans font-bold text-ink leading-tight truncate">Ph.D. Education</p>
+                <p className="text-[11px] sm:text-[13px] font-sans text-ink-muted uppercase tracking-wide truncate">Doctorate (SPU)</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-deckle shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200/60 text-purple-700 flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5 text-purple-600" />
+            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-50 border border-blue-200/60 text-blue-700 flex items-center justify-center shrink-0">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <p className="text-[14px] font-sans font-bold text-ink leading-tight">15+ Years</p>
-                <p className="text-[14px] font-sans text-ink-muted uppercase tracking-wide">Academic Rigor</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-[14px] font-sans font-bold text-ink leading-tight truncate">10 Published</p>
+                <p className="text-[11px] sm:text-[13px] font-sans text-ink-muted uppercase tracking-wide truncate">Books & Catalog</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/80 border border-deckle shadow-2xs">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-purple-50 border border-purple-200/60 text-purple-700 flex items-center justify-center shrink-0">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-[14px] font-sans font-bold text-ink leading-tight truncate">15+ Years</p>
+                <p className="text-[11px] sm:text-[13px] font-sans text-ink-muted uppercase tracking-wide truncate">Academic Rigor</p>
               </div>
             </div>
           </div>
@@ -199,15 +189,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
       {/* ========================================================= */}
       {/* 2. "THE DR. DODIYA ADVANTAGE" (WITH ARCHIVAL BACKGROUND WATERMARK) */}
       {/* ========================================================= */}
-      <section className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-white via-parchment-warm/30 to-white border border-deckle shadow-sm overflow-hidden space-y-6">
+      <section className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-8 bg-gradient-to-br from-white via-parchment-warm/30 to-white border border-deckle shadow-sm overflow-hidden space-y-5 sm:space-y-6">
         
-        {/* Archival Background Watermark: Blended portrait behind "Why Prepare With Dr. Dodiya" */}
-        <div className="absolute right-0 top-0 bottom-0 w-full sm:w-1/2 md:w-5/12 pointer-events-none overflow-hidden select-none z-0">
+        {/* Archival Background Watermark: Blended portrait behind "Why Prepare With Dr. Dodiya" (hidden on mobile to maintain 100% reading clarity) */}
+        <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-1/2 md:w-5/12 pointer-events-none overflow-hidden select-none z-0">
           <img
             src={profile.photoUrl || PROFESSOR_INFO.photoUrl}
             alt=""
             aria-hidden="true"
-            className="w-full h-full object-cover object-[center_20%] filter grayscale contrast-125 opacity-[0.07] mix-blend-multiply"
+            className="w-full h-full object-cover object-[center_20%] filter grayscale contrast-125 opacity-[0.06] mix-blend-multiply"
             style={{
               maskImage: 'radial-gradient(ellipse at 80% 30%, black 20%, transparent 80%), linear-gradient(to left, black 10%, transparent 90%)',
               WebkitMaskImage: 'radial-gradient(ellipse at 80% 30%, black 20%, transparent 80%), linear-gradient(to left, black 10%, transparent 90%)',
@@ -220,21 +210,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
         {/* Section Header */}
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-deckle/80 gap-2">
           <div>
-            <span className="text-[14px] font-sans uppercase tracking-wider text-claret font-bold">
+            <span className="text-xs sm:text-[14px] font-sans uppercase tracking-wider text-claret font-bold">
               Why Prepare With Dr. Dodiya
             </span>
-            <h2 className="font-serif text-2xl sm:text-3xl text-ink font-bold mt-0.5">
+            <h2 className="font-serif text-xl sm:text-2xl lg:text-3xl text-ink font-bold mt-0.5">
               The Academic Pedagogy Advantage
             </h2>
           </div>
-          <span className="self-start sm:self-auto inline-flex items-center gap-1.5 text-[14px] font-sans text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-3.5 py-1 rounded-full font-semibold">
+          <span className="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs sm:text-[14px] font-sans text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-3 sm:px-3.5 py-1 rounded-full font-semibold">
             <span>✓</span>
             <span>Institutional Rigor</span>
           </span>
         </div>
 
-        {/* 4 Cards Grid - with soft translucent background so watermark gently whispers through */}
-        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 4 Cards Grid - with soft translucent background */}
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
             {
               icon: Award,

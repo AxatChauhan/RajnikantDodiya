@@ -444,14 +444,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="lg:hidden border-t border-deckle bg-white/98 backdrop-blur-lg px-4 py-4 max-h-[calc(100dvh-130px)] pb-24 overflow-y-auto space-y-4 animate-fade-in shadow-2xl">
             
             {/* Quick Actions in Mobile Drawer */}
-            {onOpenAuthModal && (
+            {(onOpenStore || onOpenAuthModal) && (
               <div className="pb-3 border-b border-deckle">
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onOpenAuthModal(); }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-claret text-white text-xs font-sans font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (onOpenStore) {
+                      onOpenStore();
+                    } else if (onOpenAuthModal) {
+                      onOpenAuthModal();
+                    }
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-sans font-medium flex items-center justify-center gap-1.5 shadow-xs min-h-[42px]"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>{isScholarActive ? 'My Pass' : 'Student Login'}</span>
+                  <span>{isScholarActive ? 'My Pass' : 'Student Login & Store'}</span>
                 </button>
               </div>
             )}
