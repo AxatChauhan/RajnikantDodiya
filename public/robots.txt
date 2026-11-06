@@ -1,7 +1,9 @@
 User-agent: *
 Allow: /
-Allow: /#store
-Allow: /#sample
+Allow: /store
+Allow: /publications
+Allow: /learn
+Allow: /bookstore
 Allow: /dr-rajnikant-dodiya.jpg
 Allow: /sample-materials/
 Disallow: /api/

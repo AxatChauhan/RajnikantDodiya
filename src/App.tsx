@@ -77,10 +77,19 @@ function AppInner() {
 
     const checkInitialRoute = () => {
       const isStoreHost = typeof window !== 'undefined' && window.location.hostname.startsWith('store.');
-      const isStorePath = typeof window !== 'undefined' && (window.location.pathname.startsWith('/store') || window.location.pathname === '/store');
-      const isStoreHash = typeof window !== 'undefined' && (window.location.hash.startsWith('#store') || window.location.hash === '#store');
-      if (isStoreHost || isStorePath || isStoreHash) {
+      if (isStoreHost) {
         setActiveTab('store');
+        return;
+      }
+      if (typeof window === 'undefined') return;
+
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      const hash = window.location.hash.replace(/^#+/, '').toLowerCase();
+      const route = path || hash;
+
+      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'bookstore', 'contact', 'store'];
+      if (validTabs.includes(route as MainTab)) {
+        setActiveTab(route as MainTab);
       }
     };
     checkInitialRoute();

@@ -17,15 +17,20 @@
 
   <!-- 2. Commercial Student Store: GSET + UGC NET English Final Pack 2026 -->
   <url>
-    <loc>https://rajnikantdodiya.com/#store</loc>
+    <loc>https://rajnikantdodiya.com/store</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg</image:loc>
+      <image:title>GSET + UGC NET English Final Pack 2026</image:title>
+      <image:caption>NET Vidya English - 10 NTA Mock Exams &amp; High-Yield Revision Dossiers</image:caption>
+    </image:image>
   </url>
 
-  <!-- 3. Free Public Samples (Demo CBT Test & 25-Q Mini Mock PDF) -->
+  <!-- 3. Free Public Samples & Demo CBT Test -->
   <url>
-    <loc>https://rajnikantdodiya.com/#sample</loc>
+    <loc>https://rajnikantdodiya.com/learn</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
@@ -33,15 +38,20 @@
 
   <!-- 4. Published Books & Monographs (Kalam Monograph, ISBNs) -->
   <url>
-    <loc>https://rajnikantdodiya.com/#publications</loc>
+    <loc>https://rajnikantdodiya.com/publications</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg</image:loc>
+      <image:title>Educational Thoughts of Dr. APJ Abdul Kalam</image:title>
+      <image:caption>Doctoral Research Monograph by Dr. Rajnikant S. Dodiya</image:caption>
+    </image:image>
   </url>
 
   <!-- 5. Academic Biography, Qualifications & CV -->
   <url>
-    <loc>https://rajnikantdodiya.com/#about</loc>
+    <loc>https://rajnikantdodiya.com/about</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
@@ -49,23 +59,23 @@
 
   <!-- 6. Research Papers, Citations & Doctoral Dissertation -->
   <url>
-    <loc>https://rajnikantdodiya.com/#research</loc>
+    <loc>https://rajnikantdodiya.com/research</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
 
-  <!-- 7. Study Materials & Paper II Curriculum Tracks -->
+  <!-- 7. Academic Bookstore -->
   <url>
-    <loc>https://rajnikantdodiya.com/#learn</loc>
+    <loc>https://rajnikantdodiya.com/bookstore</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.80</priority>
   </url>
 
   <!-- 8. Keynotes, Invited Lectures & Academic Talks -->
   <url>
-    <loc>https://rajnikantdodiya.com/#talks</loc>
+    <loc>https://rajnikantdodiya.com/talks</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
@@ -73,7 +83,7 @@
 
   <!-- 9. Communities, ELEF Forum & CAIELE Centre -->
   <url>
-    <loc>https://rajnikantdodiya.com/#communities</loc>
+    <loc>https://rajnikantdodiya.com/communities</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
@@ -81,7 +91,7 @@
 
   <!-- 10. Contact & Speaking Invitations -->
   <url>
-    <loc>https://rajnikantdodiya.com/#contact</loc>
+    <loc>https://rajnikantdodiya.com/contact</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.60</priority>

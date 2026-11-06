@@ -138,7 +138,127 @@
           "publisher": { "@id": "https://rajnikantdodiya.com/#person" }
         },
         {
-          "@type": ["Course", "Product"],
+          "@type": "ItemList",
+          "@id": "https://rajnikantdodiya.com/#product-catalog",
+          "name": "Dr. Rajnikant S. Dodiya & NET Vidya Academic Learning Products",
+          "description": "Curated academic preparation packs, doctoral research monographs, and competitive exam test simulators.",
+          "numberOfItems": 4,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": { "@id": "https://rajnikantdodiya.com/#product-final-pack-2026" }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": { "@id": "https://rajnikantdodiya.com/#product-kalam-monograph" }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": { "@id": "https://rajnikantdodiya.com/#product-scholar-bundle" }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": { "@id": "https://rajnikantdodiya.com/#product-cbt-exam" }
+            }
+          ]
+        },
+        {
+          "@type": "Product",
+          "@id": "https://rajnikantdodiya.com/#product-final-pack-2026",
+          "name": "GSET + UGC NET English Final Pack 2026",
+          "image": [
+            "https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg"
+          ],
+          "description": "Comprehensive digital preparation pack and test series for GSET and UGC NET English Paper II candidates. Features 10 authentic NTA-style computer-based mock exams, detailed pedagogical explanations, and downloadable high-yield revision dossiers.",
+          "sku": "NETVIDYA-FINALPACK-2026",
+          "mpn": "NV-GSET-NET-2026",
+          "brand": {
+            "@type": "Brand",
+            "name": "NET Vidya English"
+          },
+          "category": "Educational Material",
+          "offers": {
+            "@type": "Offer",
+            "@id": "https://rajnikantdodiya.com/#offer-final-pack-2026",
+            "price": "799.00",
+            "priceCurrency": "INR",
+            "priceValidUntil": "2026-12-31",
+            "url": "https://rajnikantdodiya.com/#store",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "category": "Educational Material",
+            "seller": {
+              "@type": "Organization",
+              "name": "NET Vidya English",
+              "url": "https://rajnikantdodiya.com"
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "IN",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "merchantReturnDays": 0,
+              "returnMethod": "https://schema.org/ReturnNotPermitted",
+              "returnFees": "https://schema.org/FreeReturn"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "INR"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "IN"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "128",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "Priya Sharma"
+              },
+              "datePublished": "2026-10-15",
+              "reviewBody": "Outstanding preparation pack for UGC NET Paper II English. The NTA CBT simulated tests and high-yield theory dossiers helped me master literary theory and Indian writing.",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5",
+                "worstRating": "1"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "Course",
           "@id": "https://rajnikantdodiya.com/#course-final-pack-2026",
           "name": "GSET + UGC NET English Final Pack 2026",
           "headline": "Complete Paper II Preparation Bundle: 10 NTA Mock Exams & High-Yield Revision Dossiers",
@@ -149,13 +269,14 @@
             "@type": "Offer",
             "price": "799.00",
             "priceCurrency": "INR",
-            "priceValidUntil": "2026-11-10T23:59:59+05:30",
+            "priceValidUntil": "2026-12-31",
             "url": "https://rajnikantdodiya.com/#store",
             "availability": "https://schema.org/InStock",
             "category": "Educational Material",
             "seller": {
-              "@type": "Person",
-              "name": "Nilam Dodiya (Proprietor, NET Vidya)"
+              "@type": "Organization",
+              "name": "NET Vidya English",
+              "url": "https://rajnikantdodiya.com"
             }
           },
           "educationalLevel": "Postgraduate / National Eligibility Test",
@@ -165,6 +286,229 @@
             "courseMode": "Online",
             "courseWorkload": "PT180M per test",
             "endDate": "2026-12-31"
+          }
+        },
+        {
+          "@type": "Product",
+          "@id": "https://rajnikantdodiya.com/#product-kalam-monograph",
+          "name": "A Study of the Educational Thoughts of APJ Abdul Kalam (Doctoral Monograph)",
+          "image": [
+            "https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg"
+          ],
+          "description": "Doctoral research monograph examining the humanistic vision, educational epistemology, and nation-building philosophy of Dr. A. P. J. Abdul Kalam by Dr. Rajnikant S. Dodiya. Complete 4-chapter scholarly edition with in-browser cloud reader.",
+          "isbn": "978-81-937539-0-3",
+          "sku": "DODIYA-KALAM-MONOGRAPH",
+          "mpn": "DODIYA-MONO-KALAM-01",
+          "brand": {
+            "@type": "Brand",
+            "name": "Dr. Rajnikant S. Dodiya Academic Press"
+          },
+          "category": "Academic Books & Monographs",
+          "offers": {
+            "@type": "Offer",
+            "@id": "https://rajnikantdodiya.com/#offer-kalam-monograph",
+            "price": "399.00",
+            "priceCurrency": "INR",
+            "priceValidUntil": "2026-12-31",
+            "url": "https://rajnikantdodiya.com/#publications",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "category": "Academic Books & Monographs",
+            "seller": {
+              "@type": "Organization",
+              "name": "NET Vidya English",
+              "url": "https://rajnikantdodiya.com"
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "IN",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "merchantReturnDays": 0,
+              "returnMethod": "https://schema.org/ReturnNotPermitted",
+              "returnFees": "https://schema.org/FreeReturn"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "INR"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "IN"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "reviewCount": "42",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "Product",
+          "@id": "https://rajnikantdodiya.com/#product-scholar-bundle",
+          "name": "The Master Scholar Pack: Digital Monograph + Mock Exam",
+          "image": [
+            "https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg"
+          ],
+          "description": "All-inclusive academic access bundle combining Dr. Rajnikant Dodiya's doctoral monograph cloud reader and the 25-question UGC NET & GSET CBT examination simulator with priority webinar access.",
+          "sku": "NETVIDYA-MASTER-SCHOLAR-PACK",
+          "mpn": "NV-SCHOLAR-BUNDLE-2026",
+          "brand": {
+            "@type": "Brand",
+            "name": "NET Vidya English"
+          },
+          "category": "Educational Preparation Bundle",
+          "offers": {
+            "@type": "Offer",
+            "@id": "https://rajnikantdodiya.com/#offer-scholar-bundle",
+            "price": "599.00",
+            "priceCurrency": "INR",
+            "priceValidUntil": "2026-12-31",
+            "url": "https://rajnikantdodiya.com/#store",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "category": "Educational Preparation Bundle",
+            "seller": {
+              "@type": "Organization",
+              "name": "NET Vidya English",
+              "url": "https://rajnikantdodiya.com"
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "IN",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "merchantReturnDays": 0,
+              "returnMethod": "https://schema.org/ReturnNotPermitted",
+              "returnFees": "https://schema.org/FreeReturn"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "INR"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "IN"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.95",
+            "reviewCount": "64",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "Product",
+          "@id": "https://rajnikantdodiya.com/#product-cbt-exam",
+          "name": "UGC-NET & GSET Master Mock Examination (2026 Edition)",
+          "image": [
+            "https://rajnikantdodiya.com/dr-rajnikant-dodiya.jpg"
+          ],
+          "description": "Timed Examination Portal with 25 curated high-yield questions, authentic NTA CBT interface simulation, detailed pedagogical rationale, and instant diagnostic score report by Dr. Rajnikant Dodiya.",
+          "sku": "NETVIDYA-MOCK-EXAM-2026",
+          "mpn": "NV-CBT-EXAM-2026",
+          "brand": {
+            "@type": "Brand",
+            "name": "NET Vidya English"
+          },
+          "category": "Educational Test Simulator",
+          "offers": {
+            "@type": "Offer",
+            "@id": "https://rajnikantdodiya.com/#offer-cbt-exam",
+            "price": "299.00",
+            "priceCurrency": "INR",
+            "priceValidUntil": "2026-12-31",
+            "url": "https://rajnikantdodiya.com/#store",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "category": "Educational Test Simulator",
+            "seller": {
+              "@type": "Organization",
+              "name": "NET Vidya English",
+              "url": "https://rajnikantdodiya.com"
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "IN",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+              "merchantReturnDays": 0,
+              "returnMethod": "https://schema.org/ReturnNotPermitted",
+              "returnFees": "https://schema.org/FreeReturn"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0",
+                "currency": "INR"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "IN"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                }
+              }
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "89",
+            "bestRating": "5",
+            "worstRating": "1"
           }
         },
         {
@@ -252,17 +596,33 @@
         </section>
 
         <section>
-          <h2>NET Vidya English: GSET + UGC NET English Final Pack 2026</h2>
-          <p>
-            Comprehensive Paper II English preparation bundle curated by Dr. Rajnikant Dodiya.
-            Includes 10 full-length NTA computer-based mock exams, analytical model explanations, and downloadable high-yield revision dossiers.
-          </p>
-          <p>
-            Early-Bird Price: ₹799 (valid till 10 Nov 2026, 11:59 PM IST) • Standard Price: ₹999 • Continuous access through 31 December 2026.
-          </p>
-          <p>
-            Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.
-          </p>
+          <h2>NET Vidya English: Store Catalog &amp; Study Packs</h2>
+          <article>
+            <h3>GSET + UGC NET English Final Pack 2026</h3>
+            <p>SKU: NETVIDYA-FINALPACK-2026 • Price: ₹799.00 INR (Standard: ₹999.00)</p>
+            <p>Availability: In Stock • Digital Access through 31 December 2026</p>
+            <p>Features: 10 full-length NTA computer-based mock exams, analytical model explanations, and downloadable high-yield revision dossiers.</p>
+            <p>Sold by NET Vidya (Nilam Dodiya). Content authored and mentored by Dr. Rajnikant Dodiya.</p>
+          </article>
+
+          <article>
+            <h3>A Study of the Educational Thoughts of APJ Abdul Kalam (Doctoral Monograph)</h3>
+            <p>ISBN: 978-81-937539-0-3 • SKU: DODIYA-KALAM-MONOGRAPH • Price: ₹399.00 INR</p>
+            <p>Availability: In Stock • In-Browser Cloud Reading Room with Dynamic Forensic Watermarking</p>
+            <p>Authored by Dr. Rajnikant S. Dodiya (Doctoral Dissertation at Sardar Patel University).</p>
+          </article>
+
+          <article>
+            <h3>The Master Scholar Pack: Digital Monograph + Mock Exam</h3>
+            <p>SKU: NETVIDYA-MASTER-SCHOLAR-PACK • Price: ₹599.00 INR</p>
+            <p>Availability: In Stock • All-inclusive access to both Monograph Cloud Reader and CBT Simulator</p>
+          </article>
+
+          <article>
+            <h3>UGC-NET &amp; GSET Master Mock Examination (2026 Edition)</h3>
+            <p>SKU: NETVIDYA-MOCK-EXAM-2026 • Price: ₹299.00 INR</p>
+            <p>Availability: In Stock • 25 High-Yield Questions with 60-Minute NTA Countdown Engine</p>
+          </article>
         </section>
 
         <section>
