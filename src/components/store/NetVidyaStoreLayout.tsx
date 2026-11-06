@@ -407,6 +407,9 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           onClose={() => setIsAdminOpen(false)}
         />
       )}
+
+      {/* Floating WhatsApp Support Desk for Store */}
+      <NetVidyaWhatsAppWidget hasBottomNav={false} />
     </div>
   );
 };

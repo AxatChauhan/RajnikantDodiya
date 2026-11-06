@@ -372,8 +372,8 @@ function AppInner() {
         </div>
       </footer>
 
-      {/* Floating WhatsApp Student Desk */}
-      <NetVidyaWhatsAppWidget />
+      {/* Floating WhatsApp Student Desk (Floats above mobile bottom navigation bar) */}
+      <NetVidyaWhatsAppWidget hasBottomNav={true} />
 
     </div>
   );
