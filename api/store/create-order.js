@@ -5,6 +5,7 @@ import {
   DEFAULT_STORE_SETTINGS,
   fetchStoreSettings
 } from './price.js';
+import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../lib/store-config.js';
 
 /**
  * Vercel Serverless Function: Create Razorpay Order
@@ -35,15 +36,10 @@ export default async function handler(req, res) {
     const settings = await fetchStoreSettings();
     const priceCalculation = computeCurrentServerPrice(settings, simulatedNow);
 
-    // Server-enforced coupon code validation
-    const VALID_COUPONS = {
-      'GSET50': 50,
-      'NET100': 100,
-      'SCHOLAR150': 150,
-      'EARLYBIRD': 50
-    };
+    // Server-enforced coupon code validation from centralized store-config
     const cleanCoupon = (couponCode || '').toString().trim().toUpperCase();
-    const discount = VALID_COUPONS[cleanCoupon] || 0;
+    const couponEntry = STORE_PAYMENT_DEFAULTS.validCoupons[cleanCoupon];
+    const discount = couponEntry?.amount || 0;
     const finalPrice = Math.max(1, priceCalculation.price - discount);
     const amountInPaisa = finalPrice * 100; // Razorpay expects amount in paise
 

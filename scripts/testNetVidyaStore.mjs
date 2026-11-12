@@ -408,6 +408,26 @@ if (fs.existsSync(policiesFile)) {
   assert(content.includes('netvidyaenglish@gmail.com'), 'Support email is NET Vidya branded (not personal/institute)');
 }
 
+// -----------------------------------------------------------------------------
+// TEST SUITE 9: Centralized Store Config & Site-Wide Policy Exposure
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 9: Centralized Store Config & Root Policy Exposure ---');
+
+const sharedConfigPath = path.resolve('lib/store-config.js');
+assert(fs.existsSync(sharedConfigPath), 'Centralized store config lib/store-config.js exists');
+if (fs.existsSync(sharedConfigPath)) {
+  const cfg = fs.readFileSync(sharedConfigPath, 'utf-8');
+  assert(!cfg.includes('HMPIETR') && !cfg.includes('Sardar Patel University'), 'Centralized store config maintains zero university/institute mentions');
+  assert(cfg.includes('https://rzp.io/rzp/locBUA0o'), 'Centralized store config holds default Razorpay payment link');
+  assert(cfg.includes('STORE_POLICIES') && cfg.includes('STORE_POLICY_LINKS'), 'Centralized store config exports structured policies and policy links');
+}
+
+const appContent = fs.readFileSync(path.resolve('src/App.tsx'), 'utf-8');
+assert(appContent.includes('StorePolicyLinks') && appContent.includes('POLICY_ROUTE_MAP'), 'Root App.tsx mounts shared StorePolicyLinks and direct policy route resolution');
+
+const bookstoreContent = fs.readFileSync(path.resolve('src/components/library-store/AcademicStorePage.tsx'), 'utf-8');
+assert(bookstoreContent.includes('StorePolicyLinks') && bookstoreContent.includes("onNavigate('store')"), 'AcademicStorePage exposes centralized policy links and direct Final Pack store cross-link');
+
 
 // -----------------------------------------------------------------------------
 // SUMMARY

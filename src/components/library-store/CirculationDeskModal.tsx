@@ -30,18 +30,23 @@ declare global {
   }
 }
 
+import { STORE_MERCHANT } from '../../config/storeConfig';
+import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
+
 interface CirculationDeskModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedProduct: StoreProduct | null;
   onPurchaseSuccess: (product: StoreProduct, studentName: string, studentMobile: string, orderId: string, deviceToken?: string) => void;
+  onOpenPolicy?: (tab: PolicyTab) => void;
 }
 
 export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
   isOpen,
   onClose,
   selectedProduct,
-  onPurchaseSuccess
+  onPurchaseSuccess,
+  onOpenPolicy
 }) => {
   const [activeTab, setActiveTab] = useState<'checkout' | 'restore'>('checkout');
   const [activeProduct, setActiveProduct] = useState<StoreProduct>(selectedProduct || STORE_PRODUCTS[0]);
@@ -517,6 +522,21 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                 </>
               )}
             </button>
+
+            {onOpenPolicy && (
+              <div className="pt-2 border-t border-deckle/70 space-y-1.5 text-center">
+                <p className="text-[11px] font-mono text-ink-muted">
+                  {STORE_MERCHANT.sellerLine}
+                </p>
+                <StorePolicyLinks
+                  variant="compact"
+                  onSelectPolicy={(tab) => {
+                    onClose();
+                    onOpenPolicy(tab);
+                  }}
+                />
+              </div>
+            )}
 
           </form>
         )}

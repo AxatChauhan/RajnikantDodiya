@@ -29,6 +29,8 @@ import {
   X
 } from 'lucide-react';
 import { MainTab } from '../Navbar';
+import { STORE_MERCHANT } from '../../config/storeConfig';
+import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
 
 // Lazily loaded checkout modal, DRM reader modal, and CBT exam portal
 const CirculationDeskModal = lazy(() =>
@@ -59,11 +61,13 @@ const BOOK_SYNOPSES: Record<string, string> = {
 export interface AcademicStorePageProps {
   onOpenAuthModal?: () => void;
   onNavigate?: (tab: MainTab, subId?: string) => void;
+  onOpenPolicy?: (tab: PolicyTab) => void;
 }
 
 export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
   onOpenAuthModal,
-  onNavigate
+  onNavigate,
+  onOpenPolicy
 }) => {
   const { books } = useSiteContent();
   const allBooks = books && books.length > 0 ? books : BOOKS;
@@ -283,6 +287,30 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
           </div>
         )}
       </div>
+
+      {/* Cross-link to NET Vidya Final Pack 2026 Store */}
+      {onNavigate && (
+        <section className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-50 via-white to-indigo-50 border border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-blue-700">
+              {STORE_MERCHANT.storeTitle} • Flagship Competitive Batch
+            </span>
+            <h2 className="font-serif text-lg sm:text-xl text-ink font-medium">
+              GSET + UGC NET English Final Pack 2026
+            </h2>
+            <p className="text-xs text-ink-muted font-reading leading-relaxed">
+              Full 10+ NTA CBT mock tests, model explanations &amp; revision dossiers curated by {STORE_MERCHANT.curator}. {STORE_MERCHANT.sellerLine}
+            </p>
+          </div>
+          <button
+            onClick={() => onNavigate('store')}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <span>Open Final Pack Store</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </section>
+      )}
 
       {/* ========================================================= */}
       {/* 2. BAY I: DIGITAL STUDY PASSES & SIMULATORS (3 TIERS)    */}
@@ -661,7 +689,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                 </div>
 
                 <a
-                  href={`https://wa.me/919638716634?text=${encodeURIComponent(
+                  href={`https://wa.me/${STORE_MERCHANT.whatsappNumber}?text=${encodeURIComponent(
                     `Hello Dr. Dodiya, I am interested in ordering a physical print copy of your book: "${book.title}" (ISBN: ${book.isbn}, Publisher: ${book.publisher}). Please guide me on availability.`
                   )}`}
                   target="_blank"
@@ -749,7 +777,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
                 Close
               </button>
               <a
-                href={`https://wa.me/919638716634?text=${encodeURIComponent(
+                href={`https://wa.me/${STORE_MERCHANT.whatsappNumber}?text=${encodeURIComponent(
                   `Hello Dr. Dodiya, I would like to inquire about ordering a copy of: "${inspectedBook.title}" (ISBN: ${inspectedBook.isbn}).`
                 )}`}
                 target="_blank"
@@ -763,6 +791,16 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
         </div>
       )}
 
+      {/* Store Policies & Commercial Compliance Footer */}
+      {onOpenPolicy && (
+        <section className="p-4 sm:p-5 rounded-2xl bg-parchment-warm/60 border border-deckle text-center space-y-2">
+          <p className="text-[11px] font-mono text-ink-muted">
+            {STORE_MERCHANT.sellerLine} • Support: {STORE_MERCHANT.supportEmail} ({STORE_MERCHANT.supportPhone})
+          </p>
+          <StorePolicyLinks variant="academic" onSelectPolicy={onOpenPolicy} />
+        </section>
+      )}
+
       {/* ========================================================= */}
       {/* 6. MODALS: CHECKOUT, DRM READER, & CBT EXAM PORTAL        */}
       {/* ========================================================= */}
@@ -773,6 +811,7 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
             onClose={() => setIsCheckoutOpen(false)}
             selectedProduct={selectedProduct}
             onPurchaseSuccess={handlePurchaseSuccess}
+            onOpenPolicy={onOpenPolicy}
           />
         </Suspense>
       )}

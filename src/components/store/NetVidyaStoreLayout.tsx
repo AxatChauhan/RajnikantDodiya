@@ -23,20 +23,28 @@ import { NetVidyaStudentLoginModal } from './NetVidyaStudentLoginModal';
 import { NetVidyaPolicies, PolicyTab } from './NetVidyaPolicies';
 import { NetVidyaAdminModal } from './NetVidyaAdminModal';
 import { NetVidyaWhatsAppWidget } from './NetVidyaWhatsAppWidget';
+import { STORE_MERCHANT } from '../../config/storeConfig';
+import { StorePolicyLinks } from '../common/StorePolicyLinks';
 
 export type StoreView = 'home' | 'sample' | 'dashboard' | 'policies';
 
 interface NetVidyaStoreLayoutProps {
   onBackToAcademicSite?: () => void;
+  onOpenBookstore?: () => void;
+  initialView?: StoreView;
+  initialPolicyTab?: PolicyTab;
 }
 
 export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
-  onBackToAcademicSite
+  onBackToAcademicSite,
+  onOpenBookstore,
+  initialView = 'home',
+  initialPolicyTab = 'terms'
 }) => {
   const { currentServerPrice, isEarlyBirdActive, buyerSession } = useNetVidyaStore();
 
-  const [currentView, setCurrentView] = useState<StoreView>('home');
-  const [selectedPolicyTab, setSelectedPolicyTab] = useState<PolicyTab>('terms');
+  const [currentView, setCurrentView] = useState<StoreView>(initialView);
+  const [selectedPolicyTab, setSelectedPolicyTab] = useState<PolicyTab>(initialPolicyTab);
 
   // Modals
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -108,6 +116,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               >
                 <Clock className="w-3.5 h-3.5 text-blue-700" />
                 <span>My Dashboard</span>
+              </button>
+            )}
+            {onOpenBookstore && (
+              <button
+                onClick={onOpenBookstore}
+                className="px-3 py-1.5 rounded-xl text-gray-600 hover:text-blue-800 hover:bg-gray-100 transition-colors"
+                title="Browse Monographs & Print Editions"
+              >
+                Bookstore
               </button>
             )}
             {onBackToAcademicSite && (
@@ -255,12 +272,21 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>Contact & Support Desk</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
+              {onOpenBookstore && (
+                <button
+                  onClick={() => { onOpenBookstore(); setMobileMenuOpen(false); }}
+                  className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-gray-700"
+                >
+                  <span>Bookstore &amp; Printed Editions</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </button>
+              )}
               {onBackToAcademicSite && (
                 <button
                   onClick={() => { onBackToAcademicSite(); setMobileMenuOpen(false); }}
                   className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-blue-700"
                 >
-                  <span>Academic Portfolio (Dr. Rajnikant Dodiya)</span>
+                  <span>Academic Portfolio ({STORE_MERCHANT.curatorShort})</span>
                   <ChevronRight className="w-4 h-4 text-blue-500" />
                 </button>
               )}
@@ -294,6 +320,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             onOpenCheckout={() => setIsCheckoutOpen(true)}
             onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             onOpenLogin={() => setIsLoginOpen(true)}
+            onOpenBookstore={onOpenBookstore}
           />
         )}
 
@@ -326,47 +353,37 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
             <div>
-              <strong className="text-gray-900 font-bold text-sm block">NET Vidya English</strong>
+              <strong className="text-gray-900 font-bold text-sm block">{STORE_MERCHANT.storeTitle}</strong>
               <p className="mt-0.5 text-gray-600">
-                Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.
+                {STORE_MERCHANT.sellerLine || 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.'}
               </p>
             </div>
-            {onBackToAcademicSite && (
-              <button
-                onClick={onBackToAcademicSite}
-                className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
-              >
-                <span>← Back to Academic Portfolio (Dr. Rajnikant Dodiya)</span>
-              </button>
-            )}
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {onOpenBookstore && (
+                <button
+                  onClick={onOpenBookstore}
+                  className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
+                >
+                  <span>Academic Bookstore (Monographs &amp; Print Books)</span>
+                </button>
+              )}
+              {onBackToAcademicSite && (
+                <button
+                  onClick={onBackToAcademicSite}
+                  className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
+                >
+                  <span>← Back to Academic Portfolio ({STORE_MERCHANT.curatorShort})</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Mandatory Policy Links (Razorpay Compliance) */}
           <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-center md:justify-between gap-4 text-[11px]">
-            <div className="flex flex-wrap items-center justify-center gap-4 text-gray-600 font-medium">
-              <button onClick={() => handleOpenPolicies('contact')} className="hover:text-blue-700 underline">
-                Contact Us
-              </button>
-              <span>•</span>
-              <button onClick={() => handleOpenPolicies('terms')} className="hover:text-blue-700 underline">
-                Terms & Conditions
-              </button>
-              <span>•</span>
-              <button onClick={() => handleOpenPolicies('privacy')} className="hover:text-blue-700 underline">
-                Privacy Policy
-              </button>
-              <span>•</span>
-              <button onClick={() => handleOpenPolicies('refund')} className="hover:text-blue-700 underline">
-                Cancellation & Refund
-              </button>
-              <span>•</span>
-              <button onClick={() => handleOpenPolicies('delivery')} className="hover:text-blue-700 underline">
-                Digital Delivery Policy
-              </button>
-            </div>
+            <StorePolicyLinks onSelectPolicy={handleOpenPolicies} variant="store" />
 
             <p className="text-gray-400">
-              © {new Date().getFullYear()} NET Vidya English. All rights reserved.
+              © {new Date().getFullYear()} {STORE_MERCHANT.storeTitle}. All rights reserved.
             </p>
           </div>
         </div>
@@ -377,6 +394,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
         <NetVidyaCheckoutModal
           isOpen={isCheckoutOpen}
           onClose={() => setIsCheckoutOpen(false)}
+          onOpenPolicy={handleOpenPolicies}
           onSuccess={() => {
             setIsCheckoutOpen(false);
             setCurrentView('dashboard');

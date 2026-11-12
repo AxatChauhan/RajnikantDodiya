@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { downloadBuyersAsXlsx } from '../utils/excelExport';
+import {
+  DEFAULT_STORE_SETTINGS,
+  STORE_PAYMENT_DEFAULTS
+} from '../config/storeConfig';
 
 export interface NetVidyaStoreSettings {
   productSlug: string;
@@ -269,17 +273,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       const cached = localStorage.getItem(STORAGE_KEY_SETTINGS);
       if (cached) return JSON.parse(cached);
     } catch {}
-    return {
-      productSlug: 'final-pack-2026',
-      productName: 'GSET + UGC NET English Final Pack 2026',
-      earlyBirdPrice: 799,
-      standardPrice: 999,
-      earlyBirdCutoff: '2026-11-10T23:59:59+05:30',
-      accessExpiryDate: '2026-12-31T23:59:59+05:30',
-      sellerLine: 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.',
-      supportEmail: 'netvidyaenglish@gmail.com',
-      supportPhone: '+91 96387 16634'
-    };
+    return { ...DEFAULT_STORE_SETTINGS };
   });
 
   // 2. Buyer Session State
@@ -325,14 +319,16 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   // Real-time server price & checkout mode sync
+  const defaultLink =
+    import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
   const [serverPriceState, setServerPriceState] = useState<{
     price: number | null;
     paymentMode: 'api_checkout' | 'payment_link';
     paymentLinkUrl: string;
   }>({
-    price: 799,
+    price: STORE_PAYMENT_DEFAULTS.defaultPaymentLinkPrice,
     paymentMode: 'payment_link',
-    paymentLinkUrl: import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || 'https://rzp.io/rzp/locBUA0o'
+    paymentLinkUrl: defaultLink
   });
 
   useEffect(() => {
@@ -343,12 +339,12 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
           setServerPriceState({
             price: data.price,
             paymentMode: data.paymentMode === 'api_checkout' ? 'api_checkout' : 'payment_link',
-            paymentLinkUrl: data.paymentLinkUrl || import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || 'https://rzp.io/rzp/locBUA0o'
+            paymentLinkUrl: data.paymentLinkUrl || defaultLink
           });
         }
       })
       .catch(() => {});
-  }, []);
+  }, [defaultLink]);
 
   const now = new Date();
   const cutoffDate = new Date(settings.earlyBirdCutoff);

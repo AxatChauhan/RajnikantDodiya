@@ -79,7 +79,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
   const [manualName, setManualName] = useState('');
   const [manualEmail, setManualEmail] = useState('');
   const [manualMobile, setManualMobile] = useState('');
-  const [manualAmount, setManualAmount] = useState(799);
+  const [manualAmount, setManualAmount] = useState(currentServerPrice);
 
   // Pricing Form State
   const [earlyPriceInput, setEarlyPriceInput] = useState(settings.earlyBirdPrice);

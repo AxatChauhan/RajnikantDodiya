@@ -30,7 +30,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   onOpenCheckout,
   onLoginSuccess
 }) => {
-  const { login, signup, forgotPassword, resetPassword } = useNetVidyaStore();
+  const { login, signup, forgotPassword, resetPassword, currentServerPrice } = useNetVidyaStore();
 
   const [activeTab, setActiveTab] = useState<TabType>('login');
   
@@ -545,7 +545,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             }}
             className="text-xs font-bold text-blue-700 hover:text-blue-900 underline inline-flex items-center gap-1"
           >
-            <span>Enroll Now (Early-Bird ₹799)</span>
+            <span>Enroll Now (₹{currentServerPrice})</span>
             <span>→</span>
           </button>
         </div>

@@ -9,6 +9,8 @@ import { handleGoogleAuthRedirect } from './lib/googleAuth';
 import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
 import { NetVidyaStoreProvider } from './contexts/NetVidyaStoreContext';
 import { NetVidyaWhatsAppWidget } from './components/store/NetVidyaWhatsAppWidget';
+import { StorePolicyLinks, PolicyTab } from './components/common/StorePolicyLinks';
+import { STORE_MERCHANT } from './config/storeConfig';
 
 // Lazily loaded 8 main tab views (Optimized for instant Initial Paint)
 const AboutPage = lazy(() => import('./components/AboutPage').then(m => ({ default: m.AboutPage })));
@@ -28,6 +30,27 @@ const ProtectedReaderModal = lazy(() => import('./components/library-store/Prote
 const ExamPortal = lazy(() => import('./components/library-store/ExamPortal').then(m => ({ default: m.ExamPortal })));
 const AuthorStudioModal = lazy(() => import('./components/studio/AuthorStudioModal').then(m => ({ default: m.AuthorStudioModal })));
 const NetVidyaStoreLayout = lazy(() => import('./components/store/NetVidyaStoreLayout').then(m => ({ default: m.NetVidyaStoreLayout })));
+const NetVidyaPolicies = lazy(() => import('./components/store/NetVidyaPolicies').then(m => ({ default: m.NetVidyaPolicies })));
+
+const POLICY_ROUTE_MAP: Record<string, PolicyTab> = {
+  policies: 'terms',
+  terms: 'terms',
+  'terms-and-conditions': 'terms',
+  'policies-terms': 'terms',
+  privacy: 'privacy',
+  'privacy-policy': 'privacy',
+  'policies-privacy': 'privacy',
+  refund: 'refund',
+  'refund-policy': 'refund',
+  'cancellation-refund': 'refund',
+  'policies-refund': 'refund',
+  delivery: 'delivery',
+  'shipping-policy': 'delivery',
+  'digital-delivery': 'delivery',
+  'policies-delivery': 'delivery',
+  'contact-store': 'contact',
+  'policies-contact': 'contact'
+};
 
 const AcademicLoadingFallback: React.FC = () => (
   <div className="min-h-[45vh] flex flex-col items-center justify-center p-8 space-y-3 text-center animate-fade-in">
@@ -50,6 +73,8 @@ function AppInner() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isExamOpen, setIsExamOpen] = useState(false);
+  const [activePolicyTab, setActivePolicyTab] = useState<PolicyTab>('terms');
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   useEffect(() => {
@@ -72,6 +97,11 @@ function AppInner() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleOpenPolicyModal = (tab: PolicyTab) => {
+    setActivePolicyTab(tab);
+    setIsPolicyModalOpen(true);
+  };
+
   useEffect(() => {
     handleGoogleAuthRedirect();
 
@@ -87,7 +117,13 @@ function AppInner() {
       const hash = window.location.hash.replace(/^#+/, '').toLowerCase();
       const route = path || hash;
 
-      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'bookstore', 'contact', 'store'];
+      if (POLICY_ROUTE_MAP[route]) {
+        setActivePolicyTab(POLICY_ROUTE_MAP[route]);
+        setActiveTab('policies');
+        return;
+      }
+
+      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'bookstore', 'contact', 'store', 'policies'];
       if (validTabs.includes(route as MainTab)) {
         setActiveTab(route as MainTab);
       }
@@ -112,7 +148,8 @@ function AppInner() {
       learn: `Study Materials & Examination Prep | NET Vidya English`,
       bookstore: `Academic Bookstore & Study Materials | Dr. Rajnikant Dodiya`,
       contact: `Contact & Collaboration | Dr. Rajnikant Dodiya`,
-      store: 'GSET + UGC NET English Final Pack 2026 | NET Vidya English by Dr. Rajnikant Dodiya'
+      store: 'GSET + UGC NET English Final Pack 2026 | NET Vidya English by Dr. Rajnikant Dodiya',
+      policies: 'Store Policies, Terms, Privacy & Refunds | NET Vidya English'
     };
 
     const tabDescriptions: Record<MainTab, string> = {
@@ -125,7 +162,8 @@ function AppInner() {
       learn: 'Comprehensive UGC NET & GSET English syllabus modules, mock test papers, and learning resources by Dr. Rajnikant Dodiya.',
       bookstore: 'Browse published educational texts, monograph chapters, and research volumes authored by Dr. Rajnikant Dodiya.',
       contact: 'Get in touch with Dr. Rajnikant Dodiya for academic collaboration, lecture invitations, and NET Vidya student inquiries.',
-      store: 'Enroll in the GSET + UGC NET English Final Pack 2026 for ₹799. 10 full NTA CBT mocks, model explanations, and revision dossiers by Dr. Rajnikant Dodiya.'
+      store: 'Enroll in the GSET + UGC NET English Final Pack 2026. 10 full NTA CBT mocks, model explanations, and revision dossiers curated by Dr. Rajnikant Dodiya.',
+      policies: 'Official Terms & Conditions, Privacy Policy, Cancellation & Refund Policy, Digital Delivery Policy, and Merchant Contact for NET Vidya English.'
     };
 
     document.title = tabTitles[activeTab] || `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & NET Vidya English`;
@@ -163,6 +201,7 @@ function AppInner() {
       <Suspense fallback={<AcademicLoadingFallback />}>
         <NetVidyaStoreLayout
           onBackToAcademicSite={() => handleNavigate('home')}
+          onOpenBookstore={() => handleNavigate('bookstore')}
         />
       </Suspense>
     );
@@ -243,10 +282,18 @@ function AppInner() {
               <AcademicStorePage
                 onOpenAuthModal={() => setIsAuthModalOpen(true)}
                 onNavigate={handleNavigate}
+                onOpenPolicy={handleOpenPolicyModal}
               />
             )}
             {activeTab === 'contact' && (
               <ContactPage subSection={activeSubSection} />
+            )}
+            {activeTab === 'policies' && (
+              <NetVidyaPolicies
+                initialTab={activePolicyTab}
+                isOpen={true}
+                onClose={() => handleNavigate('home')}
+              />
             )}
           </Suspense>
         </AcademicErrorBoundary>
@@ -328,6 +375,18 @@ function AppInner() {
         <AuthorStudioModal />
       </Suspense>
 
+      {/* Global Store Policies Modal (Centralized Legal & Razorpay Compliance Viewer) */}
+      {isPolicyModalOpen && (
+        <Suspense fallback={null}>
+          <NetVidyaPolicies
+            initialTab={activePolicyTab}
+            isOpen={isPolicyModalOpen}
+            asModal={true}
+            onClose={() => setIsPolicyModalOpen(false)}
+          />
+        </Suspense>
+      )}
+
       {/* Academic Footer */}
       <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-20 sm:mt-28 pt-8 border-t border-deckle space-y-4 text-xs text-ink-muted">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -366,9 +425,17 @@ function AppInner() {
           </div>
         </div>
 
+        {/* Centralized Store Policies & Merchant Disclosure Bar (Razorpay Verification Visibility) */}
+        <div className="pt-3 border-t border-deckle/60 flex flex-col lg:flex-row items-center justify-between gap-3 text-[11px]">
+          <span className="text-ink-muted text-center lg:text-left">
+            {STORE_MERCHANT.sellerLine} • {STORE_MERCHANT.supportEmail}
+          </span>
+          <StorePolicyLinks variant="academic" onSelectPolicy={handleOpenPolicyModal} />
+        </div>
+
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-deckle/60 text-[11px] text-ink-faint text-center sm:text-left">
           <span>© {new Date().getFullYear()} {profile.name || PROFESSOR_INFO.name} | All Academic Rights Reserved</span>
-          <span>NET Vidya English · {profile.location || PROFESSOR_INFO.location}</span>
+          <span>{STORE_MERCHANT.storeTitle} · {profile.location || PROFESSOR_INFO.location}</span>
         </div>
       </footer>
 

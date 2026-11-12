@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
+import { STORE_MERCHANT } from '../../config/storeConfig';
 
 interface NetVidyaWhatsAppWidgetProps {
   phoneNumber?: string;
@@ -8,8 +9,8 @@ interface NetVidyaWhatsAppWidgetProps {
 }
 
 export const NetVidyaWhatsAppWidget: React.FC<NetVidyaWhatsAppWidgetProps> = ({
-  phoneNumber = '919638716634',
-  defaultMessage = 'Hello NET Vidya, I am preparing for GSET / UGC NET English 2026 and have a query about the Final Pack.',
+  phoneNumber = STORE_MERCHANT.whatsappNumber,
+  defaultMessage = `Hello ${STORE_MERCHANT.brandName}, I am preparing for GSET / UGC NET English 2026 and have a query about the Final Pack.`,
   hasBottomNav = true
 }) => {
   const [isPromptDismissed, setIsPromptDismissed] = useState(false);

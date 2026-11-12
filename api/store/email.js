@@ -4,10 +4,12 @@
  * Provides fallback simulation logger when external delivery credentials are not set.
  */
 
+import { STORE_MERCHANT, DEFAULT_STORE_SETTINGS } from '../../lib/store-config.js';
+
 export const SENDER_INFO = {
-  name: 'NET Vidya English (Nilam Dodiya)',
-  email: 'netvidyaenglish@gmail.com',
-  replyTo: 'netvidyaenglish@gmail.com'
+  name: `${STORE_MERCHANT.storeTitle} (${STORE_MERCHANT.proprietor})`,
+  email: STORE_MERCHANT.supportEmail,
+  replyTo: STORE_MERCHANT.supportEmail
 };
 
 /**
@@ -20,7 +22,7 @@ export async function sendPurchaseConfirmationEmail({
   orderId = '',
   amount = 799,
   paymentId = '',
-  dashboardUrl = 'https://rajnikantdodiya.com/#dashboard'
+  dashboardUrl = STORE_MERCHANT.dashboardUrl
 }) {
   const cleanEmail = (to || '').trim().toLowerCase();
   if (!cleanEmail || !cleanEmail.includes('@')) {
@@ -28,7 +30,7 @@ export async function sendPurchaseConfirmationEmail({
     return { success: false, error: 'Invalid recipient email' };
   }
 
-  const subject = `Purchase Confirmation: GSET + UGC NET English Final Pack 2026 (${orderId})`;
+  const subject = `Purchase Confirmation: ${DEFAULT_STORE_SETTINGS.productName} (${orderId})`;
 
   const textContent = `
 Dear ${studentName},
@@ -37,14 +39,14 @@ Thank you for enrolling in the GSET + UGC NET English Final Pack 2026!
 Your payment of ₹${amount} (Payment ID: ${paymentId}) has been successfully verified.
 
 Order ID: ${orderId}
-Product: GSET + UGC NET English Final Pack 2026
-Access Validity: Through 31 Dec 2026
-Sold by: NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.
+Product: ${DEFAULT_STORE_SETTINGS.productName}
+Access Validity: Through ${STORE_MERCHANT.accessExpiryLabel}
+${STORE_MERCHANT.sellerLine}
 
 You can access your reading materials and test hall at your student dashboard:
 ${dashboardUrl}
 
-Need assistance? Contact our student support at netvidyaenglish@gmail.com.
+Need assistance? Contact our student support at ${STORE_MERCHANT.supportEmail}.
 
 Best wishes for your preparation,
 NET Vidya English Team
@@ -60,8 +62,8 @@ NET Vidya English Team
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; padding: 24px;">
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;">
     <div style="background-color: #1e3a8a; padding: 24px; text-align: center; color: #ffffff;">
-      <h1 style="margin: 0; font-size: 22px;">NET Vidya English</h1>
-      <p style="margin: 6px 0 0; font-size: 14px; color: #93c5fd;">GSET + UGC NET English Final Pack 2026</p>
+      <h1 style="margin: 0; font-size: 22px;">${STORE_MERCHANT.storeTitle}</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #93c5fd;">${DEFAULT_STORE_SETTINGS.productName}</p>
     </div>
     
     <div style="padding: 24px;">
@@ -85,7 +87,7 @@ NET Vidya English Team
           </tr>
           <tr>
             <td style="padding: 6px 0; color: #64748b;">Access Validity:</td>
-            <td style="padding: 6px 0; font-weight: bold; text-align: right;">Through 31 Dec 2026</td>
+            <td style="padding: 6px 0; font-weight: bold; text-align: right;">Through ${STORE_MERCHANT.accessExpiryLabel}</td>
           </tr>
         </table>
       </div>
@@ -103,8 +105,8 @@ NET Vidya English Team
     </div>
 
     <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 24px; font-size: 12px; color: #64748b; text-align: center;">
-      <p style="margin: 0;">Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.</p>
-      <p style="margin: 4px 0 0;">For inquiries, email <a href="mailto:netvidyaenglish@gmail.com" style="color: #2563eb;">netvidyaenglish@gmail.com</a></p>
+      <p style="margin: 0;">${STORE_MERCHANT.sellerLine}</p>
+      <p style="margin: 4px 0 0;">For inquiries, email <a href="mailto:${STORE_MERCHANT.supportEmail}" style="color: #2563eb;">${STORE_MERCHANT.supportEmail}</a></p>
     </div>
   </div>
 </body>

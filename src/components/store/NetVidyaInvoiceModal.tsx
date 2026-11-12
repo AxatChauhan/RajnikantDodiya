@@ -1,6 +1,7 @@
 import React from 'react';
-import { X, Printer, CheckCircle2, ShieldCheck, Download } from 'lucide-react';
+import { X, Printer, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { NetVidyaBuyerSession } from '../../contexts/NetVidyaStoreContext';
+import { DEFAULT_STORE_SETTINGS, STORE_MERCHANT } from '../../config/storeConfig';
 
 interface NetVidyaInvoiceModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
   isOpen,
   onClose,
   buyerSession,
-  amount = 799
+  amount = DEFAULT_STORE_SETTINGS.earlyBirdPrice
 }) => {
   if (!isOpen) return null;
 
@@ -74,14 +75,14 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
               <span className="text-xs font-bold font-mono tracking-widest text-blue-700 uppercase">
                 Payment Receipt & Enrollment Voucher
               </span>
-              <h1 className="text-2xl font-black text-gray-950 mt-1">NET Vidya English</h1>
+              <h1 className="text-2xl font-black text-gray-950 mt-1">{STORE_MERCHANT.storeTitle}</h1>
               <p className="text-xs text-gray-600 mt-1">
-                Sold by <strong>NET Vidya</strong> (Proprietor: Nilam Dodiya)
+                Sold by <strong>{STORE_MERCHANT.brandName}</strong> (Proprietor: {STORE_MERCHANT.proprietor})
               </p>
               <p className="text-xs text-gray-500">
-                Academic Direction & Mentorship: <strong>Dr. Rajnikant S. Dodiya</strong>
+                Academic Direction & Mentorship: <strong>{STORE_MERCHANT.curator}</strong>
               </p>
-              <p className="text-xs text-gray-500">netvidyaenglish@gmail.com • +91 96387 16634</p>
+              <p className="text-xs text-gray-500">{STORE_MERCHANT.supportEmail} • {STORE_MERCHANT.supportPhone}</p>
             </div>
 
             <div className="sm:text-right space-y-1">

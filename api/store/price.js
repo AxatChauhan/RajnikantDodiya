@@ -8,20 +8,15 @@
  * - Access validity: 31 Dec 2026
  */
 
-export const DEFAULT_PAYMENT_LINK = 'https://rzp.io/rzp/locBUA0o';
-export const DEFAULT_PAYMENT_LINK_PRICE = 799;
+import {
+  DEFAULT_STORE_SETTINGS,
+  STORE_MERCHANT,
+  STORE_PAYMENT_DEFAULTS
+} from '../../lib/store-config.js';
 
-export const DEFAULT_STORE_SETTINGS = {
-  productSlug: 'final-pack-2026',
-  productName: 'GSET + UGC NET English Final Pack 2026',
-  earlyBirdPrice: 799,
-  standardPrice: 999,
-  earlyBirdCutoff: '2026-11-10T23:59:59+05:30',
-  accessExpiryDate: '2026-12-31T23:59:59+05:30',
-  sellerLine: 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.',
-  supportEmail: 'netvidyaenglish@gmail.com',
-  supportPhone: '+91 96387 16634'
-};
+export const DEFAULT_PAYMENT_LINK = STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
+export const DEFAULT_PAYMENT_LINK_PRICE = STORE_PAYMENT_DEFAULTS.defaultPaymentLinkPrice;
+export { DEFAULT_STORE_SETTINGS };
 
 export function computeCurrentServerPrice(settings = DEFAULT_STORE_SETTINGS, simulatedNow = null) {
   const now = simulatedNow ? new Date(simulatedNow) : new Date();

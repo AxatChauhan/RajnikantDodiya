@@ -11,11 +11,14 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../config/storeConfig';
+import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
 
 interface NetVidyaCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (buyer: { name: string; email: string; mobile: string; orderId: string }) => void;
+  onOpenPolicy?: (tab: PolicyTab) => void;
 }
 
 declare global {
@@ -27,7 +30,8 @@ declare global {
 export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
+  onOpenPolicy
 }) => {
   const {
     currentServerPrice,
@@ -85,12 +89,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       setCouponError('Please enter a coupon code.');
       return;
     }
-    const coupons: Record<string, { amount: number; message: string }> = {
-      'GSET50': { amount: 50, message: '₹50 GSET Aspirant discount applied!' },
-      'NET100': { amount: 100, message: '₹100 NET Candidate scholarship discount applied!' },
-      'SCHOLAR150': { amount: 150, message: '₹150 Special Scholar discount applied!' },
-      'EARLYBIRD': { amount: 50, message: '₹50 Early Bird discount applied!' }
-    };
+    const coupons = STORE_PAYMENT_DEFAULTS.validCoupons;
     if (coupons[code]) {
       setAppliedDiscount({ code, ...coupons[code] });
       setCouponError(null);
@@ -145,7 +144,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         throw new Error(orderData.error || 'Failed to initiate order. Please try again.');
       }
 
-      const fallbackLink = (contextPaymentLinkUrl || import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || 'https://rzp.io/rzp/locBUA0o').trim();
+      const fallbackLink = (contextPaymentLinkUrl || import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || STORE_PAYMENT_DEFAULTS.defaultPaymentLink).trim();
       const paymentLinkUrl = orderData.paymentLinkUrl || (orderData.paymentMode === 'payment_link' ? fallbackLink : '');
 
       // Branch A: Verified Payment Link + Webhook Mode
@@ -275,7 +274,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           });
         }, 500);
       } else {
-        throw new Error('Online payment checkout is awaiting Razorpay link/key configuration. Please contact support on WhatsApp (+91 96387 16634) for instant activation.');
+        throw new Error(`Online payment checkout is awaiting Razorpay link/key configuration. Please contact support on WhatsApp (${STORE_MERCHANT.supportPhone}) for instant activation.`);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Unable to connect to payment gateway.');
@@ -351,7 +350,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       });
     } else {
       setActivationStatusMsg(
-        'Your account is signed in! Once your ₹799 Razorpay payment finishes, wait 5–10 seconds and tap "Check Webhook & Unlock" below.'
+        `Your account is signed in! Once your ₹${paymentLinkState.amount} Razorpay payment finishes, wait 5–10 seconds and tap "Check Webhook & Unlock" below.`
       );
     }
   };
@@ -392,7 +391,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
             GSET + UGC NET English Final Pack 2026
           </h2>
           <p className="text-xs text-gray-500">
-            Sold by NET Vidya (Nilam Dodiya) • Content by Dr. Rajnikant Dodiya
+            Sold by {STORE_MERCHANT.brandName} ({STORE_MERCHANT.proprietor}) • Content by {STORE_MERCHANT.curatorShort}
           </p>
         </div>
 
@@ -413,7 +412,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           </div>
           <div className="text-left sm:text-right text-xs text-blue-800">
             <span className="font-semibold block">Valid through</span>
-            <strong className="text-blue-950 font-bold">31 Dec 2026</strong>
+            <strong className="text-blue-950 font-bold">{STORE_MERCHANT.accessExpiryLabel}</strong>
           </div>
         </div>
 
@@ -665,13 +664,24 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         )}
 
         {/* Trust Badges */}
-        <div className="pt-2 border-t border-gray-200 flex flex-wrap items-center justify-center sm:justify-between gap-2.5 text-[11px] text-gray-500">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>256-Bit SSL Encrypted</span>
+        <div className="pt-2 border-t border-gray-200 space-y-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2.5 text-[11px] text-gray-500">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>256-Bit SSL Encrypted</span>
+            </div>
+            <span>Razorpay Verified</span>
+            <span>Instant Digital Access</span>
           </div>
-          <span>Razorpay Verified</span>
-          <span>Instant Digital Access</span>
+          {onOpenPolicy && (
+            <StorePolicyLinks
+              variant="compact"
+              onSelectPolicy={(tab) => {
+                onClose();
+                onOpenPolicy(tab);
+              }}
+            />
+          )}
         </div>
 
       </div>

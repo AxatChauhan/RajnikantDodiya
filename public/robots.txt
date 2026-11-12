@@ -4,6 +4,11 @@ Allow: /store
 Allow: /publications
 Allow: /learn
 Allow: /bookstore
+Allow: /terms
+Allow: /privacy-policy
+Allow: /refund-policy
+Allow: /shipping-policy
+Allow: /policies
 Allow: /dr-rajnikant-dodiya.jpg
 Allow: /sample-materials/
 Disallow: /api/
