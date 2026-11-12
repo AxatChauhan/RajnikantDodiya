@@ -8,6 +8,9 @@
  * - Access validity: 31 Dec 2026
  */
 
+export const DEFAULT_PAYMENT_LINK = 'https://rzp.io/rzp/locBUA0o';
+export const DEFAULT_PAYMENT_LINK_PRICE = 799;
+
 export const DEFAULT_STORE_SETTINGS = {
   productSlug: 'final-pack-2026',
   productName: 'GSET + UGC NET English Final Pack 2026',
@@ -82,23 +85,36 @@ export default async function handler(req, res) {
     const settings = await fetchStoreSettings();
     const priceData = computeCurrentServerPrice(settings, simulatedNow);
 
+    const hasApiKeys = Boolean(
+      (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID) &&
+      process.env.RAZORPAY_KEY_SECRET
+    );
+    const rawLink = process.env.RAZORPAY_PAYMENT_LINK ?? process.env.VITE_RAZORPAY_PAYMENT_LINK ?? DEFAULT_PAYMENT_LINK;
+    const paymentLinkUrl = rawLink.trim();
+    const isPaymentLinkMode = !hasApiKeys && Boolean(paymentLinkUrl) && paymentLinkUrl !== 'disabled';
+    const resolvedPrice =
+      !simulatedNow && isPaymentLinkMode
+        ? Number(process.env.RAZORPAY_PAYMENT_LINK_AMOUNT || DEFAULT_PAYMENT_LINK_PRICE)
+        : priceData.price;
+
     return res.status(200).json({
       success: true,
       productSlug: settings.productSlug,
       productName: settings.productName,
-      price: priceData.price,
-      isEarlyBird: priceData.isEarlyBird,
-      earlyBirdPrice: priceData.earlyBirdPrice,
-      standardPrice: priceData.standardPrice,
-      earlyBirdCutoff: priceData.earlyBirdCutoff,
-      accessExpiryDate: priceData.accessExpiryDate,
+      earlyBirdPrice: settings.earlyBirdPrice,
+      standardPrice: settings.standardPrice,
+      earlyBirdCutoff: settings.earlyBirdCutoff,
+      accessExpiryDate: settings.accessExpiryDate,
       sellerLine: settings.sellerLine,
+      paymentMode: hasApiKeys ? 'api_checkout' : isPaymentLinkMode ? 'payment_link' : 'unconfigured',
+      ...(isPaymentLinkMode ? { paymentLinkUrl } : {}),
       product: {
         slug: settings.productSlug,
         name: settings.productName,
         seller: settings.sellerLine
       },
-      ...priceData
+      ...priceData,
+      price: resolvedPrice
     });
   } catch (err) {
     const fallback = computeCurrentServerPrice(DEFAULT_STORE_SETTINGS);

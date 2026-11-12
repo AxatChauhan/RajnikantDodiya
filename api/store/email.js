@@ -20,7 +20,7 @@ export async function sendPurchaseConfirmationEmail({
   orderId = '',
   amount = 799,
   paymentId = '',
-  dashboardUrl = 'https://store.rajnikantdodiya.com/#dashboard'
+  dashboardUrl = 'https://rajnikantdodiya.com/#dashboard'
 }) {
   const cleanEmail = (to || '').trim().toLowerCase();
   if (!cleanEmail || !cleanEmail.includes('@')) {

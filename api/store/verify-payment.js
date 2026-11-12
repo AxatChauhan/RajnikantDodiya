@@ -3,6 +3,7 @@ import { computeCurrentServerPrice, DEFAULT_STORE_SETTINGS, fetchStoreSettings }
 import {
   findUserByEmail,
   saveUser,
+  recordPaidBuyer,
   createSessionToken,
   DEFAULT_ACCESS_EXPIRY
 } from '../../lib/auth-helper.js';
@@ -49,7 +50,22 @@ export default async function handler(req, res) {
     }
 
     // 2. Cryptographic HMAC-SHA256 Verification with timingSafeEqual
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'netvidya_rzp_test_secret_key_2026';
+    const isProduction = Boolean(
+      process.env.VERCEL ||
+      process.env.VERCEL_ENV === 'production' ||
+      process.env.NODE_ENV === 'production'
+    );
+    const keySecret =
+      process.env.RAZORPAY_KEY_SECRET ||
+      (isProduction ? '' : 'netvidya_rzp_test_secret_key_2026');
+
+    if (!keySecret) {
+      return res.status(503).json({
+        success: false,
+        verified: false,
+        error: 'Direct Razorpay API verification is disabled until RAZORPAY_KEY_SECRET is configured.'
+      });
+    }
 
     const payload = razorpay_order_id
       ? `${razorpay_order_id}|${razorpay_payment_id}`
@@ -82,7 +98,7 @@ export default async function handler(req, res) {
     const finalOrderId = razorpay_order_id || orderId || `NV_${Date.now()}`;
     const accessExpiresAt = settings.accessExpiryDate || DEFAULT_ACCESS_EXPIRY;
 
-    // 4. Grant Student Access in netvidya_users
+    // 4. Grant Student Access in netvidya_users (if registered) & memory session
     let user = await findUserByEmail(cleanEmail);
     if (!user) {
       user = {
@@ -114,37 +130,18 @@ export default async function handler(req, res) {
       expiresAt: user.expires_at
     });
 
-    // 6. Record Transaction in Supabase netvidya_buyers
-    let dbRecorded = false;
-    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-
-    if (supabaseUrl && serviceRoleKey) {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(supabaseUrl, serviceRoleKey);
-
-        const { error } = await supabase.from('netvidya_buyers').upsert({
-          student_name: cleanName,
-          email: cleanEmail,
-          mobile: cleanMobile,
-          order_id: finalOrderId,
-          razorpay_payment_id,
-          razorpay_order_id: razorpay_order_id || null,
-          amount_paid: amountPaid,
-          payment_method: 'razorpay',
-          is_active: true,
-          enrolled_at: new Date().toISOString(),
-          expires_at: accessExpiresAt
-        }, { onConflict: 'email' });
-
-        if (!error) {
-          dbRecorded = true;
-        }
-      } catch (dbErr) {
-        console.warn('Supabase buyer record warning:', dbErr);
-      }
-    }
+    // 6. Record Transaction in netvidya_buyers (Supabase + memory + test DB)
+    const { dbRecorded } = (await recordPaidBuyer({
+      email: cleanEmail,
+      studentName: cleanName,
+      mobile: cleanMobile,
+      orderId: finalOrderId,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpayOrderId: razorpay_order_id || null,
+      amountPaid,
+      paymentMethod: 'razorpay',
+      expiresAt: accessExpiresAt
+    })) || { dbRecorded: false };
 
     // 7. Dispatch Purchase Confirmation Email
     try {

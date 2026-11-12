@@ -226,10 +226,11 @@ interface NetVidyaStoreContextType {
   buyerSession: NetVidyaBuyerSession;
   loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean }) => void;
   logoutBuyer: () => void;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; error?: string }>;
+  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; error?: string }>;
   forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string; token?: string }>;
   resetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  refreshSession: () => Promise<{ isBuyer: boolean; isLoggedIn: boolean; error?: string }>;
   logout: () => void;
   readingFiles: ReadingFileItem[];
   addReadingFile: (file: Omit<ReadingFileItem, 'id' | 'downloadCount' | 'dateAdded'>) => void;
@@ -249,6 +250,8 @@ interface NetVidyaStoreContextType {
   currentServerPrice: number;
   isEarlyBirdActive: boolean;
   msUntilCutoff: number;
+  paymentMode: 'api_checkout' | 'payment_link';
+  paymentLinkUrl: string;
 }
 
 const STORAGE_KEY_SESSION = 'netvidya_buyer_session_v1';
@@ -321,11 +324,37 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     return INITIAL_BUYERS_REGISTRY;
   });
 
-  // Real-time server price calculation
+  // Real-time server price & checkout mode sync
+  const [serverPriceState, setServerPriceState] = useState<{
+    price: number | null;
+    paymentMode: 'api_checkout' | 'payment_link';
+    paymentLinkUrl: string;
+  }>({
+    price: 799,
+    paymentMode: 'payment_link',
+    paymentLinkUrl: import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || 'https://rzp.io/rzp/locBUA0o'
+  });
+
+  useEffect(() => {
+    fetch('/api/store/price')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.success && typeof data.price === 'number') {
+          setServerPriceState({
+            price: data.price,
+            paymentMode: data.paymentMode === 'api_checkout' ? 'api_checkout' : 'payment_link',
+            paymentLinkUrl: data.paymentLinkUrl || import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || 'https://rzp.io/rzp/locBUA0o'
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const now = new Date();
   const cutoffDate = new Date(settings.earlyBirdCutoff);
   const isEarlyBirdActive = now <= cutoffDate;
-  const currentServerPrice = isEarlyBirdActive ? settings.earlyBirdPrice : settings.standardPrice;
+  const computedPrice = isEarlyBirdActive ? settings.earlyBirdPrice : settings.standardPrice;
+  const currentServerPrice = serverPriceState.price !== null ? serverPriceState.price : computedPrice;
   const msUntilCutoff = Math.max(0, cutoffDate.getTime() - now.getTime());
 
   // 6. Admin Authentication State
@@ -390,8 +419,9 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       setBuyerSession(session);
       try {
         localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+        if (data.token) localStorage.setItem('netvidya_auth_token_v1', data.token);
       } catch {}
-      return { success: true };
+      return { success: true, isBuyer: Boolean(data.user?.isBuyer) };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Network error during sign in' };
     }
@@ -421,8 +451,9 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       setBuyerSession(session);
       try {
         localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+        if (data.token) localStorage.setItem('netvidya_auth_token_v1', data.token);
       } catch {}
-      return { success: true };
+      return { success: true, isBuyer: Boolean(data.user?.isBuyer) };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Network error during sign up' };
     }
@@ -473,6 +504,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     setBuyerSession(empty);
     try {
       localStorage.removeItem(STORAGE_KEY_SESSION);
+      localStorage.removeItem('netvidya_auth_token_v1');
     } catch {}
   }, []);
 
@@ -497,28 +529,57 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logoutBuyer = logout;
 
+  // Refresh session against server (used on mount and after webhook payment activation)
+  const refreshSession = useCallback(async () => {
+    const token = buyerSession.token || (() => {
+      try {
+        return localStorage.getItem('netvidya_auth_token_v1') || '';
+      } catch {
+        return '';
+      }
+    })();
+
+    if (!token) {
+      return { isBuyer: false, isLoggedIn: false, error: 'Please sign in or create an account first.' };
+    }
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success && data.user) {
+        const nextIsBuyer = Boolean(data.user.isBuyer);
+        const nextToken = data.token || token;
+        setBuyerSession(prev => {
+          const updated: NetVidyaBuyerSession = {
+            ...prev,
+            isLoggedIn: true,
+            isBuyer: nextIsBuyer,
+            name: data.user.name || prev.name,
+            email: data.user.email || prev.email,
+            mobile: data.user.mobile || prev.mobile,
+            token: nextToken,
+            expiresAt: data.user.expiresAt || prev.expiresAt
+          };
+          try {
+            localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(updated));
+            if (nextToken) localStorage.setItem('netvidya_auth_token_v1', nextToken);
+          } catch {}
+          return updated;
+        });
+        return { isBuyer: nextIsBuyer, isLoggedIn: true };
+      }
+      return { isBuyer: false, isLoggedIn: false, error: data.error || 'Session expired.' };
+    } catch (err: any) {
+      return { isBuyer: false, isLoggedIn: buyerSession.isLoggedIn, error: err?.message || 'Network check failed.' };
+    }
+  }, [buyerSession.token, buyerSession.isLoggedIn]);
+
   // Validate session against server on mount
   useEffect(() => {
-    const token = buyerSession.token;
-    if (token && buyerSession.isLoggedIn) {
-      fetch('/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.user) {
-            setBuyerSession(prev => ({
-              ...prev,
-              isLoggedIn: true,
-              isBuyer: Boolean(data.user.isBuyer),
-              name: data.user.name || prev.name,
-              email: data.user.email || prev.email,
-              mobile: data.user.mobile || prev.mobile,
-              expiresAt: data.user.expiresAt || prev.expiresAt
-            }));
-          }
-        })
-        .catch(() => {});
+    if (buyerSession.token && buyerSession.isLoggedIn) {
+      refreshSession().catch(() => {});
     }
   }, []);
 
@@ -704,6 +765,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         signup,
         forgotPassword,
         resetPassword,
+        refreshSession,
         logout,
         readingFiles,
         addReadingFile,
@@ -722,7 +784,9 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         adminLogout,
         currentServerPrice,
         isEarlyBirdActive,
-        msUntilCutoff
+        msUntilCutoff,
+        paymentMode: serverPriceState.paymentMode,
+        paymentLinkUrl: serverPriceState.paymentLinkUrl
       }}
     >
       {children}

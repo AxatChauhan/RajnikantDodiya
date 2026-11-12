@@ -89,12 +89,12 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'Invalid email format.' });
         }
         const existing = await findUserByEmail(cleanEmail);
-        if (existing) {
+        if (existing && existing.password_hash) {
           return res.status(409).json({ success: false, error: 'Account with this email already exists.' });
         }
-        const isBuyer = await isEmailBuyer(cleanEmail);
+        const isBuyer = (existing && existing.is_buyer) || await isEmailBuyer(cleanEmail);
         const { salt, hash } = hashPassword(password);
-        const userId = `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+        const userId = existing?.id || `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
         const newUser = {
           id: userId,
           name: name.trim(),
@@ -143,6 +143,14 @@ export default async function handler(req, res) {
         const cleanEmail = email.trim().toLowerCase();
         const user = await findUserByEmail(cleanEmail);
         if (!user) {
+          const paidViaWebhook = await isEmailBuyer(cleanEmail);
+          if (paidViaWebhook) {
+            return res.status(401).json({
+              success: false,
+              requiresAccountSetup: true,
+              error: "Payment verified for this email! Click 'Create Account' above using this same email to set your password and unlock access."
+            });
+          }
           return res.status(401).json({ success: false, error: 'Invalid email or password.' });
         }
         const isPasswordValid = verifyPassword(password, user.password_salt, user.password_hash);
@@ -186,17 +194,27 @@ export default async function handler(req, res) {
           return res.status(401).json({ success: false, error: 'Unauthorized: valid token required.' });
         }
         const user = await findUserByEmail(payload.email);
-        const isBuyer = user ? (user.is_buyer || await isEmailBuyer(user.email)) : payload.isBuyer;
+        const buyerRecordFound = await isEmailBuyer(payload.email);
+        const isBuyer = Boolean(user?.is_buyer || buyerRecordFound || payload.isBuyer);
+        if (user && isBuyer && !user.is_buyer) {
+          user.is_buyer = true;
+          await saveUser(user);
+        }
+        const resolvedUser = {
+          id: user?.id || payload.id || `usr_${payload.email}`,
+          name: user?.name || payload.name || payload.email.split('@')[0],
+          email: user?.email || payload.email,
+          mobile: user?.mobile || payload.mobile || '',
+          isBuyer,
+          expiresAt: user?.expires_at || payload.expiresAt || DEFAULT_ACCESS_EXPIRY
+        };
+        const refreshedToken = isBuyer && !payload.isBuyer
+          ? createSessionToken(resolvedUser)
+          : undefined;
         return res.status(200).json({
           success: true,
-          user: {
-            id: user?.id || payload.id || `usr_${payload.email}`,
-            name: user?.name || payload.name || payload.email.split('@')[0],
-            email: user?.email || payload.email,
-            mobile: user?.mobile || payload.mobile || '',
-            isBuyer: Boolean(isBuyer),
-            expiresAt: user?.expires_at || payload.expiresAt || DEFAULT_ACCESS_EXPIRY
-          }
+          ...(refreshedToken ? { token: refreshedToken } : {}),
+          user: resolvedUser
         });
       }
 

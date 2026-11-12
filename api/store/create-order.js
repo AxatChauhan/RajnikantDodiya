@@ -1,4 +1,10 @@
-import { computeCurrentServerPrice, DEFAULT_STORE_SETTINGS, fetchStoreSettings } from './price.js';
+import {
+  computeCurrentServerPrice,
+  DEFAULT_PAYMENT_LINK,
+  DEFAULT_PAYMENT_LINK_PRICE,
+  DEFAULT_STORE_SETTINGS,
+  fetchStoreSettings
+} from './price.js';
 
 /**
  * Vercel Serverless Function: Create Razorpay Order
@@ -43,10 +49,15 @@ export default async function handler(req, res) {
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const rawPaymentLink =
+      process.env.RAZORPAY_PAYMENT_LINK ??
+      process.env.VITE_RAZORPAY_PAYMENT_LINK ??
+      DEFAULT_PAYMENT_LINK;
+    const paymentLinkUrl = rawPaymentLink.trim();
 
     const receipt = `NV_ORD_${Date.now().toString().slice(-8)}`;
 
-    // 2. If Razorpay server credentials exist, call Razorpay Orders API
+    // 2. If Razorpay server API credentials exist, call Razorpay Orders API (Native In-App Checkout)
     if (keyId && keySecret) {
       const authHeader = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
       const response = await fetch('https://api.razorpay.com/v1/orders', {
@@ -81,6 +92,7 @@ export default async function handler(req, res) {
       const orderData = await response.json();
       return res.status(200).json({
         success: true,
+        paymentMode: 'api_checkout',
         orderId: orderData.id,
         amount: priceCalculation.price,
         amountInPaisa,
@@ -94,10 +106,45 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Test / Development Fallback Order Generation
+    // 3. Verified Payment Link + Webhook Mode (before live website API keys are activated)
+    if (paymentLinkUrl && paymentLinkUrl !== 'disabled') {
+      const linkOrderId = `order_link_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      const linkAmount = Number(process.env.RAZORPAY_PAYMENT_LINK_AMOUNT || DEFAULT_PAYMENT_LINK_PRICE);
+      return res.status(200).json({
+        success: true,
+        paymentMode: 'payment_link',
+        paymentLinkUrl,
+        orderId: linkOrderId,
+        amount: linkAmount,
+        amountInPaisa: linkAmount * 100,
+        currency: 'INR',
+        studentName,
+        email: email.trim().toLowerCase(),
+        mobile: mobile.trim(),
+        isEarlyBird: priceCalculation.isEarlyBird,
+        accessExpiryDate: priceCalculation.accessExpiryDate
+      });
+    }
+
+    // 4. Reject unconfigured production checkouts (never expose free auto-unlocks in production)
+    const isProduction = Boolean(
+      process.env.VERCEL ||
+      process.env.VERCEL_ENV === 'production' ||
+      process.env.NODE_ENV === 'production'
+    );
+    if (isProduction) {
+      return res.status(503).json({
+        success: false,
+        paymentMode: 'unconfigured',
+        error: 'Payment gateway is currently being activated. Please contact +91 96387 16634 on WhatsApp for instant enrollment.'
+      });
+    }
+
+    // 5. Local Development & Automated Test Fallback Order Generation
     const testOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     return res.status(200).json({
       success: true,
+      paymentMode: 'test_simulation',
       orderId: testOrderId,
       amount: priceCalculation.price,
       amountInPaisa,
