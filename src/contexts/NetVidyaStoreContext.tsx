@@ -65,10 +65,355 @@ export interface EnrolledBuyerRecord {
   isActive: boolean;
 }
 
-// Initial Content: Clean zeroed-out state for new segregated 2026 packs (Under Active Curation)
-export const INITIAL_READING_FILES: ReadingFileItem[] = [];
+// Initial Content: Populated with official UGC NET and GSET 2026 materials
+export const INITIAL_READING_FILES: ReadingFileItem[] = [
+  {
+    id: 'ugc-reading-ebook',
+    title: 'UGC NET English — Complete E-book (283 Pages)',
+    category: 'Core Monograph',
+    description: 'Comprehensive 283-page high-yield e-book with integrated reader covering Chaucer to Contemporary World Literature, Theory & Research.',
+    fileSizeMb: 42.5,
+    downloadCount: 184,
+    dateAdded: '2026-11-15',
+    sampleUrl: '/study-vault/ugc/reading/ebook/index.html'
+  },
+  {
+    id: 'ugc-reading-pyq',
+    title: 'PYQ Trend Analysis & Critical Insights (35 Pages)',
+    category: 'Trend Analysis',
+    description: 'Exhaustive 35-page analysis of previous year examination questions, distractor patterns, and high-frequency topics.',
+    fileSizeMb: 5.2,
+    downloadCount: 142,
+    dateAdded: '2026-11-15',
+    sampleUrl: '/study-vault/ugc/reading/pyq_analysis/index.html'
+  },
+  {
+    id: 'ugc-reading-revision',
+    title: 'Last 30 Days Quick Revision Kit (29 Pages)',
+    category: 'Sprint Revision',
+    description: '29-page rapid revision dossier distilled for rapid concept review and final preparation before exam day.',
+    fileSizeMb: 4.8,
+    downloadCount: 195,
+    dateAdded: '2026-11-15',
+    sampleUrl: '/study-vault/ugc/reading/revision_kit/index.html'
+  }
+];
 
-export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [];
+export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
+  // UGC NET Tests (NTA Simulation)
+  {
+    id: 'ugc-net-mock-1',
+    title: 'NET Mock 1: Full-Length Paper II NTA Simulation',
+    category: 'NET Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-15T00:00:00+05:30',
+    description: 'Comprehensive 100-question Paper II English Literature NTA simulation with countdown timer, question palette, and detailed explanations.'
+  },
+  {
+    id: 'ugc-practice-mock-a',
+    title: 'Practice Mock A: Full-Length Speed Simulation',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-15T00:00:00+05:30',
+    description: 'Full-length 100-question practice mock test for speed and accuracy building.'
+  },
+  {
+    id: 'ugc-unit-1',
+    title: 'Unit Test 1: Drama',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-15T00:00:00+05:30',
+    description: 'Focused 50-question diagnostic test on Drama from British, American, and World literature.'
+  },
+  {
+    id: 'ugc-unit-2',
+    title: 'Unit Test 2: Poetry',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-15T00:00:00+05:30',
+    description: 'Focused 50-question test on British, American, and Postcolonial Poetry.'
+  },
+  {
+    id: 'ugc-unit-3',
+    title: 'Unit Test 3: Fiction and Short Story',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-17T00:00:00+05:30',
+    description: 'Comprehensive assessment of classical and modern prose fiction.'
+  },
+  {
+    id: 'ugc-unit-4',
+    title: 'Unit Test 4: Non-fictional Prose',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-17T00:00:00+05:30',
+    description: 'Key questions on essays, biographies, diaries, and philosophical prose.'
+  },
+  {
+    id: 'ugc-practice-mock-b',
+    title: 'Practice Mock B: Literature & Criticism',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-17T00:00:00+05:30',
+    description: '100 questions covering core literary periods and movements.'
+  },
+  {
+    id: 'ugc-unit-5',
+    title: 'Unit Test 5: Language and Pedagogy',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-19T00:00:00+05:30',
+    description: 'Linguistics, English Language Teaching methods, and pedagogical heuristics.'
+  },
+  {
+    id: 'ugc-unit-6',
+    title: 'Unit Test 6: English in India',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-19T00:00:00+05:30',
+    description: 'Macaulay’s Minute to NEP 2020: policy, institutionalisation, and Indian writing.'
+  },
+  {
+    id: 'ugc-practice-mock-c',
+    title: 'Practice Mock C: High-Yield Rehearsal',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-19T00:00:00+05:30',
+    description: 'Full-length 100-question practice mock test.'
+  },
+  {
+    id: 'ugc-net-mock-2',
+    title: 'NET Mock 2: Full-Length Paper II NTA Simulation',
+    category: 'NET Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-20T00:00:00+05:30',
+    description: 'Full-length NTA simulation mock test releasing on 20 November.'
+  },
+  {
+    id: 'ugc-unit-7',
+    title: 'Unit Test 7: Cultural Studies',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-22T00:00:00+05:30',
+    description: 'Birmingham School, Stuart Hall, subcultures, and popular culture analysis.'
+  },
+  {
+    id: 'ugc-unit-8',
+    title: 'Unit Test 8: Literary Criticism',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-22T00:00:00+05:30',
+    description: 'Classical, Renaissance, Neo-classical, Romantic, and Victorian critical doctrines.'
+  },
+  {
+    id: 'ugc-practice-mock-d',
+    title: 'Practice Mock D: Speed and Accuracy Rehearsal',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-22T00:00:00+05:30',
+    description: '100-question mock test covering high-frequency PYQ trends.'
+  },
+  {
+    id: 'ugc-unit-9',
+    title: 'Unit Test 9: Literary Theory Post-World War II',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-24T00:00:00+05:30',
+    description: 'Structuralism, Post-structuralism, Deconstruction, Psychoanalysis, and Eco-criticism.'
+  },
+  {
+    id: 'ugc-unit-10',
+    title: 'Unit Test 10: Research Methods & Materials in English',
+    category: 'Unit Test',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-24T00:00:00+05:30',
+    description: 'MLA handbook style, citation mechanics, research design, and plagiarism ethics.'
+  },
+  {
+    id: 'ugc-practice-mock-e',
+    title: 'Practice Mock E: Unit Mastery Mock',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-24T00:00:00+05:30',
+    description: 'Full-length 100-question mock test.'
+  },
+  {
+    id: 'ugc-net-mock-3',
+    title: 'NET Mock 3: Grand Mid-Term Diagnostic Mock',
+    category: 'NET Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-27T00:00:00+05:30',
+    description: 'Mid-term comprehensive diagnostic simulation.'
+  },
+  {
+    id: 'ugc-practice-mock-f',
+    title: 'Practice Mock F: Rapid Fire Rehearsal',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-27T00:00:00+05:30',
+    description: 'Full 100 questions NTA simulation.'
+  },
+  {
+    id: 'ugc-practice-mock-g',
+    title: 'Practice Mock G: Comprehensive Mock',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-30T00:00:00+05:30',
+    description: 'Full 100 questions NTA simulation.'
+  },
+  {
+    id: 'ugc-practice-mock-h',
+    title: 'Practice Mock H: Analytical Mock',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-12-02T00:00:00+05:30',
+    description: 'Full 100 questions NTA simulation.'
+  },
+  {
+    id: 'ugc-net-mock-4',
+    title: 'NET Mock 4: Advanced Synthesis NTA Mock',
+    category: 'NET Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-12-04T00:00:00+05:30',
+    description: 'Releasing 4 December 2026.'
+  },
+  {
+    id: 'ugc-practice-mock-i',
+    title: 'Practice Mock I: Final Sprint Mock',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-12-04T00:00:00+05:30',
+    description: 'Full 100 questions NTA simulation.'
+  },
+  {
+    id: 'ugc-practice-mock-j',
+    title: 'Practice Mock J: Ultimate Sprint Mock',
+    category: 'Practice Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-12-06T00:00:00+05:30',
+    description: 'Full 100 questions NTA simulation.'
+  },
+  {
+    id: 'ugc-net-mock-5',
+    title: 'NET Mock 5: Pre-Exam Grand Rehearsal',
+    category: 'NET Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-12-09T00:00:00+05:30',
+    description: 'Releasing 9 December 2026.'
+  },
+  {
+    id: 'ugc-net-mock-6',
+    title: 'NET Mock 6: Final Rank Booster Exam',
+    category: 'NET Mock',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-12-13T00:00:00+05:30',
+    description: 'Final full rehearsal before the December 2026 examination.'
+  },
+
+  // GSET Paper 1 Tests (Gujarati/English CBT)
+  {
+    id: 'gset-p1-m1',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 01',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m2',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 02',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m3',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 03',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+
+  // GSET Paper 2 Education Discipline Tests
+  {
+    id: 'gset-p2-edu-m1',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 01',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions covering Philosophical, Sociological & Psychological Foundations, Curriculum Studies & Pedagogy.'
+  },
+  {
+    id: 'gset-p2-edu-m2',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 02',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions covering Teacher Education, Research in Education, and Educational Technology.'
+  },
+  {
+    id: 'gset-p2-edu-m3',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 03',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+
+  // GSET Paper 2 English Literature Tests
+  {
+    id: 'gset-p2-eng-m1',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 01',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m3',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 03',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering Literary Criticism, Cultural Studies, and Research Methodology.'
+  }
+];
 
 // Initial Empty Content for Enrolled Candidate Registry (No test candidates)
 export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [];
@@ -110,8 +455,8 @@ interface NetVidyaStoreContextType {
 
 const STORAGE_KEY_SESSION = 'netvidya_buyer_session_v1';
 const STORAGE_KEY_SETTINGS = 'netvidya_store_settings_v1';
-const STORAGE_KEY_FILES = 'netvidya_reading_files_v2';
-const STORAGE_KEY_TESTS = 'netvidya_tests_v2';
+const STORAGE_KEY_FILES = 'netvidya_reading_files_v3';
+const STORAGE_KEY_TESTS = 'netvidya_tests_v3';
 const STORAGE_KEY_BUYERS = 'netvidya_buyers_registry_v1';
 
 const NetVidyaStoreContext = createContext<NetVidyaStoreContextType | undefined>(undefined);

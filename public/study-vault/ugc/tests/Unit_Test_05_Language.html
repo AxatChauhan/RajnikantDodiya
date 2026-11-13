@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Test 5: Language – UGC NET English Study Bundle</title>
+<style>
+:root{--ink:#222;--muted:#666;--line:#cfd4dc;--bg:#eef1f5;--top:#2b4c7e;--grey:#e0e0e0;--red:#d9534f;--green:#3c9f40;--purple:#6f42c1;--orange:#f0ad4e;--blue:#2d6cb5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.5}
+.top{background:var(--top);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+.top .logo{font-weight:700;font-size:15px;flex:1;min-width:200px}
+.cand{display:flex;align-items:center;gap:10px;font-size:13px}
+.photo{width:42px;height:48px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#888;font-size:22px}
+.bar2{background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:6px 14px;flex-wrap:wrap;gap:8px}
+.bar2 .sec{background:var(--blue);color:#fff;padding:4px 12px;border-radius:3px;font-size:13px}
+.tl{font-weight:700}.tl span{background:#000;color:#fff;padding:3px 10px;border-radius:3px;font-variant-numeric:tabular-nums;margin-left:6px}
+.tl span.low{background:var(--red)}
+.wrap{display:grid;grid-template-columns:1fr 300px;gap:0;min-height:calc(100vh - 110px)}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.qpane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.qtitle{padding:8px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qtitle small{font-weight:400;color:var(--muted)}
+.qbody{padding:14px;flex:1;overflow:auto}
+.passage{background:#f7f9fc;border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;max-height:260px;overflow:auto;font-size:14px}
+.passage p{margin:.3em 0}
+.stem{margin-bottom:10px}.stem .it{margin:3px 0 3px 16px}
+table.lt{border-collapse:collapse;margin:8px 0;width:100%;font-size:14px}
+table.lt td,table.lt th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.lt th{background:#eef2f8}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;cursor:pointer;border-radius:4px}
+label.opt:hover{background:#f3f6fb}
+label.opt input{margin-top:4px;transform:scale(1.15)}
+label.opt.right{background:#e3f4e4}label.opt.wrong{background:#fbe3e2}
+.exp{margin-top:10px;padding:10px 12px;border-left:4px solid var(--green);background:#f2faf3;font-size:14px}
+.btns{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fafbfc}
+.b{border:1px solid #999;background:#fff;color:#222;padding:7px 12px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.b.green{background:var(--green);border-color:var(--green);color:#fff}
+.b.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+.b.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.b.sub{background:var(--green);border-color:var(--green);color:#fff}
+.b:disabled{opacity:.45;cursor:default}
+.sp{flex:1}
+.side{background:#fff;padding:10px}
+.leg{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-bottom:10px}
+.leg div{display:flex;align-items:center;gap:6px}
+.st{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;font-size:13px;font-weight:700;border:1px solid #aaa;background:var(--grey);color:#222;border-radius:3px;position:relative;flex:none}
+.st.na{background:var(--red);border-color:var(--red);color:#fff;border-radius:3px 3px 12px 12px}
+.st.an{background:var(--green);border-color:var(--green);color:#fff;border-radius:12px 12px 3px 3px}
+.st.mk{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1px solid #fff}
+.st.r{background:var(--green);border-color:var(--green);color:#fff}.st.w{background:var(--red);border-color:var(--red);color:#fff}
+.leg .st{width:26px;height:22px;font-size:11px}
+.palhead{background:var(--blue);color:#fff;padding:5px 8px;font-weight:700;font-size:13px;margin:6px 0}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:7px;max-height:52vh;overflow:auto;padding:2px}
+.pal .st{cursor:pointer;width:100%}
+.pal .st.cur{outline:2px solid #000;outline-offset:1px}
+.card{max-width:900px;margin:18px auto;background:#fff;border:1px solid var(--line);padding:18px 22px}
+.card h2{margin-top:0;color:var(--top)}
+.inst li{margin:5px 0}
+.inst .st{width:30px;height:26px;margin-right:6px;vertical-align:middle}
+table.sum,table.res{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+table.sum td,table.sum th,table.res td,table.res th{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.res td:first-child,table.res th:first-child{text-align:left}
+table.sum th,table.res th{background:#eef2f8}
+.big{font-size:38px;font-weight:700;color:var(--top)}
+.barx{height:8px;background:#e6eaf2;border-radius:4px;overflow:hidden}.barx i{display:block;height:100%;background:var(--blue)}
+input[type=text]{padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:15px;width:100%;max-width:320px}
+.note{font-size:12.5px;color:var(--muted)}
+.hide{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:12px}
+.modal .card{margin:0;max-width:640px;width:100%}
+.flt .b{text-transform:none;font-weight:400}
+/*np*/@media print{#exam,#modal{display:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Unit Test 5: Language – UGC NET English Study Bundle</div>
+  <div class="cand"><div class="photo">&#128100;</div><div>Candidate Name: <b id="cname">—</b><br>Subject: English (Paper 2)</div></div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<section id="start">
+ <div class="card">
+  <h2>General Instructions</h2>
+  <p class="note">This practice test copies the look of the NTA computer-based test (CBT) screen so that you can practise in the same way. It is not an official NTA test. Verify the current exam pattern and marking with the official NTA notice.</p>
+  <ol class="inst">
+   <li>Total questions: <b id="nq"></b> · Each question carries 2 marks · Duration: <b id="tm"></b> minutes · No negative marking (as in the current UGC NET; verify with the NTA notice).</li>
+   <li>The clock at the top right shows the time left. The test is submitted automatically when the time is over.</li>
+   <li>The Question Palette on the right shows the status of each question:
+    <ul style="list-style:none;padding-left:4px">
+     <li><span class="st">1</span> You have not visited the question yet.</li>
+     <li><span class="st na">2</span> You have not answered the question.</li>
+     <li><span class="st an">3</span> You have answered the question.</li>
+     <li><span class="st mk">4</span> You have NOT answered the question, but have marked it for review.</li>
+     <li><span class="st am">5</span> You have answered the question and marked it for review. <b>Such answers WILL be considered for evaluation.</b></li>
+    </ul></li>
+   <li>To answer: click an option, then click <b>SAVE &amp; NEXT</b>. <b>If you move to another question without saving, your answer is not saved.</b></li>
+   <li><b>SAVE &amp; MARK FOR REVIEW</b> saves your answer and marks the question. <b>MARK FOR REVIEW &amp; NEXT</b> marks it without an answer. <b>CLEAR</b> removes your answer.</li>
+   <li>Click a number in the palette to go straight to that question.</li>
+   <li>Your progress is saved in this browser. If the page closes, open it again and click “Resume”.</li>
+  </ol>
+  <p><label>Your name: <br><input type="text" id="nm" placeholder="Type your name"></label></p>
+  <p><label><input type="checkbox" id="agree"> I have read and understood the instructions.</label></p>
+  <button class="b blue" id="go" disabled>I am ready to begin</button> <button class="b hide" id="resume">Resume saved test</button>
+  <p class="note">© Dr Rajnikant Dodiya · NET Vidya English · For the registered buyer only</p>
+ </div>
+</section>
+
+<!-- TEST -->
+<div id="test" class="hide">
+ <div class="bar2"><span class="sec">English (Paper 2)</span><span class="tl" id="tlbox">Time Left: <span id="timer">--:--</span></span></div>
+ <div class="wrap">
+  <div class="qpane">
+   <div class="qtitle"><span id="qno"></span><small id="qunit"></small></div>
+   <div class="qbody">
+    <div id="psg" class="passage hide"></div>
+    <div class="stem" id="stem"></div>
+    <div id="opts"></div>
+    <div id="expbox"></div>
+   </div>
+   <div class="btns" id="tbtns">
+    <button class="b green" id="saveNext">Save &amp; Next</button>
+    <button class="b" id="clr">Clear</button>
+    <button class="b orange" id="saveMark">Save &amp; Mark for Review</button>
+    <button class="b blue" id="markNext">Mark for Review &amp; Next</button>
+    <span class="sp"></span>
+    <button class="b" id="back">&laquo; Back</button>
+    <button class="b" id="nxt">Next &raquo;</button>
+    <button class="b sub" id="subBtn">Submit</button>
+   </div>
+   <div class="btns hide" id="rbtns">
+    <button class="b" id="rback">&laquo; Back</button>
+    <button class="b" id="rnext">Next &raquo;</button>
+    <span class="sp"></span>
+    <span class="flt">Show:
+     <button class="b" data-f="all">All</button><button class="b" data-f="w">Wrong</button><button class="b" data-f="u">Not attempted</button></span>
+    <button class="b blue" id="backRes">Back to result</button>
+   </div>
+  </div>
+  <div class="side">
+   <div class="leg" id="leg"></div>
+   <div class="palhead">English (Paper 2) – Choose a Question</div>
+   <div class="pal" id="pal"></div>
+  </div>
+ </div>
+</div>
+
+<!-- SUBMIT SUMMARY -->
+<div class="modal hide" id="sumModal"><div class="card">
+ <h2>Exam Summary</h2>
+ <table class="sum" id="sumTbl"></table>
+ <p>Are you sure you want to submit? You cannot change your answers after this.</p>
+ <button class="b sub" id="yesSub">Yes, submit</button> <button class="b" id="noSub">No, go back</button>
+</div></div>
+
+<!-- RESULT -->
+<section id="result" class="hide"><div class="card">
+  <h2>Your Result</h2>
+  <p id="who"></p>
+  <div class="big" id="score"></div>
+  <p id="summary"></p>
+  <h3>Unit-wise performance</h3>
+  <table class="res" id="unitTbl"></table>
+  <p class="note">Tip: revise first the units where your accuracy is below 60%. Then open the review and read every explanation.</p>
+  <p><button class="b blue" id="review">Review answers with explanations</button> <button class="b" id="retake">Retake test</button> <button class="b" onclick="window.print()">Print result</button></p>
+</div></section>
+
+<script>
+const QS = [{"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Books) with List II (Authors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>The Sound Pattern of English</i></td><td>I. Steven Pinker</td></tr><tr><td>B. <i>An Outline of English Phonetics</i></td><td>II. Peter Roach</td></tr><tr><td>C. <i>English Phonetics and Phonology</i></td><td>III. Noam Chomsky and Morris Halle</td></tr><tr><td>D. <i>The Language Instinct</i></td><td>IV. Daniel Jones</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-IV, C-II, D-III", "A-III, B-IV, C-II, D-I", "A-III, B-IV, C-I, D-II", "A-II, B-I, C-IV, D-III"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (ELT books) with List II (Authors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>The Practice of English Language Teaching</i></td><td>I. Diane Larsen-Freeman</td></tr><tr><td>B. <i>A Course in Language Teaching</i></td><td>II. Jeremy Harmer</td></tr><tr><td>C. <i>Techniques and Principles in Language Teaching</i></td><td>III. Michael Swan</td></tr><tr><td>D. <i>Practical English Usage</i></td><td>IV. Penny Ur</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-IV, C-II, D-III", "A-II, B-IV, C-I, D-III", "A-II, B-I, C-IV, D-III", "A-I, B-III, C-IV, D-II"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Features of connected speech) with List II (Meanings):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Elision</td><td>I. Dropping of a sound, as in “nex(t) day”</td></tr><tr><td>B. Assimilation</td><td>II. A sound changing to be like a neighbouring sound, as in “te[m] boys”</td></tr><tr><td>C. Weak form</td><td>III. The rise and fall of pitch over a stretch of speech</td></tr><tr><td>D. Intonation</td><td>IV. The unstressed form of a function word, as /ən/ for <i>and</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-IV, D-II", "A-I, B-II, C-IV, D-III", "A-III, B-II, C-IV, D-I", "A-II, B-I, C-III, D-IV"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Sentence types) with List II (Examples):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Simple sentence</td><td>I. “She sang because she was happy.”</td></tr><tr><td>B. Compound sentence</td><td>II. “She sang and he danced.”</td></tr><tr><td>C. Complex sentence</td><td>III. “She sang.”</td></tr><tr><td>D. Compound-complex sentence</td><td>IV. “She sang because she was happy, and he danced.”</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-II, C-I, D-IV", "A-I, B-II, C-III, D-IV", "A-III, B-I, C-II, D-IV", "A-II, B-IV, C-III, D-I"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Non-finite and modal forms) with List II (Examples):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Gerund</td><td>I. “<i>Swimming</i> is good exercise.”</td></tr><tr><td>B. Infinitive</td><td>II. “I want <i>to swim</i>.”</td></tr><tr><td>C. Participle</td><td>III. “You <i>must</i> go.”</td></tr><tr><td>D. Modal auxiliary</td><td>IV. “a <i>broken</i> window”</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-II, C-IV, D-III", "A-I, B-IV, C-II, D-III", "A-III, B-II, C-IV, D-I", "A-III, B-I, C-IV, D-II"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Sense relations) with List II (Examples):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Synonymy</td><td>I. <i>bank</i> (of a river) – <i>bank</i> (for money)</td></tr><tr><td>B. Antonymy</td><td>II. <i>rose</i> – <i>flower</i></td></tr><tr><td>C. Hyponymy</td><td>III. <i>big</i> – <i>large</i></td></tr><tr><td>D. Homonymy</td><td>IV. <i>hot</i> – <i>cold</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-IV, C-II, D-III", "A-III, B-IV, C-II, D-I", "A-III, B-II, C-IV, D-I", "A-IV, B-I, C-II, D-III"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Speech acts in Searle’s classes) with List II (Examples):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Assertive</td><td>I. “I now pronounce you husband and wife.”</td></tr><tr><td>B. Directive</td><td>II. “Thank you so much.”</td></tr><tr><td>C. Expressive</td><td>III. “It is raining.”</td></tr><tr><td>D. Declaration</td><td>IV. “Close the door.”</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-I, C-II, D-IV", "A-I, B-IV, C-II, D-III", "A-III, B-IV, C-II, D-I", "A-II, B-III, C-IV, D-I"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Learner sentences) with List II (Kinds of error):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “He go to school every day.”</td><td>I. Stative verb in the progressive</td></tr><tr><td>B. “I am knowing him for years.”</td><td>II. Redundancy (tautology)</td></tr><tr><td>C. “She is more taller than me.”</td><td>III. Subject–verb agreement</td></tr><tr><td>D. “Please return back the book.”</td><td>IV. Double comparative</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-I, D-II", "A-II, B-I, C-IV, D-III", "A-I, B-IV, C-III, D-II", "A-III, B-I, C-IV, D-II"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MT", "stem": "Match List I (Word-formation processes) with List II (Examples):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Compounding</td><td>I. <i>kindness</i></td></tr><tr><td>B. Derivation</td><td>II. <i>to google</i></td></tr><tr><td>C. Inflection</td><td>III. <i>books</i></td></tr><tr><td>D. Conversion</td><td>IV. <i>blackboard</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-IV, B-I, C-III, D-II", "A-III, B-I, C-IV, D-II", "A-IV, B-II, C-III, D-I", "A-I, B-IV, C-II, D-III"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the first five of Gagné’s “nine events of instruction” in order:<div class='it'>A. Gain attention</div><div class='it'>B. Stimulate recall of prior learning</div><div class='it'>C. Provide learning guidance</div><div class='it'>D. Inform learners of the objective</div><div class='it'>E. Present the content</div>Choose the correct answer from the options given below:", "options": ["D, A, B, E, C", "A, E, B, D, C", "A, C, B, E, D", "A, D, B, E, C"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the following adjectives in the usual English order before a noun (as in “a … box”):<div class='it'>A. wooden (material)</div><div class='it'>B. big (size)</div><div class='it'>C. old (age)</div><div class='it'>D. lovely (opinion)</div><div class='it'>E. red (colour)</div>Choose the correct answer from the options given below:", "options": ["B, C, E, D, A", "D, B, C, E, A", "D, B, E, C, A", "D, B, A, E, C"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the usual steps of a lesson plan (as taught in B.Ed. courses) in order:<div class='it'>A. Writing the objectives</div><div class='it'>B. Recapitulation</div><div class='it'>C. Home assignment</div><div class='it'>D. Presentation</div><div class='it'>E. Introduction or motivation</div>Choose the correct answer from the options given below:", "options": ["A, E, C, D, B", "E, A, D, B, C", "A, E, D, B, C", "A, D, E, B, C"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the following places of articulation from the front of the mouth to the back:<div class='it'>A. Bilabial</div><div class='it'>B. Dental</div><div class='it'>C. Labiodental</div><div class='it'>D. Velar</div><div class='it'>E. Alveolar</div>Choose the correct answer from the options given below:", "options": ["A, C, B, E, D", "C, A, B, E, D", "A, B, C, E, D", "A, C, E, B, D"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the following ELT books in the chronological order of publication:<div class='it'>A. D. A. Wilkins, <i>Notional Syllabuses</i></div><div class='it'>B. Robert Lado, <i>Linguistics Across Cultures</i></div><div class='it'>C. Michael West, <i>A General Service List of English Words</i></div><div class='it'>D. Harold Palmer, <i>The Principles of Language-Study</i></div><div class='it'>E. N. S. Prabhu, <i>Second Language Pedagogy</i></div>Choose the correct answer from the options given below:", "options": ["D, C, A, B, E", "E, D, C, B, A", "D, C, B, A, E", "D, E, B, A, C"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the steps of the microteaching cycle in order:<div class='it'>A. Re-plan</div><div class='it'>B. Teach</div><div class='it'>C. Feedback</div><div class='it'>D. Plan</div><div class='it'>E. Re-teach</div>Choose the correct answer from the options given below:", "options": ["D, B, C, E, A", "D, B, C, A, E", "B, D, C, A, E", "D, B, E, A, C"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "In the clause “They elected him president yesterday”, arrange the clause elements in the order in which they appear:<div class='it'>A. Complement</div><div class='it'>B. Adverbial</div><div class='it'>C. Object</div><div class='it'>D. Verb</div><div class='it'>E. Subject</div>Choose the correct answer from the options given below:", "options": ["D, C, E, A, B", "E, D, A, C, B", "E, D, C, A, B", "D, E, C, A, B"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the following national curriculum frameworks of India in chronological order:<div class='it'>A. NCF 1988</div><div class='it'>B. NCF 1975</div><div class='it'>C. NCF for School Education 2023</div><div class='it'>D. NCF 2000</div><div class='it'>E. NCF 2005</div>Choose the correct answer from the options given below:", "options": ["A, B, D, E, C", "B, A, D, E, C", "B, A, D, C, E", "C, A, D, E, B"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SQ", "stem": "Arrange the following trends in second language acquisition research in chronological order of emergence:<div class='it'>A. Sociocultural theory in SLA</div><div class='it'>B. Error Analysis</div><div class='it'>C. Krashen’s Monitor Model</div><div class='it'>D. Interlanguage theory</div><div class='it'>E. Contrastive Analysis</div>Choose the correct answer from the options given below:", "options": ["E, D, B, C, A", "D, B, E, C, A", "C, B, D, E, A", "E, B, D, C, A"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are plosive consonants in English?<div class='it'>A. /p/</div><div class='it'>B. /t/</div><div class='it'>C. /s/</div><div class='it'>D. /k/</div><div class='it'>E. /g/</div>Choose the correct answer from the options given below:", "options": ["A, B and D only", "B, C, D and E only", "A, B, D and E only", "A, C, D and E only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are usually function (grammatical) words?<div class='it'>A. Conjunctions</div><div class='it'>B. Nouns</div><div class='it'>C. Auxiliary verbs</div><div class='it'>D. Articles</div><div class='it'>E. Prepositions</div>Choose the correct answer from the options given below:", "options": ["A, B, C, D and E", "A, C, D and E only", "A, C and E only", "B, C, D and E only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are principles of the Direct Method?<div class='it'>A. Grammar is taught inductively</div><div class='it'>B. Only the target language is used in class</div><div class='it'>C. Grammar rules are memorised first</div><div class='it'>D. Translation exercises are central</div><div class='it'>E. Everyday vocabulary and sentences are taught first</div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "B and E only", "A, B, C and E only", "A, B and E only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are examples of reduplication in English?<div class='it'>A. <i>chit-chat</i></div><div class='it'>B. <i>zig-zag</i></div><div class='it'>C. <i>goody-goody</i></div><div class='it'>D. <i>unhappy</i></div><div class='it'>E. <i>teacher</i></div>Choose the correct answer from the options given below:", "options": ["A, B and D only", "A, C and E only", "A, B, C and E only", "A, B and C only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following sentences are in the passive voice?<div class='it'>A. “They have gone home.”</div><div class='it'>B. “He was given a prize.”</div><div class='it'>C. “The match has been won.”</div><div class='it'>D. “She is writing a letter.”</div><div class='it'>E. “The letter was written yesterday.”</div>Choose the correct answer from the options given below:", "options": ["B, C and E only", "B, D and E only", "B, C, D and E only", "C and E only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are tools of continuous and comprehensive assessment?<div class='it'>A. Rubrics</div><div class='it'>B. Checklists</div><div class='it'>C. Anecdotal records</div><div class='it'>D. A single end-of-year board examination</div><div class='it'>E. Portfolios</div>Choose the correct answer from the options given below:", "options": ["A, B and E only", "A, B, D and E only", "A, B, C and E only", "A, B, C, D and E"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are among Hockett’s design features of human language?<div class='it'>A. A fixed set of inborn calls only</div><div class='it'>B. Duality of patterning</div><div class='it'>C. Arbitrariness</div><div class='it'>D. Productivity</div><div class='it'>E. Displacement</div>Choose the correct answer from the options given below:", "options": ["A, B, C, D and E", "B, C, D and E only", "B, D and E only", "A, C, D and E only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "Which of the following are consonant clusters?<div class='it'>A. /str/ in <i>street</i></div><div class='it'>B. /spl/ in <i>split</i></div><div class='it'>C. /kw/ in <i>queen</i></div><div class='it'>D. /ə/ in <i>about</i></div><div class='it'>E. /ɪ/ in <i>sit</i></div>Choose the correct answer from the options given below:", "options": ["B and C only", "A, C and E only", "A, B, C and E only", "A, B and C only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "MS", "stem": "According to Halliday and Hasan, which of the following are cohesive devices?<div class='it'>A. Ellipsis</div><div class='it'>B. Conjunction</div><div class='it'>C. Reference</div><div class='it'>D. Substitution</div><div class='it'>E. Rhyme</div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "A, B and D only", "B, C, D and E only", "A, B, C and D only"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Phonetics studies speech sounds in general, while phonology studies the sound system of a particular language.</div><div class='it'><b>Statement II:</b> A phoneme is the smallest unit of meaning in a language.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Contrastive Analysis predicts learning difficulty from differences between the first and second languages.</div><div class='it'><b>Statement II:</b> Error Analysis studies the errors that learners actually make.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> In “The cat sat on the mat”, “on the mat” is a noun clause.</div><div class='it'><b>Statement II:</b> In this sentence, “sat” is used intransitively.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> A lingua franca is a common language used between speakers of different first languages.</div><div class='it'><b>Statement II:</b> English serves as a lingua franca only in Asia.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Diglossia means knowing two languages equally well.</div><div class='it'><b>Statement II:</b> Code-mixing never occurs in Indian English speech.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Young children often say “goed” for “went”.</div><div class='it'><b>Reason R:</b> They are applying a regular rule (add -ed) that they have worked out for themselves.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Phonetic symbols help learners of English pronunciation.</div><div class='it'><b>Reason R:</b> The International Phonetic Association was founded in Paris.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Rote memorisation is the core of Communicative Language Teaching.</div><div class='it'><b>Reason R:</b> Communicative Language Teaching stresses meaningful communication.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> English is a stress-timed language.</div><div class='it'><b>Reason R:</b> In English, every syllable takes exactly the same amount of time.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> The Silent Way uses coloured Cuisenaire rods.</div><div class='it'><b>Reason R:</b> Gattegno wanted the teacher to talk as much as possible.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "The plural ending in <i>cats</i> is pronounced", "options": ["/s/", "/z/", "/ɪz/", "/ʃ/"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "The plural <i>mice</i> (from <i>mouse</i>) is formed by", "options": ["adding a suffix", "an internal vowel change", "reduplication", "clipping"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "Words such as <i>sandwich</i> and <i>boycott</i>, formed from personal names, are called", "options": ["acronyms", "blends", "back-formations", "eponyms"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "How many pure vowels (monophthongs) does RP English have?", "options": ["12", "8", "20", "24"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "Krashen’s Natural Order Hypothesis claims that", "options": ["the mother tongue must be learnt first", "learners should study grammar in textbook order", "grammatical structures are acquired in a predictable order", "adults learn faster than children"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "Which of the following is a glottal fricative?", "options": ["/ʔ/", "/h/", "/ʒ/", "/x/"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "In “If I were you, I would go”, the verb <i>were</i> is in the", "options": ["subjunctive mood", "imperative mood", "indicative past tense", "passive voice"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "Choose the correct form for formal written English: “Neither of the boys ___ present.”", "options": ["were", "are", "was", "have been"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "The indirect form of: He said, “I am tired.” is", "options": ["He said that he was tired.", "He said that I am tired.", "He said that he is tired yesterday.", "He told that he was tired."]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "A cloze test is usually made by", "options": ["asking learners to translate a passage", "reading a passage aloud for dictation", "asking only yes/no questions", "deleting every <i>n</i>th word from a passage"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "The National Curriculum Framework 2005 treats children’s multilingualism as", "options": ["a barrier to learning English", "a problem to be removed", "irrelevant to English teaching", "a resource for learning"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "“Fossilization” in second language learning means that", "options": ["some errors become fixed and stop changing", "the learner forgets the first language", "vocabulary grows very fast", "grammar is learnt by rote"]}, {"unit": "Unit 5: Language: Basic Concepts, Theories and Pedagogy", "passage": null, "type": "SG", "stem": "In ELT, ESP stands for", "options": ["English for Specific Purposes", "English as a Second Programme", "Elementary Spoken Proficiency", "English for Speaking Practice"]}];
+const S = JSON.parse(atob("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tVGdpBSZzxWYmBSZoRlIgwiIuMHZy92dgQnblRnbvNGIlJXYgMnb19mTiACLi4SZ2lGdhNWayZGIhBycpByLz9iIgwiIuMHM5kTMgwycwgzkAK+cwcTOxASZ0FGbgwiM3kTMgwycwYTOxASZ0FGbgwycwUTOxICIsIiLu9Wa0F2Y1RWZgU2ZhV3ZuFGbgI3bmBib39mbrBCdzVmYgUGa0BycpBSNwAjMgY0QOByOzRnbl1Wdj9GZgQlUFNkTiACLi4SKBhCI5FGZyVGdzVWegkyQoACduVGZpNXZyBHIp8EKg0WaoBSKWhCIkVGdjVGblBSKThCI5VGaUJCIsIiLu9WazNXZzBCajFWZ01SZyBSZoRHIzd3bsx2bmByajFmYkVWZm1SZSJCIsIiL3gTOxACL2cTOxACL3UTOxACLzUTOxACLxITOxICIsIiLvs2LgwyL09CIs8CuO/CIs8iZvACLvA3LiACLi4iclRmcvBichxWatl2cgEGI39Gbs9mZgMnbhxGcg42bzNXZsBibhlGdyFmYyVGSiACLi0Jgi7CevJGIuVGZv92dgQWZyBCZs9GInlmYgkHblZ3bsBSQcCo4iACLi4ibvlGduVGdlJHIlNmbhhmblBCLzNXZzNXYgwyajFmYkVWZmBSZ2l2ZgwSZj5WYtJ3bmJXZwBCdpNWasVGI6MHduVmdlBiclRXYsBSZoRlIgwiIugXamZWYg4WYgcmbpRGZhBCd19Ga0l2dgM3chx2YgQmcvdHIzV2ZuFGajBibvl2cyVmdu92QiACLi4ycyVmbyFWZsBibhlGZulEIm9GIzJ3byJXZg42bt12bDJCIsIiLpMXZzlWbvJHcoAyclZXazNXat12bjBycpByczFGbjBCa0ZWamBSZoRlIgwiIu42bpRXYsVmcg0Jgib2bgQmbptGnAKOIlhGdgMXagkXb552bwlHSiACLi4SZ2lGdjVmakFGIuFGIltWasBSZsBXajlGdyFGcgEGI74Wdv5GIhBSZrlGbgM3ay92dgQmb1JXZnBSQiACLi4yclNXdhx2YgUGdh5WakJ3biV3cgQmbhBibpFWbgQnb192QiACLi4CazlGbn5WRg4WZr9GczBCduVWdsZGIm9GIzVmc1RXYlZkIgwiIug2cpx2ZuVEIm9GIzJXZoNWYlRHIy9mZgM3av9mYgQmchRmbhR3UiACLi4CN5kTMgwyM4kTMgwCOxkTMgwCO2kTMisFI6ISZiACLdFDIsEDIsQDIsQDIsEDIsMDIsEDIsIDIsMDIsEDIsQDIsIDIsEDIsMDIsMDIsQDIsIDIsEDIsIDIsMDIsQDIsEDIsMDIsQDIsQDIsIDIsMDIsEDIsQDIsQDIsIDIsMDIsQDIsIDIsMDIsIDIsMDIsEDIsMDIsIDIsQDIsEDIsQDIsMDIsIDIsEDIsEDIsIDIsIDIsIzWgojIrJye".split("").reverse().join("")));
+const MIN = 60, KEY = "nvsb_ut5nta";
+const N = QS.length;
+const fresh = () => ({ans:Array(N).fill(0), mk:Array(N).fill(false), vis:Array(N).fill(false), cur:0, end:0, name:"", done:false});
+let st = fresh(), mode = "test", filter = "all", pick = 0;
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(KEY)); return s && s.ans && s.ans.length === N && s.vis ? s : null; }catch(e){ return null; } }
+$("nq").textContent = N; $("tm").textContent = MIN;
+const saved = load();
+if (saved && !saved.done) $("resume").classList.remove("hide");
+$("agree").onchange = () => { $("go").disabled = !$("agree").checked; };
+$("go").onclick = () => { st = fresh(); st.end = Date.now() + MIN*60000; st.name = $("nm").value.trim(); save(); begin(); };
+$("resume").onclick = () => { st = saved; begin(); };
+if (saved && saved.done) { st = saved; showResult(); }
+
+function status(i){
+  if (st.ans[i] && st.mk[i]) return "am";
+  if (st.mk[i]) return "mk";
+  if (st.ans[i]) return "an";
+  if (st.vis[i]) return "na";
+  return "";
+}
+function counts(){
+  const c = {an:0, na:0, mk:0, am:0, nv:0};
+  for (let i=0;i<N;i++){ const s = status(i); if (s==="") c.nv++; else c[s]++; }
+  return c;
+}
+function legend(){
+  if (mode === "test"){
+    const c = counts();
+    $("leg").innerHTML = `<div><span class="st an">${c.an}</span>Answered</div><div><span class="st na">${c.na}</span>Not Answered</div>
+      <div><span class="st">${c.nv}</span>Not Visited</div><div><span class="st mk">${c.mk}</span>Marked for Review</div>
+      <div style="grid-column:1/3"><span class="st am">${c.am}</span>Answered &amp; Marked for Review (will be considered for evaluation)</div>`;
+  } else {
+    $("leg").innerHTML = `<div><span class="st r">✓</span>Correct</div><div><span class="st w">✗</span>Wrong</div><div><span class="st">–</span>Not attempted</div>`;
+  }
+}
+function begin(){
+  mode = "test";
+  $("cname").textContent = st.name || "Candidate";
+  ["start","result"].forEach(x => $(x).classList.add("hide")); $("test").classList.remove("hide");
+  $("tbtns").classList.remove("hide"); $("rbtns").classList.add("hide"); $("tlbox").classList.remove("hide");
+  buildPal(); go(st.cur); tick(); window.scrollTo(0,0);
+}
+let timerId;
+function tick(){
+  clearInterval(timerId);
+  const f = () => {
+    const left = Math.max(0, st.end - Date.now());
+    const h = Math.floor(left/3600000), m = Math.floor(left%3600000/60000), s = Math.floor(left%60000/1000);
+    $("timer").textContent = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    $("timer").classList.toggle("low", left < 5*60000);
+    if (left <= 0 && mode === "test") { clearInterval(timerId); alert("Time is over. Your test will now be submitted."); finish(); }
+  };
+  f(); timerId = setInterval(f, 1000);
+}
+function visible(){
+  return QS.map((_,i)=>i).filter(i => mode==="test" || filter==="all" || (filter==="w" && st.ans[i] && st.ans[i]!==S.k[i]) || (filter==="u" && !st.ans[i]));
+}
+function buildPal(){
+  const p = $("pal"); p.innerHTML = "";
+  visible().forEach(i => { const b = document.createElement("span"); b.className = "st"; b.textContent = i+1; b.id = "p"+i; b.onclick = () => go(i); p.appendChild(b); });
+  paint();
+}
+function paint(){
+  QS.forEach((_,i) => { const b = $("p"+i); if(!b) return;
+    b.className = "st " + (mode==="test" ? status(i) : (!st.ans[i] ? "" : st.ans[i]===S.k[i] ? "r" : "w"));
+    if (i === st.cur) b.classList.add("cur"); });
+  legend();
+}
+function go(i){
+  st.cur = i; if (mode==="test") st.vis[i] = true;
+  pick = st.ans[i] || 0;
+  const q = QS[i];
+  $("qno").textContent = `Question No. ${i+1}`; $("qunit").textContent = q.unit;
+  if (q.passage) { $("psg").innerHTML = "<b>Read the passage and answer the question.</b>" + q.passage; $("psg").classList.remove("hide"); } else $("psg").classList.add("hide");
+  $("stem").innerHTML = q.stem;
+  const o = $("opts"); o.innerHTML = "";
+  q.options.forEach((t,j) => {
+    const l = document.createElement("label"); l.className = "opt";
+    l.innerHTML = `<input type="radio" name="o" ${pick===j+1?"checked":""} ${mode!=="test"?"disabled":""}><span><b>(${j+1})</b> ${t}</span>`;
+    if (mode === "test") l.querySelector("input").onchange = () => { pick = j+1; };
+    else { if (S.k[i]===j+1) l.classList.add("right"); else if (st.ans[i]===j+1) l.classList.add("wrong"); }
+    o.appendChild(l);
+  });
+  $("expbox").innerHTML = mode==="review" ? `<div class="exp"><b>Correct answer: (${S.k[i]})</b>${st.ans[i] ? (st.ans[i]===S.k[i] ? " – you got it right." : ` – you chose (${st.ans[i]}).`) : " – not attempted."}${S.e[i] ? "<br>"+S.e[i] : ""}</div>` : "";
+  const v = visible(), k = v.indexOf(i);
+  ["back","rback"].forEach(x => $(x).disabled = k <= 0); ["nxt","rnext"].forEach(x => $(x).disabled = k >= v.length-1);
+  if (mode==="test") save(); paint();
+}
+function nextQ(){ const v = visible(), k = v.indexOf(st.cur); if (k < v.length-1) go(v[k+1]); else go(st.cur); }
+function prevQ(){ const v = visible(), k = v.indexOf(st.cur); if (k > 0) go(v[k-1]); }
+$("saveNext").onclick = () => { if (!pick) { alert("Please choose an option first, or use NEXT to skip."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = false; save(); nextQ(); };
+$("saveMark").onclick = () => { if (!pick) { alert("Please choose an option first."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = true; save(); nextQ(); };
+$("markNext").onclick = () => { st.mk[st.cur] = true; save(); nextQ(); };
+$("clr").onclick = () => { st.ans[st.cur] = 0; pick = 0; save(); go(st.cur); };
+$("nxt").onclick = nextQ; $("back").onclick = prevQ; $("rnext").onclick = nextQ; $("rback").onclick = prevQ;
+$("subBtn").onclick = () => {
+  const c = counts();
+  $("sumTbl").innerHTML = `<tr><th>Section</th><th>No. of Questions</th><th>Answered</th><th>Not Answered</th><th>Marked for Review</th><th>Answered &amp; Marked for Review</th><th>Not Visited</th></tr>
+    <tr><td>English (Paper 2)</td><td>${N}</td><td>${c.an}</td><td>${c.na}</td><td>${c.mk}</td><td>${c.am}</td><td>${c.nv}</td></tr>`;
+  $("sumModal").classList.remove("hide");
+};
+$("noSub").onclick = () => $("sumModal").classList.add("hide");
+$("yesSub").onclick = () => { $("sumModal").classList.add("hide"); finish(); };
+function finish(){ st.done = true; save(); clearInterval(timerId); showResult(); }
+function showResult(){
+  mode = "result";
+  $("test").classList.add("hide"); $("start").classList.add("hide"); $("result").classList.remove("hide");
+  let r=0,w=0,u=0; const units = {};
+  QS.forEach((q,i) => { const U = units[q.unit] = units[q.unit] || {t:0,r:0};
+    U.t++; if(!st.ans[i]) u++; else if (st.ans[i]===S.k[i]) {r++;U.r++;} else w++; });
+  $("cname").textContent = st.name || "Candidate";
+  $("who").textContent = st.name ? `Candidate: ${st.name}` : "";
+  $("score").textContent = `${r*2} / ${N*2}`;
+  $("summary").textContent = `Correct ${r} · Wrong ${w} · Not attempted ${u} · Accuracy ${r+w ? Math.round(100*r/(r+w)) : 0}%`;
+  $("unitTbl").innerHTML = "<tr><th>Unit</th><th>Correct</th><th>Marks</th><th style='width:35%'>Accuracy</th></tr>" +
+    Object.entries(units).map(([k,U]) => { const p = Math.round(100*U.r/U.t); return `<tr><td>${k}</td><td>${U.r} / ${U.t}</td><td>${U.r*2}</td><td><div class="barx"><i style="width:${p}%"></i></div>${p}%</td></tr>`; }).join("");
+  window.scrollTo(0,0);
+}
+$("review").onclick = () => { mode = "review"; filter = "all";
+  $("result").classList.add("hide"); $("test").classList.remove("hide");
+  $("tbtns").classList.add("hide"); $("rbtns").classList.remove("hide"); $("tlbox").classList.add("hide");
+  buildPal(); go(0); };
+document.querySelectorAll(".flt [data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; buildPal(); const v = visible(); if (v.length) go(v[0]); else { $("stem").textContent = "No questions in this group."; $("opts").innerHTML=""; $("expbox").innerHTML=""; } });
+$("backRes").onclick = showResult;
+$("retake").onclick = () => { if (confirm("Start a fresh attempt? Your current result will be cleared.")) { try{ localStorage.removeItem(KEY); }catch(e){} location.reload(); } };
+</script>
+</body>
+</html>

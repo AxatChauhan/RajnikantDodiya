@@ -78,6 +78,8 @@ export const AuthorStudioModal: React.FC = () => {
   const {
     isStudioOpen,
     closeStudio,
+    activeStudioTab,
+    setActiveStudioTab,
     theme,
     setTheme,
     profile,
@@ -110,9 +112,15 @@ export const AuthorStudioModal: React.FC = () => {
   const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
   const [attemptsRemaining, setAttemptsRemaining] = useState<number>(5);
 
-  // Active Studio Tab
-  const [activeTab, setActiveTab] = useState<StudioTab>('theme');
+  // Active Studio Tab (Default to activeStudioTab e.g. 'store' when navigated from Store or Admin)
+  const [activeTab, setActiveTab] = useState<StudioTab>(() => activeStudioTab || 'theme');
   const [saveToast, setSaveToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isStudioOpen && activeStudioTab) {
+      setActiveTab(activeStudioTab);
+    }
+  }, [isStudioOpen, activeStudioTab]);
 
   // NET Vidya Store Context & State
   const {
@@ -169,6 +177,17 @@ export const AuthorStudioModal: React.FC = () => {
   const [storeTestQuestions, setStoreTestQuestions] = useState(100);
   const [storeTestReleaseDate, setStoreTestReleaseDate] = useState('2026-11-10T00:00');
   const [storeTestDescription, setStoreTestDescription] = useState('');
+  const [storeSelectedTestFile, setStoreSelectedTestFile] = useState<File | null>(null);
+
+  const handleStoreTestFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setStoreSelectedTestFile(file);
+      if (!storeTestTitle.trim()) {
+        setStoreTestTitle(file.name.replace(/\.html$/i, '').replace(/[-_]/g, ' '));
+      }
+    }
+  };
 
   const triggerStoreToast = (msg: string) => {
     setSaveToast(msg);
@@ -246,6 +265,7 @@ export const AuthorStudioModal: React.FC = () => {
     });
     setStoreTestTitle('');
     setStoreTestDescription('');
+    setStoreSelectedTestFile(null);
     triggerStoreToast('New Test Hall module scheduled. It will automatically unlock on the set release date.');
   };
 
@@ -645,9 +665,13 @@ export const AuthorStudioModal: React.FC = () => {
 
   // Handle Save All to Production
   const handleSaveAll = async () => {
-    const res = await saveAllToProduction();
+    const res = await saveAllToProduction({
+      settings: storeSettings,
+      readingFiles: storeReadingFiles,
+      tests: storeTests
+    });
     if (res.success) {
-      setSaveToast(res.message);
+      setSaveToast('All studio customizations and store settings synchronized to production.');
       setTimeout(() => setSaveToast(null), 4000);
     } else {
       setSaveToast(`Error: ${res.message}`);
@@ -2805,6 +2829,22 @@ export const AuthorStudioModal: React.FC = () => {
 
                         <form onSubmit={handleStoreAddTest} className="space-y-4">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Genuine HTML File Picker */}
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-semibold text-ink mb-1">Select Ready-Made Test HTML File (.html)</label>
+                              <input
+                                type="file"
+                                accept=".html"
+                                onChange={handleStoreTestFileChange}
+                                className="w-full text-xs text-ink-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-claret/10 file:text-claret hover:file:bg-claret/20 cursor-pointer border border-deckle rounded-xl p-1.5 bg-[#FAF9F5]"
+                              />
+                              {storeSelectedTestFile && (
+                                <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+                                  Selected: <strong>{storeSelectedTestFile.name}</strong>
+                                </span>
+                              )}
+                            </div>
+
                             <div className="sm:col-span-2">
                               <label className="block text-xs font-semibold text-ink mb-1">Test Title *</label>
                               <input

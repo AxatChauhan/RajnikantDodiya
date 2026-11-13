@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Test 6: English in India – UGC NET English Study Bundle</title>
+<style>
+:root{--ink:#222;--muted:#666;--line:#cfd4dc;--bg:#eef1f5;--top:#2b4c7e;--grey:#e0e0e0;--red:#d9534f;--green:#3c9f40;--purple:#6f42c1;--orange:#f0ad4e;--blue:#2d6cb5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.5}
+.top{background:var(--top);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+.top .logo{font-weight:700;font-size:15px;flex:1;min-width:200px}
+.cand{display:flex;align-items:center;gap:10px;font-size:13px}
+.photo{width:42px;height:48px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#888;font-size:22px}
+.bar2{background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:6px 14px;flex-wrap:wrap;gap:8px}
+.bar2 .sec{background:var(--blue);color:#fff;padding:4px 12px;border-radius:3px;font-size:13px}
+.tl{font-weight:700}.tl span{background:#000;color:#fff;padding:3px 10px;border-radius:3px;font-variant-numeric:tabular-nums;margin-left:6px}
+.tl span.low{background:var(--red)}
+.wrap{display:grid;grid-template-columns:1fr 300px;gap:0;min-height:calc(100vh - 110px)}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.qpane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.qtitle{padding:8px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qtitle small{font-weight:400;color:var(--muted)}
+.qbody{padding:14px;flex:1;overflow:auto}
+.passage{background:#f7f9fc;border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;max-height:260px;overflow:auto;font-size:14px}
+.passage p{margin:.3em 0}
+.stem{margin-bottom:10px}.stem .it{margin:3px 0 3px 16px}
+table.lt{border-collapse:collapse;margin:8px 0;width:100%;font-size:14px}
+table.lt td,table.lt th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.lt th{background:#eef2f8}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;cursor:pointer;border-radius:4px}
+label.opt:hover{background:#f3f6fb}
+label.opt input{margin-top:4px;transform:scale(1.15)}
+label.opt.right{background:#e3f4e4}label.opt.wrong{background:#fbe3e2}
+.exp{margin-top:10px;padding:10px 12px;border-left:4px solid var(--green);background:#f2faf3;font-size:14px}
+.btns{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fafbfc}
+.b{border:1px solid #999;background:#fff;color:#222;padding:7px 12px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.b.green{background:var(--green);border-color:var(--green);color:#fff}
+.b.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+.b.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.b.sub{background:var(--green);border-color:var(--green);color:#fff}
+.b:disabled{opacity:.45;cursor:default}
+.sp{flex:1}
+.side{background:#fff;padding:10px}
+.leg{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-bottom:10px}
+.leg div{display:flex;align-items:center;gap:6px}
+.st{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;font-size:13px;font-weight:700;border:1px solid #aaa;background:var(--grey);color:#222;border-radius:3px;position:relative;flex:none}
+.st.na{background:var(--red);border-color:var(--red);color:#fff;border-radius:3px 3px 12px 12px}
+.st.an{background:var(--green);border-color:var(--green);color:#fff;border-radius:12px 12px 3px 3px}
+.st.mk{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1px solid #fff}
+.st.r{background:var(--green);border-color:var(--green);color:#fff}.st.w{background:var(--red);border-color:var(--red);color:#fff}
+.leg .st{width:26px;height:22px;font-size:11px}
+.palhead{background:var(--blue);color:#fff;padding:5px 8px;font-weight:700;font-size:13px;margin:6px 0}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:7px;max-height:52vh;overflow:auto;padding:2px}
+.pal .st{cursor:pointer;width:100%}
+.pal .st.cur{outline:2px solid #000;outline-offset:1px}
+.card{max-width:900px;margin:18px auto;background:#fff;border:1px solid var(--line);padding:18px 22px}
+.card h2{margin-top:0;color:var(--top)}
+.inst li{margin:5px 0}
+.inst .st{width:30px;height:26px;margin-right:6px;vertical-align:middle}
+table.sum,table.res{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+table.sum td,table.sum th,table.res td,table.res th{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.res td:first-child,table.res th:first-child{text-align:left}
+table.sum th,table.res th{background:#eef2f8}
+.big{font-size:38px;font-weight:700;color:var(--top)}
+.barx{height:8px;background:#e6eaf2;border-radius:4px;overflow:hidden}.barx i{display:block;height:100%;background:var(--blue)}
+input[type=text]{padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:15px;width:100%;max-width:320px}
+.note{font-size:12.5px;color:var(--muted)}
+.hide{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:12px}
+.modal .card{margin:0;max-width:640px;width:100%}
+.flt .b{text-transform:none;font-weight:400}
+/*np*/@media print{#exam,#modal{display:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Unit Test 6: English in India – UGC NET English Study Bundle</div>
+  <div class="cand"><div class="photo">&#128100;</div><div>Candidate Name: <b id="cname">—</b><br>Subject: English (Paper 2)</div></div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<section id="start">
+ <div class="card">
+  <h2>General Instructions</h2>
+  <p class="note">This practice test copies the look of the NTA computer-based test (CBT) screen so that you can practise in the same way. It is not an official NTA test. Verify the current exam pattern and marking with the official NTA notice.</p>
+  <ol class="inst">
+   <li>Total questions: <b id="nq"></b> · Each question carries 2 marks · Duration: <b id="tm"></b> minutes · No negative marking (as in the current UGC NET; verify with the NTA notice).</li>
+   <li>The clock at the top right shows the time left. The test is submitted automatically when the time is over.</li>
+   <li>The Question Palette on the right shows the status of each question:
+    <ul style="list-style:none;padding-left:4px">
+     <li><span class="st">1</span> You have not visited the question yet.</li>
+     <li><span class="st na">2</span> You have not answered the question.</li>
+     <li><span class="st an">3</span> You have answered the question.</li>
+     <li><span class="st mk">4</span> You have NOT answered the question, but have marked it for review.</li>
+     <li><span class="st am">5</span> You have answered the question and marked it for review. <b>Such answers WILL be considered for evaluation.</b></li>
+    </ul></li>
+   <li>To answer: click an option, then click <b>SAVE &amp; NEXT</b>. <b>If you move to another question without saving, your answer is not saved.</b></li>
+   <li><b>SAVE &amp; MARK FOR REVIEW</b> saves your answer and marks the question. <b>MARK FOR REVIEW &amp; NEXT</b> marks it without an answer. <b>CLEAR</b> removes your answer.</li>
+   <li>Click a number in the palette to go straight to that question.</li>
+   <li>Your progress is saved in this browser. If the page closes, open it again and click “Resume”.</li>
+  </ol>
+  <p><label>Your name: <br><input type="text" id="nm" placeholder="Type your name"></label></p>
+  <p><label><input type="checkbox" id="agree"> I have read and understood the instructions.</label></p>
+  <button class="b blue" id="go" disabled>I am ready to begin</button> <button class="b hide" id="resume">Resume saved test</button>
+  <p class="note">© Dr Rajnikant Dodiya · NET Vidya English · For the registered buyer only</p>
+ </div>
+</section>
+
+<!-- TEST -->
+<div id="test" class="hide">
+ <div class="bar2"><span class="sec">English (Paper 2)</span><span class="tl" id="tlbox">Time Left: <span id="timer">--:--</span></span></div>
+ <div class="wrap">
+  <div class="qpane">
+   <div class="qtitle"><span id="qno"></span><small id="qunit"></small></div>
+   <div class="qbody">
+    <div id="psg" class="passage hide"></div>
+    <div class="stem" id="stem"></div>
+    <div id="opts"></div>
+    <div id="expbox"></div>
+   </div>
+   <div class="btns" id="tbtns">
+    <button class="b green" id="saveNext">Save &amp; Next</button>
+    <button class="b" id="clr">Clear</button>
+    <button class="b orange" id="saveMark">Save &amp; Mark for Review</button>
+    <button class="b blue" id="markNext">Mark for Review &amp; Next</button>
+    <span class="sp"></span>
+    <button class="b" id="back">&laquo; Back</button>
+    <button class="b" id="nxt">Next &raquo;</button>
+    <button class="b sub" id="subBtn">Submit</button>
+   </div>
+   <div class="btns hide" id="rbtns">
+    <button class="b" id="rback">&laquo; Back</button>
+    <button class="b" id="rnext">Next &raquo;</button>
+    <span class="sp"></span>
+    <span class="flt">Show:
+     <button class="b" data-f="all">All</button><button class="b" data-f="w">Wrong</button><button class="b" data-f="u">Not attempted</button></span>
+    <button class="b blue" id="backRes">Back to result</button>
+   </div>
+  </div>
+  <div class="side">
+   <div class="leg" id="leg"></div>
+   <div class="palhead">English (Paper 2) – Choose a Question</div>
+   <div class="pal" id="pal"></div>
+  </div>
+ </div>
+</div>
+
+<!-- SUBMIT SUMMARY -->
+<div class="modal hide" id="sumModal"><div class="card">
+ <h2>Exam Summary</h2>
+ <table class="sum" id="sumTbl"></table>
+ <p>Are you sure you want to submit? You cannot change your answers after this.</p>
+ <button class="b sub" id="yesSub">Yes, submit</button> <button class="b" id="noSub">No, go back</button>
+</div></div>
+
+<!-- RESULT -->
+<section id="result" class="hide"><div class="card">
+  <h2>Your Result</h2>
+  <p id="who"></p>
+  <div class="big" id="score"></div>
+  <p id="summary"></p>
+  <h3>Unit-wise performance</h3>
+  <table class="res" id="unitTbl"></table>
+  <p class="note">Tip: revise first the units where your accuracy is below 60%. Then open the review and read every explanation.</p>
+  <p><button class="b blue" id="review">Review answers with explanations</button> <button class="b" id="retake">Retake test</button> <button class="b" onclick="window.print()">Print result</button></p>
+</div></section>
+
+<script>
+const QS = [{"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Novels) with List II (Novelists):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>A River Sutra</i></td><td>I. Arun Joshi</td></tr><tr><td>B. <i>Shadow from Ladakh</i></td><td>II. Kamala Markandaya</td></tr><tr><td>C. <i>The Foreigner</i></td><td>III. Bhabani Bhattacharya</td></tr><tr><td>D. <i>A Handful of Rice</i></td><td>IV. Gita Mehta</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-IV, D-II", "A-IV, B-III, C-I, D-II", "A-II, B-III, C-I, D-IV", "A-II, B-III, C-IV, D-I"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Poets) with List II (Collections):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Keki N. Daruwalla</td><td>I. <i>Travelling in a Cage</i></td></tr><tr><td>B. Shiv K. Kumar</td><td>II. <i>Trapfalls in the Sky</i></td></tr><tr><td>C. Dilip Chitre</td><td>III. <i>Middle Earth</i></td></tr><tr><td>D. Arvind Krishna Mehrotra</td><td>IV. <i>The Keeper of the Dead</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-IV, B-I, C-II, D-III", "A-IV, B-II, C-I, D-III", "A-I, B-II, C-IV, D-III", "A-II, B-IV, C-III, D-I"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Indian English expressions) with List II (Meanings):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>prepone</i></td><td>I. The husband of one’s wife’s sister</td></tr><tr><td>B. <i>cousin-brother</i></td><td>II. Something done just to pass time</td></tr><tr><td>C. <i>timepass</i></td><td>III. To bring forward to an earlier time</td></tr><tr><td>D. <i>co-brother</i></td><td>IV. A male cousin</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-II, D-I", "A-IV, B-III, C-II, D-I", "A-II, B-IV, C-III, D-I", "A-I, B-III, C-IV, D-II"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (English words) with List II (Indian sources):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>catamaran</i></td><td>I. Hindi <i>champo</i>, “press, massage”</td></tr><tr><td>B. <i>shampoo</i></td><td>II. Tamil <i>kattumaram</i>, “tied logs”</td></tr><tr><td>C. <i>juggernaut</i></td><td>III. Sanskrit <i>Jagannatha</i>, lord of the world</td></tr><tr><td>D. <i>pyjamas</i></td><td>IV. Persian–Urdu <i>pay-jama</i>, “leg garment”</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-III, C-I, D-IV", "A-IV, B-I, C-III, D-II", "A-II, B-I, C-III, D-IV", "A-II, B-III, C-IV, D-I"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Works in English translation) with List II (Translators):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Chemmeen</i></td><td>I. V. K. Narayana Menon</td></tr><tr><td>B. <i>Godaan</i> (<i>The Gift of a Cow</i>)</td><td>II. Bhisham Sahni himself</td></tr><tr><td>C. <i>Pather Panchali</i></td><td>III. T. W. Clark and Tarapada Mukherji</td></tr><tr><td>D. <i>Tamas</i></td><td>IV. Gordon C. Roadarmel</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-IV, C-III, D-II", "A-IV, B-I, C-III, D-II", "A-I, B-IV, C-II, D-III", "A-II, B-III, C-IV, D-I"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Scholars) with List II (Books):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Makarand Paranjape (ed.)</td><td>I. <i>The Collected Essays of A. K. Ramanujan</i></td></tr><tr><td>B. Priya Joshi</td><td>II. <i>In Another Country: Colonialism, Culture, and the English Novel in India</i></td></tr><tr><td>C. Rosinka Chaudhuri</td><td>III. <i>Indian Poetry in English</i></td></tr><tr><td>D. Vinay Dharwadker (ed.)</td><td>IV. <i>Gentlemen Poets in Colonial Bengal</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-II, C-I, D-IV", "A-III, B-IV, C-II, D-I", "A-III, B-II, C-IV, D-I", "A-II, B-IV, C-III, D-I"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Novels) with List II (Settings):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Inside the Haveli</i></td><td>I. Old Delhi</td></tr><tr><td>B. <i>Clear Light of Day</i></td><td>II. Udaipur</td></tr><tr><td>C. <i>English, August</i></td><td>III. Laxmangarh and Bangalore</td></tr><tr><td>D. <i>The White Tiger</i></td><td>IV. Madna</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-I, C-IV, D-III", "A-II, B-I, C-III, D-IV", "A-III, B-I, C-IV, D-II", "A-III, B-I, C-II, D-IV"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Writers) with List II (Awards):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Nirad C. Chaudhuri</td><td>I. Booker Prize</td></tr><tr><td>B. Jhumpa Lahiri</td><td>II. Jnanpith Award</td></tr><tr><td>C. Kiran Desai</td><td>III. Duff Cooper Memorial Prize</td></tr><tr><td>D. Amitav Ghosh</td><td>IV. Pulitzer Prize for Fiction</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-I, D-II", "A-III, B-II, C-I, D-IV", "A-IV, B-III, C-I, D-II", "A-I, B-IV, C-II, D-III"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MT", "stem": "Match List I (Writers) with List II (Places closely linked with them):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. R. K. Narayan</td><td>I. Cuttack</td></tr><tr><td>B. Nissim Ezekiel</td><td>II. Mysore</td></tr><tr><td>C. Jayanta Mahapatra</td><td>III. Landour, Mussoorie</td></tr><tr><td>D. Ruskin Bond</td><td>IV. Bombay</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-IV, C-I, D-III", "A-II, B-I, C-IV, D-III", "A-II, B-IV, C-III, D-I", "A-I, B-III, C-IV, D-II"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following in the chronological order of publication:<div class='it'>A. Mulk Raj Anand, <i>Untouchable</i></div><div class='it'>B. Sake Dean Mahomet, <i>The Travels of Dean Mahomet</i></div><div class='it'>C. Sarojini Naidu, <i>The Golden Threshold</i></div><div class='it'>D. Krupabai Satthianadhan, <i>Kamala</i></div><div class='it'>E. Kashiprasad Ghosh, <i>The Shair and Other Poems</i></div>Choose the correct answer from the options given below:", "options": ["D, E, B, C, A", "B, E, D, C, A", "B, E, C, D, A", "B, D, C, A, E"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following events in Indian language policy in chronological order:<div class='it'>A. The National Education Policy</div><div class='it'>B. The National Policy on Education adopts the three-language formula</div><div class='it'>C. The National Policy on Education (second)</div><div class='it'>D. The Constitution comes into force</div><div class='it'>E. The Official Languages Act</div>Choose the correct answer from the options given below:", "options": ["D, E, C, B, A", "D, B, E, C, A", "D, E, B, C, A", "E, D, B, C, A"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following novels of Anita Desai in the chronological order of publication:<div class='it'>A. <i>Cry, the Peacock</i></div><div class='it'>B. <i>Voices in the City</i></div><div class='it'>C. <i>In Custody</i></div><div class='it'>D. <i>Bye-Bye Blackbird</i></div><div class='it'>E. <i>Fire on the Mountain</i></div>Choose the correct answer from the options given below:", "options": ["A, B, E, D, C", "A, E, B, D, C", "A, B, D, E, C", "A, D, B, E, C"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following novels of Shashi Deshpande in the chronological order of publication:<div class='it'>A. <i>That Long Silence</i></div><div class='it'>B. <i>The Dark Holds No Terrors</i></div><div class='it'>C. <i>The Binding Vine</i></div><div class='it'>D. <i>Small Remedies</i></div><div class='it'>E. <i>Roots and Shadows</i></div>Choose the correct answer from the options given below:", "options": ["B, D, A, C, E", "B, E, C, A, D", "B, A, E, C, D", "B, E, A, C, D"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following works of Kamala Das in the chronological order of publication:<div class='it'>A. <i>Only the Soul Knows How to Sing</i></div><div class='it'>B. <i>My Story</i> (English)</div><div class='it'>C. <i>Summer in Calcutta</i></div><div class='it'>D. <i>The Old Playhouse and Other Poems</i></div><div class='it'>E. <i>The Descendants</i></div>Choose the correct answer from the options given below:", "options": ["B, C, E, D, A", "C, E, D, B, A", "C, E, B, D, A", "C, E, D, A, B"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following collections of Jayanta Mahapatra in the chronological order of publication:<div class='it'>A. <i>Relationship</i></div><div class='it'>B. <i>Shadow Space</i></div><div class='it'>C. <i>Life Signs</i></div><div class='it'>D. <i>A Rain of Rites</i></div><div class='it'>E. <i>Close the Sky, Ten by Ten</i></div>Choose the correct answer from the options given below:", "options": ["C, E, D, A, B", "E, A, D, C, B", "E, D, A, C, B", "D, E, A, C, B"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following works of Rohinton Mistry in the chronological order of publication:<div class='it'>A. <i>Such a Long Journey</i></div><div class='it'>B. <i>A Fine Balance</i></div><div class='it'>C. <i>Tales from Firozsha Baag</i></div><div class='it'>D. <i>The Scream</i></div><div class='it'>E. <i>Family Matters</i></div>Choose the correct answer from the options given below:", "options": ["B, A, C, E, D", "C, B, A, E, D", "C, D, B, E, A", "C, A, B, E, D"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following books of Arundhati Roy in the chronological order of publication:<div class='it'>A. <i>Field Notes on Democracy</i></div><div class='it'>B. <i>The God of Small Things</i></div><div class='it'>C. <i>The Ministry of Utmost Happiness</i></div><div class='it'>D. <i>The Cost of Living</i></div><div class='it'>E. <i>Power Politics</i></div>Choose the correct answer from the options given below:", "options": ["B, D, E, A, C", "B, E, D, A, C", "B, C, E, A, D", "B, D, A, E, C"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SQ", "stem": "Arrange the following novels of Manju Kapur in the chronological order of publication:<div class='it'>A. <i>A Married Woman</i></div><div class='it'>B. <i>Home</i></div><div class='it'>C. <i>Difficult Daughters</i></div><div class='it'>D. <i>Custody</i></div><div class='it'>E. <i>Brothers</i></div>Choose the correct answer from the options given below:", "options": ["E, C, A, B, D", "C, A, B, E, D", "C, A, B, D, E", "C, B, A, D, E"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following novels were written by Bhabani Bhattacharya?<div class='it'>A. <i>So Many Hungers!</i></div><div class='it'>B. <i>Coolie</i></div><div class='it'>C. <i>He Who Rides a Tiger</i></div><div class='it'>D. <i>The Dark Room</i></div><div class='it'>E. <i>Music for Mohini</i></div>Choose the correct answer from the options given below:", "options": ["A, C, D and E only", "A, C and E only", "A and C only", "C and E only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following poems were written by Nissim Ezekiel?<div class='it'>A. “Background, Casually”</div><div class='it'>B. “Enterprise”</div><div class='it'>C. “Obituary”</div><div class='it'>D. “Poet, Lover, Birdwatcher”</div><div class='it'>E. “Hunger”</div>Choose the correct answer from the options given below:", "options": ["B, D and E only", "A, B, D and E only", "A, B and D only", "A, B, C and D only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following writers of Indian or South Asian origin live (or lived) and write in Canada?<div class='it'>A. M. G. Vassanji</div><div class='it'>B. Hari Kunzru</div><div class='it'>C. Jhumpa Lahiri</div><div class='it'>D. Shauna Singh Baldwin</div><div class='it'>E. Rohinton Mistry</div>Choose the correct answer from the options given below:", "options": ["A, B and D only", "A, B, D and E only", "A and D only", "A, D and E only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following novels deal with the Emergency (1975–77)?<div class='it'>A. <i>A Fine Balance</i></div><div class='it'>B. <i>Untouchable</i></div><div class='it'>C. <i>Kanthapura</i></div><div class='it'>D. <i>Midnight’s Children</i></div><div class='it'>E. <i>Rich Like Us</i></div>Choose the correct answer from the options given below:", "options": ["A and E only", "D and E only", "A, D and E only", "A, B, D and E only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following are Indian women playwrights in English?<div class='it'>A. Poile Sengupta</div><div class='it'>B. Dina Mehta</div><div class='it'>C. Manjula Padmanabhan</div><div class='it'>D. Mahesh Dattani</div><div class='it'>E. Girish Karnad</div>Choose the correct answer from the options given below:", "options": ["A, B, C and E only", "A and C only", "A and B only", "A, B and C only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following are commonly noted features of Indian English?<div class='it'>A. Pronunciation identical to RP</div><div class='it'>B. Complete absence of regional influence</div><div class='it'>C. The invariable tag <i>isn’t it?</i></div><div class='it'>D. Emphatic <i>only</i> (“I am like this only”)</div><div class='it'>E. Progressive forms with stative verbs (“I am knowing”)</div>Choose the correct answer from the options given below:", "options": ["B, C and D only", "A, C, D and E only", "D and E only", "C, D and E only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following institutions are associated with English language teaching in India?<div class='it'>A. The English Language Teaching Institutes (ELTIs)</div><div class='it'>B. The Regional Institutes of English</div><div class='it'>C. The English and Foreign Languages University (formerly CIEFL)</div><div class='it'>D. AIIMS</div><div class='it'>E. ISRO</div>Choose the correct answer from the options given below:", "options": ["B, C and D only", "B and C only", "A, B and C only", "A, B, C and D only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following were written by Ruskin Bond?<div class='it'>A. <i>The Blue Umbrella</i></div><div class='it'>B. <i>A Flight of Pigeons</i></div><div class='it'>C. <i>Delhi Is Not Far</i></div><div class='it'>D. <i>Malgudi Days</i></div><div class='it'>E. <i>The Dark Room</i></div>Choose the correct answer from the options given below:", "options": ["A, B and C only", "A, B, C and E only", "A and C only", "A, C and D only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "MS", "stem": "Which of the following books were written by Shashi Tharoor?<div class='it'>A. <i>Riot</i></div><div class='it'>B. <i>An Era of Darkness</i></div><div class='it'>C. <i>English, August</i></div><div class='it'>D. <i>Show Business</i></div><div class='it'>E. <i>Serious Men</i></div>Choose the correct answer from the options given below:", "options": ["A and B only", "A, B and D only", "A, B, D and E only", "A, B, C and D only"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> <i>The Travels of Dean Mahomet</i> (1794) is often called the first book written in English by an Indian.</div><div class='it'><b>Statement II:</b> Dean Mahomet later opened the Hindoostane Coffee House in London.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> The Kothari Commission submitted its report in 1966.</div><div class='it'><b>Statement II:</b> The Commission was chaired by S. Radhakrishnan.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Anand’s <i>Untouchable</i> carries a preface by W. B. Yeats.</div><div class='it'><b>Statement II:</b> Bakha, the hero of <i>Untouchable</i>, is a sweeper.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Ezekiel won the Sahitya Akademi Award for <i>A Time to Change</i>.</div><div class='it'><b>Statement II:</b> Ezekiel was born in Calcutta.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Arundhati Roy won the Booker Prize in 1997.</div><div class='it'><b>Statement II:</b> Roy trained as an architect.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> In the Foreword to <i>Kanthapura</i>, Raja Rao speaks of conveying “in a language that is not one’s own the spirit that is one’s own”.</div><div class='it'><b>Reason R:</b> Rao felt English was the language of our intellectual but not our emotional make-up.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Kamala Das’s <i>My Story</i> caused controversy.</div><div class='it'><b>Reason R:</b> It was first serialised in Malayalam as <i>Ente Katha</i>.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> In India, English is used mainly as a second language.</div><div class='it'><b>Reason R:</b> English has no official status in India.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Indian English poetry before 1947 was entirely modernist.</div><div class='it'><b>Reason R:</b> Poets such as Toru Dutt and Sarojini Naidu wrote largely in a Romantic and Victorian manner.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Macaulay’s Minute (1835) favoured English education in India.</div><div class='it'><b>Reason R:</b> Macaulay claimed that “a single shelf of a good European library was worth the whole native literature of India and Arabia”.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "<i>Train to Pakistan</i> was first published in the USA (1956) under the title", "options": ["<i>Partition</i>", "<i>Mano Majra</i>", "<i>The Sutlej</i>", "<i>Midnight Train</i>"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "Agha Shahid Ali’s <i>Call Me Ishmael Tonight</i> (2003) is a book of", "options": ["sonnets", "ghazals in English", "haiku", "villanelles"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "“Is There an Indian Way of Thinking? An Informal Essay” (1989) was written by", "options": ["Nirad C. Chaudhuri", "A. K. Ramanujan", "Ashis Nandy", "Amartya Sen"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "Vikram Seth’s <i>The Golden Gate</i> is written in", "options": ["blank verse", "heroic couplets", "free verse", "Onegin stanzas (tetrameter sonnets)"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "“The Hungry Stones” is a short story by", "options": ["Rabindranath Tagore", "Premchand", "R. K. Narayan", "Mulk Raj Anand"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "“Our Casuarina Tree” was written by", "options": ["Sarojini Naidu", "Toru Dutt", "Henry Derozio", "Manmohan Ghose"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "Mahesh Dattani received the Sahitya Akademi Award (1998) for", "options": ["<i>Tara</i>", "<i>Dance Like a Man</i>", "<i>Thirty Days in September</i>", "<i>Final Solutions and Other Plays</i>"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "Girish Karnad’s first play (1961) was", "options": ["<i>Tughlaq</i>", "<i>Hayavadana</i>", "<i>Nagamandala</i>", "<i>Yayati</i>"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "The poem “A River”, on the Vaikai at Madurai, was written by", "options": ["R. Parthasarathy", "A. K. Ramanujan", "Arun Kolatkar", "Nissim Ezekiel"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "Geetanjali Shree’s <i>Tomb of Sand</i>, winner of the International Booker Prize (2022), was translated from Hindi by", "options": ["Daisy Rockwell", "Arunava Sinha", "Jerry Pinto", "Gillian Wright"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "The bestselling <i>Shiva Trilogy</i> (from <i>The Immortals of Meluha</i>, 2010) was written by", "options": ["Chetan Bhagat", "Ashwin Sanghi", "Amish Tripathi", "Devdutt Pattanaik"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "The English and Foreign Languages University, Hyderabad, was earlier known as", "options": ["the Regional Institute of English", "the British Council Institute", "the Central Institute of Indian Languages", "the Central Institute of English and Foreign Languages (CIEFL)"]}, {"unit": "Unit 6: English in India", "passage": null, "type": "SG", "stem": "<i>Mother India</i> (1927), which Gandhi called “a drain inspector’s report”, was written by", "options": ["Annie Besant", "E. M. Forster", "Beverley Nichols", "Katherine Mayo"]}];
+const S = JSON.parse(atob("=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".split("").reverse().join("")));
+const MIN = 60, KEY = "nvsb_ut6nta";
+const N = QS.length;
+const fresh = () => ({ans:Array(N).fill(0), mk:Array(N).fill(false), vis:Array(N).fill(false), cur:0, end:0, name:"", done:false});
+let st = fresh(), mode = "test", filter = "all", pick = 0;
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(KEY)); return s && s.ans && s.ans.length === N && s.vis ? s : null; }catch(e){ return null; } }
+$("nq").textContent = N; $("tm").textContent = MIN;
+const saved = load();
+if (saved && !saved.done) $("resume").classList.remove("hide");
+$("agree").onchange = () => { $("go").disabled = !$("agree").checked; };
+$("go").onclick = () => { st = fresh(); st.end = Date.now() + MIN*60000; st.name = $("nm").value.trim(); save(); begin(); };
+$("resume").onclick = () => { st = saved; begin(); };
+if (saved && saved.done) { st = saved; showResult(); }
+
+function status(i){
+  if (st.ans[i] && st.mk[i]) return "am";
+  if (st.mk[i]) return "mk";
+  if (st.ans[i]) return "an";
+  if (st.vis[i]) return "na";
+  return "";
+}
+function counts(){
+  const c = {an:0, na:0, mk:0, am:0, nv:0};
+  for (let i=0;i<N;i++){ const s = status(i); if (s==="") c.nv++; else c[s]++; }
+  return c;
+}
+function legend(){
+  if (mode === "test"){
+    const c = counts();
+    $("leg").innerHTML = `<div><span class="st an">${c.an}</span>Answered</div><div><span class="st na">${c.na}</span>Not Answered</div>
+      <div><span class="st">${c.nv}</span>Not Visited</div><div><span class="st mk">${c.mk}</span>Marked for Review</div>
+      <div style="grid-column:1/3"><span class="st am">${c.am}</span>Answered &amp; Marked for Review (will be considered for evaluation)</div>`;
+  } else {
+    $("leg").innerHTML = `<div><span class="st r">✓</span>Correct</div><div><span class="st w">✗</span>Wrong</div><div><span class="st">–</span>Not attempted</div>`;
+  }
+}
+function begin(){
+  mode = "test";
+  $("cname").textContent = st.name || "Candidate";
+  ["start","result"].forEach(x => $(x).classList.add("hide")); $("test").classList.remove("hide");
+  $("tbtns").classList.remove("hide"); $("rbtns").classList.add("hide"); $("tlbox").classList.remove("hide");
+  buildPal(); go(st.cur); tick(); window.scrollTo(0,0);
+}
+let timerId;
+function tick(){
+  clearInterval(timerId);
+  const f = () => {
+    const left = Math.max(0, st.end - Date.now());
+    const h = Math.floor(left/3600000), m = Math.floor(left%3600000/60000), s = Math.floor(left%60000/1000);
+    $("timer").textContent = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    $("timer").classList.toggle("low", left < 5*60000);
+    if (left <= 0 && mode === "test") { clearInterval(timerId); alert("Time is over. Your test will now be submitted."); finish(); }
+  };
+  f(); timerId = setInterval(f, 1000);
+}
+function visible(){
+  return QS.map((_,i)=>i).filter(i => mode==="test" || filter==="all" || (filter==="w" && st.ans[i] && st.ans[i]!==S.k[i]) || (filter==="u" && !st.ans[i]));
+}
+function buildPal(){
+  const p = $("pal"); p.innerHTML = "";
+  visible().forEach(i => { const b = document.createElement("span"); b.className = "st"; b.textContent = i+1; b.id = "p"+i; b.onclick = () => go(i); p.appendChild(b); });
+  paint();
+}
+function paint(){
+  QS.forEach((_,i) => { const b = $("p"+i); if(!b) return;
+    b.className = "st " + (mode==="test" ? status(i) : (!st.ans[i] ? "" : st.ans[i]===S.k[i] ? "r" : "w"));
+    if (i === st.cur) b.classList.add("cur"); });
+  legend();
+}
+function go(i){
+  st.cur = i; if (mode==="test") st.vis[i] = true;
+  pick = st.ans[i] || 0;
+  const q = QS[i];
+  $("qno").textContent = `Question No. ${i+1}`; $("qunit").textContent = q.unit;
+  if (q.passage) { $("psg").innerHTML = "<b>Read the passage and answer the question.</b>" + q.passage; $("psg").classList.remove("hide"); } else $("psg").classList.add("hide");
+  $("stem").innerHTML = q.stem;
+  const o = $("opts"); o.innerHTML = "";
+  q.options.forEach((t,j) => {
+    const l = document.createElement("label"); l.className = "opt";
+    l.innerHTML = `<input type="radio" name="o" ${pick===j+1?"checked":""} ${mode!=="test"?"disabled":""}><span><b>(${j+1})</b> ${t}</span>`;
+    if (mode === "test") l.querySelector("input").onchange = () => { pick = j+1; };
+    else { if (S.k[i]===j+1) l.classList.add("right"); else if (st.ans[i]===j+1) l.classList.add("wrong"); }
+    o.appendChild(l);
+  });
+  $("expbox").innerHTML = mode==="review" ? `<div class="exp"><b>Correct answer: (${S.k[i]})</b>${st.ans[i] ? (st.ans[i]===S.k[i] ? " – you got it right." : ` – you chose (${st.ans[i]}).`) : " – not attempted."}${S.e[i] ? "<br>"+S.e[i] : ""}</div>` : "";
+  const v = visible(), k = v.indexOf(i);
+  ["back","rback"].forEach(x => $(x).disabled = k <= 0); ["nxt","rnext"].forEach(x => $(x).disabled = k >= v.length-1);
+  if (mode==="test") save(); paint();
+}
+function nextQ(){ const v = visible(), k = v.indexOf(st.cur); if (k < v.length-1) go(v[k+1]); else go(st.cur); }
+function prevQ(){ const v = visible(), k = v.indexOf(st.cur); if (k > 0) go(v[k-1]); }
+$("saveNext").onclick = () => { if (!pick) { alert("Please choose an option first, or use NEXT to skip."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = false; save(); nextQ(); };
+$("saveMark").onclick = () => { if (!pick) { alert("Please choose an option first."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = true; save(); nextQ(); };
+$("markNext").onclick = () => { st.mk[st.cur] = true; save(); nextQ(); };
+$("clr").onclick = () => { st.ans[st.cur] = 0; pick = 0; save(); go(st.cur); };
+$("nxt").onclick = nextQ; $("back").onclick = prevQ; $("rnext").onclick = nextQ; $("rback").onclick = prevQ;
+$("subBtn").onclick = () => {
+  const c = counts();
+  $("sumTbl").innerHTML = `<tr><th>Section</th><th>No. of Questions</th><th>Answered</th><th>Not Answered</th><th>Marked for Review</th><th>Answered &amp; Marked for Review</th><th>Not Visited</th></tr>
+    <tr><td>English (Paper 2)</td><td>${N}</td><td>${c.an}</td><td>${c.na}</td><td>${c.mk}</td><td>${c.am}</td><td>${c.nv}</td></tr>`;
+  $("sumModal").classList.remove("hide");
+};
+$("noSub").onclick = () => $("sumModal").classList.add("hide");
+$("yesSub").onclick = () => { $("sumModal").classList.add("hide"); finish(); };
+function finish(){ st.done = true; save(); clearInterval(timerId); showResult(); }
+function showResult(){
+  mode = "result";
+  $("test").classList.add("hide"); $("start").classList.add("hide"); $("result").classList.remove("hide");
+  let r=0,w=0,u=0; const units = {};
+  QS.forEach((q,i) => { const U = units[q.unit] = units[q.unit] || {t:0,r:0};
+    U.t++; if(!st.ans[i]) u++; else if (st.ans[i]===S.k[i]) {r++;U.r++;} else w++; });
+  $("cname").textContent = st.name || "Candidate";
+  $("who").textContent = st.name ? `Candidate: ${st.name}` : "";
+  $("score").textContent = `${r*2} / ${N*2}`;
+  $("summary").textContent = `Correct ${r} · Wrong ${w} · Not attempted ${u} · Accuracy ${r+w ? Math.round(100*r/(r+w)) : 0}%`;
+  $("unitTbl").innerHTML = "<tr><th>Unit</th><th>Correct</th><th>Marks</th><th style='width:35%'>Accuracy</th></tr>" +
+    Object.entries(units).map(([k,U]) => { const p = Math.round(100*U.r/U.t); return `<tr><td>${k}</td><td>${U.r} / ${U.t}</td><td>${U.r*2}</td><td><div class="barx"><i style="width:${p}%"></i></div>${p}%</td></tr>`; }).join("");
+  window.scrollTo(0,0);
+}
+$("review").onclick = () => { mode = "review"; filter = "all";
+  $("result").classList.add("hide"); $("test").classList.remove("hide");
+  $("tbtns").classList.add("hide"); $("rbtns").classList.remove("hide"); $("tlbox").classList.add("hide");
+  buildPal(); go(0); };
+document.querySelectorAll(".flt [data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; buildPal(); const v = visible(); if (v.length) go(v[0]); else { $("stem").textContent = "No questions in this group."; $("opts").innerHTML=""; $("expbox").innerHTML=""; } });
+$("backRes").onclick = showResult;
+$("retake").onclick = () => { if (confirm("Start a fresh attempt? Your current result will be cleared.")) { try{ localStorage.removeItem(KEY); }catch(e){} location.reload(); } };
+</script>
+</body>
+</html>

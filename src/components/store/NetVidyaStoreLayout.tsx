@@ -11,9 +11,11 @@ import {
   Sparkles,
   Award,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { useSiteContent } from '../../contexts/SiteContentContext';
 import { NetVidyaStoreHome } from './NetVidyaStoreHome';
 import { NetVidyaFreeSample } from './NetVidyaFreeSample';
 import { NetVidyaDashboard } from './NetVidyaDashboard';
@@ -44,6 +46,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   initialExamStore = 'ugc'
 }) => {
   const { currentServerPrice, isEarlyBirdActive, buyerSession } = useNetVidyaStore();
+  const { openStudio } = useSiteContent();
 
   const [activeExamStore, setActiveExamStore] = useState<'ugc' | 'gset'>(() => {
     if (typeof window !== 'undefined') {
@@ -80,8 +83,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       if (typeof window === 'undefined') return;
       const hash = window.location.hash.toLowerCase();
       const search = window.location.search.toLowerCase();
-      if (hash === '#admin' || hash === '#store-admin' || search.includes('admin=true')) {
-        setIsAdminOpen(true);
+      if (hash === '#admin' || hash === '#store-admin' || hash === '#store-studio' || search.includes('admin=true')) {
+        openStudio('store');
       }
       if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
         setCurrentView('dashboard');
@@ -102,19 +105,19 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       window.removeEventListener('hashchange', checkAdminRoute);
       window.removeEventListener('popstate', checkAdminRoute);
     };
-  }, []);
+  }, [openStudio]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Secret key combination: Ctrl+Shift+A (or Cmd+Shift+A)
+      // Secret key combination: Ctrl+Shift+A (or Cmd+Shift+A) opens unified Author Studio
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
-        setIsAdminOpen(prev => !prev);
+        openStudio('store');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [openStudio]);
 
   const handleOpenPolicies = (tab: PolicyTab = 'terms') => {
     setSelectedPolicyTab(tab);
@@ -247,12 +250,29 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               onClick={() => setIsCheckoutOpen(true)}
               className="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             >
-              <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
-              <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
+              {activeExamStore === 'gset' ? (
+                <>
+                  <span className="hidden min-[400px]:inline">Enroll GSET (from ₹149)</span>
+                  <span className="min-[400px]:hidden">GSET ₹149</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden min-[400px]:inline">Enroll Bundle (₹499)</span>
+                  <span className="min-[400px]:hidden">Buy ₹499</span>
+                </>
+              )}
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
 
-            {/* Admin Trigger Button */}
+            {/* Author Studio Trigger Button */}
+            <button
+              onClick={() => openStudio('store')}
+              title="Open Author Studio (NET Vidya Store & Enrolled Scholars)"
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-900 text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0"
+            >
+              <Shield className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+              <span className="hidden lg:inline">Studio</span>
+            </button>
 
             {/* Mobile Hamburger Menu */}
             <button
@@ -390,6 +410,16 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   <ChevronRight className="w-4 h-4 text-blue-500" />
                 </button>
               )}
+              <button
+                onClick={() => { openStudio('store'); setMobileMenuOpen(false); }}
+                className="w-full text-left p-2.5 rounded-lg hover:bg-blue-50 text-blue-800 flex items-center justify-between font-bold border border-blue-100"
+              >
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-700" />
+                  <span>Author Studio (Store Admin)</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-blue-500" />
+              </button>
             </div>
 
             {/* Quick Action in Drawer */}
@@ -398,7 +428,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 onClick={() => { setIsCheckoutOpen(true); setMobileMenuOpen(false); }}
                 className="w-full py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
               >
-                <span>Buy Final Pack (₹{currentServerPrice})</span>
+                <span>{activeExamStore === 'gset' ? 'Enroll GSET 2026 (from ₹149)' : 'Enroll UGC NET Bundle (₹499)'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

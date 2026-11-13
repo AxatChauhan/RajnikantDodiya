@@ -109,11 +109,11 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
             UGC NET English <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 bg-clip-text text-transparent">
-              Final Pack 2026
+              Complete Study Bundle 2026
             </span>
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            The definitive national preparation bundle: authentic NTA computer-based test simulations, comprehensive pedagogical explanations, and downloadable high-yield revision dossiers.
+            The definitive national preparation bundle: 21 authentic NTA computer-based CBT test simulations, 3 complete high-yield online reading dossiers, and comprehensive pedagogical explanations.
           </p>
         </div>
 
@@ -177,7 +177,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               onClick={onOpenCheckout}
               className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02]"
             >
-              <span>Buy Final Pack — ₹{currentServerPrice}</span>
+              <span>Enroll in Complete Bundle (₹{currentServerPrice})</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
@@ -185,7 +185,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4 text-blue-700 fill-current" />
-              <span>Try Free Demo</span>
+              <span>Try Free Demo (10 Qs + Sample)</span>
             </button>
           </div>
 

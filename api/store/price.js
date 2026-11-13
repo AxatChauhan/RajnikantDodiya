@@ -11,7 +11,9 @@
 import {
   DEFAULT_STORE_SETTINGS,
   STORE_MERCHANT,
-  STORE_PAYMENT_DEFAULTS
+  STORE_PAYMENT_DEFAULTS,
+  GSET_PRODUCTS,
+  UGC_BUNDLE_PRODUCT
 } from '../../lib/store-config.js';
 
 export const DEFAULT_PAYMENT_LINK = STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
@@ -57,7 +59,7 @@ export async function fetchStoreSettings() {
         .maybeSingle();
 
       if (data) {
-        settings.earlyBirdPrice = Number(data.early_bird_price) || 799;
+        settings.earlyBirdPrice = Number(data.early_bird_price) || 499;
         settings.standardPrice = Number(data.standard_price) || 999;
         if (data.early_bird_cutoff) settings.earlyBirdCutoff = data.early_bird_cutoff;
         if (data.access_expiry_date) settings.accessExpiryDate = data.access_expiry_date;
@@ -103,6 +105,8 @@ export default async function handler(req, res) {
       sellerLine: settings.sellerLine,
       paymentMode: hasApiKeys ? 'api_checkout' : isPaymentLinkMode ? 'payment_link' : 'unconfigured',
       ...(isPaymentLinkMode ? { paymentLinkUrl } : {}),
+      gsetProducts: GSET_PRODUCTS,
+      ugcBundle: UGC_BUNDLE_PRODUCT,
       product: {
         slug: settings.productSlug,
         name: settings.productName,

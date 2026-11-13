@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Test 4: Prose – UGC NET English Study Bundle</title>
+<style>
+:root{--ink:#222;--muted:#666;--line:#cfd4dc;--bg:#eef1f5;--top:#2b4c7e;--grey:#e0e0e0;--red:#d9534f;--green:#3c9f40;--purple:#6f42c1;--orange:#f0ad4e;--blue:#2d6cb5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.5}
+.top{background:var(--top);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+.top .logo{font-weight:700;font-size:15px;flex:1;min-width:200px}
+.cand{display:flex;align-items:center;gap:10px;font-size:13px}
+.photo{width:42px;height:48px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#888;font-size:22px}
+.bar2{background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:6px 14px;flex-wrap:wrap;gap:8px}
+.bar2 .sec{background:var(--blue);color:#fff;padding:4px 12px;border-radius:3px;font-size:13px}
+.tl{font-weight:700}.tl span{background:#000;color:#fff;padding:3px 10px;border-radius:3px;font-variant-numeric:tabular-nums;margin-left:6px}
+.tl span.low{background:var(--red)}
+.wrap{display:grid;grid-template-columns:1fr 300px;gap:0;min-height:calc(100vh - 110px)}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.qpane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.qtitle{padding:8px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qtitle small{font-weight:400;color:var(--muted)}
+.qbody{padding:14px;flex:1;overflow:auto}
+.passage{background:#f7f9fc;border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;max-height:260px;overflow:auto;font-size:14px}
+.passage p{margin:.3em 0}
+.stem{margin-bottom:10px}.stem .it{margin:3px 0 3px 16px}
+table.lt{border-collapse:collapse;margin:8px 0;width:100%;font-size:14px}
+table.lt td,table.lt th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.lt th{background:#eef2f8}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;cursor:pointer;border-radius:4px}
+label.opt:hover{background:#f3f6fb}
+label.opt input{margin-top:4px;transform:scale(1.15)}
+label.opt.right{background:#e3f4e4}label.opt.wrong{background:#fbe3e2}
+.exp{margin-top:10px;padding:10px 12px;border-left:4px solid var(--green);background:#f2faf3;font-size:14px}
+.btns{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fafbfc}
+.b{border:1px solid #999;background:#fff;color:#222;padding:7px 12px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.b.green{background:var(--green);border-color:var(--green);color:#fff}
+.b.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+.b.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.b.sub{background:var(--green);border-color:var(--green);color:#fff}
+.b:disabled{opacity:.45;cursor:default}
+.sp{flex:1}
+.side{background:#fff;padding:10px}
+.leg{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-bottom:10px}
+.leg div{display:flex;align-items:center;gap:6px}
+.st{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;font-size:13px;font-weight:700;border:1px solid #aaa;background:var(--grey);color:#222;border-radius:3px;position:relative;flex:none}
+.st.na{background:var(--red);border-color:var(--red);color:#fff;border-radius:3px 3px 12px 12px}
+.st.an{background:var(--green);border-color:var(--green);color:#fff;border-radius:12px 12px 3px 3px}
+.st.mk{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1px solid #fff}
+.st.r{background:var(--green);border-color:var(--green);color:#fff}.st.w{background:var(--red);border-color:var(--red);color:#fff}
+.leg .st{width:26px;height:22px;font-size:11px}
+.palhead{background:var(--blue);color:#fff;padding:5px 8px;font-weight:700;font-size:13px;margin:6px 0}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:7px;max-height:52vh;overflow:auto;padding:2px}
+.pal .st{cursor:pointer;width:100%}
+.pal .st.cur{outline:2px solid #000;outline-offset:1px}
+.card{max-width:900px;margin:18px auto;background:#fff;border:1px solid var(--line);padding:18px 22px}
+.card h2{margin-top:0;color:var(--top)}
+.inst li{margin:5px 0}
+.inst .st{width:30px;height:26px;margin-right:6px;vertical-align:middle}
+table.sum,table.res{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+table.sum td,table.sum th,table.res td,table.res th{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.res td:first-child,table.res th:first-child{text-align:left}
+table.sum th,table.res th{background:#eef2f8}
+.big{font-size:38px;font-weight:700;color:var(--top)}
+.barx{height:8px;background:#e6eaf2;border-radius:4px;overflow:hidden}.barx i{display:block;height:100%;background:var(--blue)}
+input[type=text]{padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:15px;width:100%;max-width:320px}
+.note{font-size:12.5px;color:var(--muted)}
+.hide{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:12px}
+.modal .card{margin:0;max-width:640px;width:100%}
+.flt .b{text-transform:none;font-weight:400}
+/*np*/@media print{#exam,#modal{display:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Unit Test 4: Prose – UGC NET English Study Bundle</div>
+  <div class="cand"><div class="photo">&#128100;</div><div>Candidate Name: <b id="cname">—</b><br>Subject: English (Paper 2)</div></div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<section id="start">
+ <div class="card">
+  <h2>General Instructions</h2>
+  <p class="note">This practice test copies the look of the NTA computer-based test (CBT) screen so that you can practise in the same way. It is not an official NTA test. Verify the current exam pattern and marking with the official NTA notice.</p>
+  <ol class="inst">
+   <li>Total questions: <b id="nq"></b> · Each question carries 2 marks · Duration: <b id="tm"></b> minutes · No negative marking (as in the current UGC NET; verify with the NTA notice).</li>
+   <li>The clock at the top right shows the time left. The test is submitted automatically when the time is over.</li>
+   <li>The Question Palette on the right shows the status of each question:
+    <ul style="list-style:none;padding-left:4px">
+     <li><span class="st">1</span> You have not visited the question yet.</li>
+     <li><span class="st na">2</span> You have not answered the question.</li>
+     <li><span class="st an">3</span> You have answered the question.</li>
+     <li><span class="st mk">4</span> You have NOT answered the question, but have marked it for review.</li>
+     <li><span class="st am">5</span> You have answered the question and marked it for review. <b>Such answers WILL be considered for evaluation.</b></li>
+    </ul></li>
+   <li>To answer: click an option, then click <b>SAVE &amp; NEXT</b>. <b>If you move to another question without saving, your answer is not saved.</b></li>
+   <li><b>SAVE &amp; MARK FOR REVIEW</b> saves your answer and marks the question. <b>MARK FOR REVIEW &amp; NEXT</b> marks it without an answer. <b>CLEAR</b> removes your answer.</li>
+   <li>Click a number in the palette to go straight to that question.</li>
+   <li>Your progress is saved in this browser. If the page closes, open it again and click “Resume”.</li>
+  </ol>
+  <p><label>Your name: <br><input type="text" id="nm" placeholder="Type your name"></label></p>
+  <p><label><input type="checkbox" id="agree"> I have read and understood the instructions.</label></p>
+  <button class="b blue" id="go" disabled>I am ready to begin</button> <button class="b hide" id="resume">Resume saved test</button>
+  <p class="note">© Dr Rajnikant Dodiya · NET Vidya English · For the registered buyer only</p>
+ </div>
+</section>
+
+<!-- TEST -->
+<div id="test" class="hide">
+ <div class="bar2"><span class="sec">English (Paper 2)</span><span class="tl" id="tlbox">Time Left: <span id="timer">--:--</span></span></div>
+ <div class="wrap">
+  <div class="qpane">
+   <div class="qtitle"><span id="qno"></span><small id="qunit"></small></div>
+   <div class="qbody">
+    <div id="psg" class="passage hide"></div>
+    <div class="stem" id="stem"></div>
+    <div id="opts"></div>
+    <div id="expbox"></div>
+   </div>
+   <div class="btns" id="tbtns">
+    <button class="b green" id="saveNext">Save &amp; Next</button>
+    <button class="b" id="clr">Clear</button>
+    <button class="b orange" id="saveMark">Save &amp; Mark for Review</button>
+    <button class="b blue" id="markNext">Mark for Review &amp; Next</button>
+    <span class="sp"></span>
+    <button class="b" id="back">&laquo; Back</button>
+    <button class="b" id="nxt">Next &raquo;</button>
+    <button class="b sub" id="subBtn">Submit</button>
+   </div>
+   <div class="btns hide" id="rbtns">
+    <button class="b" id="rback">&laquo; Back</button>
+    <button class="b" id="rnext">Next &raquo;</button>
+    <span class="sp"></span>
+    <span class="flt">Show:
+     <button class="b" data-f="all">All</button><button class="b" data-f="w">Wrong</button><button class="b" data-f="u">Not attempted</button></span>
+    <button class="b blue" id="backRes">Back to result</button>
+   </div>
+  </div>
+  <div class="side">
+   <div class="leg" id="leg"></div>
+   <div class="palhead">English (Paper 2) – Choose a Question</div>
+   <div class="pal" id="pal"></div>
+  </div>
+ </div>
+</div>
+
+<!-- SUBMIT SUMMARY -->
+<div class="modal hide" id="sumModal"><div class="card">
+ <h2>Exam Summary</h2>
+ <table class="sum" id="sumTbl"></table>
+ <p>Are you sure you want to submit? You cannot change your answers after this.</p>
+ <button class="b sub" id="yesSub">Yes, submit</button> <button class="b" id="noSub">No, go back</button>
+</div></div>
+
+<!-- RESULT -->
+<section id="result" class="hide"><div class="card">
+  <h2>Your Result</h2>
+  <p id="who"></p>
+  <div class="big" id="score"></div>
+  <p id="summary"></p>
+  <h3>Unit-wise performance</h3>
+  <table class="res" id="unitTbl"></table>
+  <p class="note">Tip: revise first the units where your accuracy is below 60%. Then open the review and read every explanation.</p>
+  <p><button class="b blue" id="review">Review answers with explanations</button> <button class="b" id="retake">Retake test</button> <button class="b" onclick="window.print()">Print result</button></p>
+</div></section>
+
+<script>
+const QS = [{"unit": "Unit 4: Non-fictional Prose", "passage": "<p>I have been assured by a very knowing American of my acquaintance in London, that a young healthy child well nursed is at a year old a most delicious, nourishing, and wholesome food, whether stewed, roasted, baked, or boiled; and I make no doubt that it will equally serve in a fricassee or a ragout.</p>", "type": "SG", "stem": "The passage is best described as", "options": ["sincere advice on diet", "a page from a cookery book", "a religious sermon", "savage satire spoken by a calm, straight-faced proposer"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>I have been assured by a very knowing American of my acquaintance in London, that a young healthy child well nursed is at a year old a most delicious, nourishing, and wholesome food, whether stewed, roasted, baked, or boiled; and I make no doubt that it will equally serve in a fricassee or a ragout.</p>", "type": "SG", "stem": "The list “stewed, roasted, baked, or boiled” mainly creates", "options": ["horror through a matter-of-fact, practical tone", "comic relief from a serious argument", "a scientific description", "suspense in a story"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>I have been assured by a very knowing American of my acquaintance in London, that a young healthy child well nursed is at a year old a most delicious, nourishing, and wholesome food, whether stewed, roasted, baked, or boiled; and I make no doubt that it will equally serve in a fricassee or a ragout.</p>", "type": "SG", "stem": "The real target of the work is", "options": ["the heartless exploitation of the Irish poor", "American cooking", "the London theatre", "the Catholic Church in France"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>I have been assured by a very knowing American of my acquaintance in London, that a young healthy child well nursed is at a year old a most delicious, nourishing, and wholesome food, whether stewed, roasted, baked, or boiled; and I make no doubt that it will equally serve in a fricassee or a ragout.</p>", "type": "SG", "stem": "The “I” of the passage is", "options": ["a persona, a self-satisfied “projector”, not Swift speaking directly", "Swift speaking in his own sincere voice", "an American traveller", "a London cook"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>I have been assured by a very knowing American of my acquaintance in London, that a young healthy child well nursed is at a year old a most delicious, nourishing, and wholesome food, whether stewed, roasted, baked, or boiled; and I make no doubt that it will equally serve in a fricassee or a ragout.</p>", "type": "SG", "stem": "<i>A Modest Proposal</i> was published in", "options": ["1729", "1704", "1726", "1745"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>Whoso would be a man must be a nonconformist. … A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines.</p>", "type": "SG", "stem": "“Whoso would be a man must be a nonconformist” means that", "options": ["men must leave the established church", "true manhood needs independence from social conformity", "only rebels deserve respect", "manhood depends on wealth"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>Whoso would be a man must be a nonconformist. … A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines.</p>", "type": "SG", "stem": "The writer attacks", "options": ["all consistency", "philosophy as such", "religion as such", "a foolish kind of consistency"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>Whoso would be a man must be a nonconformist. … A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines.</p>", "type": "SG", "stem": "The passage comes from Emerson’s essay", "options": ["“Nature”", "“Self-Reliance”", "“The American Scholar”", "“The Over-Soul”"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>Whoso would be a man must be a nonconformist. … A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines.</p>", "type": "SG", "stem": "The writer was the leading figure of", "options": ["American Transcendentalism", "the Oxford Movement", "the Harlem Renaissance", "the Lost Generation"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": "<p>Whoso would be a man must be a nonconformist. … A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines.</p>", "type": "SG", "stem": "The style of the passage is best described as", "options": ["digressive and narrative", "dry and legal", "aphoristic and sermon-like", "comic dialogue"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Essays) with List II (Essayists):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “Of Gardens”</td><td>I. Abraham Cowley</td></tr><tr><td>B. “Of Myself”</td><td>II. Francis Bacon</td></tr><tr><td>C. “A Dissertation upon Roast Pig”</td><td>III. William Hazlitt</td></tr><tr><td>D. “On Familiar Style”</td><td>IV. Charles Lamb</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-IV, C-I, D-III", "A-IV, B-I, C-II, D-III", "A-IV, B-I, C-III, D-II", "A-II, B-I, C-IV, D-III"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Autobiographies) with List II (Authors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Father and Son</i></td><td>I. Vladimir Nabokov</td></tr><tr><td>B. <i>Goodbye to All That</i></td><td>II. Edmund Gosse</td></tr><tr><td>C. <i>Speak, Memory</i></td><td>III. Robert Graves</td></tr><tr><td>D. <i>The Education of Henry Adams</i></td><td>IV. Henry Adams</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-IV, C-I, D-III", "A-II, B-I, C-III, D-IV", "A-II, B-III, C-I, D-IV", "A-I, B-IV, C-III, D-II"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Travel books) with List II (Authors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Travels in West Africa</i></td><td>I. Mary Kingsley</td></tr><tr><td>B. <i>The Road to Oxiana</i></td><td>II. Paul Theroux</td></tr><tr><td>C. <i>In Patagonia</i></td><td>III. Robert Byron</td></tr><tr><td>D. <i>The Great Railway Bazaar</i></td><td>IV. Bruce Chatwin</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-II, D-IV", "A-I, B-IV, C-III, D-II", "A-II, B-IV, C-III, D-I", "A-I, B-III, C-IV, D-II"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Periodicals) with List II (Founders or editors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>The Tatler</i></td><td>I. Samuel Johnson</td></tr><tr><td>B. <i>The Rambler</i></td><td>II. T. S. Eliot</td></tr><tr><td>C. <i>The Edinburgh Review</i></td><td>III. Francis Jeffrey</td></tr><tr><td>D. <i>The Criterion</i></td><td>IV. Richard Steele</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-IV, B-I, C-III, D-II", "A-II, B-I, C-III, D-IV", "A-IV, B-I, C-II, D-III", "A-IV, B-II, C-I, D-III"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Phrases) with List II (Victorian writers):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. The “cash nexus”</td><td>I. J. S. Mill</td></tr><tr><td>B. “The tyranny of the majority”</td><td>II. Thomas Carlyle</td></tr><tr><td>C. “There is no wealth but life”</td><td>III. John Ruskin</td></tr><tr><td>D. “Barbarians, Philistines and Populace”</td><td>IV. Matthew Arnold</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-I, C-IV, D-III", "A-II, B-I, C-III, D-IV", "A-II, B-IV, C-III, D-I", "A-III, B-II, C-I, D-IV"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Biographers) with List II (Subjects):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Richard Ellmann</td><td>I. Oscar Wilde</td></tr><tr><td>B. Michael Holroyd</td><td>II. Bernard Shaw</td></tr><tr><td>C. Hermione Lee</td><td>III. Samuel Pepys</td></tr><tr><td>D. Claire Tomalin</td><td>IV. Virginia Woolf</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-IV, D-II", "A-I, B-II, C-IV, D-III", "A-IV, B-II, C-I, D-III", "A-I, B-III, C-II, D-IV"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Works) with List II (Kinds of prose):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Donne’s “Death’s Duel”</td><td>I. A tract on freedom of the press</td></tr><tr><td>B. Bunyan’s <i>The Pilgrim’s Progress</i></td><td>II. A dream allegory</td></tr><tr><td>C. Milton’s <i>Areopagitica</i></td><td>III. A dialogue on fishing</td></tr><tr><td>D. Walton’s <i>The Compleat Angler</i></td><td>IV. A sermon</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-IV, C-I, D-III", "A-IV, B-I, C-II, D-III", "A-I, B-II, C-III, D-IV", "A-IV, B-II, C-I, D-III"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MT", "stem": "Match List I (Works) with List II (Authors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Common Sense</i></td><td>I. Hamilton, Madison and Jay</td></tr><tr><td>B. <i>The Federalist</i></td><td>II. Benjamin Franklin</td></tr><tr><td>C. <i>Poor Richard’s Almanack</i></td><td>III. Thomas Jefferson</td></tr><tr><td>D. <i>Notes on the State of Virginia</i></td><td>IV. Thomas Paine</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-IV, C-II, D-III", "A-III, B-I, C-II, D-IV", "A-I, B-II, C-III, D-IV", "A-IV, B-I, C-II, D-III"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following works of Francis Bacon in the chronological order of publication:<div class='it'>A. <i>Essays</i> (first edition)</div><div class='it'>B. <i>Essays</i> (third, enlarged edition)</div><div class='it'>C. <i>Novum Organum</i></div><div class='it'>D. <i>The Advancement of Learning</i></div><div class='it'>E. <i>New Atlantis</i></div>Choose the correct answer from the options given below:", "options": ["A, C, B, D, E", "A, D, C, B, E", "D, A, C, B, E", "A, D, C, E, B"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following seventeenth-century prose works in the chronological order of publication:<div class='it'>A. <i>Leviathan</i></div><div class='it'>B. <i>Areopagitica</i></div><div class='it'>C. <i>Religio Medici</i> (authorised edition)</div><div class='it'>D. <i>The Compleat Angler</i></div><div class='it'>E. <i>The Pilgrim’s Progress</i></div>Choose the correct answer from the options given below:", "options": ["C, B, A, D, E", "A, C, B, D, E", "C, B, E, D, A", "C, B, A, E, D"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following eighteenth-century prose works in the chronological order of publication:<div class='it'>A. Johnson, <i>The Rambler</i></div><div class='it'>B. Addison and Steele, <i>The Spectator</i></div><div class='it'>C. Burke, <i>A Philosophical Enquiry into … the Sublime and Beautiful</i></div><div class='it'>D. Swift, <i>A Tale of a Tub</i></div><div class='it'>E. Swift, <i>A Modest Proposal</i></div>Choose the correct answer from the options given below:", "options": ["D, B, C, A, E", "D, B, E, C, A", "A, B, E, D, C", "D, B, E, A, C"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following works of political prose in the chronological order of publication:<div class='it'>A. Paine, <i>Rights of Man</i> (Part I)</div><div class='it'>B. Wollstonecraft, <i>A Vindication of the Rights of Woman</i></div><div class='it'>C. Malthus, <i>An Essay on the Principle of Population</i></div><div class='it'>D. Godwin, <i>Political Justice</i></div><div class='it'>E. Burke, <i>Reflections on the Revolution in France</i></div>Choose the correct answer from the options given below:", "options": ["A, B, D, E, C", "E, A, B, D, C", "E, B, D, A, C", "A, B, E, D, C"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following Victorian prose works in the chronological order of publication:<div class='it'>A. Darwin, <i>On the Origin of Species</i></div><div class='it'>B. Ruskin, <i>The Seven Lamps of Architecture</i></div><div class='it'>C. Mill, <i>Utilitarianism</i> (book form)</div><div class='it'>D. Macaulay, <i>The History of England</i>, Vols I–II</div><div class='it'>E. Pater, <i>Studies in the History of the Renaissance</i></div>Choose the correct answer from the options given below:", "options": ["B, D, A, C, E", "D, B, A, C, E", "C, B, A, D, E", "D, A, B, C, E"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following works in the chronological order of publication:<div class='it'>A. Strachey, <i>Eminent Victorians</i></div><div class='it'>B. Woolf, <i>Three Guineas</i></div><div class='it'>C. Orwell, “Politics and the English Language”</div><div class='it'>D. Woolf, <i>The Common Reader</i></div><div class='it'>E. Woolf, <i>A Room of One’s Own</i></div>Choose the correct answer from the options given below:", "options": ["D, E, A, B, C", "A, D, B, C, E", "A, D, E, B, C", "A, D, B, E, C"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following prose works by Indian writers in the chronological order of publication:<div class='it'>A. Nehru, <i>The Discovery of India</i></div><div class='it'>B. V. S. Naipaul, <i>An Area of Darkness</i></div><div class='it'>C. Nehru, <i>Glimpses of World History</i></div><div class='it'>D. Nirad C. Chaudhuri, <i>The Autobiography of an Unknown Indian</i></div><div class='it'>E. Amartya Sen, <i>The Argumentative Indian</i></div>Choose the correct answer from the options given below:", "options": ["C, D, A, B, E", "D, A, C, B, E", "A, C, D, B, E", "C, A, D, B, E"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SQ", "stem": "Arrange the following American prose works in the chronological order of publication:<div class='it'>A. <i>Narrative of the Life of Frederick Douglass</i></div><div class='it'>B. Franklin’s <i>Autobiography</i> (first, French edition)</div><div class='it'>C. Emerson’s <i>Nature</i></div><div class='it'>D. Thoreau’s <i>Walden</i></div><div class='it'>E. Du Bois’s <i>The Souls of Black Folk</i></div>Choose the correct answer from the options given below:", "options": ["B, C, D, A, E", "B, C, D, E, A", "B, C, A, D, E", "B, A, D, E, C"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following prose works were written by Jonathan Swift?<div class='it'>A. <i>An Argument against Abolishing Christianity</i></div><div class='it'>B. <i>A Tale of a Tub</i></div><div class='it'>C. <i>The Shortest-Way with the Dissenters</i></div><div class='it'>D. <i>The Drapier’s Letters</i></div><div class='it'>E. <i>Cato’s Letters</i></div>Choose the correct answer from the options given below:", "options": ["A, B, C and D only", "A, D and E only", "A, B and D only", "A and D only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following were written by T. B. Macaulay?<div class='it'>A. <i>Critical and Historical Essays</i></div><div class='it'>B. <i>Past and Present</i></div><div class='it'>C. <i>The French Revolution: A History</i></div><div class='it'>D. <i>The History of England</i></div><div class='it'>E. The “Minute on Indian Education”</div>Choose the correct answer from the options given below:", "options": ["A, B and D only", "A, D and E only", "A, C, D and E only", "A and D only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following non-fiction works were written by Virginia Woolf?<div class='it'>A. <i>Aspects of the Novel</i></div><div class='it'>B. <i>The Craft of Fiction</i></div><div class='it'>C. <i>The Common Reader</i></div><div class='it'>D. <i>Three Guineas</i></div><div class='it'>E. <i>A Room of One’s Own</i></div>Choose the correct answer from the options given below:", "options": ["D and E only", "C and D only", "C, D and E only", "C and E only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following non-fiction books were written by George Orwell?<div class='it'>A. <i>Goodbye to All That</i></div><div class='it'>B. <i>Homage to Catalonia</i></div><div class='it'>C. <i>The Road to Wigan Pier</i></div><div class='it'>D. <i>Brave New World Revisited</i></div><div class='it'>E. <i>Down and Out in Paris and London</i></div>Choose the correct answer from the options given below:", "options": ["B, C, D and E only", "A, B, C and E only", "B, C and E only", "C, D and E only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following are typical features of the familiar (personal) essay?<div class='it'>A. A first-person voice</div><div class='it'>B. A strict scholarly apparatus of notes</div><div class='it'>C. Free, digressive movement of thought</div><div class='it'>D. A conversational tone</div><div class='it'>E. An impersonal technical style</div>Choose the correct answer from the options given below:", "options": ["C and D only", "A and D only", "A, C and D only", "A, D and E only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following prose works were written by Samuel Johnson?<div class='it'>A. <i>The Idler</i></div><div class='it'>B. <i>Rasselas</i></div><div class='it'>C. <i>The Citizen of the World</i></div><div class='it'>D. <i>A Journey to the Western Islands of Scotland</i></div><div class='it'>E. <i>A Sentimental Journey</i></div>Choose the correct answer from the options given below:", "options": ["A, B and D only", "A, C and D only", "A, B and E only", "B, C and D only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following were written by Charles Lamb (alone or with his sister Mary)?<div class='it'>A. <i>Table-Talk</i></div><div class='it'>B. <i>Last Essays of Elia</i></div><div class='it'>C. <i>Essays of Elia</i></div><div class='it'>D. <i>Tales from Shakespeare</i></div><div class='it'>E. <i>The Plain Speaker</i></div>Choose the correct answer from the options given below:", "options": ["C and D only", "A, B, C and D only", "B, C and D only", "C, D and E only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "MS", "stem": "Which of the following writers are usually called Victorian “sages”?<div class='it'>A. Lewis Carroll</div><div class='it'>B. Thomas Carlyle</div><div class='it'>C. Matthew Arnold</div><div class='it'>D. John Ruskin</div><div class='it'>E. Edward Lear</div>Choose the correct answer from the options given below:", "options": ["A, B and C only", "A, B, C and D only", "B and D only", "B, C and D only"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Izaak Walton’s <i>The Compleat Angler</i> first appeared in 1653.</div><div class='it'><b>Statement II:</b> Charles Cotton later added a second part on fly-fishing.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> <i>Eikon Basilike</i> was presented as the work of Charles I.</div><div class='it'><b>Statement II:</b> Milton answered it in <i>Areopagitica</i>.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Boswell first met Johnson in 1775.</div><div class='it'><b>Statement II:</b> They first met in Tom Davies’s bookshop in London.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Ruskin’s <i>Sesame and Lilies</i> is a novel.</div><div class='it'><b>Statement II:</b> Its lecture “Of Queens’ Gardens” is about gardening.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Bacon’s essays grew longer and fuller in the later editions.</div><div class='it'><b>Reason R:</b> Bacon kept revising and expanding them from 1597 to 1625.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Johnson’s <i>Dictionary</i> illustrates word meanings with quotations from writers.</div><div class='it'><b>Reason R:</b> Johnson was paid 1,500 guineas for the work.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Carlyle’s <i>Sartor Resartus</i> is a philosophical satire.</div><div class='it'><b>Reason R:</b> It is written in plain, simple and even sentences.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Woolf’s <i>Three Guineas</i> is a novel.</div><div class='it'><b>Reason R:</b> It is an essay on war, women and education, written in the form of letters.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "<i>Characters of Virtues and Vices</i> (1608), an early English character-book, was written by", "options": ["John Earle", "Joseph Hall", "Thomas Overbury", "Thomas Fuller"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "“A Letter to a Noble Lord” (1796), a defence of the writer’s pension, was written by", "options": ["Thomas Paine", "William Godwin", "Samuel Johnson", "Edmund Burke"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "The anonymous “Letters of Junius” (1769–72) appeared in", "options": ["<i>The Spectator</i>", "<i>The Public Advertiser</i>", "<i>The Gentleman’s Magazine</i>", "<i>The Times</i>"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "<i>The Gentleman’s Magazine</i> (1731) was founded by", "options": ["Samuel Johnson", "Richard Steele", "Edward Cave", "Daniel Defoe"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "In his <i>Autobiography</i>, J. S. Mill says that his “mental crisis” was eased by reading", "options": ["Byron’s poems", "Wordsworth’s poems", "Carlyle’s essays", "Bentham’s works"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "Darwin’s voyage round the world (1831–36) was made on HMS", "options": ["<i>Beagle</i>", "<i>Endeavour</i>", "<i>Bounty</i>", "<i>Victory</i>"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "Leslie Stephen was the first editor of the", "options": ["<i>Dictionary of National Biography</i>", "<i>Oxford English Dictionary</i>", "<i>Encyclopaedia Britannica</i>", "<i>Cambridge History of English Literature</i>"]}, {"unit": "Unit 4: Non-fictional Prose", "passage": null, "type": "SG", "stem": "“The Lion and the Unicorn: Socialism and the English Genius” (1941) was written by", "options": ["George Orwell", "G. K. Chesterton", "J. B. Priestley", "E. M. Forster"]}];
+const S = JSON.parse(atob("=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".split("").reverse().join("")));
+const MIN = 60, KEY = "nvsb_ut4nta";
+const N = QS.length;
+const fresh = () => ({ans:Array(N).fill(0), mk:Array(N).fill(false), vis:Array(N).fill(false), cur:0, end:0, name:"", done:false});
+let st = fresh(), mode = "test", filter = "all", pick = 0;
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(KEY)); return s && s.ans && s.ans.length === N && s.vis ? s : null; }catch(e){ return null; } }
+$("nq").textContent = N; $("tm").textContent = MIN;
+const saved = load();
+if (saved && !saved.done) $("resume").classList.remove("hide");
+$("agree").onchange = () => { $("go").disabled = !$("agree").checked; };
+$("go").onclick = () => { st = fresh(); st.end = Date.now() + MIN*60000; st.name = $("nm").value.trim(); save(); begin(); };
+$("resume").onclick = () => { st = saved; begin(); };
+if (saved && saved.done) { st = saved; showResult(); }
+
+function status(i){
+  if (st.ans[i] && st.mk[i]) return "am";
+  if (st.mk[i]) return "mk";
+  if (st.ans[i]) return "an";
+  if (st.vis[i]) return "na";
+  return "";
+}
+function counts(){
+  const c = {an:0, na:0, mk:0, am:0, nv:0};
+  for (let i=0;i<N;i++){ const s = status(i); if (s==="") c.nv++; else c[s]++; }
+  return c;
+}
+function legend(){
+  if (mode === "test"){
+    const c = counts();
+    $("leg").innerHTML = `<div><span class="st an">${c.an}</span>Answered</div><div><span class="st na">${c.na}</span>Not Answered</div>
+      <div><span class="st">${c.nv}</span>Not Visited</div><div><span class="st mk">${c.mk}</span>Marked for Review</div>
+      <div style="grid-column:1/3"><span class="st am">${c.am}</span>Answered &amp; Marked for Review (will be considered for evaluation)</div>`;
+  } else {
+    $("leg").innerHTML = `<div><span class="st r">✓</span>Correct</div><div><span class="st w">✗</span>Wrong</div><div><span class="st">–</span>Not attempted</div>`;
+  }
+}
+function begin(){
+  mode = "test";
+  $("cname").textContent = st.name || "Candidate";
+  ["start","result"].forEach(x => $(x).classList.add("hide")); $("test").classList.remove("hide");
+  $("tbtns").classList.remove("hide"); $("rbtns").classList.add("hide"); $("tlbox").classList.remove("hide");
+  buildPal(); go(st.cur); tick(); window.scrollTo(0,0);
+}
+let timerId;
+function tick(){
+  clearInterval(timerId);
+  const f = () => {
+    const left = Math.max(0, st.end - Date.now());
+    const h = Math.floor(left/3600000), m = Math.floor(left%3600000/60000), s = Math.floor(left%60000/1000);
+    $("timer").textContent = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    $("timer").classList.toggle("low", left < 5*60000);
+    if (left <= 0 && mode === "test") { clearInterval(timerId); alert("Time is over. Your test will now be submitted."); finish(); }
+  };
+  f(); timerId = setInterval(f, 1000);
+}
+function visible(){
+  return QS.map((_,i)=>i).filter(i => mode==="test" || filter==="all" || (filter==="w" && st.ans[i] && st.ans[i]!==S.k[i]) || (filter==="u" && !st.ans[i]));
+}
+function buildPal(){
+  const p = $("pal"); p.innerHTML = "";
+  visible().forEach(i => { const b = document.createElement("span"); b.className = "st"; b.textContent = i+1; b.id = "p"+i; b.onclick = () => go(i); p.appendChild(b); });
+  paint();
+}
+function paint(){
+  QS.forEach((_,i) => { const b = $("p"+i); if(!b) return;
+    b.className = "st " + (mode==="test" ? status(i) : (!st.ans[i] ? "" : st.ans[i]===S.k[i] ? "r" : "w"));
+    if (i === st.cur) b.classList.add("cur"); });
+  legend();
+}
+function go(i){
+  st.cur = i; if (mode==="test") st.vis[i] = true;
+  pick = st.ans[i] || 0;
+  const q = QS[i];
+  $("qno").textContent = `Question No. ${i+1}`; $("qunit").textContent = q.unit;
+  if (q.passage) { $("psg").innerHTML = "<b>Read the passage and answer the question.</b>" + q.passage; $("psg").classList.remove("hide"); } else $("psg").classList.add("hide");
+  $("stem").innerHTML = q.stem;
+  const o = $("opts"); o.innerHTML = "";
+  q.options.forEach((t,j) => {
+    const l = document.createElement("label"); l.className = "opt";
+    l.innerHTML = `<input type="radio" name="o" ${pick===j+1?"checked":""} ${mode!=="test"?"disabled":""}><span><b>(${j+1})</b> ${t}</span>`;
+    if (mode === "test") l.querySelector("input").onchange = () => { pick = j+1; };
+    else { if (S.k[i]===j+1) l.classList.add("right"); else if (st.ans[i]===j+1) l.classList.add("wrong"); }
+    o.appendChild(l);
+  });
+  $("expbox").innerHTML = mode==="review" ? `<div class="exp"><b>Correct answer: (${S.k[i]})</b>${st.ans[i] ? (st.ans[i]===S.k[i] ? " – you got it right." : ` – you chose (${st.ans[i]}).`) : " – not attempted."}${S.e[i] ? "<br>"+S.e[i] : ""}</div>` : "";
+  const v = visible(), k = v.indexOf(i);
+  ["back","rback"].forEach(x => $(x).disabled = k <= 0); ["nxt","rnext"].forEach(x => $(x).disabled = k >= v.length-1);
+  if (mode==="test") save(); paint();
+}
+function nextQ(){ const v = visible(), k = v.indexOf(st.cur); if (k < v.length-1) go(v[k+1]); else go(st.cur); }
+function prevQ(){ const v = visible(), k = v.indexOf(st.cur); if (k > 0) go(v[k-1]); }
+$("saveNext").onclick = () => { if (!pick) { alert("Please choose an option first, or use NEXT to skip."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = false; save(); nextQ(); };
+$("saveMark").onclick = () => { if (!pick) { alert("Please choose an option first."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = true; save(); nextQ(); };
+$("markNext").onclick = () => { st.mk[st.cur] = true; save(); nextQ(); };
+$("clr").onclick = () => { st.ans[st.cur] = 0; pick = 0; save(); go(st.cur); };
+$("nxt").onclick = nextQ; $("back").onclick = prevQ; $("rnext").onclick = nextQ; $("rback").onclick = prevQ;
+$("subBtn").onclick = () => {
+  const c = counts();
+  $("sumTbl").innerHTML = `<tr><th>Section</th><th>No. of Questions</th><th>Answered</th><th>Not Answered</th><th>Marked for Review</th><th>Answered &amp; Marked for Review</th><th>Not Visited</th></tr>
+    <tr><td>English (Paper 2)</td><td>${N}</td><td>${c.an}</td><td>${c.na}</td><td>${c.mk}</td><td>${c.am}</td><td>${c.nv}</td></tr>`;
+  $("sumModal").classList.remove("hide");
+};
+$("noSub").onclick = () => $("sumModal").classList.add("hide");
+$("yesSub").onclick = () => { $("sumModal").classList.add("hide"); finish(); };
+function finish(){ st.done = true; save(); clearInterval(timerId); showResult(); }
+function showResult(){
+  mode = "result";
+  $("test").classList.add("hide"); $("start").classList.add("hide"); $("result").classList.remove("hide");
+  let r=0,w=0,u=0; const units = {};
+  QS.forEach((q,i) => { const U = units[q.unit] = units[q.unit] || {t:0,r:0};
+    U.t++; if(!st.ans[i]) u++; else if (st.ans[i]===S.k[i]) {r++;U.r++;} else w++; });
+  $("cname").textContent = st.name || "Candidate";
+  $("who").textContent = st.name ? `Candidate: ${st.name}` : "";
+  $("score").textContent = `${r*2} / ${N*2}`;
+  $("summary").textContent = `Correct ${r} · Wrong ${w} · Not attempted ${u} · Accuracy ${r+w ? Math.round(100*r/(r+w)) : 0}%`;
+  $("unitTbl").innerHTML = "<tr><th>Unit</th><th>Correct</th><th>Marks</th><th style='width:35%'>Accuracy</th></tr>" +
+    Object.entries(units).map(([k,U]) => { const p = Math.round(100*U.r/U.t); return `<tr><td>${k}</td><td>${U.r} / ${U.t}</td><td>${U.r*2}</td><td><div class="barx"><i style="width:${p}%"></i></div>${p}%</td></tr>`; }).join("");
+  window.scrollTo(0,0);
+}
+$("review").onclick = () => { mode = "review"; filter = "all";
+  $("result").classList.add("hide"); $("test").classList.remove("hide");
+  $("tbtns").classList.add("hide"); $("rbtns").classList.remove("hide"); $("tlbox").classList.add("hide");
+  buildPal(); go(0); };
+document.querySelectorAll(".flt [data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; buildPal(); const v = visible(); if (v.length) go(v[0]); else { $("stem").textContent = "No questions in this group."; $("opts").innerHTML=""; $("expbox").innerHTML=""; } });
+$("backRes").onclick = showResult;
+$("retake").onclick = () => { if (confirm("Start a fresh attempt? Your current result will be cleared.")) { try{ localStorage.removeItem(KEY); }catch(e){} location.reload(); } };
+</script>
+</body>
+</html>

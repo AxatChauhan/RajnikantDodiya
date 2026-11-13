@@ -12,7 +12,8 @@ Allow: /policies
 Allow: /dr-rajnikant-dodiya.jpg
 Allow: /sample-materials/
 Disallow: /api/
-Disallow: /api/store/admin
+Disallow: /study-vault/
+Disallow: /api/store/
 Disallow: /test-hall/runner.html?mode=private
 
 # Sitemap Index

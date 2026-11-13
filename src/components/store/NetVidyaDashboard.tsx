@@ -552,23 +552,38 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleDownloadFile(file)}
-                    disabled={downloadingId === file.id}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
-                  >
-                    {downloadingId === file.id ? (
-                      <>
-                        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Signing Link...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-4 h-4" />
-                        <span>Download PDF</span>
-                      </>
+                  <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                    {file.sampleUrl && (
+                      <button
+                        onClick={() => {
+                          window.open(file.sampleUrl, '_blank');
+                          markItemCompleted(file.id, 'file', file.title);
+                        }}
+                        className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        <span>Open Online Reader</span>
+                      </button>
                     )}
-                  </button>
+
+                    <button
+                      onClick={() => handleDownloadFile(file)}
+                      disabled={downloadingId === file.id}
+                      className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {downloadingId === file.id ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Signing Link...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4" />
+                          <span>Download PDF</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

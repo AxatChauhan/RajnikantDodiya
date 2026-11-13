@@ -100,17 +100,18 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
 
           <div className="pt-6 space-y-2">
             <button
-              onClick={() => window.open('/sample-materials/demo-test.html', '_blank')}
+              onClick={() => window.open('/sample-materials/ugc-demo/Free_Demo_Test.html', '_blank')}
               className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-sm"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Launch Free Demo CBT Test</span>
             </button>
             <button
-              onClick={() => setIsDemoRunning(true)}
+              onClick={() => window.open('/sample-materials/ugc-demo/sample_notes/index.html', '_blank')}
               className="w-full py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
             >
-              <span>Open in In-Page Modal</span>
+              <BookOpen className="w-4 h-4" />
+              <span>Read Free Sample Notes (15 Pages)</span>
             </button>
           </div>
         </div>

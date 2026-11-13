@@ -171,7 +171,10 @@ export function unmaskAnswer(masked: string | number): number {
 export const AUTHOR_EMAILS = [
   'rajnikantdodiya@hmpenglish.com',
   'rajnikantdodiya2@gmail.com',
-  'rajnikant.dodiya@spuvvn.edu'
+  'rajnikant.dodiya@spuvvn.edu',
+  'admin@rajnikantdodiya.com',
+  'rajnikantdodiya@gmail.com',
+  'dr.rajnikantdodiya@gmail.com'
 ];
 
 export function isAuthorEmail(email: string): boolean {

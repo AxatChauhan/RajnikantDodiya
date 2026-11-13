@@ -1,0 +1,276 @@
+{
+ "product": "UGC NET English Study Bundle",
+ "access_until": "2026-12-31",
+ "time_zone": "Asia/Kolkata",
+ "note": "Server must check login + release date before serving any file. 'ready': false = file not yet delivered by Dr Dodiya.",
+ "free": [
+  {
+   "file": "1_Free/sample_notes/index.html",
+   "title": "Free Sample – Notes and MCQs"
+  },
+  {
+   "file": "1_Free/Free_Demo_Test.html",
+   "title": "Free Demo Test (10 Qs)"
+  }
+ ],
+ "reading": [
+  {
+   "release": "2026-11-15",
+   "file": "3_Reading/ebook/index.html",
+   "title": "Complete E-book (283 pages)"
+  },
+  {
+   "release": "2026-11-15",
+   "file": "3_Reading/revision_kit/index.html",
+   "title": "Last 30 Days Revision Kit (29 pages)"
+  },
+  {
+   "release": "2026-11-15",
+   "file": "3_Reading/pyq_analysis/index.html",
+   "title": "PYQ Trend Analysis (35 pages)"
+  }
+ ],
+ "tests": [
+  {
+   "release": "2026-11-15",
+   "file": "2_Tests/NET_Mock_01.html",
+   "title": "NET Mock 1",
+   "qs": 100,
+   "minutes": 120,
+   "type": "NET Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-15",
+   "file": "2_Tests/Practice_Mock_A.html",
+   "title": "Practice Mock A",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-15",
+   "file": "2_Tests/Unit_Test_01_Drama.html",
+   "title": "Unit Test 1: Drama",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-15",
+   "file": "2_Tests/Unit_Test_02_Poetry.html",
+   "title": "Unit Test 2: Poetry",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-17",
+   "file": "2_Tests/Unit_Test_03_Fiction.html",
+   "title": "Unit Test 3: Fiction and Short Story",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-17",
+   "file": "2_Tests/Unit_Test_04_Prose.html",
+   "title": "Unit Test 4: Non-fictional Prose",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-17",
+   "file": "2_Tests/Practice_Mock_B.html",
+   "title": "Practice Mock B",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-19",
+   "file": "2_Tests/Unit_Test_05_Language.html",
+   "title": "Unit Test 5: Language and Pedagogy",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-19",
+   "file": "2_Tests/Unit_Test_06_English_in_India.html",
+   "title": "Unit Test 6: English in India",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-19",
+   "file": "2_Tests/Practice_Mock_C.html",
+   "title": "Practice Mock C",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-20",
+   "file": "2_Tests/NET_Mock_02.html",
+   "title": "NET Mock 2",
+   "qs": 100,
+   "minutes": 120,
+   "type": "NET Mock",
+   "ready": false
+  },
+  {
+   "release": "2026-11-22",
+   "file": "2_Tests/Unit_Test_07_Cultural_Studies.html",
+   "title": "Unit Test 7: Cultural Studies",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-22",
+   "file": "2_Tests/Unit_Test_08_Criticism.html",
+   "title": "Unit Test 8: Literary Criticism",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-22",
+   "file": "2_Tests/Practice_Mock_D.html",
+   "title": "Practice Mock D",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-24",
+   "file": "2_Tests/Unit_Test_09_Theory.html",
+   "title": "Unit Test 9: Literary Theory",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-24",
+   "file": "2_Tests/Unit_Test_10_Research.html",
+   "title": "Unit Test 10: Research Methods",
+   "qs": 50,
+   "minutes": 60,
+   "type": "Unit Test",
+   "ready": true
+  },
+  {
+   "release": "2026-11-24",
+   "file": "2_Tests/Practice_Mock_E.html",
+   "title": "Practice Mock E",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-27",
+   "file": "2_Tests/NET_Mock_03.html",
+   "title": "NET Mock 3",
+   "qs": 100,
+   "minutes": 120,
+   "type": "NET Mock",
+   "ready": false
+  },
+  {
+   "release": "2026-11-27",
+   "file": "2_Tests/Practice_Mock_F.html",
+   "title": "Practice Mock F",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-11-30",
+   "file": "2_Tests/Practice_Mock_G.html",
+   "title": "Practice Mock G",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-12-02",
+   "file": "2_Tests/Practice_Mock_H.html",
+   "title": "Practice Mock H",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-12-04",
+   "file": "2_Tests/NET_Mock_04.html",
+   "title": "NET Mock 4",
+   "qs": 100,
+   "minutes": 120,
+   "type": "NET Mock",
+   "ready": false
+  },
+  {
+   "release": "2026-12-04",
+   "file": "2_Tests/Practice_Mock_I.html",
+   "title": "Practice Mock I",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-12-06",
+   "file": "2_Tests/Practice_Mock_J.html",
+   "title": "Practice Mock J",
+   "qs": 100,
+   "minutes": 120,
+   "type": "Practice Mock",
+   "ready": true
+  },
+  {
+   "release": "2026-12-09",
+   "file": "2_Tests/NET_Mock_05.html",
+   "title": "NET Mock 5",
+   "qs": 100,
+   "minutes": 120,
+   "type": "NET Mock",
+   "ready": false
+  },
+  {
+   "release": "2026-12-13",
+   "file": "2_Tests/NET_Mock_06.html",
+   "title": "NET Mock 6 (final)",
+   "qs": 100,
+   "minutes": 120,
+   "type": "NET Mock",
+   "ready": false
+  },
+  {
+   "release": "2026-12-13",
+   "file": "3_Reading/last_week_sheet/index.html",
+   "title": "Last-week Revision Sheet",
+   "type": "Reading",
+   "ready": false
+  }
+ ]
+}

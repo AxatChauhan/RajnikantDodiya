@@ -91,7 +91,7 @@ function AppInner() {
   }, []);
 
   const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
-  const { alertBanner, layoutSettings, profile } = useSiteContent();
+  const { alertBanner, layoutSettings, profile, openStudio } = useSiteContent();
   const { buyerSession } = useNetVidyaStore();
 
   const handleNavigate = (tab: MainTab, subSection?: string) => {

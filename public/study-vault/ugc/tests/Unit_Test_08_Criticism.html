@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Test 8: Criticism – UGC NET English Study Bundle</title>
+<style>
+:root{--ink:#222;--muted:#666;--line:#cfd4dc;--bg:#eef1f5;--top:#2b4c7e;--grey:#e0e0e0;--red:#d9534f;--green:#3c9f40;--purple:#6f42c1;--orange:#f0ad4e;--blue:#2d6cb5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.5}
+.top{background:var(--top);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+.top .logo{font-weight:700;font-size:15px;flex:1;min-width:200px}
+.cand{display:flex;align-items:center;gap:10px;font-size:13px}
+.photo{width:42px;height:48px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#888;font-size:22px}
+.bar2{background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:6px 14px;flex-wrap:wrap;gap:8px}
+.bar2 .sec{background:var(--blue);color:#fff;padding:4px 12px;border-radius:3px;font-size:13px}
+.tl{font-weight:700}.tl span{background:#000;color:#fff;padding:3px 10px;border-radius:3px;font-variant-numeric:tabular-nums;margin-left:6px}
+.tl span.low{background:var(--red)}
+.wrap{display:grid;grid-template-columns:1fr 300px;gap:0;min-height:calc(100vh - 110px)}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.qpane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.qtitle{padding:8px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qtitle small{font-weight:400;color:var(--muted)}
+.qbody{padding:14px;flex:1;overflow:auto}
+.passage{background:#f7f9fc;border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;max-height:260px;overflow:auto;font-size:14px}
+.passage p{margin:.3em 0}
+.stem{margin-bottom:10px}.stem .it{margin:3px 0 3px 16px}
+table.lt{border-collapse:collapse;margin:8px 0;width:100%;font-size:14px}
+table.lt td,table.lt th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.lt th{background:#eef2f8}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;cursor:pointer;border-radius:4px}
+label.opt:hover{background:#f3f6fb}
+label.opt input{margin-top:4px;transform:scale(1.15)}
+label.opt.right{background:#e3f4e4}label.opt.wrong{background:#fbe3e2}
+.exp{margin-top:10px;padding:10px 12px;border-left:4px solid var(--green);background:#f2faf3;font-size:14px}
+.btns{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fafbfc}
+.b{border:1px solid #999;background:#fff;color:#222;padding:7px 12px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.b.green{background:var(--green);border-color:var(--green);color:#fff}
+.b.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+.b.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.b.sub{background:var(--green);border-color:var(--green);color:#fff}
+.b:disabled{opacity:.45;cursor:default}
+.sp{flex:1}
+.side{background:#fff;padding:10px}
+.leg{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-bottom:10px}
+.leg div{display:flex;align-items:center;gap:6px}
+.st{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;font-size:13px;font-weight:700;border:1px solid #aaa;background:var(--grey);color:#222;border-radius:3px;position:relative;flex:none}
+.st.na{background:var(--red);border-color:var(--red);color:#fff;border-radius:3px 3px 12px 12px}
+.st.an{background:var(--green);border-color:var(--green);color:#fff;border-radius:12px 12px 3px 3px}
+.st.mk{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1px solid #fff}
+.st.r{background:var(--green);border-color:var(--green);color:#fff}.st.w{background:var(--red);border-color:var(--red);color:#fff}
+.leg .st{width:26px;height:22px;font-size:11px}
+.palhead{background:var(--blue);color:#fff;padding:5px 8px;font-weight:700;font-size:13px;margin:6px 0}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:7px;max-height:52vh;overflow:auto;padding:2px}
+.pal .st{cursor:pointer;width:100%}
+.pal .st.cur{outline:2px solid #000;outline-offset:1px}
+.card{max-width:900px;margin:18px auto;background:#fff;border:1px solid var(--line);padding:18px 22px}
+.card h2{margin-top:0;color:var(--top)}
+.inst li{margin:5px 0}
+.inst .st{width:30px;height:26px;margin-right:6px;vertical-align:middle}
+table.sum,table.res{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+table.sum td,table.sum th,table.res td,table.res th{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.res td:first-child,table.res th:first-child{text-align:left}
+table.sum th,table.res th{background:#eef2f8}
+.big{font-size:38px;font-weight:700;color:var(--top)}
+.barx{height:8px;background:#e6eaf2;border-radius:4px;overflow:hidden}.barx i{display:block;height:100%;background:var(--blue)}
+input[type=text]{padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:15px;width:100%;max-width:320px}
+.note{font-size:12.5px;color:var(--muted)}
+.hide{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:12px}
+.modal .card{margin:0;max-width:640px;width:100%}
+.flt .b{text-transform:none;font-weight:400}
+/*np*/@media print{#exam,#modal{display:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Unit Test 8: Criticism – UGC NET English Study Bundle</div>
+  <div class="cand"><div class="photo">&#128100;</div><div>Candidate Name: <b id="cname">—</b><br>Subject: English (Paper 2)</div></div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<section id="start">
+ <div class="card">
+  <h2>General Instructions</h2>
+  <p class="note">This practice test copies the look of the NTA computer-based test (CBT) screen so that you can practise in the same way. It is not an official NTA test. Verify the current exam pattern and marking with the official NTA notice.</p>
+  <ol class="inst">
+   <li>Total questions: <b id="nq"></b> · Each question carries 2 marks · Duration: <b id="tm"></b> minutes · No negative marking (as in the current UGC NET; verify with the NTA notice).</li>
+   <li>The clock at the top right shows the time left. The test is submitted automatically when the time is over.</li>
+   <li>The Question Palette on the right shows the status of each question:
+    <ul style="list-style:none;padding-left:4px">
+     <li><span class="st">1</span> You have not visited the question yet.</li>
+     <li><span class="st na">2</span> You have not answered the question.</li>
+     <li><span class="st an">3</span> You have answered the question.</li>
+     <li><span class="st mk">4</span> You have NOT answered the question, but have marked it for review.</li>
+     <li><span class="st am">5</span> You have answered the question and marked it for review. <b>Such answers WILL be considered for evaluation.</b></li>
+    </ul></li>
+   <li>To answer: click an option, then click <b>SAVE &amp; NEXT</b>. <b>If you move to another question without saving, your answer is not saved.</b></li>
+   <li><b>SAVE &amp; MARK FOR REVIEW</b> saves your answer and marks the question. <b>MARK FOR REVIEW &amp; NEXT</b> marks it without an answer. <b>CLEAR</b> removes your answer.</li>
+   <li>Click a number in the palette to go straight to that question.</li>
+   <li>Your progress is saved in this browser. If the page closes, open it again and click “Resume”.</li>
+  </ol>
+  <p><label>Your name: <br><input type="text" id="nm" placeholder="Type your name"></label></p>
+  <p><label><input type="checkbox" id="agree"> I have read and understood the instructions.</label></p>
+  <button class="b blue" id="go" disabled>I am ready to begin</button> <button class="b hide" id="resume">Resume saved test</button>
+  <p class="note">© Dr Rajnikant Dodiya · NET Vidya English · For the registered buyer only</p>
+ </div>
+</section>
+
+<!-- TEST -->
+<div id="test" class="hide">
+ <div class="bar2"><span class="sec">English (Paper 2)</span><span class="tl" id="tlbox">Time Left: <span id="timer">--:--</span></span></div>
+ <div class="wrap">
+  <div class="qpane">
+   <div class="qtitle"><span id="qno"></span><small id="qunit"></small></div>
+   <div class="qbody">
+    <div id="psg" class="passage hide"></div>
+    <div class="stem" id="stem"></div>
+    <div id="opts"></div>
+    <div id="expbox"></div>
+   </div>
+   <div class="btns" id="tbtns">
+    <button class="b green" id="saveNext">Save &amp; Next</button>
+    <button class="b" id="clr">Clear</button>
+    <button class="b orange" id="saveMark">Save &amp; Mark for Review</button>
+    <button class="b blue" id="markNext">Mark for Review &amp; Next</button>
+    <span class="sp"></span>
+    <button class="b" id="back">&laquo; Back</button>
+    <button class="b" id="nxt">Next &raquo;</button>
+    <button class="b sub" id="subBtn">Submit</button>
+   </div>
+   <div class="btns hide" id="rbtns">
+    <button class="b" id="rback">&laquo; Back</button>
+    <button class="b" id="rnext">Next &raquo;</button>
+    <span class="sp"></span>
+    <span class="flt">Show:
+     <button class="b" data-f="all">All</button><button class="b" data-f="w">Wrong</button><button class="b" data-f="u">Not attempted</button></span>
+    <button class="b blue" id="backRes">Back to result</button>
+   </div>
+  </div>
+  <div class="side">
+   <div class="leg" id="leg"></div>
+   <div class="palhead">English (Paper 2) – Choose a Question</div>
+   <div class="pal" id="pal"></div>
+  </div>
+ </div>
+</div>
+
+<!-- SUBMIT SUMMARY -->
+<div class="modal hide" id="sumModal"><div class="card">
+ <h2>Exam Summary</h2>
+ <table class="sum" id="sumTbl"></table>
+ <p>Are you sure you want to submit? You cannot change your answers after this.</p>
+ <button class="b sub" id="yesSub">Yes, submit</button> <button class="b" id="noSub">No, go back</button>
+</div></div>
+
+<!-- RESULT -->
+<section id="result" class="hide"><div class="card">
+  <h2>Your Result</h2>
+  <p id="who"></p>
+  <div class="big" id="score"></div>
+  <p id="summary"></p>
+  <h3>Unit-wise performance</h3>
+  <table class="res" id="unitTbl"></table>
+  <p class="note">Tip: revise first the units where your accuracy is below 60%. Then open the review and read every explanation.</p>
+  <p><button class="b blue" id="review">Review answers with explanations</button> <button class="b" id="retake">Retake test</button> <button class="b" onclick="window.print()">Print result</button></p>
+</div></section>
+
+<script>
+const QS = [{"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Greek critical terms) with List II (Meanings):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Mimesis</td><td>I. Purgation or clarification of pity and fear</td></tr><tr><td>B. Katharsis</td><td>II. Narration by a narrator rather than direct enactment</td></tr><tr><td>C. Hamartia</td><td>III. Imitation or representation</td></tr><tr><td>D. Diegesis</td><td>IV. The tragic error or flaw of judgement</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-I, D-II", "A-III, B-I, C-IV, D-II", "A-I, B-III, C-IV, D-II", "A-IV, B-II, C-I, D-III"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Renaissance critics) with List II (Works):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Thomas Wilson</td><td>I. <i>The Arte of Rhetorique</i></td></tr><tr><td>B. Francis Meres</td><td>II. <i>A Defence of Poetry, Music and Stage Plays</i></td></tr><tr><td>C. Thomas Lodge</td><td>III. “A Brief Apology for Poetry” (preface to <i>Orlando Furioso</i>)</td></tr><tr><td>D. Sir John Harington</td><td>IV. <i>Palladis Tamia</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-IV, C-III, D-II", "A-I, B-IV, C-II, D-III", "A-I, B-III, C-II, D-IV", "A-IV, B-III, C-I, D-II"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Neoclassical critics) with List II (Ideas or phrases):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Thomas Rymer</td><td>I. Essays on true and false wit in <i>The Spectator</i></td></tr><tr><td>B. Alexander Pope</td><td>II. “Poetic justice”</td></tr><tr><td>C. John Dryden</td><td>III. “Here is God’s plenty” (on Chaucer)</td></tr><tr><td>D. Joseph Addison</td><td>IV. “True wit is Nature to advantage dressed”</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-IV, B-II, C-III, D-I", "A-II, B-IV, C-I, D-III", "A-IV, B-III, C-I, D-II", "A-II, B-IV, C-III, D-I"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Romantic writers) with List II (Critical ideas):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. John Keats</td><td>I. The literature of knowledge and the literature of power</td></tr><tr><td>B. William Hazlitt</td><td>II. “Without Contraries is no progression”</td></tr><tr><td>C. Thomas De Quincey</td><td>III. Gusto</td></tr><tr><td>D. William Blake</td><td>IV. Negative capability</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-IV, D-II", "A-IV, B-III, C-II, D-I", "A-II, B-I, C-III, D-IV", "A-IV, B-III, C-I, D-II"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Victorian critics) with List II (Works):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Walter Pater</td><td>I. <i>Essays in Criticism</i></td></tr><tr><td>B. Matthew Arnold</td><td>II. <i>Appreciations</i></td></tr><tr><td>C. John Ruskin</td><td>III. <i>Renaissance in Italy</i></td></tr><tr><td>D. John Addington Symonds</td><td>IV. <i>Modern Painters</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-I, C-IV, D-III", "A-II, B-III, C-IV, D-I", "A-I, B-II, C-IV, D-III", "A-III, B-IV, C-II, D-I"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Critics) with List II (Ideas):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. F. R. Leavis</td><td>I. The fallacy of imitative form</td></tr><tr><td>B. T. S. Eliot</td><td>II. The auditory imagination</td></tr><tr><td>C. Yvor Winters</td><td>III. Language as gesture</td></tr><tr><td>D. R. P. Blackmur</td><td>IV. “The Great Tradition” of the English novel</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-II, C-I, D-IV", "A-IV, B-II, C-I, D-III", "A-IV, B-II, C-III, D-I", "A-I, B-IV, C-III, D-II"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Critical circles or schools) with List II (Key figures):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. The Geneva School (critics of consciousness)</td><td>I. R. S. Crane</td></tr><tr><td>B. The Prague Linguistic Circle</td><td>II. Jan Mukařovský</td></tr><tr><td>C. The Moscow Linguistic Circle</td><td>III. Georges Poulet</td></tr><tr><td>D. The Chicago School</td><td>IV. Roman Jakobson</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-II, D-I", "A-III, B-II, C-IV, D-I", "A-IV, B-II, C-III, D-I", "A-I, B-IV, C-II, D-III"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Critical books) with List II (Authors):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Love and Death in the American Novel</i></td><td>I. Leslie Fiedler</td></tr><tr><td>B. <i>Axel’s Castle</i></td><td>II. F. O. Matthiessen</td></tr><tr><td>C. <i>American Renaissance</i></td><td>III. Richard Chase</td></tr><tr><td>D. <i>The American Novel and Its Tradition</i></td><td>IV. Edmund Wilson</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-II, D-I", "A-I, B-IV, C-II, D-III", "A-I, B-IV, C-III, D-II", "A-II, B-I, C-III, D-IV"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MT", "stem": "Match List I (Rasas) with List II (Dominant emotions, <i>sthayibhavas</i>):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Shringara</td><td>I. Anger (<i>krodha</i>)</td></tr><tr><td>B. Karuna</td><td>II. Fear (<i>bhaya</i>)</td></tr><tr><td>C. Raudra</td><td>III. Sorrow (<i>shoka</i>)</td></tr><tr><td>D. Bhayanaka</td><td>IV. Love (<i>rati</i>)</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-IV, B-I, C-III, D-II", "A-III, B-IV, C-I, D-II", "A-II, B-IV, C-I, D-III", "A-IV, B-III, C-I, D-II"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following critical works in chronological order:<div class='it'>A. Castelvetro, commentary on Aristotle’s <i>Poetics</i></div><div class='it'>B. Dante, <i>De vulgari eloquentia</i></div><div class='it'>C. Boccaccio, <i>Genealogy of the Gentile Gods</i></div><div class='it'>D. Scaliger, <i>Poetices libri septem</i></div><div class='it'>E. Sidney, <i>An Apology for Poetry</i> (published)</div>Choose the correct answer from the options given below:", "options": ["B, C, D, A, E", "B, C, A, D, E", "B, D, C, A, E", "B, C, D, E, A"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following works of English neoclassical criticism in chronological order:<div class='it'>A. Pope, <i>An Essay on Criticism</i></div><div class='it'>B. Rymer, <i>The Tragedies of the Last Age</i></div><div class='it'>C. Addison, “The Pleasures of the Imagination”</div><div class='it'>D. Dennis, <i>The Grounds of Criticism in Poetry</i></div><div class='it'>E. Dryden, <i>Of Dramatic Poesy</i></div>Choose the correct answer from the options given below:", "options": ["C, B, D, A, E", "E, B, D, A, C", "B, E, D, A, C", "A, E, B, D, C"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following texts of aestheticism in chronological order:<div class='it'>A. Poe, “The Poetic Principle”</div><div class='it'>B. Wilde, <i>Intentions</i></div><div class='it'>C. Pater, <i>Studies in the History of the Renaissance</i></div><div class='it'>D. Gautier, Preface to <i>Mademoiselle de Maupin</i></div><div class='it'>E. Whistler, the “Ten O’Clock” lecture</div>Choose the correct answer from the options given below:", "options": ["D, C, A, E, B", "A, C, E, D, B", "D, A, C, B, E", "D, A, C, E, B"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following books of Frank Kermode in the chronological order of publication:<div class='it'>A. <i>Forms of Attention</i></div><div class='it'>B. <i>Shakespeare’s Language</i></div><div class='it'>C. <i>The Genesis of Secrecy</i></div><div class='it'>D. <i>The Sense of an Ending</i></div><div class='it'>E. <i>Romantic Image</i></div>Choose the correct answer from the options given below:", "options": ["D, E, C, A, B", "C, D, E, A, B", "E, D, C, B, A", "E, D, C, A, B"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following books of Lionel Trilling in the chronological order of publication:<div class='it'>A. <i>The Opposing Self</i></div><div class='it'>B. <i>Matthew Arnold</i></div><div class='it'>C. <i>Sincerity and Authenticity</i></div><div class='it'>D. <i>The Liberal Imagination</i></div><div class='it'>E. <i>Beyond Culture</i></div>Choose the correct answer from the options given below:", "options": ["B, D, E, A, C", "B, C, A, E, D", "B, D, A, E, C", "B, A, D, E, C"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following writings on tragedy in chronological order:<div class='it'>A. Aristotle, <i>Poetics</i></div><div class='it'>B. Hegel, <i>Lectures on Aesthetics</i> (published)</div><div class='it'>C. Bradley, <i>Shakespearean Tragedy</i></div><div class='it'>D. Steiner, <i>The Death of Tragedy</i></div><div class='it'>E. Nietzsche, <i>The Birth of Tragedy</i></div>Choose the correct answer from the options given below:", "options": ["A, B, C, E, D", "A, C, B, E, D", "A, B, E, C, D", "A, C, E, B, D"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following writings on comedy and laughter in chronological order:<div class='it'>A. Frye, “The Argument of Comedy”</div><div class='it'>B. Freud, <i>Jokes and Their Relation to the Unconscious</i></div><div class='it'>C. Meredith, “An Essay on Comedy”</div><div class='it'>D. Bergson, <i>Laughter</i></div><div class='it'>E. Bakhtin, <i>Rabelais and His World</i> (Russian)</div>Choose the correct answer from the options given below:", "options": ["C, D, B, A, E", "A, C, D, B, E", "C, B, D, A, E", "C, E, B, A, D"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following critical journals in the order in which they were founded:<div class='it'>A. <i>The Kenyon Review</i></div><div class='it'>B. <i>New Literary History</i></div><div class='it'>C. <i>Essays in Criticism</i></div><div class='it'>D. <i>Scrutiny</i></div><div class='it'>E. <i>The Criterion</i></div>Choose the correct answer from the options given below:", "options": ["E, D, A, B, C", "B, D, A, C, E", "E, D, A, C, B", "E, A, D, C, B"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SQ", "stem": "Arrange the following writings on the sublime in chronological order:<div class='it'>A. Longinus, <i>On the Sublime</i></div><div class='it'>B. Burke, <i>A Philosophical Enquiry into … the Sublime and Beautiful</i></div><div class='it'>C. Lyotard, “The Sublime and the Avant-Garde”</div><div class='it'>D. Kant, <i>Critique of Judgment</i></div><div class='it'>E. Boileau’s French translation of Longinus</div>Choose the correct answer from the options given below:", "options": ["A, E, B, D, C", "A, B, E, D, C", "E, A, B, D, C", "B, E, A, D, C"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following arguments are made by Sidney in <i>An Apology for Poetry</i>?<div class='it'>A. Poetry is the oldest form of learning</div><div class='it'>B. Poetry both teaches and delights</div><div class='it'>C. Poets should be banished from the state</div><div class='it'>D. Rhyme is a barbarous invention</div><div class='it'>E. The poet creates a “golden” world better than nature’s “brazen” one</div>Choose the correct answer from the options given below:", "options": ["A, B, C and E only", "A and E only", "A, D and E only", "A, B and E only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following are critical works of S. T. Coleridge?<div class='it'>A. <i>Table Talk</i></div><div class='it'>B. <i>Anima Poetae</i></div><div class='it'>C. <i>The Spirit of the Age</i></div><div class='it'>D. <i>Biographia Literaria</i></div><div class='it'>E. <i>Lectures on Shakespeare</i></div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "A, C, D and E only", "B, C, D and E only", "A, B, C, D and E"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following terms come from essays by Wimsatt and Beardsley?<div class='it'>A. The objective correlative</div><div class='it'>B. The intentional fallacy</div><div class='it'>C. The affective fallacy</div><div class='it'>D. Negative capability</div><div class='it'>E. The heresy of paraphrase</div>Choose the correct answer from the options given below:", "options": ["B and E only", "B and C only", "B and D only", "C and D only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following ideas are found in Walter Pater?<div class='it'>A. Art for art’s sake</div><div class='it'>B. High seriousness</div><div class='it'>C. “All art constantly aspires towards the condition of music”</div><div class='it'>D. The objective correlative</div><div class='it'>E. The aesthetic critic asks, “What is this … to me?”</div>Choose the correct answer from the options given below:", "options": ["A, B, C and E only", "A, C and E only", "C and E only", "A and E only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "In the Preface to Shakespeare, which of the following faults does Johnson find in Shakespeare?<div class='it'>A. He sacrifices virtue to convenience</div><div class='it'>B. His plots are often loosely formed</div><div class='it'>C. He breaks the unity of action</div><div class='it'>D. He neglects his endings</div><div class='it'>E. He is too fond of quibbles (puns)</div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "A, B and D only", "A, D and E only", "A, B, C, D and E"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following ideas are associated with T. E. Hulme?<div class='it'>A. Gusto</div><div class='it'>B. A preference for classicism over romanticism</div><div class='it'>C. A call for “dry, hard” poetry</div><div class='it'>D. Romanticism as “spilt religion”</div><div class='it'>E. Negative capability</div>Choose the correct answer from the options given below:", "options": ["B, D and E only", "B, C, D and E only", "C and D only", "B, C and D only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following are works of Indian poetics?<div class='it'>A. Anandavardhana’s <i>Dhvanyaloka</i></div><div class='it'>B. Mammata’s <i>Kavyaprakasha</i></div><div class='it'>C. Longinus’s <i>Peri Hypsous</i></div><div class='it'>D. Horace’s <i>Ars Poetica</i></div><div class='it'>E. Bharata’s <i>Natyashastra</i></div>Choose the correct answer from the options given below:", "options": ["A, B, C and E only", "B, C and E only", "A, B and C only", "A, B and E only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following are part of Northrop Frye’s archetypal theory?<div class='it'>A. The four <i>mythoi</i> (comedy, romance, tragedy, irony)</div><div class='it'>B. Interpellation</div><div class='it'>C. Différance</div><div class='it'>D. Displacement of myth</div><div class='it'>E. The theory of modes</div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "A, D and E only", "A, C, D and E only", "A and E only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "MS", "stem": "Which of the following ideas are associated with Henry James’s theory of fiction?<div class='it'>A. Point of view</div><div class='it'>B. The omniscient intrusive narrator as the ideal</div><div class='it'>C. “Felt life”</div><div class='it'>D. Stream of consciousness as his own term</div><div class='it'>E. The “centre of consciousness”</div>Choose the correct answer from the options given below:", "options": ["B, C and E only", "A, C and E only", "A, C, D and E only", "A, D and E only"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Aristotle’s <i>Poetics</i> discusses tragedy and epic at length.</div><div class='it'><b>Statement II:</b> The lost second book of the <i>Poetics</i> is believed to have dealt with comedy.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Horace’s <i>Ars Poetica</i> is a verse letter addressed to the Pisos.</div><div class='it'><b>Statement II:</b> Horace advises that Medea’s killing of her sons should be shown on stage.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Dryden coined the term “poetic justice”.</div><div class='it'><b>Statement II:</b> Rymer called <i>Othello</i> “a bloody farce”.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Shelley’s <i>A Defence of Poetry</i> was published in his lifetime.</div><div class='it'><b>Statement II:</b> Shelley’s <i>Defence</i> was a reply to Wordsworth’s Preface.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Eliot’s “Tradition and the Individual Talent” appeared in 1919.</div><div class='it'><b>Statement II:</b> In it Eliot calls poetry “not a turning loose of emotion, but an escape from emotion”.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Plato banishes poets from his ideal republic.</div><div class='it'><b>Reason R:</b> Plato thinks that poetry imitates appearances and not the truth.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Aristotle answers Plato by defending mimesis as natural and instructive.</div><div class='it'><b>Reason R:</b> Aristotle studied in Plato’s Academy.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Coleridge distinguishes between imagination and fancy.</div><div class='it'><b>Reason R:</b> For Coleridge, fancy is the higher and more creative faculty.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Leavis’s <i>The Great Tradition</i> opens by naming Austen, George Eliot, Henry James and Conrad as the great English novelists.</div><div class='it'><b>Reason R:</b> The book also contains an essay on Dickens’s <i>Hard Times</i> as a “moral fable”.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> The New Critics ignored the language of the text.</div><div class='it'><b>Reason R:</b> They practised close reading of the words on the page.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "“Sweetest Shakespeare, Fancy’s child” occurs in", "options": ["Milton’s “L’Allegro”", "Jonson’s poem in the First Folio", "Dryden’s <i>Of Dramatic Poesy</i>", "Gray’s “The Progress of Poesy”"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "In <i>Of Dramatic Poesy</i>, Neander says of Jonson: “I admire him, but I love …”", "options": ["Fletcher", "Beaumont", "Corneille", "Shakespeare"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "Who described the novel as “a mirror carried along a high road”?", "options": ["Flaubert", "Balzac", "Stendhal", "Henry James"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>The Romantic Agony</i> (1930), a study of the dark side of Romanticism, was written by", "options": ["Frank Kermode", "M. H. Abrams", "C. M. Bowra", "Mario Praz"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>The Romantic Imagination</i> (1949) was written by", "options": ["M. H. Abrams", "Basil Willey", "C. M. Bowra", "René Wellek"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>The Allegory of Love</i> (1936) was written by", "options": ["E. M. W. Tillyard", "J. R. R. Tolkien", "C. S. Lewis", "Helen Gardner"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>The Elizabethan World Picture</i> (1943) was written by", "options": ["C. S. Lewis", "Caroline Spurgeon", "E. M. W. Tillyard", "G. Wilson Knight"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>European Literature and the Latin Middle Ages</i> (1948) was written by", "options": ["Erich Auerbach", "Leo Spitzer", "Ernst Robert Curtius", "Ernst Gombrich"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>The Kenyon Review</i> (1939) was founded and first edited by", "options": ["Allen Tate", "Cleanth Brooks", "John Crowe Ransom", "Robert Penn Warren"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "The contrast between “Hebraism and Hellenism” is drawn in", "options": ["Pater’s <i>The Renaissance</i>", "Ruskin’s <i>Modern Painters</i>", "Arnold’s <i>Culture and Anarchy</i>", "Newman’s <i>The Idea of a University</i>"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "<i>Lectures on Rhetoric and Belles Lettres</i> (1783) was written by", "options": ["Hugh Blair", "Adam Smith", "Edmund Burke", "Lord Kames"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "Who wrote that every great and original writer “must himself create the taste by which he is to be enjoyed”?", "options": ["William Wordsworth", "S. T. Coleridge", "Samuel Johnson", "John Keats"]}, {"unit": "Unit 8: Literary Criticism", "passage": null, "type": "SG", "stem": "In Bharata’s <i>Natyashastra</i>, the number of rasas listed is", "options": ["eight", "five", "nine", "eleven"]}];
+const S = JSON.parse(atob("=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".split("").reverse().join("")));
+const MIN = 60, KEY = "nvsb_ut8nta";
+const N = QS.length;
+const fresh = () => ({ans:Array(N).fill(0), mk:Array(N).fill(false), vis:Array(N).fill(false), cur:0, end:0, name:"", done:false});
+let st = fresh(), mode = "test", filter = "all", pick = 0;
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(KEY)); return s && s.ans && s.ans.length === N && s.vis ? s : null; }catch(e){ return null; } }
+$("nq").textContent = N; $("tm").textContent = MIN;
+const saved = load();
+if (saved && !saved.done) $("resume").classList.remove("hide");
+$("agree").onchange = () => { $("go").disabled = !$("agree").checked; };
+$("go").onclick = () => { st = fresh(); st.end = Date.now() + MIN*60000; st.name = $("nm").value.trim(); save(); begin(); };
+$("resume").onclick = () => { st = saved; begin(); };
+if (saved && saved.done) { st = saved; showResult(); }
+
+function status(i){
+  if (st.ans[i] && st.mk[i]) return "am";
+  if (st.mk[i]) return "mk";
+  if (st.ans[i]) return "an";
+  if (st.vis[i]) return "na";
+  return "";
+}
+function counts(){
+  const c = {an:0, na:0, mk:0, am:0, nv:0};
+  for (let i=0;i<N;i++){ const s = status(i); if (s==="") c.nv++; else c[s]++; }
+  return c;
+}
+function legend(){
+  if (mode === "test"){
+    const c = counts();
+    $("leg").innerHTML = `<div><span class="st an">${c.an}</span>Answered</div><div><span class="st na">${c.na}</span>Not Answered</div>
+      <div><span class="st">${c.nv}</span>Not Visited</div><div><span class="st mk">${c.mk}</span>Marked for Review</div>
+      <div style="grid-column:1/3"><span class="st am">${c.am}</span>Answered &amp; Marked for Review (will be considered for evaluation)</div>`;
+  } else {
+    $("leg").innerHTML = `<div><span class="st r">✓</span>Correct</div><div><span class="st w">✗</span>Wrong</div><div><span class="st">–</span>Not attempted</div>`;
+  }
+}
+function begin(){
+  mode = "test";
+  $("cname").textContent = st.name || "Candidate";
+  ["start","result"].forEach(x => $(x).classList.add("hide")); $("test").classList.remove("hide");
+  $("tbtns").classList.remove("hide"); $("rbtns").classList.add("hide"); $("tlbox").classList.remove("hide");
+  buildPal(); go(st.cur); tick(); window.scrollTo(0,0);
+}
+let timerId;
+function tick(){
+  clearInterval(timerId);
+  const f = () => {
+    const left = Math.max(0, st.end - Date.now());
+    const h = Math.floor(left/3600000), m = Math.floor(left%3600000/60000), s = Math.floor(left%60000/1000);
+    $("timer").textContent = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    $("timer").classList.toggle("low", left < 5*60000);
+    if (left <= 0 && mode === "test") { clearInterval(timerId); alert("Time is over. Your test will now be submitted."); finish(); }
+  };
+  f(); timerId = setInterval(f, 1000);
+}
+function visible(){
+  return QS.map((_,i)=>i).filter(i => mode==="test" || filter==="all" || (filter==="w" && st.ans[i] && st.ans[i]!==S.k[i]) || (filter==="u" && !st.ans[i]));
+}
+function buildPal(){
+  const p = $("pal"); p.innerHTML = "";
+  visible().forEach(i => { const b = document.createElement("span"); b.className = "st"; b.textContent = i+1; b.id = "p"+i; b.onclick = () => go(i); p.appendChild(b); });
+  paint();
+}
+function paint(){
+  QS.forEach((_,i) => { const b = $("p"+i); if(!b) return;
+    b.className = "st " + (mode==="test" ? status(i) : (!st.ans[i] ? "" : st.ans[i]===S.k[i] ? "r" : "w"));
+    if (i === st.cur) b.classList.add("cur"); });
+  legend();
+}
+function go(i){
+  st.cur = i; if (mode==="test") st.vis[i] = true;
+  pick = st.ans[i] || 0;
+  const q = QS[i];
+  $("qno").textContent = `Question No. ${i+1}`; $("qunit").textContent = q.unit;
+  if (q.passage) { $("psg").innerHTML = "<b>Read the passage and answer the question.</b>" + q.passage; $("psg").classList.remove("hide"); } else $("psg").classList.add("hide");
+  $("stem").innerHTML = q.stem;
+  const o = $("opts"); o.innerHTML = "";
+  q.options.forEach((t,j) => {
+    const l = document.createElement("label"); l.className = "opt";
+    l.innerHTML = `<input type="radio" name="o" ${pick===j+1?"checked":""} ${mode!=="test"?"disabled":""}><span><b>(${j+1})</b> ${t}</span>`;
+    if (mode === "test") l.querySelector("input").onchange = () => { pick = j+1; };
+    else { if (S.k[i]===j+1) l.classList.add("right"); else if (st.ans[i]===j+1) l.classList.add("wrong"); }
+    o.appendChild(l);
+  });
+  $("expbox").innerHTML = mode==="review" ? `<div class="exp"><b>Correct answer: (${S.k[i]})</b>${st.ans[i] ? (st.ans[i]===S.k[i] ? " – you got it right." : ` – you chose (${st.ans[i]}).`) : " – not attempted."}${S.e[i] ? "<br>"+S.e[i] : ""}</div>` : "";
+  const v = visible(), k = v.indexOf(i);
+  ["back","rback"].forEach(x => $(x).disabled = k <= 0); ["nxt","rnext"].forEach(x => $(x).disabled = k >= v.length-1);
+  if (mode==="test") save(); paint();
+}
+function nextQ(){ const v = visible(), k = v.indexOf(st.cur); if (k < v.length-1) go(v[k+1]); else go(st.cur); }
+function prevQ(){ const v = visible(), k = v.indexOf(st.cur); if (k > 0) go(v[k-1]); }
+$("saveNext").onclick = () => { if (!pick) { alert("Please choose an option first, or use NEXT to skip."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = false; save(); nextQ(); };
+$("saveMark").onclick = () => { if (!pick) { alert("Please choose an option first."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = true; save(); nextQ(); };
+$("markNext").onclick = () => { st.mk[st.cur] = true; save(); nextQ(); };
+$("clr").onclick = () => { st.ans[st.cur] = 0; pick = 0; save(); go(st.cur); };
+$("nxt").onclick = nextQ; $("back").onclick = prevQ; $("rnext").onclick = nextQ; $("rback").onclick = prevQ;
+$("subBtn").onclick = () => {
+  const c = counts();
+  $("sumTbl").innerHTML = `<tr><th>Section</th><th>No. of Questions</th><th>Answered</th><th>Not Answered</th><th>Marked for Review</th><th>Answered &amp; Marked for Review</th><th>Not Visited</th></tr>
+    <tr><td>English (Paper 2)</td><td>${N}</td><td>${c.an}</td><td>${c.na}</td><td>${c.mk}</td><td>${c.am}</td><td>${c.nv}</td></tr>`;
+  $("sumModal").classList.remove("hide");
+};
+$("noSub").onclick = () => $("sumModal").classList.add("hide");
+$("yesSub").onclick = () => { $("sumModal").classList.add("hide"); finish(); };
+function finish(){ st.done = true; save(); clearInterval(timerId); showResult(); }
+function showResult(){
+  mode = "result";
+  $("test").classList.add("hide"); $("start").classList.add("hide"); $("result").classList.remove("hide");
+  let r=0,w=0,u=0; const units = {};
+  QS.forEach((q,i) => { const U = units[q.unit] = units[q.unit] || {t:0,r:0};
+    U.t++; if(!st.ans[i]) u++; else if (st.ans[i]===S.k[i]) {r++;U.r++;} else w++; });
+  $("cname").textContent = st.name || "Candidate";
+  $("who").textContent = st.name ? `Candidate: ${st.name}` : "";
+  $("score").textContent = `${r*2} / ${N*2}`;
+  $("summary").textContent = `Correct ${r} · Wrong ${w} · Not attempted ${u} · Accuracy ${r+w ? Math.round(100*r/(r+w)) : 0}%`;
+  $("unitTbl").innerHTML = "<tr><th>Unit</th><th>Correct</th><th>Marks</th><th style='width:35%'>Accuracy</th></tr>" +
+    Object.entries(units).map(([k,U]) => { const p = Math.round(100*U.r/U.t); return `<tr><td>${k}</td><td>${U.r} / ${U.t}</td><td>${U.r*2}</td><td><div class="barx"><i style="width:${p}%"></i></div>${p}%</td></tr>`; }).join("");
+  window.scrollTo(0,0);
+}
+$("review").onclick = () => { mode = "review"; filter = "all";
+  $("result").classList.add("hide"); $("test").classList.remove("hide");
+  $("tbtns").classList.add("hide"); $("rbtns").classList.remove("hide"); $("tlbox").classList.add("hide");
+  buildPal(); go(0); };
+document.querySelectorAll(".flt [data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; buildPal(); const v = visible(); if (v.length) go(v[0]); else { $("stem").textContent = "No questions in this group."; $("opts").innerHTML=""; $("expbox").innerHTML=""; } });
+$("backRes").onclick = showResult;
+$("retake").onclick = () => { if (confirm("Start a fresh attempt? Your current result will be cleared.")) { try{ localStorage.removeItem(KEY); }catch(e){} location.reload(); } };
+</script>
+</body>
+</html>

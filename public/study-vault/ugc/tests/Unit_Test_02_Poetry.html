@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Test 2: Poetry – UGC NET English Study Bundle</title>
+<style>
+:root{--ink:#222;--muted:#666;--line:#cfd4dc;--bg:#eef1f5;--top:#2b4c7e;--grey:#e0e0e0;--red:#d9534f;--green:#3c9f40;--purple:#6f42c1;--orange:#f0ad4e;--blue:#2d6cb5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.5}
+.top{background:var(--top);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+.top .logo{font-weight:700;font-size:15px;flex:1;min-width:200px}
+.cand{display:flex;align-items:center;gap:10px;font-size:13px}
+.photo{width:42px;height:48px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#888;font-size:22px}
+.bar2{background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:6px 14px;flex-wrap:wrap;gap:8px}
+.bar2 .sec{background:var(--blue);color:#fff;padding:4px 12px;border-radius:3px;font-size:13px}
+.tl{font-weight:700}.tl span{background:#000;color:#fff;padding:3px 10px;border-radius:3px;font-variant-numeric:tabular-nums;margin-left:6px}
+.tl span.low{background:var(--red)}
+.wrap{display:grid;grid-template-columns:1fr 300px;gap:0;min-height:calc(100vh - 110px)}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.qpane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.qtitle{padding:8px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qtitle small{font-weight:400;color:var(--muted)}
+.qbody{padding:14px;flex:1;overflow:auto}
+.passage{background:#f7f9fc;border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;max-height:260px;overflow:auto;font-size:14px}
+.passage p{margin:.3em 0}
+.stem{margin-bottom:10px}.stem .it{margin:3px 0 3px 16px}
+table.lt{border-collapse:collapse;margin:8px 0;width:100%;font-size:14px}
+table.lt td,table.lt th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.lt th{background:#eef2f8}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;cursor:pointer;border-radius:4px}
+label.opt:hover{background:#f3f6fb}
+label.opt input{margin-top:4px;transform:scale(1.15)}
+label.opt.right{background:#e3f4e4}label.opt.wrong{background:#fbe3e2}
+.exp{margin-top:10px;padding:10px 12px;border-left:4px solid var(--green);background:#f2faf3;font-size:14px}
+.btns{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fafbfc}
+.b{border:1px solid #999;background:#fff;color:#222;padding:7px 12px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.b.green{background:var(--green);border-color:var(--green);color:#fff}
+.b.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+.b.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.b.sub{background:var(--green);border-color:var(--green);color:#fff}
+.b:disabled{opacity:.45;cursor:default}
+.sp{flex:1}
+.side{background:#fff;padding:10px}
+.leg{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-bottom:10px}
+.leg div{display:flex;align-items:center;gap:6px}
+.st{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;font-size:13px;font-weight:700;border:1px solid #aaa;background:var(--grey);color:#222;border-radius:3px;position:relative;flex:none}
+.st.na{background:var(--red);border-color:var(--red);color:#fff;border-radius:3px 3px 12px 12px}
+.st.an{background:var(--green);border-color:var(--green);color:#fff;border-radius:12px 12px 3px 3px}
+.st.mk{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am{background:var(--purple);border-color:var(--purple);color:#fff;border-radius:50%}
+.st.am::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:1px solid #fff}
+.st.r{background:var(--green);border-color:var(--green);color:#fff}.st.w{background:var(--red);border-color:var(--red);color:#fff}
+.leg .st{width:26px;height:22px;font-size:11px}
+.palhead{background:var(--blue);color:#fff;padding:5px 8px;font-weight:700;font-size:13px;margin:6px 0}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:7px;max-height:52vh;overflow:auto;padding:2px}
+.pal .st{cursor:pointer;width:100%}
+.pal .st.cur{outline:2px solid #000;outline-offset:1px}
+.card{max-width:900px;margin:18px auto;background:#fff;border:1px solid var(--line);padding:18px 22px}
+.card h2{margin-top:0;color:var(--top)}
+.inst li{margin:5px 0}
+.inst .st{width:30px;height:26px;margin-right:6px;vertical-align:middle}
+table.sum,table.res{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+table.sum td,table.sum th,table.res td,table.res th{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.res td:first-child,table.res th:first-child{text-align:left}
+table.sum th,table.res th{background:#eef2f8}
+.big{font-size:38px;font-weight:700;color:var(--top)}
+.barx{height:8px;background:#e6eaf2;border-radius:4px;overflow:hidden}.barx i{display:block;height:100%;background:var(--blue)}
+input[type=text]{padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:15px;width:100%;max-width:320px}
+.note{font-size:12.5px;color:var(--muted)}
+.hide{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:12px}
+.modal .card{margin:0;max-width:640px;width:100%}
+.flt .b{text-transform:none;font-weight:400}
+/*np*/@media print{#exam,#modal{display:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Unit Test 2: Poetry – UGC NET English Study Bundle</div>
+  <div class="cand"><div class="photo">&#128100;</div><div>Candidate Name: <b id="cname">—</b><br>Subject: English (Paper 2)</div></div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<section id="start">
+ <div class="card">
+  <h2>General Instructions</h2>
+  <p class="note">This practice test copies the look of the NTA computer-based test (CBT) screen so that you can practise in the same way. It is not an official NTA test. Verify the current exam pattern and marking with the official NTA notice.</p>
+  <ol class="inst">
+   <li>Total questions: <b id="nq"></b> · Each question carries 2 marks · Duration: <b id="tm"></b> minutes · No negative marking (as in the current UGC NET; verify with the NTA notice).</li>
+   <li>The clock at the top right shows the time left. The test is submitted automatically when the time is over.</li>
+   <li>The Question Palette on the right shows the status of each question:
+    <ul style="list-style:none;padding-left:4px">
+     <li><span class="st">1</span> You have not visited the question yet.</li>
+     <li><span class="st na">2</span> You have not answered the question.</li>
+     <li><span class="st an">3</span> You have answered the question.</li>
+     <li><span class="st mk">4</span> You have NOT answered the question, but have marked it for review.</li>
+     <li><span class="st am">5</span> You have answered the question and marked it for review. <b>Such answers WILL be considered for evaluation.</b></li>
+    </ul></li>
+   <li>To answer: click an option, then click <b>SAVE &amp; NEXT</b>. <b>If you move to another question without saving, your answer is not saved.</b></li>
+   <li><b>SAVE &amp; MARK FOR REVIEW</b> saves your answer and marks the question. <b>MARK FOR REVIEW &amp; NEXT</b> marks it without an answer. <b>CLEAR</b> removes your answer.</li>
+   <li>Click a number in the palette to go straight to that question.</li>
+   <li>Your progress is saved in this browser. If the page closes, open it again and click “Resume”.</li>
+  </ol>
+  <p><label>Your name: <br><input type="text" id="nm" placeholder="Type your name"></label></p>
+  <p><label><input type="checkbox" id="agree"> I have read and understood the instructions.</label></p>
+  <button class="b blue" id="go" disabled>I am ready to begin</button> <button class="b hide" id="resume">Resume saved test</button>
+  <p class="note">© Dr Rajnikant Dodiya · NET Vidya English · For the registered buyer only</p>
+ </div>
+</section>
+
+<!-- TEST -->
+<div id="test" class="hide">
+ <div class="bar2"><span class="sec">English (Paper 2)</span><span class="tl" id="tlbox">Time Left: <span id="timer">--:--</span></span></div>
+ <div class="wrap">
+  <div class="qpane">
+   <div class="qtitle"><span id="qno"></span><small id="qunit"></small></div>
+   <div class="qbody">
+    <div id="psg" class="passage hide"></div>
+    <div class="stem" id="stem"></div>
+    <div id="opts"></div>
+    <div id="expbox"></div>
+   </div>
+   <div class="btns" id="tbtns">
+    <button class="b green" id="saveNext">Save &amp; Next</button>
+    <button class="b" id="clr">Clear</button>
+    <button class="b orange" id="saveMark">Save &amp; Mark for Review</button>
+    <button class="b blue" id="markNext">Mark for Review &amp; Next</button>
+    <span class="sp"></span>
+    <button class="b" id="back">&laquo; Back</button>
+    <button class="b" id="nxt">Next &raquo;</button>
+    <button class="b sub" id="subBtn">Submit</button>
+   </div>
+   <div class="btns hide" id="rbtns">
+    <button class="b" id="rback">&laquo; Back</button>
+    <button class="b" id="rnext">Next &raquo;</button>
+    <span class="sp"></span>
+    <span class="flt">Show:
+     <button class="b" data-f="all">All</button><button class="b" data-f="w">Wrong</button><button class="b" data-f="u">Not attempted</button></span>
+    <button class="b blue" id="backRes">Back to result</button>
+   </div>
+  </div>
+  <div class="side">
+   <div class="leg" id="leg"></div>
+   <div class="palhead">English (Paper 2) – Choose a Question</div>
+   <div class="pal" id="pal"></div>
+  </div>
+ </div>
+</div>
+
+<!-- SUBMIT SUMMARY -->
+<div class="modal hide" id="sumModal"><div class="card">
+ <h2>Exam Summary</h2>
+ <table class="sum" id="sumTbl"></table>
+ <p>Are you sure you want to submit? You cannot change your answers after this.</p>
+ <button class="b sub" id="yesSub">Yes, submit</button> <button class="b" id="noSub">No, go back</button>
+</div></div>
+
+<!-- RESULT -->
+<section id="result" class="hide"><div class="card">
+  <h2>Your Result</h2>
+  <p id="who"></p>
+  <div class="big" id="score"></div>
+  <p id="summary"></p>
+  <h3>Unit-wise performance</h3>
+  <table class="res" id="unitTbl"></table>
+  <p class="note">Tip: revise first the units where your accuracy is below 60%. Then open the review and read every explanation.</p>
+  <p><button class="b blue" id="review">Review answers with explanations</button> <button class="b" id="retake">Retake test</button> <button class="b" onclick="window.print()">Print result</button></p>
+</div></section>
+
+<script>
+const QS = [{"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Poems) with List II (Poets):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “Go, Lovely Rose”</td><td>I. Edmund Waller</td></tr><tr><td>B. “Corinna’s Going A-Maying”</td><td>II. Abraham Cowley</td></tr><tr><td>C. “On the Death of Mr Crashaw”</td><td>III. Robert Herrick</td></tr><tr><td>D. “An Elegy upon the Death of the Dean of Paul’s, Dr John Donne”</td><td>IV. Thomas Carew</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-I, C-II, D-IV", "A-II, B-III, C-I, D-IV", "A-I, B-III, C-II, D-IV", "A-II, B-I, C-IV, D-III"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Poems) with List II (Romantic poets):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “The Pains of Sleep”</td><td>I. P. B. Shelley</td></tr><tr><td>B. “Julian and Maddalo”</td><td>II. S. T. Coleridge</td></tr><tr><td>C. “Isabella, or the Pot of Basil”</td><td>III. John Keats</td></tr><tr><td>D. “Beppo”</td><td>IV. Lord Byron</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-I, C-III, D-IV", "A-IV, B-I, C-III, D-II", "A-II, B-IV, C-III, D-I", "A-I, B-III, C-IV, D-II"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Poems) with List II (Victorian poets):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “Pied Beauty”</td><td>I. A. C. Swinburne</td></tr><tr><td>B. “Say not the struggle nought availeth”</td><td>II. G. M. Hopkins</td></tr><tr><td>C. “Sohrab and Rustum”</td><td>III. Matthew Arnold</td></tr><tr><td>D. “Hertha”</td><td>IV. Arthur Hugh Clough</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-III, C-IV, D-I", "A-IV, B-II, C-III, D-I", "A-II, B-IV, C-III, D-I", "A-IV, B-I, C-III, D-II"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Poems of the Second World War) with List II (Poets):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “Vergissmeinnicht”</td><td>I. Richard Eberhart</td></tr><tr><td>B. “The Death of the Ball Turret Gunner”</td><td>II. Keith Douglas</td></tr><tr><td>C. “The Fury of Aerial Bombardment”</td><td>III. Alun Lewis</td></tr><tr><td>D. “All Day It Has Rained”</td><td>IV. Randall Jarrell</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-IV, C-III, D-I", "A-II, B-I, C-IV, D-III", "A-II, B-IV, C-I, D-III", "A-I, B-II, C-IV, D-III"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Figures of speech) with List II (Examples):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. Zeugma</td><td>I. “She lost her heart and her purse.”</td></tr><tr><td>B. Litotes</td><td>II. “All hands on deck.”</td></tr><tr><td>C. Synecdoche</td><td>III. “Not a bad result at all.”</td></tr><tr><td>D. Apostrophe</td><td>IV. “O Rose, thou art sick!”</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-II, D-IV", "A-I, B-III, C-IV, D-II", "A-I, B-IV, C-II, D-III", "A-I, B-II, C-IV, D-III"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Poems) with List II (American poets):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “Thanatopsis”</td><td>I. William Cullen Bryant</td></tr><tr><td>B. <i>The Bridge</i></td><td>II. Wallace Stevens</td></tr><tr><td>C. “Poetry” (“I, too, dislike it”)</td><td>III. Marianne Moore</td></tr><tr><td>D. “Thirteen Ways of Looking at a Blackbird”</td><td>IV. Hart Crane</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-III, B-IV, C-I, D-II", "A-IV, B-I, C-III, D-II", "A-II, B-III, C-IV, D-I", "A-I, B-IV, C-III, D-II"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Lines) with List II (Works):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “A thing of beauty is a joy for ever”</td><td>I. <i>An Essay on Man</i></td></tr><tr><td>B. “Hope springs eternal in the human breast”</td><td>II. “Dover Beach”</td></tr><tr><td>C. “Ah, love, let us be true / To one another!”</td><td>III. <i>In Memoriam</i></td></tr><tr><td>D. “’Tis better to have loved and lost / Than never to have loved at all”</td><td>IV. <i>Endymion</i></td></tr></table>Choose the correct answer from the options given below:", "options": ["A-IV, B-I, C-II, D-III", "A-I, B-IV, C-II, D-III", "A-IV, B-II, C-I, D-III", "A-II, B-IV, C-I, D-III"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Long poems) with List II (Their divisions):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. <i>Paradise Regained</i></td><td>I. Four books</td></tr><tr><td>B. <i>The Prelude</i> (1850)</td><td>II. Five cantos</td></tr><tr><td>C. <i>The Rape of the Lock</i> (1714)</td><td>III. Fourteen books</td></tr><tr><td>D. <i>Aurora Leigh</i></td><td>IV. Nine books</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-I, B-III, C-II, D-IV", "A-II, B-III, C-I, D-IV", "A-I, B-III, C-IV, D-II", "A-IV, B-III, C-I, D-II"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MT", "stem": "Match List I (Epithets) with List II (Poets):<table class='lt'><tr><th>List I</th><th>List II</th></tr><tr><td>A. “The Poet’s Poet”</td><td>I. James Hogg</td></tr><tr><td>B. “The Ettrick Shepherd”</td><td>II. Anna Seward</td></tr><tr><td>C. “The Swan of Lichfield”</td><td>III. Edmund Spenser</td></tr><tr><td>D. “The Northamptonshire Peasant Poet”</td><td>IV. John Clare</td></tr></table>Choose the correct answer from the options given below:", "options": ["A-II, B-I, C-III, D-IV", "A-III, B-I, C-IV, D-II", "A-IV, B-III, C-II, D-I", "A-III, B-I, C-II, D-IV"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following poems in the chronological order of publication:<div class='it'>A. Thomson, <i>The Seasons</i> (complete)</div><div class='it'>B. Goldsmith, “The Deserted Village”</div><div class='it'>C. Cowper, <i>The Task</i></div><div class='it'>D. Crabbe, <i>The Village</i></div><div class='it'>E. Gray, “Elegy Written in a Country Churchyard”</div>Choose the correct answer from the options given below:", "options": ["A, E, C, D, B", "A, E, B, D, C", "A, C, B, D, E", "A, D, E, B, C"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following collections of Thomas Hardy in the chronological order of publication:<div class='it'>A. <i>Moments of Vision</i></div><div class='it'>B. <i>Wessex Poems</i></div><div class='it'>C. <i>Poems of the Past and the Present</i></div><div class='it'>D. <i>Time’s Laughingstocks</i></div><div class='it'>E. <i>Satires of Circumstance</i></div>Choose the correct answer from the options given below:", "options": ["B, D, C, E, A", "B, C, D, E, A", "B, C, D, A, E", "C, B, D, E, A"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following books of Robert Lowell in the chronological order of publication:<div class='it'>A. <i>Notebook 1967–68</i></div><div class='it'>B. <i>Life Studies</i></div><div class='it'>C. <i>The Dolphin</i></div><div class='it'>D. <i>Lord Weary’s Castle</i></div><div class='it'>E. <i>For the Union Dead</i></div>Choose the correct answer from the options given below:", "options": ["B, D, E, A, C", "A, B, E, D, C", "D, E, B, A, C", "D, B, E, A, C"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following books of Dylan Thomas in the chronological order of publication:<div class='it'>A. <i>Deaths and Entrances</i></div><div class='it'>B. <i>In Country Sleep</i></div><div class='it'>C. <i>18 Poems</i></div><div class='it'>D. <i>Twenty-five Poems</i></div><div class='it'>E. <i>The Map of Love</i></div>Choose the correct answer from the options given below:", "options": ["D, C, E, A, B", "C, D, E, A, B", "C, E, A, B, D", "C, D, A, E, B"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following Old and Middle English poems in their probable chronological order:<div class='it'>A. <i>Piers Plowman</i> (B-text)</div><div class='it'>B. <i>Beowulf</i> (surviving manuscript)</div><div class='it'>C. Gower’s <i>Confessio Amantis</i></div><div class='it'>D. “Cædmon’s Hymn”</div><div class='it'>E. <i>The Owl and the Nightingale</i></div>Choose the correct answer from the options given below:", "options": ["D, B, A, E, C", "D, B, E, A, C", "B, D, E, A, C", "A, D, B, E, C"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following works of Robert Southey in the chronological order of publication:<div class='it'>A. <i>Joan of Arc</i></div><div class='it'>B. <i>The Curse of Kehama</i></div><div class='it'>C. <i>Thalaba the Destroyer</i></div><div class='it'>D. <i>A Vision of Judgement</i></div><div class='it'>E. <i>Madoc</i></div>Choose the correct answer from the options given below:", "options": ["D, C, E, B, A", "A, C, B, E, D", "A, C, E, D, B", "A, C, E, B, D"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following movements or groups in English poetry in chronological order:<div class='it'>A. The Pre-Raphaelites</div><div class='it'>B. The Augustans</div><div class='it'>C. The Movement</div><div class='it'>D. The Metaphysical poets</div><div class='it'>E. The Imagists</div>Choose the correct answer from the options given below:", "options": ["D, B, C, A, E", "D, E, A, B, C", "D, B, A, E, C", "D, B, E, A, C"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following books of Christina Rossetti in the chronological order of publication:<div class='it'>A. <i>Goblin Market and Other Poems</i></div><div class='it'>B. <i>Sing-Song</i></div><div class='it'>C. <i>A Pageant and Other Poems</i></div><div class='it'>D. <i>The Prince’s Progress and Other Poems</i></div><div class='it'>E. <i>Verses</i></div>Choose the correct answer from the options given below:", "options": ["A, D, B, C, E", "A, E, B, C, D", "D, A, B, C, E", "A, B, D, C, E"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SQ", "stem": "Arrange the following works of Ezra Pound in the chronological order of publication:<div class='it'>A. <i>Hugh Selwyn Mauberley</i></div><div class='it'>B. <i>Cathay</i></div><div class='it'>C. <i>Personae</i></div><div class='it'>D. <i>The Pisan Cantos</i></div><div class='it'>E. <i>Ripostes</i></div>Choose the correct answer from the options given below:", "options": ["C, E, B, D, A", "A, C, E, B, D", "E, B, A, C, D", "C, E, B, A, D"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following poems by Wordsworth appeared in the first edition (1798) of <i>Lyrical Ballads</i>?<div class='it'>A. “Michael”</div><div class='it'>B. “Lines Composed a Few Miles above Tintern Abbey”</div><div class='it'>C. “Simon Lee”</div><div class='it'>D. “We Are Seven”</div><div class='it'>E. “The Thorn”</div>Choose the correct answer from the options given below:", "options": ["B, C, D and E only", "B, D and E only", "B, C and D only", "A, B, C, D and E"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following poems are in Yeats’s <i>The Tower</i> (1928)?<div class='it'>A. “The Second Coming”</div><div class='it'>B. “Easter, 1916”</div><div class='it'>C. “Among School Children”</div><div class='it'>D. “Sailing to Byzantium”</div><div class='it'>E. “Leda and the Swan”</div>Choose the correct answer from the options given below:", "options": ["A, C and D only", "A, C and E only", "C and E only", "C, D and E only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following poets are associated with Imagism?<div class='it'>A. Amy Lowell</div><div class='it'>B. H. D. (Hilda Doolittle)</div><div class='it'>C. Wilfred Owen</div><div class='it'>D. Richard Aldington</div><div class='it'>E. Rupert Brooke</div>Choose the correct answer from the options given below:", "options": ["A, B and D only", "B, C and D only", "A, B, C and D only", "A and D only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following are associated with the Beat poets?<div class='it'>A. Robert Frost</div><div class='it'>B. Allen Ginsberg</div><div class='it'>C. Gregory Corso</div><div class='it'>D. Wallace Stevens</div><div class='it'>E. Lawrence Ferlinghetti</div>Choose the correct answer from the options given below:", "options": ["C, D and E only", "B, C and D only", "B, C and E only", "B, D and E only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following poems were written by W. H. Auden?<div class='it'>A. “The Unknown Citizen”</div><div class='it'>B. “Musée des Beaux Arts”</div><div class='it'>C. “Lullaby” (“Lay your sleeping head”)</div><div class='it'>D. “Snake”</div><div class='it'>E. “The Hollow Men”</div>Choose the correct answer from the options given below:", "options": ["A, B and E only", "A, B, C and D only", "A, B and C only", "A and C only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following are parts of the Pindaric ode?<div class='it'>A. Epode</div><div class='it'>B. Antistrophe</div><div class='it'>C. Refrain</div><div class='it'>D. Octave</div><div class='it'>E. Strophe</div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "A and E only", "A, B, C and E only", "A, B and E only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following are conventions of the classical epic?<div class='it'>A. Beginning <i>in medias res</i></div><div class='it'>B. A closing rhymed couplet</div><div class='it'>C. Invocation of the Muse</div><div class='it'>D. Epic catalogue</div><div class='it'>E. Epic (extended) simile</div>Choose the correct answer from the options given below:", "options": ["A, C and E only", "A, C, D and E only", "A, B, C, D and E", "B, C, D and E only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following are conventions of the pastoral elegy?<div class='it'>A. Invocation of the Muses</div><div class='it'>B. Consolation at the end</div><div class='it'>C. A procession of mourners</div><div class='it'>D. Nature mourning the dead</div><div class='it'>E. A comic subplot</div>Choose the correct answer from the options given below:", "options": ["A, B and C only", "A, B, C, D and E", "A, B, C and E only", "A, B, C and D only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "MS", "stem": "Which of the following poems were written by Sylvia Plath?<div class='it'>A. “Tulips”</div><div class='it'>B. “Lady Lazarus”</div><div class='it'>C. “Skunk Hour”</div><div class='it'>D. “The Fish”</div><div class='it'>E. “Morning Song”</div>Choose the correct answer from the options given below:", "options": ["A, B, D and E only", "A, B and E only", "B and E only", "A, D and E only"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> <i>Paradise Lost</i> first appeared in ten books in 1667.</div><div class='it'><b>Statement II:</b> The second edition of 1674 has twelve books.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> “The Rime of the Ancient Mariner” first appeared in <i>Lyrical Ballads</i> (1798).</div><div class='it'><b>Statement II:</b> Coleridge added the prose marginal glosses in that first edition.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Shelley wrote “Adonais” on the death of Byron.</div><div class='it'><b>Statement II:</b> “Adonais” is written in Spenserian stanzas.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Eliot dedicated <i>The Waste Land</i> to W. B. Yeats.</div><div class='it'><b>Statement II:</b> <i>The Waste Land</i> was first published in 1915.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "ST", "stem": "Given below are two statements:<div class='it'><b>Statement I:</b> Rossetti’s “The Blessed Damozel” first appeared in <i>The Germ</i>.</div><div class='it'><b>Statement II:</b> <i>The Germ</i> was edited by John Ruskin.</div>In the light of the above statements, choose the most appropriate answer from the options given below:", "options": ["Both Statement I and Statement II are correct", "Both Statement I and Statement II are incorrect", "Statement I is correct but Statement II is incorrect", "Statement I is incorrect but Statement II is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Keats’s “Ode to a Nightingale” sets the bird’s song against human suffering and death.</div><div class='it'><b>Reason R:</b> Keats’s brother Tom died of tuberculosis in December 1818.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Donne’s “A Valediction: Forbidding Mourning” uses the image of a pair of compasses.</div><div class='it'><b>Reason R:</b> Metaphysical poets liked far-fetched comparisons drawn from learning and science.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Blake’s <i>Songs of Experience</i> show a darker world than <i>Songs of Innocence</i>.</div><div class='it'><b>Reason R:</b> Blake meant the two books to show “the two contrary states of the human soul”.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Browning’s dramatic monologues reveal character through the speaker’s own words.</div><div class='it'><b>Reason R:</b> Browning wrote most of them in the third person.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "AR", "stem": "Given below are two statements: one is labelled as Assertion A and the other as Reason R.<div class='it'><b>Assertion A:</b> Pope translated Homer’s <i>Iliad</i> into English verse.</div><div class='it'><b>Reason R:</b> The money from the translation made Pope financially independent.</div>In the light of the above statements, choose the correct answer from the options given below:", "options": ["Both A and R are correct and R is the correct explanation of A", "Both A and R are correct but R is NOT the correct explanation of A", "A is correct but R is not correct", "A is not correct but R is correct"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "<i>Sir Gawain and the Green Knight</i> is written in", "options": ["alliterative long lines with a rhymed “bob and wheel”", "heroic couplets", "rhyme royal", "terza rima"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "“The Phoenix and the Turtle” (1601) was written by", "options": ["Ben Jonson", "William Shakespeare", "John Donne", "Michael Drayton"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "In Milton’s “Lycidas”, the “Pilot of the Galilean lake” is", "options": ["Christ", "Moses", "Neptune", "St Peter"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "<i>The Shepherd’s Week</i> (1714), a burlesque of pastoral, was written by", "options": ["John Gay", "Ambrose Philips", "Alexander Pope", "James Thomson"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "Pope’s <i>Windsor-Forest</i> (1713) ends by celebrating", "options": ["the Glorious Revolution", "the Battle of Blenheim", "the Peace of Utrecht", "the coronation of George I"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "<i>The Lady of the Lake</i> (1810), a romance in verse, was written by", "options": ["Lord Byron", "Walter Scott", "Robert Southey", "Thomas Moore"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "<i>Lalla Rookh</i> (1817), an oriental romance in verse, was written by", "options": ["Robert Southey", "Walter Scott", "Lord Byron", "Thomas Moore"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "“Here lies One Whose Name was writ in Water” is the epitaph of", "options": ["P. B. Shelley", "Lord Byron", "John Keats", "Thomas Chatterton"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "In Eliot’s <i>Four Quartets</i>, the poem named after rocks off the coast of Massachusetts is", "options": ["“The Dry Salvages”", "“Burnt Norton”", "“East Coker”", "“Little Gidding”"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "Which of the following belonged to the “Liverpool poets” of the 1960s?", "options": ["Tony Harrison", "Roger McGough", "Ted Hughes", "Geoffrey Hill"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "Edward Thomas was encouraged to begin writing poetry (1914) by", "options": ["Rupert Brooke", "Ezra Pound", "Robert Frost", "Walter de la Mare"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "In the Old English “The Dream of the Rood”, much of the story is told by", "options": ["Christ", "Mary", "an angel", "the Cross itself"]}, {"unit": "Unit 2: Poetry", "passage": null, "type": "SG", "stem": "The first complete English verse translation of Homer’s <i>Iliad</i> (1611) was made by", "options": ["Alexander Pope", "George Chapman", "William Cowper", "John Dryden"]}];
+const S = JSON.parse(atob("91lIukCMyMJgiXTM3EDKgIXZ0FGbgknc1RnblNGIhBSZtF2Yg4TavwDZhlGbJ5Ta8AycZCo4lB3bQJCIsIiLztWYlB3cgQ2bvJFIlhGdgoTYpV2bw9GcvN3byBHIm9GIlNXdgUmchJHIBJCIsIiLzFWbvhGVgY2bgU2chVGdgUGb05WZnBSYgkHb0JXYwBychdHIdCo4uV2ahRFI09mTgQWYvJFIlhGVcCo4gMXmAKOdz9mcGJCIsIiLpcjN5EDIs4TavwDZuV3bTBSelNncl1EIlhGV+kGPoAiblRHdhBFIuFWayJEIk5WYgkmcuVGSg4WYpJHZBBCa0l2ViACLi4ycldWYsxWa2BCazlGbn5WRgUmchByZulGZkl2RgUGb0RXaMBCZuFGIyV2avNEI0NXYFBCLlNXdvhGIy9mbh1GIhBycpBibvRncv5EI05mc1JkIgwiIuUWbvJFIsknclRXZtV2QgQnbhR3clR3byBFIlhGdg4WSiACLi4iclhGchJ3ZvlmYgQmbhBCZuVWayZGIzlJgi72bylnQgMXY3BSZy92bNJCIsIiL5FGZgUGa0BiZvBCdl9GcgIXYsVHcvBHI0N3btBSZoRHIzF2dgQHdvN2UgwycsVmdv5GIzlGagUmcvZWZCJCIsIiLu9WazNXZjNWdTBCazlmbhB3UgUGa0BiZvBichdFIlhGdgQWZk5WZgkHdhVmc0BSZoRlIgwiIu4TavwzcsFmcvR3chBlPpxDIzlJgiPHcpxWaoBFIzt2Yv1GI0lkIgwiIuk3ZyVGbjBCdwVncy92YgUGa0BycrNWY0RXYgQmbhByc5V2agUGa0BycllmcyF2YgUGSiACLi4iPp9CPylHdyFWTgMXmAKeZ29GT+kGPgMXmAKuclR3clh2QgQnclJ2bSBibpBCZlJXYlBHchBCdJJCIsIiLdCo4sVWZodHnAKOIl5Was1ic19mZgEGIk5WYg0JgiL2bixJgiDCdy9GazBSYggGdpdHIzRmblBSY65WY0NHIoNWYFJCIsIiLlNmblR3cphXZgMXmAKubvlGdhx2cuFmc0BSZoRHIlNXdhNGI09mbgQWakBSel52btBSZoRHI7UWdyRHIoR3bCJCIsIiLyVmblR3cpxGI05WZsl2cgEGIvRHIyVGdjFmchh2YgEGI5JGIu92cyVGcgQ3cylmZgUGa0BibpBiblt2bwNHIlJXYgkXZoRlIgwiIu0WahBycphGdgMXZ2l2ZgkCN5cTMoASZnFGcgUGb0lGdgQWZulmYt92YgUGaUJCIsIiL0lWZj52bjBCbhNWazlHawFGdl1GIsF2YpBXe0BSYgMXagU2Zh1WagM3chBXbvNGIlhGViACLi4CdzFmc052bjBycZCo4tV2bwBSZoRHIy9mZg42bzFWZyBCbhNWan9GbgUGa0BCdv5GIsQmb19mcnt2YhJGIzlGI0NWYmBCbhNWaoBXYyd2bpJGIlhGdgsTZ1JHdggGdvJkIgwiIukCM1gTMoASa0RXZzN3bSBCblFGajlWTg0WYpxGbpdFI5JGIkVGdpRWZgMXY3BCdJJCIsIiLdCo4vJnYiFmZgI3bpx2Zp1GIslGnAKOIsQmb19GUgEmc6VEIvRHIu9Wa0F2YpRWZkBSZoRHI5JnchNGIz52bpRXakVGIyVGdhxGI7IjM5EDIulGIkVmchVGcwFGI0lkIgwiIukSMygTMg4CZoAyc0FWZLBycuJXdv1GI0lkIgwiIukyNxgTMoAiPp9CPzVmdhVGTgUmbpxGb5JWaT5Ta8AibpBCZlRGZhBSZyV2dgMXZzN3bsdGIlhGViACLi4SZ2xWZ3RHIltWYtByb0BCWgQmbhBSSJZFIzt2bvJEIkVGZpZXakBibvRHbp1kIgwiIuMXblRXagU2csFmZgUGa0BSZ09mc3BCcvh2cpJEIoRXZiFmepxWRgQmbhBCbsV2dvxkIgwiIu0JgiPXazJXeoRFnAKOIk5WYg0JgiPXah52bkFEnAKOIs0JgiPXYkl2Y5xEnAKOIulGIuVWZTJCIsIiLu9GdslWTgQmbhBCbpdmcpZFIsIXZt9GSg4Wag4WZlNlIgwiIucmbvNHIsFmcvh2YgsWZlJ3Rg02byZGIzVWbvNGIlR2bwVGIk5WYgUGaw9mc0NXa05WYgwSZoB3byR3cgY2bgQWYpJHdgUGaUJCIsIiLz1WZ0lGIlNHbhZGIlhGdgUGdvJ3dgU2YuVmc3FGTgQmbhBCdvlGbFJCIsIiLpYTN5EDKg4TavwDb39GS+kGPgQWZoNXasJWdwByc0h2ZpxEI5RXaDBycZCo4pRHdlh2ZulGbyVmRiACLi4SK0ETOxgCI+k2L8MXZ0NXanFWbJByclRkPpxDI5d2bs9Ga05WYgMXmAKOZuV3bQJCIsIiLpEjM5EDKg4TavwjclNmbhREIlhGdgQmbhByclRnchJ2bSBCblFGajlWT+kGPg4WagUmchByctVGdpBSZzxWYmBSZoRlIgwiIukCMwgTMoAibvlGdpRWZgQmbvNWZzBSZoRHIulGIkVmchVGcwFGIdCo4sVWYoNWaNxJgiLCIsIiL4QTOxACLwITOxACL1ETOxACLyETOxACL5ATOxICIsIiLzkDOxACLxgDOxACLycDOxACL2YDOxACLyYDOxICIsIiLzBTN5EDI7cTMTCo4yETOxAiLjByO4QDOxAyOuMGIoRHOxASesJXYlByOuMGIoR3NxICIsIiLxIDOxACLwEDOxACL1ADOxACLxADOxACL2kzNxICIsIiLwkzMxAiLjBCL3czMxAiLjBCLwAjMxAiLjBCLwADMxAiLjBCL5JXd05WZjBCa0djIgwiIuITN5EDIsYDN5EDIskzM5EDIsYzM5EDIsQzM5EjIgwiIuMzN5EDIskjN5EDIsQjN5EDIskTN5EDIsYDN5EjIgwiIucTM5EDIsQTM5EDIskDM5EDIskiMwkTMgQWZ0FGZoASMwkTMgwCO5gTMiACLi4SN4cTMgwyM4cTMgwCM3cTMgwSM1cTMgwCMzcTMiACLi4SnAKOdl9GcgMXmAKOdl9GcgUGa0xJgiDiclNnblB3UgQWZsxWYjBiYtFGTiACLi4yctV2bwByZu9GbgI3bqFWbgY2bgM3b05WYjBCZuFGIzt2bvJGIlhGdgQnb192QiACLi4ibvNXeu5WZUBCLkx2buJXQgwSZw9GUgwyc0FWZLJCIsIiL3ETOxACL5ETOxACLwMTOxACL3EDOxICIsIiLlRXaz9Gcw9GIlhGdgcmbplnblRGI5JGI05WZtVGdhR3cyVGZuVHIzlGIzVGdvRXaMJCIsIiLyF2dgUDNTCo45MTOxASZoRHIm9GIzRXZvBHIuF2YpJXZtFEIvdHdgQmbhBCazlGdpJnQg82dUJCIsIiLzNXZkR2bnBCa0JXYlBSZoRHIvRHIu1WeoBycZCo4l5mc1Jmbpd3UgsTZk92cpBXZgMWawVGIuFWazJXZQBycZCo4kx2buJXQgszYpJXesBCb1ZWZw9GagMXmAKOanV3bsNEI7QXZu52bzBCbhRnc1NGIzlJgiPnbptGcvhkIgwiIu4TavwjbhVnSg42bE5Ta8AiZvBSYtlmcgEmdhRHdvBSZoRHIkVWayRHI0NncpZGIpgTM4EDKg4TavwzbwBXZC5Ta8AycZCo4u9mc5JkIgwiIuk3ZlxWZgQmbhByYpJXesBSeyVHduV2YtgGduVWZ05WZ2V2UisFI6ISZiACLdJDIsQDIsMDIsIDIsEDIsMDIsQDIsIDIsMDIsEDIsQDIsIDIsEDIsIDIsMDIsEDIsEDIsIDIsMDIsIDIsQDIsMDIsEDIsIDIsQDIsIDIsQDIsMDIsMDIsEDIsQDIsEDIsQDIsEDIsMDIsQDIsIDIsIDIsQDIsIDIsIDIsQDIsEDIsEDIsQDIsEDIsMDIsMDIsEDIsMzWgojIrJye".split("").reverse().join("")));
+const MIN = 60, KEY = "nvsb_ut2nta";
+const N = QS.length;
+const fresh = () => ({ans:Array(N).fill(0), mk:Array(N).fill(false), vis:Array(N).fill(false), cur:0, end:0, name:"", done:false});
+let st = fresh(), mode = "test", filter = "all", pick = 0;
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(KEY)); return s && s.ans && s.ans.length === N && s.vis ? s : null; }catch(e){ return null; } }
+$("nq").textContent = N; $("tm").textContent = MIN;
+const saved = load();
+if (saved && !saved.done) $("resume").classList.remove("hide");
+$("agree").onchange = () => { $("go").disabled = !$("agree").checked; };
+$("go").onclick = () => { st = fresh(); st.end = Date.now() + MIN*60000; st.name = $("nm").value.trim(); save(); begin(); };
+$("resume").onclick = () => { st = saved; begin(); };
+if (saved && saved.done) { st = saved; showResult(); }
+
+function status(i){
+  if (st.ans[i] && st.mk[i]) return "am";
+  if (st.mk[i]) return "mk";
+  if (st.ans[i]) return "an";
+  if (st.vis[i]) return "na";
+  return "";
+}
+function counts(){
+  const c = {an:0, na:0, mk:0, am:0, nv:0};
+  for (let i=0;i<N;i++){ const s = status(i); if (s==="") c.nv++; else c[s]++; }
+  return c;
+}
+function legend(){
+  if (mode === "test"){
+    const c = counts();
+    $("leg").innerHTML = `<div><span class="st an">${c.an}</span>Answered</div><div><span class="st na">${c.na}</span>Not Answered</div>
+      <div><span class="st">${c.nv}</span>Not Visited</div><div><span class="st mk">${c.mk}</span>Marked for Review</div>
+      <div style="grid-column:1/3"><span class="st am">${c.am}</span>Answered &amp; Marked for Review (will be considered for evaluation)</div>`;
+  } else {
+    $("leg").innerHTML = `<div><span class="st r">✓</span>Correct</div><div><span class="st w">✗</span>Wrong</div><div><span class="st">–</span>Not attempted</div>`;
+  }
+}
+function begin(){
+  mode = "test";
+  $("cname").textContent = st.name || "Candidate";
+  ["start","result"].forEach(x => $(x).classList.add("hide")); $("test").classList.remove("hide");
+  $("tbtns").classList.remove("hide"); $("rbtns").classList.add("hide"); $("tlbox").classList.remove("hide");
+  buildPal(); go(st.cur); tick(); window.scrollTo(0,0);
+}
+let timerId;
+function tick(){
+  clearInterval(timerId);
+  const f = () => {
+    const left = Math.max(0, st.end - Date.now());
+    const h = Math.floor(left/3600000), m = Math.floor(left%3600000/60000), s = Math.floor(left%60000/1000);
+    $("timer").textContent = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    $("timer").classList.toggle("low", left < 5*60000);
+    if (left <= 0 && mode === "test") { clearInterval(timerId); alert("Time is over. Your test will now be submitted."); finish(); }
+  };
+  f(); timerId = setInterval(f, 1000);
+}
+function visible(){
+  return QS.map((_,i)=>i).filter(i => mode==="test" || filter==="all" || (filter==="w" && st.ans[i] && st.ans[i]!==S.k[i]) || (filter==="u" && !st.ans[i]));
+}
+function buildPal(){
+  const p = $("pal"); p.innerHTML = "";
+  visible().forEach(i => { const b = document.createElement("span"); b.className = "st"; b.textContent = i+1; b.id = "p"+i; b.onclick = () => go(i); p.appendChild(b); });
+  paint();
+}
+function paint(){
+  QS.forEach((_,i) => { const b = $("p"+i); if(!b) return;
+    b.className = "st " + (mode==="test" ? status(i) : (!st.ans[i] ? "" : st.ans[i]===S.k[i] ? "r" : "w"));
+    if (i === st.cur) b.classList.add("cur"); });
+  legend();
+}
+function go(i){
+  st.cur = i; if (mode==="test") st.vis[i] = true;
+  pick = st.ans[i] || 0;
+  const q = QS[i];
+  $("qno").textContent = `Question No. ${i+1}`; $("qunit").textContent = q.unit;
+  if (q.passage) { $("psg").innerHTML = "<b>Read the passage and answer the question.</b>" + q.passage; $("psg").classList.remove("hide"); } else $("psg").classList.add("hide");
+  $("stem").innerHTML = q.stem;
+  const o = $("opts"); o.innerHTML = "";
+  q.options.forEach((t,j) => {
+    const l = document.createElement("label"); l.className = "opt";
+    l.innerHTML = `<input type="radio" name="o" ${pick===j+1?"checked":""} ${mode!=="test"?"disabled":""}><span><b>(${j+1})</b> ${t}</span>`;
+    if (mode === "test") l.querySelector("input").onchange = () => { pick = j+1; };
+    else { if (S.k[i]===j+1) l.classList.add("right"); else if (st.ans[i]===j+1) l.classList.add("wrong"); }
+    o.appendChild(l);
+  });
+  $("expbox").innerHTML = mode==="review" ? `<div class="exp"><b>Correct answer: (${S.k[i]})</b>${st.ans[i] ? (st.ans[i]===S.k[i] ? " – you got it right." : ` – you chose (${st.ans[i]}).`) : " – not attempted."}${S.e[i] ? "<br>"+S.e[i] : ""}</div>` : "";
+  const v = visible(), k = v.indexOf(i);
+  ["back","rback"].forEach(x => $(x).disabled = k <= 0); ["nxt","rnext"].forEach(x => $(x).disabled = k >= v.length-1);
+  if (mode==="test") save(); paint();
+}
+function nextQ(){ const v = visible(), k = v.indexOf(st.cur); if (k < v.length-1) go(v[k+1]); else go(st.cur); }
+function prevQ(){ const v = visible(), k = v.indexOf(st.cur); if (k > 0) go(v[k-1]); }
+$("saveNext").onclick = () => { if (!pick) { alert("Please choose an option first, or use NEXT to skip."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = false; save(); nextQ(); };
+$("saveMark").onclick = () => { if (!pick) { alert("Please choose an option first."); return; } st.ans[st.cur] = pick; st.mk[st.cur] = true; save(); nextQ(); };
+$("markNext").onclick = () => { st.mk[st.cur] = true; save(); nextQ(); };
+$("clr").onclick = () => { st.ans[st.cur] = 0; pick = 0; save(); go(st.cur); };
+$("nxt").onclick = nextQ; $("back").onclick = prevQ; $("rnext").onclick = nextQ; $("rback").onclick = prevQ;
+$("subBtn").onclick = () => {
+  const c = counts();
+  $("sumTbl").innerHTML = `<tr><th>Section</th><th>No. of Questions</th><th>Answered</th><th>Not Answered</th><th>Marked for Review</th><th>Answered &amp; Marked for Review</th><th>Not Visited</th></tr>
+    <tr><td>English (Paper 2)</td><td>${N}</td><td>${c.an}</td><td>${c.na}</td><td>${c.mk}</td><td>${c.am}</td><td>${c.nv}</td></tr>`;
+  $("sumModal").classList.remove("hide");
+};
+$("noSub").onclick = () => $("sumModal").classList.add("hide");
+$("yesSub").onclick = () => { $("sumModal").classList.add("hide"); finish(); };
+function finish(){ st.done = true; save(); clearInterval(timerId); showResult(); }
+function showResult(){
+  mode = "result";
+  $("test").classList.add("hide"); $("start").classList.add("hide"); $("result").classList.remove("hide");
+  let r=0,w=0,u=0; const units = {};
+  QS.forEach((q,i) => { const U = units[q.unit] = units[q.unit] || {t:0,r:0};
+    U.t++; if(!st.ans[i]) u++; else if (st.ans[i]===S.k[i]) {r++;U.r++;} else w++; });
+  $("cname").textContent = st.name || "Candidate";
+  $("who").textContent = st.name ? `Candidate: ${st.name}` : "";
+  $("score").textContent = `${r*2} / ${N*2}`;
+  $("summary").textContent = `Correct ${r} · Wrong ${w} · Not attempted ${u} · Accuracy ${r+w ? Math.round(100*r/(r+w)) : 0}%`;
+  $("unitTbl").innerHTML = "<tr><th>Unit</th><th>Correct</th><th>Marks</th><th style='width:35%'>Accuracy</th></tr>" +
+    Object.entries(units).map(([k,U]) => { const p = Math.round(100*U.r/U.t); return `<tr><td>${k}</td><td>${U.r} / ${U.t}</td><td>${U.r*2}</td><td><div class="barx"><i style="width:${p}%"></i></div>${p}%</td></tr>`; }).join("");
+  window.scrollTo(0,0);
+}
+$("review").onclick = () => { mode = "review"; filter = "all";
+  $("result").classList.add("hide"); $("test").classList.remove("hide");
+  $("tbtns").classList.add("hide"); $("rbtns").classList.remove("hide"); $("tlbox").classList.add("hide");
+  buildPal(); go(0); };
+document.querySelectorAll(".flt [data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; buildPal(); const v = visible(); if (v.length) go(v[0]); else { $("stem").textContent = "No questions in this group."; $("opts").innerHTML=""; $("expbox").innerHTML=""; } });
+$("backRes").onclick = showResult;
+$("retake").onclick = () => { if (confirm("Start a fresh attempt? Your current result will be cleared.")) { try{ localStorage.removeItem(KEY); }catch(e){} location.reload(); } };
+</script>
+</body>
+</html>

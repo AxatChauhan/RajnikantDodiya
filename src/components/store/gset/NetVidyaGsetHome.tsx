@@ -44,17 +44,17 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
 
   const englishCombo: GsetProductItem = {
     id: 'gset-english-combo',
-    name: 'GSET English Complete Scholar Duo',
+    name: 'GSET English Scholar Duo (Paper 1 + English)',
     stream: 'english',
-    price: currentServerPrice || 799,
-    originalPrice: 999,
-    badge: 'MOST POPULAR • COMPLETE QUALIFYING SOLUTION',
+    price: 249,
+    originalPrice: 799,
+    badge: 'MOST POPULAR • COMPLETE ENGLISH PASS',
     description: 'The definitive all-in-one preparation package for GSET English aspirants: comprehensive Paper 1 General Aptitude combined with specialized Paper 2 English Literature & ELT.',
     features: [
-      'Full Paper 1: All 10 General Aptitude & Teaching/Research Units',
-      'Full Paper 2: British, American & Indian Literature, Theory, Cultural Studies & ELT',
+      'Full Paper 1: 3 Computer-Based CBT Tests (General Aptitude)',
+      'Full Paper 2: 2 Computer-Based CBT Tests (English Literature, Theory & ELT)',
+      '5 Complete GSET Simulation Mock Exams with instant scoring',
       '100% MSU Baroda GSET Syllabus Aligned & Verified Rationales',
-      'High-Yield Revision Dossiers curated by Dr. Rajnikant Dodiya',
       'Watermarked Digital Access valid till 31 Dec 2026',
       'Priority WhatsApp Academic Guidance with Mentor'
     ],
@@ -63,17 +63,17 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
 
   const educationCombo: GsetProductItem = {
     id: 'gset-education-combo',
-    name: 'GSET Education Complete Scholar Duo',
+    name: 'GSET Education Scholar Duo (Paper 1 + Education)',
     stream: 'education',
-    price: currentServerPrice || 799,
-    originalPrice: 999,
-    badge: 'SPECIALIZED TEACHER EDUCATION DUO',
+    price: 249,
+    originalPrice: 799,
+    badge: 'MOST POPULAR • COMPLETE EDUCATION PASS',
     description: 'The definitive dual-paper preparation package for GSET Education candidates: complete Paper 1 General Aptitude combined with specialized Teacher Education & Pedagogy.',
     features: [
-      'Full Paper 1: All 10 General Aptitude & Teaching/Research Units',
-      'Full Paper 2: Philosophical, Sociological & Psychological Foundations of Education',
-      'Curriculum Studies, Teacher Education & Educational Technology Modules',
-      'Specialized Pedagogy & English Language Teaching dossiers by Veteran Academic Mentors',
+      'Full Paper 1: 3 Computer-Based CBT Tests (General Aptitude)',
+      'Full Paper 2: 3 Computer-Based CBT Tests (Teacher Education & Pedagogy)',
+      '6 Complete GSET Simulation Mock Exams with instant scoring',
+      'Philosophical, Sociological & Psychological Foundations + Pedagogy',
       'Watermarked Digital Access valid till 31 Dec 2026',
       'Priority WhatsApp Academic Guidance with Mentor'
     ],
@@ -85,14 +85,14 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
       id: 'gset-paper1',
       name: 'GSET Paper 1: General Aptitude Foundation Pack',
       stream: 'general',
-      price: 399,
+      price: 149,
       originalPrice: 499,
       badge: 'COMMON TO ALL STREAMS',
       description: 'Master all 10 general units: Teaching Aptitude, Research Methodology, Comprehension, Mathematical & Logical Reasoning, ICT, and Higher Education.',
       features: [
-        '10 Core Foundation Units High-Yield Dossiers',
-        'Mathematical & Logical Reasoning Shortcut Heuristics',
-        'Bilingual Guidance & Formula Sheets',
+        '3 Full Computer-Based CBT Mock Exams (50 Qs each)',
+        '10 Core Foundation Units High-Yield Coverage',
+        'Bilingual Gujarati/English interface & explanations',
         'Digital Access valid till 31 Dec 2026'
       ]
     },
@@ -100,16 +100,16 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
       ? [
           {
             id: 'gset-paper2-english',
-            name: 'GSET Paper 2: English Literature & ELT Specialist Pack',
+            name: 'GSET Paper 2: English Literature Specialist Pack',
             stream: 'english' as const,
-            price: 499,
-            originalPrice: 649,
+            price: 149,
+            originalPrice: 499,
             badge: 'ENGLISH SUBJECT SPECIALIST',
             description: 'Focused exclusively on Paper 2 English Literature, Literary Criticism & Theory, Post-Method Pedagogy, and ELT in India.',
             features: [
+              '2 Full Literature & Pedagogy CBT Mock Exams (100 Qs each)',
               'Chaucer to Contemporary World Literature Breakdown',
               'Literary Theory, Structuralism & Cultural Studies Guide',
-              'Post-Method Pedagogy & NEP 2020 Translanguaging',
               'Digital Access valid till 31 Dec 2026'
             ]
           }
@@ -119,13 +119,13 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
             id: 'gset-paper2-education',
             name: 'GSET Paper 2: Education Discipline Master Pack',
             stream: 'education' as const,
-            price: 499,
-            originalPrice: 649,
+            price: 149,
+            originalPrice: 499,
             badge: 'EDUCATION SUBJECT SPECIALIST',
             description: 'Focused exclusively on Paper 2 Education: Philosophy, Psychology, Learner Development, Teacher Training, and Educational Research.',
             features: [
+              '3 Full Education Discipline CBT Mock Exams (100 Qs each)',
               'Western & Indian Philosophical Systems in Education',
-              'Cognitive & Developmental Psychology Summaries',
               'Teacher Education Models & Policy Reforms (NEP 2020)',
               'Digital Access valid till 31 Dec 2026'
             ]
@@ -142,11 +142,15 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     },
     {
       q: 'Can I purchase Paper 1 or Paper 2 individually?',
-      a: 'Yes! While the Complete Scholar Duo (₹799) offers the greatest value, you can also enroll in standalone packs: Paper 1 Foundation Pack (₹399) or Paper 2 Subject Pack (₹499).'
+      a: 'Yes! While the Complete Scholar Duo (₹249) offers the greatest qualifying value, you can also enroll in standalone packs: Paper 1 Foundation Pack (₹149), Paper 2 Education Master Pack (₹149), or Paper 2 English Specialist Pack (₹149).'
     },
     {
-      q: 'How do I access the study materials and test hall?',
-      a: 'Immediately upon checkout via Razorpay, your account is activated. Simply log in with your email to access your personal dashboard, watermarked reading dossiers, and CBT test hall.'
+      q: 'Are English and Education the same exam?',
+      a: 'No. In GSET, English Literature and Teacher Education are two entirely different subject streams with completely different Paper 2 examinations. Paper 1 General Aptitude is common to both streams. Choose your respective stream above to get the matching tests.'
+    },
+    {
+      q: 'How do I access the CBT mock exams?',
+      a: 'Immediately upon checkout via Razorpay, your account is activated. Simply log in with your email to access your personal dashboard and launch the authentic computer-based CBT test hall with real timer and question palette.'
     },
     {
       q: 'How long is my access valid?',
@@ -243,6 +247,14 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
               <GraduationCap className="w-4 h-4 text-teal-700" />
               <span>Education (Pedagogy) Stream</span>
             </button>
+          </div>
+
+          {/* Stream Distinction Notice */}
+          <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs flex items-center gap-2.5">
+            <span className="shrink-0 w-2 h-2 rounded-full bg-amber-500" />
+            <p className="leading-relaxed">
+              <strong>Distinct Subject Streams:</strong> English Literature and Teacher Education are two separate qualification disciplines with completely different Paper 2 examinations. Paper 1 General Aptitude is common to both.
+            </p>
           </div>
         </div>
       </section>

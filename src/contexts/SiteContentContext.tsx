@@ -485,13 +485,15 @@ interface SiteContentContextType {
 
   // Studio UI Control
   isStudioOpen: boolean;
-  openStudio: () => void;
+  activeStudioTab: 'theme' | 'profile' | 'books' | 'exams' | 'store' | 'layout' | 'security';
+  setActiveStudioTab: (tab: 'theme' | 'profile' | 'books' | 'exams' | 'store' | 'layout' | 'security') => void;
+  openStudio: (tab?: 'theme' | 'profile' | 'books' | 'exams' | 'store' | 'layout' | 'security') => void;
   closeStudio: () => void;
 
   // Persistence & Sync
   isSyncing: boolean;
   lastSavedAt: string | null;
-  saveAllToProduction: () => Promise<{ success: boolean; message: string; error?: string }>;
+  saveAllToProduction: (storePayload?: any) => Promise<{ success: boolean; message: string; error?: string }>;
   restoreAuthenticDefaults: () => Promise<void>;
 }
 
@@ -610,6 +612,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
   });
 
   const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [activeStudioTab, setActiveStudioTab] = useState<'theme' | 'profile' | 'books' | 'exams' | 'store' | 'layout' | 'security'>('theme');
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
 
@@ -757,22 +760,30 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [activeColorConfig, activeCanvasConfig, activeFontConfig, theme.fontSizeScale, theme.headerCaps]);
 
-  // Dedicated URL-Only Access for Author Studio (e.g. /studio, /#studio, or ?studio=true)
+  // Dedicated URL-Only Access for Author Studio (e.g. /studio, /#studio, /#admin, or ?studio=true)
   useEffect(() => {
     const checkStudioUrl = () => {
       const hash = window.location.hash.toLowerCase();
       const pathname = window.location.pathname.toLowerCase();
       const search = window.location.search.toLowerCase();
 
-      const isStudioRoute = 
-        hash === '#studio' || 
-        hash === '#store' || 
+      const isStoreAdminRoute = 
+        hash === '#admin' || 
         hash === '#store-admin' || 
+        hash === '#store-studio' || 
+        search.includes('tab=store') || 
+        search.includes('admin=true');
+
+      const isGeneralStudioRoute = 
+        hash === '#studio' || 
         pathname === '/studio' || 
         pathname === '/studio/' || 
         search.includes('studio=true');
 
-      if (isStudioRoute) {
+      if (isStoreAdminRoute) {
+        setActiveStudioTab('store');
+        setIsStudioOpen(true);
+      } else if (isGeneralStudioRoute) {
         setIsStudioOpen(true);
       }
     };
@@ -950,8 +961,8 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
   }, []);
 
-  // 5. Save All Changes to Production (Supabase RPC + Local Storage)
-  const saveAllToProduction = async (): Promise<{ success: boolean; message: string; error?: string }> => {
+  // 5. Save All Changes to Production (Supabase RPC + Local Storage + API Sync)
+  const saveAllToProduction = async (storePayload?: any): Promise<{ success: boolean; message: string; error?: string }> => {
     setIsSyncing(true);
     try {
       const session = getActiveAuthorStudioSession();
@@ -992,6 +1003,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
             exams,
             banner: alertBanner,
             layout: layoutSettings,
+            ...(storePayload ? { store: storePayload } : {}),
             authorEmail
           })
         });
@@ -1115,14 +1127,19 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         layoutSettings,
         setLayoutSettings,
         isStudioOpen,
-        openStudio: () => setIsStudioOpen(true),
+        activeStudioTab,
+        setActiveStudioTab,
+        openStudio: (tab?: 'theme' | 'profile' | 'books' | 'exams' | 'store' | 'layout' | 'security') => {
+          if (tab) setActiveStudioTab(tab);
+          setIsStudioOpen(true);
+        },
         closeStudio: () => {
           setIsStudioOpen(false);
           const hash = window.location.hash.toLowerCase();
           const pathname = window.location.pathname.toLowerCase();
           const search = window.location.search.toLowerCase();
-          if (hash === '#studio' || pathname === '/studio' || pathname === '/studio/' || search.includes('studio=true')) {
-            window.history.replaceState(null, '', '/');
+          if (hash === '#studio' || hash === '#admin' || hash === '#store-admin' || hash === '#store-studio' || pathname === '/studio' || pathname === '/studio/' || search.includes('studio=true') || search.includes('admin=true')) {
+            window.history.replaceState(null, '', window.location.pathname);
           }
         },
         isSyncing,

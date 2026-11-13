@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>PYQ Trend Analysis</title>
+<style>
+:root{--bg:#eef1f5;--bar:#1f3a5f;--fg:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,Arial,sans-serif;
+-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+header{position:sticky;top:0;z-index:5;background:var(--bar);color:var(--fg);display:flex;flex-wrap:wrap;
+gap:8px;align-items:center;justify-content:space-between;padding:8px 14px}
+header b{font-size:15px}header form{display:flex;gap:6px;align-items:center;font-size:14px}
+header input{width:64px;padding:4px;border-radius:4px;border:0}header button{padding:4px 10px;border:0;border-radius:4px;cursor:pointer}
+main{max-width:1000px;margin:0 auto;padding:12px 8px 60px}
+.pg{position:relative;margin:0 auto 14px;background:#fff;box-shadow:0 1px 4px #0003;aspect-ratio:1000/1414;overflow:hidden}
+.pg img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none}
+.wm{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-around;align-items:center;
+color:#1f3a5f;opacity:.10;font-size:clamp(14px,3vw,28px);font-weight:700;transform:rotate(-28deg);white-space:nowrap}
+.no{position:absolute;right:8px;bottom:6px;font-size:12px;color:#666;background:#fff9;padding:1px 6px;border-radius:3px}
+@media print{body *{display:none!important}body:after{content:"Printing is not allowed. Please read online.";display:block;padding:40px;font-size:20px}}
+</style></head><body oncontextmenu="return false" ondragstart="return false">
+<header><b>PYQ Trend Analysis</b>
+<form onsubmit="go();return false">Page <input id="j" type="number" min="1" max="35" value="1"> / 35 <button>Go</button></form></header>
+<main id="m"></main>
+<script>
+const P=["p-01.jpg", "p-02.jpg", "p-03.jpg", "p-04.jpg", "p-05.jpg", "p-06.jpg", "p-07.jpg", "p-08.jpg", "p-09.jpg", "p-10.jpg", "p-11.jpg", "p-12.jpg", "p-13.jpg", "p-14.jpg", "p-15.jpg", "p-16.jpg", "p-17.jpg", "p-18.jpg", "p-19.jpg", "p-20.jpg", "p-21.jpg", "p-22.jpg", "p-23.jpg", "p-24.jpg", "p-25.jpg", "p-26.jpg", "p-27.jpg", "p-28.jpg", "p-29.jpg", "p-30.jpg", "p-31.jpg", "p-32.jpg", "p-33.jpg", "p-34.jpg", "p-35.jpg"], WM="{{BUYER_EMAIL}} \u00b7 NET Vidya";
+const m=document.getElementById('m');
+P.forEach((f,i)=>{const d=document.createElement('div');d.className='pg';d.id='p'+(i+1);
+d.innerHTML='<img loading="lazy" alt="Page '+(i+1)+'" src="pages/'+f+'"><div class="wm">'+('<span>'+WM+'</span>').repeat(4)+'</div><span class="no">'+(i+1)+'</span>';m.appendChild(d)});
+function go(){const n=Math.min(P.length,Math.max(1,+document.getElementById('j').value||1));document.getElementById('p'+n).scrollIntoView();}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)document.getElementById('j').value=e.target.id.slice(1)}),{threshold:.5});
+document.querySelectorAll('.pg').forEach(p=>io.observe(p));
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['s','p','u','c'].includes(e.key.toLowerCase()))e.preventDefault()});
+</script></body></html>
