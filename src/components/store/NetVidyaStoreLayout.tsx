@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   GraduationCap,
   BookOpen,
@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   Menu,
   X,
-  Lock,
   ArrowRight,
   Clock,
   Sparkles,
@@ -51,6 +50,37 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Discrete Administrative Gateway: URL Hash (#admin, #store-admin), Query (?admin=true), or Secret Keybind (Ctrl+Shift+A)
+  useEffect(() => {
+    const checkAdminRoute = () => {
+      if (typeof window === 'undefined') return;
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+      if (hash === '#admin' || hash === '#store-admin' || search.includes('admin=true')) {
+        setIsAdminOpen(true);
+      }
+    };
+    checkAdminRoute();
+    window.addEventListener('hashchange', checkAdminRoute);
+    window.addEventListener('popstate', checkAdminRoute);
+    return () => {
+      window.removeEventListener('hashchange', checkAdminRoute);
+      window.removeEventListener('popstate', checkAdminRoute);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Secret key combination: Ctrl+Shift+A (or Cmd+Shift+A)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setIsAdminOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleOpenPolicies = (tab: PolicyTab = 'terms') => {
     setSelectedPolicyTab(tab);
@@ -172,15 +202,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             </button>
 
-            {/* Admin Trigger Button - Desktop only to preserve mobile bar width */}
-            <button
-              onClick={() => setIsAdminOpen(true)}
-              className="hidden sm:inline-flex p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xs font-mono"
-              title="Dr. Rajnikant Admin Studio"
-            >
-              <Lock className="w-4 h-4" />
-            </button>
-
             {/* Mobile Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
@@ -293,20 +314,13 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </div>
 
             {/* Quick Action in Drawer */}
-            <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
+            <div className="pt-2 border-t border-gray-100">
               <button
                 onClick={() => { setIsCheckoutOpen(true); setMobileMenuOpen(false); }}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <span>Buy Final Pack (₹{currentServerPrice})</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => { setIsAdminOpen(true); setMobileMenuOpen(false); }}
-                className="p-2.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                title="Admin Studio"
-              >
-                <Lock className="w-4 h-4" />
               </button>
             </div>
           </div>
