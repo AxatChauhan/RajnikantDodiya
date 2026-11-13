@@ -127,6 +127,7 @@ export const AuthorStudioModal: React.FC = () => {
     buyersRegistry: storeBuyersRegistry,
     addManualBuyer: addStoreManualBuyer,
     toggleBuyerAccess: toggleStoreBuyerAccess,
+    clearBuyersRegistry: clearStoreBuyersRegistry,
     exportBuyersToExcel: exportStoreBuyersToExcel,
     resendConfirmationEmail: resendStoreConfirmationEmail,
     currentServerPrice: storeCurrentPrice,
@@ -2399,13 +2400,30 @@ export const AuthorStudioModal: React.FC = () => {
                           </p>
                         </div>
 
-                        <button
-                          onClick={exportStoreBuyersToExcel}
-                          className="self-start sm:self-center px-3.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>Download .xlsx File</span>
-                        </button>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {storeBuyersRegistry.length > 0 && (
+                            <button
+                              onClick={() => {
+                                if (window.confirm('Clear all candidate records from local registry?')) {
+                                  clearStoreBuyersRegistry();
+                                  triggerStoreToast('Candidate registry cleared.');
+                                }
+                              }}
+                              className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                              title="Clear local candidate records"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Clear All Records</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={exportStoreBuyersToExcel}
+                            className="px-3.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Download .xlsx File</span>
+                          </button>
+                        </div>
                       </div>
 
                       {/* Search */}

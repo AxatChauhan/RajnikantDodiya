@@ -188,41 +188,8 @@ export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
   }
 ];
 
-export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [
-  {
-    id: 'buy-1',
-    name: 'Aarav Patel',
-    email: 'aarav.patel.ugc@gmail.com',
-    mobile: '9876543210',
-    orderId: 'NV_ORD_78912301',
-    amountPaid: 799,
-    paymentMethod: 'razorpay',
-    enrolledAt: '2026-11-01T14:30:00+05:30',
-    isActive: true
-  },
-  {
-    id: 'buy-2',
-    name: 'Priya Sharma',
-    email: 'priya.sharma.gset@gmail.com',
-    mobile: '9823456781',
-    orderId: 'NV_ORD_78912302',
-    amountPaid: 799,
-    paymentMethod: 'razorpay',
-    enrolledAt: '2026-11-02T10:15:00+05:30',
-    isActive: true
-  },
-  {
-    id: 'buy-3',
-    name: 'Dr. Hardik Vaghela',
-    email: 'hardik.vaghela@gmail.com',
-    mobile: '9898012345',
-    orderId: 'NV_MANUAL_003',
-    amountPaid: 799,
-    paymentMethod: 'manual_upi',
-    enrolledAt: '2026-11-03T18:45:00+05:30',
-    isActive: true
-  }
-];
+// Initial Empty Content for Enrolled Candidate Registry (No test candidates)
+export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [];
 
 interface NetVidyaStoreContextType {
   settings: NetVidyaStoreSettings;
@@ -245,6 +212,7 @@ interface NetVidyaStoreContextType {
   buyersRegistry: EnrolledBuyerRecord[];
   addManualBuyer: (buyer: { name: string; email: string; mobile: string; amountPaid?: number }) => void;
   toggleBuyerAccess: (buyerId: string) => void;
+  clearBuyersRegistry: () => void;
   exportBuyersToExcel: () => void;
   resendConfirmationEmail: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   adminToken: string | null;
@@ -313,7 +281,23 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
   const [buyersRegistry, setBuyersRegistry] = useState<EnrolledBuyerRecord[]>(() => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY_BUYERS);
-      if (cached) return JSON.parse(cached);
+      if (cached) {
+        const parsed: EnrolledBuyerRecord[] = JSON.parse(cached);
+        // Clean out legacy mock test candidates
+        const clean = parsed.filter(b => 
+          b.id !== 'buy-1' && 
+          b.id !== 'buy-2' && 
+          b.id !== 'buy-3' && 
+          !b.email?.includes('aarav.patel') &&
+          !b.email?.includes('priya.sharma') &&
+          !b.email?.includes('hardik.vaghela') &&
+          !b.email?.includes('student@example.com')
+        );
+        try {
+          localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(clean));
+        } catch {}
+        return clean;
+      }
     } catch {}
     return INITIAL_BUYERS_REGISTRY;
   });
@@ -697,6 +681,14 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     downloadBuyersAsXlsx(buyersRegistry);
   }, [buyersRegistry]);
 
+  // Clear All Buyers from Local Storage / Registry
+  const clearBuyersRegistry = useCallback(() => {
+    setBuyersRegistry([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY_BUYERS);
+    } catch {}
+  }, []);
+
   // Resend Confirmation Email
   const resendConfirmationEmail = useCallback(async (email: string) => {
     if (!email) return { success: false, error: 'Email is required' };
@@ -772,6 +764,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         buyersRegistry,
         addManualBuyer,
         toggleBuyerAccess,
+        clearBuyersRegistry,
         exportBuyersToExcel,
         resendConfirmationEmail,
         adminToken,
