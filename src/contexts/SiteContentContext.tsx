@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import LIVE_STUDIO_SNAPSHOT from '../data/live_studio_state.json';
 import { supabase } from '../lib/supabase';
 import { PROFESSOR_INFO, Book as ProfessorBook, BOOKS } from '../data/professorData';
 import { FEATURED_BOOK_CHAPTERS, BookChapter, getRawMockExamQuestions } from '../data/storeCatalogData';
@@ -524,25 +525,48 @@ export function sanitizeBooksForPublic(booksList: StudioBookItem[]): StudioBookI
 }
 
 export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1. Initial State from localStorage (or fallback to pristine defaults)
+  // Snapshot Fallbacks (Guarantees zero regression on new code pushes and across devices)
+  const snapshotTheme = (LIVE_STUDIO_SNAPSHOT as any)?.theme;
+  const initialTheme: SiteThemeState = snapshotTheme ? { ...DEFAULT_THEME_STATE, ...snapshotTheme } : DEFAULT_THEME_STATE;
+
+  const snapshotProfile = (LIVE_STUDIO_SNAPSHOT as any)?.profile;
+  const initialProfile: AuthorProfileState = snapshotProfile ? { ...DEFAULT_AUTHOR_PROFILE, ...snapshotProfile } : DEFAULT_AUTHOR_PROFILE;
+
+  const snapshotBooks = (LIVE_STUDIO_SNAPSHOT as any)?.books;
+  const initialBooks: StudioBookItem[] = (snapshotBooks && Array.isArray(snapshotBooks) && snapshotBooks.length > 0)
+    ? snapshotBooks
+    : DEFAULT_STUDIO_BOOKS;
+
+  const snapshotExams = (LIVE_STUDIO_SNAPSHOT as any)?.exams;
+  const initialExams: StudioExamTest[] = (snapshotExams && Array.isArray(snapshotExams) && snapshotExams.length > 0)
+    ? snapshotExams
+    : DEFAULT_STUDIO_EXAMS;
+
+  const snapshotBanner = (LIVE_STUDIO_SNAPSHOT as any)?.banner;
+  const initialBanner: AlertBannerState = snapshotBanner ? { ...DEFAULT_ALERT_BANNER, ...snapshotBanner } : DEFAULT_ALERT_BANNER;
+
+  const snapshotLayout = (LIVE_STUDIO_SNAPSHOT as any)?.layout;
+  const initialLayout: LayoutSettingsState = snapshotLayout ? { ...DEFAULT_LAYOUT_SETTINGS, ...snapshotLayout } : DEFAULT_LAYOUT_SETTINGS;
+
+  // 1. Initial State from localStorage (or fallback to master snapshot)
   const [theme, setThemeState] = useState<SiteThemeState>(() => {
     try {
       if (typeof localStorage !== 'undefined') {
         const cached = localStorage.getItem(STORAGE_KEY_THEME);
-        if (cached) return { ...DEFAULT_THEME_STATE, ...JSON.parse(cached) };
+        if (cached) return { ...initialTheme, ...JSON.parse(cached) };
       }
     } catch {}
-    return DEFAULT_THEME_STATE;
+    return initialTheme;
   });
 
   const [profile, setProfileState] = useState<AuthorProfileState>(() => {
     try {
       if (typeof localStorage !== 'undefined') {
         const cached = localStorage.getItem(STORAGE_KEY_PROFILE);
-        if (cached) return { ...DEFAULT_AUTHOR_PROFILE, ...JSON.parse(cached) };
+        if (cached) return { ...initialProfile, ...JSON.parse(cached) };
       }
     } catch {}
-    return DEFAULT_AUTHOR_PROFILE;
+    return initialProfile;
   });
 
   const [books, setBooksState] = useState<StudioBookItem[]>(() => {
@@ -552,7 +576,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (cached) return sanitizeBooksForPublic(JSON.parse(cached));
       }
     } catch {}
-    return sanitizeBooksForPublic(DEFAULT_STUDIO_BOOKS);
+    return sanitizeBooksForPublic(initialBooks);
   });
 
   const [exams, setExamsState] = useState<StudioExamTest[]>(() => {
@@ -562,27 +586,27 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (cached) return JSON.parse(cached);
       }
     } catch {}
-    return DEFAULT_STUDIO_EXAMS;
+    return initialExams;
   });
 
   const [alertBanner, setAlertBannerState] = useState<AlertBannerState>(() => {
     try {
       if (typeof localStorage !== 'undefined') {
         const cached = localStorage.getItem(STORAGE_KEY_BANNER);
-        if (cached) return { ...DEFAULT_ALERT_BANNER, ...JSON.parse(cached) };
+        if (cached) return { ...initialBanner, ...JSON.parse(cached) };
       }
     } catch {}
-    return DEFAULT_ALERT_BANNER;
+    return initialBanner;
   });
 
   const [layoutSettings, setLayoutSettingsState] = useState<LayoutSettingsState>(() => {
     try {
       if (typeof localStorage !== 'undefined') {
         const cached = localStorage.getItem(STORAGE_KEY_LAYOUT);
-        if (cached) return { ...DEFAULT_LAYOUT_SETTINGS, ...JSON.parse(cached) };
+        if (cached) return { ...initialLayout, ...JSON.parse(cached) };
       }
     } catch {}
-    return DEFAULT_LAYOUT_SETTINGS;
+    return initialLayout;
   });
 
   const [isStudioOpen, setIsStudioOpen] = useState(false);
@@ -594,10 +618,47 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const activeColorConfig = COLOR_PALETTES[theme.colorPalette] || COLOR_PALETTES['oxford-navy'];
   const activeCanvasConfig = CANVAS_TONES[theme.canvasTone] || CANVAS_TONES['parchment'];
 
-  // 2. Fetch Latest Content from Supabase on mount
+  // 2. Fetch Latest Content from Server API (/api/content) and Supabase on mount
   useEffect(() => {
     let isMounted = true;
     async function fetchRemoteContent() {
+      // Step A: Check authoritative /api/content endpoint
+      try {
+        const res = await fetch('/api/content').catch(() => null);
+        if (res && res.ok) {
+          const json = await res.json().catch(() => null);
+          if (json?.success && json.state && isMounted) {
+            const st = json.state;
+            if (st.theme) {
+              setThemeState(prev => ({ ...prev, ...st.theme }));
+              try { localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(st.theme)); } catch {}
+            }
+            if (st.profile) {
+              setProfileState(prev => ({ ...prev, ...st.profile }));
+              try { localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(st.profile)); } catch {}
+            }
+            if (st.books && Array.isArray(st.books) && st.books.length > 0) {
+              const sanitizedRemoteBooks = sanitizeBooksForPublic(st.books);
+              setBooksState(sanitizedRemoteBooks);
+              try { localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(sanitizedRemoteBooks)); } catch {}
+            }
+            if (st.exams && Array.isArray(st.exams) && st.exams.length > 0) {
+              setExamsState(st.exams);
+              try { localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(st.exams)); } catch {}
+            }
+            if (st.banner) {
+              setAlertBannerState(prev => ({ ...prev, ...st.banner }));
+              try { localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(st.banner)); } catch {}
+            }
+            if (st.layout) {
+              setLayoutSettingsState(prev => ({ ...prev, ...st.layout }));
+              try { localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(st.layout)); } catch {}
+            }
+          }
+        }
+      } catch {}
+
+      // Step B: Optional Supabase sync fallback
       try {
         const { data, error } = await supabase
           .from('site_content')
@@ -607,28 +668,28 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
           for (const item of data) {
             if (item.key === 'theme' && item.content) {
               setThemeState(prev => ({ ...prev, ...item.content }));
-              localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(item.content));
+              try { localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(item.content)); } catch {}
             } else if (item.key === 'profile' && item.content) {
               setProfileState(prev => ({ ...prev, ...item.content }));
-              localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(item.content));
+              try { localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(item.content)); } catch {}
             } else if (item.key === 'books' && item.content) {
               const sanitizedRemoteBooks = sanitizeBooksForPublic(item.content);
               setBooksState(sanitizedRemoteBooks);
-              localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(sanitizedRemoteBooks));
+              try { localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(sanitizedRemoteBooks)); } catch {}
             } else if (item.key === 'exams' && item.content) {
               setExamsState(item.content);
-              localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(item.content));
+              try { localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(item.content)); } catch {}
             } else if (item.key === 'banner' && item.content) {
               setAlertBannerState(prev => ({ ...prev, ...item.content }));
-              localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(item.content));
+              try { localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(item.content)); } catch {}
             } else if (item.key === 'layout' && item.content) {
               setLayoutSettingsState(prev => ({ ...prev, ...item.content }));
-              localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(item.content));
+              try { localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(item.content)); } catch {}
             }
           }
         }
       } catch {
-        // Fallback to local cache is already active
+        // Master snapshot and local cache are already active
       }
     }
 
@@ -915,6 +976,28 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
       localStorage.setItem(STORAGE_KEY_EXAMS, JSON.stringify(exams));
       localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(alertBanner));
       localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(layoutSettings));
+
+      // Sync to authoritative /api/content endpoint (Durable serverless sync)
+      try {
+        await fetch('/api/content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {})
+          },
+          body: JSON.stringify({
+            theme,
+            profile,
+            books: publicBooks,
+            exams,
+            banner: alertBanner,
+            layout: layoutSettings,
+            authorEmail
+          })
+        });
+      } catch (err: any) {
+        console.warn('Server content sync status:', err?.message);
+      }
 
       // Attempt Supabase RPC with cryptographic author verification (VULN-02 Hardening)
       try {

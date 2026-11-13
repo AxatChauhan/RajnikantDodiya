@@ -21,7 +21,7 @@ import {
   JWT_SECRET,
   DEFAULT_ACCESS_EXPIRY,
   AUTHOR_EMAILS
-} from '../api/auth/auth-helper.js';
+} from '../lib/auth-helper.js';
 
 let totalTests = 0;
 let passedTests = 0;
@@ -342,7 +342,7 @@ async function main() {
   // 3.3 Author preview bypass of future tests
   const r3_3 = await invoke(serveTestHandler, {
     headers: { Authorization: `Bearer ${authorToken}` },
-    query: { testId: 'test-net-mock-2' }
+    query: { testId: 'test-future-mock' }
   });
   assert(
     r3_3.status === 200 && r3_3.data?.isLocked === false,
@@ -354,7 +354,7 @@ async function main() {
   // 3.4 Non-author with author email in query string cannot bypass date gate
   const r3_4 = await invoke(serveTestHandler, {
     headers: { Authorization: `Bearer ${buyerToken}` },
-    query: { testId: 'test-net-mock-2', email: AUTHOR_EMAILS[0] }
+    query: { testId: 'test-future-mock', email: AUTHOR_EMAILS[0] }
   });
   assert(
     r3_4.status === 403,
@@ -367,7 +367,7 @@ async function main() {
   // Server-side check uses `new Date()` exclusively; query params like ?now, ?date are ignored
   const r3_5 = await invoke(serveTestHandler, {
     headers: { Authorization: `Bearer ${buyerToken}` },
-    query: { testId: 'test-net-mock-2', now: '2026-12-31T23:59:59Z', currentDate: '2027-01-01' }
+    query: { testId: 'test-future-mock', now: '2026-12-31T23:59:59Z', currentDate: '2027-01-01' }
   });
   assert(
     r3_5.status === 403,

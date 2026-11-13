@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/syncLiveProductionState.mjs",
     "build": "tsc && vite build",
+    "sync:live": "node scripts/syncLiveProductionState.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test:security": "node scripts/securityAuditTests.mjs",

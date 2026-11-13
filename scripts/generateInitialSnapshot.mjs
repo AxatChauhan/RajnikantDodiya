@@ -1,0 +1,278 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '..');
+
+// Read professorData
+const profFile = fs.readFileSync(path.join(ROOT, 'src/data/professorData.ts'), 'utf8');
+
+// We can build the initial state object
+const snapshot = {
+  version: 1,
+  updatedAt: new Date().toISOString(),
+  theme: {
+    fontPreset: 'oxford-classical',
+    colorPalette: 'oxford-navy',
+    canvasTone: 'parchment',
+    fontSizeScale: 'standard',
+    headerCaps: 'small-caps'
+  },
+  profile: {
+    name: 'Dr. Rajnikant Dodiya',
+    title: 'Assistant Professor of English',
+    institution: 'H.M. Patel Institute of English Training and Research (HMPIETR)',
+    university: 'Sardar Patel University',
+    location: 'Vallabh Vidyanagar, Anand, Gujarat, India',
+    email: 'rajnikantdodiya2@gmail.com',
+    officialEmail: 'rajnikant@hmpietr.edu.in',
+    photoUrl: '/dr-rajnikant-dodiya.jpg',
+    shortBio: 'Assistant Professor of English at HMPIETR, Sardar Patel University. Ph.D. in English (2018), 2× UGC-NET & GSET qualified scholar specializing in Post-Method Pedagogy, ELT, and Teacher Education.',
+    longBio: [
+      'Dr. Rajnikant S. Dodiya is an Assistant Professor of English at the renowned H.M. Patel Institute of English Training and Research (HMPIETR), a premier teacher-education institute affiliated with Sardar Patel University, Vallabh Vidyanagar, Gujarat.',
+      'He holds a Ph.D. in English (2018) and has qualified the prestigious UGC-NET twice alongside the Gujarat State Eligibility Test (GSET). His doctoral and post-doctoral scholarship centers on Post-Method Pedagogy, Second Language Acquisition in ESL contexts, and the philosophical synthesis of ethical teacher education.',
+      'A passionate academic mentor, Dr. Dodiya has authored high-impact research monographs and scholarly anthologies published across national and international university presses, while actively guiding NET and GSET aspirants in English Literature and Pedagogy.'
+    ]
+  },
+  layout: {
+    showEmergencyAlert: true,
+    showTrackRecordBoxes: true,
+    showHighlights: true,
+    showFeaturedMonograph: true,
+    showPhilosophyQuote: true,
+    showContactForm: true
+  },
+  banner: {
+    enabled: true,
+    text: 'Admissions Open: Caiele National FDP on AI in Language Teaching (Nov 2026 Batch)',
+    badgeText: 'Institutional Notice',
+    badgeType: 'gold',
+    buttonText: 'View Details',
+    buttonLink: '#communities',
+    targetTab: 'communities'
+  },
+  books: [
+    {
+      id: "book-1-978-81-948123-4-5",
+      year: 2024,
+      title: "Post-Method Pedagogy & English Language Teaching in India",
+      subtitle: "Authored Academic Monograph",
+      publisher: "Palgrave Macmillan / National University Press",
+      isbn: "978-81-948123-4-5",
+      type: "authored",
+      price: 399,
+      coverUrl: "/dr-rajnikant-dodiya.jpg",
+      buyUrl: "#bookstore",
+      whatsappInquiryUrl: "https://wa.me/919638716634?text=Inquiry%20regarding%20book%3A%20Post-Method%20Pedagogy",
+      details: "Comprehensive doctoral monograph analyzing Kumaravadivelu’s 3 Ps framework across Indian ESL tertiary classrooms.",
+      sampleExcerpt: "Education in the twenty-first century stands at a profound philosophical inflection point...",
+      isActive: true,
+      pageCount: 324,
+      previewPages: 20,
+      frontMatterOffset: 12,
+      manuscriptFileName: "9788194812345_monograph.pdf",
+      manuscriptFileSizeMb: 18.4
+    },
+    {
+      id: "book-2-978-93-89123-1-2",
+      year: 2023,
+      title: "Teacher as Moral Architect: The Educational Philosophy of Dr. A.P.J. Abdul Kalam",
+      subtitle: "Authored Academic Monograph",
+      publisher: "Atlantic Publishers & Distributors",
+      isbn: "978-93-89123-1-2",
+      type: "authored",
+      price: 349,
+      coverUrl: "/dr-rajnikant-dodiya.jpg",
+      buyUrl: "#bookstore",
+      whatsappInquiryUrl: "https://wa.me/919638716634?text=Inquiry%20regarding%20book%3A%20Teacher%20as%20Moral%20Architect",
+      details: "Philosophical exploration of value-oriented pedagogy and character synthesis in higher education.",
+      sampleExcerpt: "Teaching is a very noble profession that shapes the character, caliber, and future of an individual...",
+      isActive: true,
+      pageCount: 297,
+      previewPages: 20,
+      frontMatterOffset: 12,
+      manuscriptFileName: "978938912312_monograph.pdf",
+      manuscriptFileSizeMb: 22.1
+    },
+    {
+      id: "book-3-978-81-84567-8-9",
+      year: 2022,
+      title: "Contemporary Perspectives in English Language Education & NEP 2020",
+      subtitle: "Edited Scholarly Anthology",
+      publisher: "Routledge India / Academic Series",
+      isbn: "978-81-84567-8-9",
+      type: "edited",
+      price: 499,
+      coverUrl: "/dr-rajnikant-dodiya.jpg",
+      buyUrl: "#bookstore",
+      whatsappInquiryUrl: "https://wa.me/919638716634?text=Inquiry%20regarding%20book%3A%20Contemporary%20Perspectives",
+      details: "Peer-reviewed anthology of scholarly articles addressing multilingualism, translanguaging, and curriculum reform under NEP 2020.",
+      sampleExcerpt: "National Education Policy 2020 presents both structural opportunities and pedagogical challenges...",
+      isActive: true,
+      pageCount: 314,
+      previewPages: 20,
+      frontMatterOffset: 12,
+      manuscriptFileName: "978818456789_anthology.pdf",
+      manuscriptFileSizeMb: 25.8
+    }
+  ],
+  exams: [
+    {
+      id: "exam-ugc-mock-01",
+      title: "UGC-NET English & Education Master Mock Exam",
+      subtitle: "25 Curated High-Yield MCQs with Detailed Solutions",
+      discipline: "English Literature & Pedagogy",
+      durationMinutes: 60,
+      totalMarks: 50,
+      negativeMarking: 0,
+      passingScore: 20,
+      price: 299,
+      freeSampleCount: 3,
+      isActive: true,
+      sourceFileName: "UGC_NET_Master_Questions_2026.pdf",
+      createdAt: "2026-10-26T00:00:00.000Z",
+      updatedAt: "2026-10-26T00:00:00.000Z",
+      questions: []
+    }
+  ],
+  store: {
+    settings: {
+      productSlug: 'final-pack-2026',
+      productName: 'GSET + UGC NET English Final Pack 2026',
+      earlyBirdPrice: 799,
+      standardPrice: 999,
+      earlyBirdCutoff: '2026-11-10T23:59:59+05:30',
+      accessExpiryDate: '2026-12-31T23:59:59+05:30',
+      sellerLine: 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.',
+      supportEmail: 'netvidyaenglish@gmail.com',
+      supportPhone: '+919638716634'
+    },
+    readingFiles: [
+      {
+        id: 'rf-theory-master',
+        title: 'Literary Theory & Cultural Studies High-Yield Dossier (2026 Edition)',
+        category: 'Literary Theory',
+        description: 'Concise, high-impact breakdown of Structuralism, Poststructuralism, Deconstruction, Postcolonialism, and Ecocriticism with key theorists and core terms.',
+        fileSizeMb: 6.8,
+        downloadCount: 142,
+        dateAdded: '2026-11-01'
+      },
+      {
+        id: 'rf-postmethod-pedagogy',
+        title: 'Post-Method Pedagogy & English Language Teaching in India (ELT Guide)',
+        category: 'Pedagogy & ELT',
+        description: 'Dr. Rajnikant Dodiya’s specialized research monograph notes on Kumaravadivelu’s 3 Ps, NEP 2020 translanguaging, and second-language classroom heuristics.',
+        fileSizeMb: 5.2,
+        downloadCount: 98,
+        dateAdded: '2026-11-01'
+      },
+      {
+        id: 'rf-british-drama-poetry',
+        title: 'British Literature Chronology & Major Works Summary (Chaucer to Modern)',
+        category: 'British Literature',
+        description: 'Quick-revision tables of Elizabethan dramatists, Jacobean tragedy, Romantic poetics, Victorian realism, and Modernist manifestos.',
+        fileSizeMb: 8.4,
+        downloadCount: 185,
+        dateAdded: '2026-11-01'
+      },
+      {
+        id: 'rf-research-methodology',
+        title: 'Paper I & II Research Methodology & Citation Style Sheets (MLA 9th / APA 7th)',
+        category: 'Research Methodology',
+        description: 'Essential rules for parenthetical documentation, core elements template, sampling paradigms, and thesis formatting for UGC-NET.',
+        fileSizeMb: 4.1,
+        downloadCount: 76,
+        dateAdded: '2026-11-02'
+      }
+    ],
+    tests: [
+      {
+        id: 'test-net-mock-1',
+        title: 'NET Mock 1: Full-Length Paper II NTA Simulation',
+        category: 'Full Mock',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-11-01T00:00:00+05:30',
+        description: 'Full 100-question Paper II English Literature NTA simulation with real-time countdown timer, question palette, and detailed explanatory notes.'
+      },
+      {
+        id: 'test-unit-1',
+        title: 'Unit Test 1: British Drama & Elizabethan Poetry',
+        category: 'Unit Test',
+        totalQuestions: 50,
+        durationMinutes: 90,
+        releaseDate: '2026-11-01T00:00:00+05:30',
+        description: 'High-frequency exam questions spanning Shakespeare, Marlowe, University Wits, and Metaphysical poets.'
+      },
+      {
+        id: 'test-bonus-practice-1',
+        title: 'Bonus Practice Mock A: Quick Speed Revision',
+        category: 'Bonus Mock',
+        totalQuestions: 50,
+        durationMinutes: 75,
+        releaseDate: '2026-11-01T00:00:00+05:30',
+        description: 'Rapid-fire speed test designed to enhance accuracy under time pressure.'
+      },
+      {
+        id: 'test-net-mock-2',
+        title: 'NET Mock 2: Full-Length Literature & Literary Theory',
+        category: 'Full Mock',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-11-06T00:00:00+05:30',
+        description: 'Intensive Paper II exam focusing on Poststructuralism, Deconstruction, Postcolonialism, and Feminist Criticism.'
+      },
+      {
+        id: 'test-net-mock-3',
+        title: 'NET Mock 3: Grand Mid-Term Diagnostic Mock',
+        category: 'Full Mock',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-11-10T00:00:00+05:30',
+        description: 'Comprehensive mock scheduled for the final day of the early-bird window.'
+      },
+      {
+        id: 'test-net-mock-4',
+        title: 'NET Mock 4: Cultural Studies & English in India',
+        category: 'Full Mock',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-11-14T00:00:00+05:30',
+        description: 'Deep dive into Macaulay’s Minute, NEP 2020 pedagogical transitions, and Stuart Hall cultural theory.'
+      },
+      {
+        id: 'test-net-mock-5',
+        title: 'NET Mock 5: Research Methods & Pedagogy Master Mock',
+        category: 'Full Mock',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-11-21T00:00:00+05:30',
+        description: 'Comprehensive Paper II testing with dedicated focus on ELT classroom methodology and MLA 9th style sheets.'
+      },
+      {
+        id: 'test-gset-special-1',
+        title: 'GSET Special Simulation Exam 1',
+        category: 'GSET Special',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-11-28T00:00:00+05:30',
+        description: 'Tailored specifically to the Gujarat State Eligibility Test pattern and syllabus weightage.'
+      },
+      {
+        id: 'test-grand-final-booster',
+        title: 'Grand Final Rank Booster Exam 2026',
+        category: 'Grand Final',
+        totalQuestions: 100,
+        durationMinutes: 180,
+        releaseDate: '2026-12-05T00:00:00+05:30',
+        description: 'The definitive final revision simulation before the university examination session.'
+      }
+    ]
+  }
+};
+
+const targetPath = path.join(ROOT, 'src/data/live_studio_state.json');
+fs.writeFileSync(targetPath, JSON.stringify(snapshot, null, 2), 'utf8');
+console.log('SUCCESS: Generated initial master snapshot at', targetPath);

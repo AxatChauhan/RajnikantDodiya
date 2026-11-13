@@ -655,6 +655,41 @@ export const AuthorStudioModal: React.FC = () => {
     }
   };
 
+  // Export Complete Studio Live Snapshot (.json)
+  const exportLiveSnapshot = () => {
+    try {
+      const snapshot = {
+        version: 1,
+        updatedAt: new Date().toISOString(),
+        theme,
+        profile,
+        books,
+        exams,
+        banner: alertBanner,
+        layout: layoutSettings,
+        store: {
+          settings: storeSettings,
+          readingFiles: storeReadingFiles,
+          tests: storeTests
+        }
+      };
+      const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `live_studio_state_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setSaveToast('Snapshot backup exported successfully.');
+      setTimeout(() => setSaveToast(null), 4000);
+    } catch {
+      setSaveToast('Failed to export snapshot backup.');
+      setTimeout(() => setSaveToast(null), 4000);
+    }
+  };
+
   // Handle Password Change Submission
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -3140,6 +3175,14 @@ export const AuthorStudioModal: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-3">
+                <button
+                  onClick={exportLiveSnapshot}
+                  className="px-3.5 py-2 rounded-xl border border-deckle text-xs font-semibold text-ink hover:text-claret hover:bg-parchment/60 transition-colors flex items-center gap-1.5"
+                  title="Download complete current studio snapshot as a JSON backup file"
+                >
+                  <Download className="w-3.5 h-3.5 text-claret" />
+                  <span>Export Backup (.json)</span>
+                </button>
                 <button
                   onClick={closeStudio}
                   className="px-3.5 py-2 rounded-xl border border-deckle text-xs font-semibold text-ink-muted hover:text-ink hover:bg-gray-50 transition-colors"

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import LIVE_STUDIO_SNAPSHOT from '../data/live_studio_state.json';
 import { downloadBuyersAsXlsx } from '../utils/excelExport';
 import {
   DEFAULT_STORE_SETTINGS,
@@ -235,13 +236,15 @@ const STORAGE_KEY_BUYERS = 'netvidya_buyers_registry_v1';
 const NetVidyaStoreContext = createContext<NetVidyaStoreContextType | undefined>(undefined);
 
 export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1. Settings State
+  // 1. Settings State (Snapshot fallback guarantees preservation across code pushes)
   const [settings, setSettings] = useState<NetVidyaStoreSettings>(() => {
+    const snapshotSettings = (LIVE_STUDIO_SNAPSHOT as any)?.store?.settings;
+    const baseSettings = snapshotSettings ? { ...DEFAULT_STORE_SETTINGS, ...snapshotSettings } : DEFAULT_STORE_SETTINGS;
     try {
       const cached = localStorage.getItem(STORAGE_KEY_SETTINGS);
-      if (cached) return JSON.parse(cached);
+      if (cached) return { ...baseSettings, ...JSON.parse(cached) };
     } catch {}
-    return { ...DEFAULT_STORE_SETTINGS };
+    return baseSettings;
   });
 
   // 2. Buyer Session State
@@ -259,22 +262,26 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   });
 
-  // 3. Reading Files Catalog
+  // 3. Reading Files Catalog (Snapshot fallback)
   const [readingFiles, setReadingFiles] = useState<ReadingFileItem[]>(() => {
+    const snapshotFiles = (LIVE_STUDIO_SNAPSHOT as any)?.store?.readingFiles;
+    const baseFiles = (snapshotFiles && Array.isArray(snapshotFiles) && snapshotFiles.length > 0) ? snapshotFiles : INITIAL_READING_FILES;
     try {
       const cached = localStorage.getItem(STORAGE_KEY_FILES);
       if (cached) return JSON.parse(cached);
     } catch {}
-    return INITIAL_READING_FILES;
+    return baseFiles;
   });
 
-  // 4. Test Hall Catalog
+  // 4. Test Hall Catalog (Snapshot fallback)
   const [tests, setTests] = useState<TestHallItem[]>(() => {
+    const snapshotTests = (LIVE_STUDIO_SNAPSHOT as any)?.store?.tests;
+    const baseTests = (snapshotTests && Array.isArray(snapshotTests) && snapshotTests.length > 0) ? snapshotTests : INITIAL_TEST_HALL_ITEMS;
     try {
       const cached = localStorage.getItem(STORAGE_KEY_TESTS);
       if (cached) return JSON.parse(cached);
     } catch {}
-    return INITIAL_TEST_HALL_ITEMS;
+    return baseTests;
   });
 
   // 5. Buyers Registry (Admin view)
@@ -328,6 +335,28 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       })
       .catch(() => {});
+
+    // Synchronize dynamic store settings, reading files, and tests from /api/content
+    fetch('/api/content')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.success && data.state?.store) {
+          const storeState = data.state.store;
+          if (storeState.settings) {
+            setSettings(prev => ({ ...prev, ...storeState.settings }));
+            try { localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(storeState.settings)); } catch {}
+          }
+          if (storeState.readingFiles && Array.isArray(storeState.readingFiles) && storeState.readingFiles.length > 0) {
+            setReadingFiles(storeState.readingFiles);
+            try { localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(storeState.readingFiles)); } catch {}
+          }
+          if (storeState.tests && Array.isArray(storeState.tests) && storeState.tests.length > 0) {
+            setTests(storeState.tests);
+            try { localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(storeState.tests)); } catch {}
+          }
+        }
+      })
+      .catch(() => {});
   }, [defaultLink]);
 
   const now = new Date();
@@ -354,6 +383,16 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(updated));
       } catch {}
+
+      // Sync store settings to /api/content
+      fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          store: { settings: updated }
+        })
+      }).catch(() => {});
+
       return updated;
     });
 
@@ -576,9 +615,23 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(updated));
       } catch {}
+
+      const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+      fetch('/api/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          store: { readingFiles: updated },
+          authorEmail: 'netvidya.dodiya@gmail.com'
+        })
+      }).catch(() => {});
+
       return updated;
     });
-  }, []);
+  }, [adminToken]);
 
   // Delete Reading File (Admin)
   const deleteReadingFile = useCallback((id: string) => {
@@ -587,9 +640,23 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(updated));
       } catch {}
+
+      const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+      fetch('/api/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          store: { readingFiles: updated },
+          authorEmail: 'netvidya.dodiya@gmail.com'
+        })
+      }).catch(() => {});
+
       return updated;
     });
-  }, []);
+  }, [adminToken]);
 
   // Add Test (Admin)
   const addTest = useCallback((test: Omit<TestHallItem, 'id'>) => {
@@ -602,9 +669,23 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(updated));
       } catch {}
+
+      const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+      fetch('/api/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          store: { tests: updated },
+          authorEmail: 'netvidya.dodiya@gmail.com'
+        })
+      }).catch(() => {});
+
       return updated;
     });
-  }, []);
+  }, [adminToken]);
 
   // Delete Test (Admin)
   const deleteTest = useCallback((id: string) => {
@@ -613,9 +694,23 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(updated));
       } catch {}
+
+      const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+      fetch('/api/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          store: { tests: updated },
+          authorEmail: 'netvidya.dodiya@gmail.com'
+        })
+      }).catch(() => {});
+
       return updated;
     });
-  }, []);
+  }, [adminToken]);
 
   // Add Manual Buyer (Admin for UPI)
   const addManualBuyer = useCallback((buyer: { name: string; email: string; mobile: string; amountPaid?: number }) => {
