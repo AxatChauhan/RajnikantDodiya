@@ -30,8 +30,17 @@ import {
   FileUp,
   FileText,
   Sparkles,
-  GraduationCap
+  GraduationCap,
+  ShoppingBag,
+  Download,
+  Users,
+  DollarSign,
+  Calendar,
+  Mail,
+  Search,
+  Clock
 } from 'lucide-react';
+import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import {
   useSiteContent,
   FONT_PRESETS,
@@ -63,7 +72,7 @@ import { maskAnswer, unmaskAnswer } from '../../lib/security';
 import { PROFESSOR_INFO } from '../../data/professorData';
 import { ProfessorCrestIcon } from '../common/ProfessorCrestIcon';
 
-type StudioTab = 'theme' | 'profile' | 'books' | 'exams' | 'layout' | 'security';
+type StudioTab = 'theme' | 'profile' | 'books' | 'exams' | 'store' | 'layout' | 'security';
 
 export const AuthorStudioModal: React.FC = () => {
   const {
@@ -104,6 +113,151 @@ export const AuthorStudioModal: React.FC = () => {
   // Active Studio Tab
   const [activeTab, setActiveTab] = useState<StudioTab>('theme');
   const [saveToast, setSaveToast] = useState<string | null>(null);
+
+  // NET Vidya Store Context & State
+  const {
+    settings: storeSettings,
+    updateSettings: updateStoreSettings,
+    readingFiles: storeReadingFiles,
+    addReadingFile: addStoreReadingFile,
+    deleteReadingFile: deleteStoreReadingFile,
+    tests: storeTests,
+    addTest: addStoreTest,
+    deleteTest: deleteStoreTest,
+    buyersRegistry: storeBuyersRegistry,
+    addManualBuyer: addStoreManualBuyer,
+    toggleBuyerAccess: toggleStoreBuyerAccess,
+    exportBuyersToExcel: exportStoreBuyersToExcel,
+    resendConfirmationEmail: resendStoreConfirmationEmail,
+    currentServerPrice: storeCurrentPrice,
+    isEarlyBirdActive: storeIsEarlyBirdActive
+  } = useNetVidyaStore();
+
+  type StoreSubTab = 'buyers' | 'manual_access' | 'pricing' | 'content';
+  const [storeSubTab, setStoreSubTab] = useState<StoreSubTab>('buyers');
+  const [storeBuyerSearch, setStoreBuyerSearch] = useState('');
+
+  // Store Pricing
+  const [storeEarlyPrice, setStoreEarlyPrice] = useState(storeSettings.earlyBirdPrice);
+  const [storeStandardPrice, setStoreStandardPrice] = useState(storeSettings.standardPrice);
+  const [storeCutoffDate, setStoreCutoffDate] = useState(storeSettings.earlyBirdCutoff.slice(0, 16));
+
+  useEffect(() => {
+    setStoreEarlyPrice(storeSettings.earlyBirdPrice);
+    setStoreStandardPrice(storeSettings.standardPrice);
+    setStoreCutoffDate(storeSettings.earlyBirdCutoff.slice(0, 16));
+  }, [storeSettings]);
+
+  // Store Manual Pass
+  const [storeManualName, setStoreManualName] = useState('');
+  const [storeManualEmail, setStoreManualEmail] = useState('');
+  const [storeManualMobile, setStoreManualMobile] = useState('');
+  const [storeManualAmount, setStoreManualAmount] = useState(storeCurrentPrice);
+
+  // Store PDF Form
+  const [storePdfTitle, setStorePdfTitle] = useState('');
+  const [storePdfCategory, setStorePdfCategory] = useState('High-Yield Dossier');
+  const [storePdfDescription, setStorePdfDescription] = useState('');
+  const [storePdfSizeMb, setStorePdfSizeMb] = useState(5.0);
+  const [storeSelectedPdfFile, setStoreSelectedPdfFile] = useState<File | null>(null);
+
+  // Store Test Form
+  const [storeTestTitle, setStoreTestTitle] = useState('');
+  const [storeTestCategory, setStoreTestCategory] = useState('Full Mock');
+  const [storeTestDuration, setStoreTestDuration] = useState(180);
+  const [storeTestQuestions, setStoreTestQuestions] = useState(100);
+  const [storeTestReleaseDate, setStoreTestReleaseDate] = useState('2026-11-10T00:00');
+  const [storeTestDescription, setStoreTestDescription] = useState('');
+
+  const triggerStoreToast = (msg: string) => {
+    setSaveToast(msg);
+    setTimeout(() => setSaveToast(null), 4000);
+  };
+
+  const handleStoreSavePricing = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedCutoff = new Date(storeCutoffDate).toISOString();
+    updateStoreSettings({
+      earlyBirdPrice: Number(storeEarlyPrice),
+      standardPrice: Number(storeStandardPrice),
+      earlyBirdCutoff: updatedCutoff
+    });
+    triggerStoreToast('Store pricing and offer countdown synchronized across production.');
+  };
+
+  const handleStoreAddManualBuyer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!storeManualName.trim() || !storeManualEmail.trim()) {
+      triggerStoreToast('Please enter candidate name and email.');
+      return;
+    }
+    addStoreManualBuyer({
+      name: storeManualName.trim(),
+      email: storeManualEmail.trim(),
+      mobile: storeManualMobile.trim(),
+      amountPaid: Number(storeManualAmount) || storeCurrentPrice
+    });
+    setStoreManualName('');
+    setStoreManualEmail('');
+    setStoreManualMobile('');
+    setStoreSubTab('buyers');
+    triggerStoreToast(`Access pass granted to ${storeManualEmail.trim()}!`);
+  };
+
+  const handleStorePdfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setStoreSelectedPdfFile(file);
+      if (!storePdfTitle.trim()) {
+        setStorePdfTitle(file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '));
+      }
+      const mb = Number((file.size / (1024 * 1024)).toFixed(1));
+      setStorePdfSizeMb(mb > 0 ? mb : 4.5);
+    }
+  };
+
+  const handleStoreAddPdf = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!storePdfTitle.trim()) return;
+    addStoreReadingFile({
+      title: storePdfTitle.trim(),
+      category: storePdfCategory,
+      description: storePdfDescription.trim() || 'Official study materials for GSET + UGC NET English Final Pack 2026.',
+      fileSizeMb: Number(storePdfSizeMb) || 4.5
+    });
+    setStorePdfTitle('');
+    setStorePdfDescription('');
+    setStoreSelectedPdfFile(null);
+    triggerStoreToast('New PDF Study Dossier published to all enrolled student dashboards.');
+  };
+
+  const handleStoreAddTest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!storeTestTitle.trim()) return;
+    const releaseIso = new Date(storeTestReleaseDate).toISOString();
+    addStoreTest({
+      title: storeTestTitle.trim(),
+      category: storeTestCategory,
+      totalQuestions: Number(storeTestQuestions) || 100,
+      durationMinutes: Number(storeTestDuration) || 180,
+      releaseDate: releaseIso,
+      description: storeTestDescription.trim() || 'NTA-style computer-based exam module.'
+    });
+    setStoreTestTitle('');
+    setStoreTestDescription('');
+    triggerStoreToast('New Test Hall module scheduled. It will automatically unlock on the set release date.');
+  };
+
+  const filteredStoreBuyers = storeBuyersRegistry.filter(b => {
+    if (!storeBuyerSearch.trim()) return true;
+    const q = storeBuyerSearch.toLowerCase().trim();
+    return (
+      (b.name && b.name.toLowerCase().includes(q)) ||
+      (b.email && b.email.toLowerCase().includes(q)) ||
+      (b.mobile && b.mobile.includes(q)) ||
+      (b.orderId && b.orderId.toLowerCase().includes(q))
+    );
+  });
 
   // Book Editing Modal State
   const [editingBook, setEditingBook] = useState<StudioBookItem | null>(null);
@@ -431,6 +585,13 @@ export const AuthorStudioModal: React.FC = () => {
       const active = getActiveAuthorStudioSession();
       setSession(active);
       setAuthError(null);
+
+      if (typeof window !== 'undefined') {
+        const hash = window.location.hash.toLowerCase();
+        if (hash === '#store' || hash === '#store-admin') {
+          setActiveTab('store');
+        }
+      }
     }
   }, [isStudioOpen]);
 
@@ -747,8 +908,9 @@ export const AuthorStudioModal: React.FC = () => {
                 {[
                   { id: 'theme', label: 'Colors & Typography', icon: Palette },
                   { id: 'profile', label: 'About Me & Bio', icon: Type },
-                  { id: 'books', label: 'My Books & Store', icon: BookOpen },
-                  { id: 'exams', label: 'CBT Exams & MCQs', icon: GraduationCap },
+                  { id: 'books', label: 'My Books & Publications', icon: BookOpen },
+                  { id: 'exams', label: 'CBT Exam Question Bank', icon: GraduationCap },
+                  { id: 'store', label: 'NET Vidya Store & Buyers', icon: ShoppingBag },
                   { id: 'layout', label: 'Layout & Alert Bar', icon: Bell },
                   { id: 'security', label: 'Master Password', icon: Shield }
                 ].map((item) => {
@@ -2132,6 +2294,576 @@ export const AuthorStudioModal: React.FC = () => {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 5: NET VIDYA STORE & BUYERS ADMINISTRATION */}
+              {activeTab === 'store' && (
+                <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
+                  {/* Header & Overview */}
+                  <div className="bg-white p-6 rounded-2xl border border-deckle shadow-xs space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono uppercase bg-claret/10 text-claret font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-claret/20">
+                            <ShoppingBag className="w-3 h-3 text-claret" />
+                            <span>Commercial Course Administration</span>
+                          </span>
+                          <span className="text-xs text-emerald-800 font-mono font-bold bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+                            Live Fee: ₹{storeCurrentPrice} {storeIsEarlyBirdActive ? '(Early-Bird Active)' : '(Standard)'}
+                          </span>
+                        </div>
+                        <h3 className="font-serif text-2xl font-bold text-ink mt-2">
+                          NET Vidya Store & Enrolled Scholars
+                        </h3>
+                        <p className="text-xs text-ink-muted mt-1 leading-relaxed">
+                          Manage course pricing, student enrollment passes, live buyer records, Excel spreadsheets, and course syllabus releases from Dr. Rajnikant Dodiya's unified studio.
+                        </p>
+                      </div>
+
+                      {/* Excel Export Quick Button */}
+                      <button
+                        onClick={exportStoreBuyersToExcel}
+                        className="self-start sm:self-center px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-colors shrink-0 cursor-pointer"
+                        title="Generate genuine OpenXML .xlsx spreadsheet of all buyers"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Export Excel (.xlsx)</span>
+                      </button>
+                    </div>
+
+                    {/* Metric Cards */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-deckle/60">
+                      <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
+                        <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Total Scholars</span>
+                        <span className="text-xl font-bold text-ink font-serif">{storeBuyersRegistry.length}</span>
+                      </div>
+                      <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
+                        <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Active Passes</span>
+                        <span className="text-xl font-bold text-emerald-700 font-serif">
+                          {storeBuyersRegistry.filter(b => b.isActive).length}
+                        </span>
+                      </div>
+                      <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
+                        <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Study Dossiers</span>
+                        <span className="text-xl font-bold text-ink font-serif">{storeReadingFiles.length} PDFs</span>
+                      </div>
+                      <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
+                        <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">CBT Mock Tests</span>
+                        <span className="text-xl font-bold text-ink font-serif">{storeTests.length} Modules</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sub-Navigation Tabs */}
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs border-b border-deckle">
+                    {[
+                      { id: 'buyers', label: `Enrolled Registry (${storeBuyersRegistry.length})`, icon: Users },
+                      { id: 'manual_access', label: 'Grant Manual Pass (Direct UPI)', icon: Plus },
+                      { id: 'pricing', label: 'Pricing & Cutoff Countdown', icon: DollarSign },
+                      { id: 'content', label: 'Study Dossiers & Mock Tests', icon: FileText }
+                    ].map(t => {
+                      const Icon = t.icon;
+                      const isActive = storeSubTab === t.id;
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => setStoreSubTab(t.id as StoreSubTab)}
+                          className={`px-3.5 py-2 rounded-xl font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                            isActive
+                              ? 'bg-claret text-white shadow-xs'
+                              : 'bg-white hover:bg-gray-100 text-ink-muted border border-deckle'
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          <span>{t.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* SUB-VIEW 1: BUYERS REGISTRY */}
+                  {storeSubTab === 'buyers' && (
+                    <div className="bg-white p-6 rounded-2xl border border-deckle shadow-xs space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <h4 className="font-serif text-lg font-bold text-ink flex items-center gap-2">
+                            <Users className="w-4 h-4 text-claret" />
+                            <span>Enrolled Candidate Registry</span>
+                          </h4>
+                          <p className="text-xs text-ink-muted mt-0.5">
+                            Live records of all candidate passes. Revoke or restore access, or resend confirmation emails.
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={exportStoreBuyersToExcel}
+                          className="self-start sm:self-center px-3.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download .xlsx File</span>
+                        </button>
+                      </div>
+
+                      {/* Search */}
+                      <div className="relative">
+                        <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={storeBuyerSearch}
+                          onChange={e => setStoreBuyerSearch(e.target.value)}
+                          placeholder="Search scholars by name, email, phone number, or order ID..."
+                          className="w-full pl-10 pr-4 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                        />
+                      </div>
+
+                      {/* Table */}
+                      <div className="border border-deckle rounded-xl overflow-hidden shadow-2xs">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead className="bg-[#FAF9F5] text-ink border-b border-deckle font-semibold">
+                              <tr>
+                                <th className="p-3">Candidate</th>
+                                <th className="p-3">Contact</th>
+                                <th className="p-3">Order / Trans ID</th>
+                                <th className="p-3">Amount</th>
+                                <th className="p-3">Status</th>
+                                <th className="p-3 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-deckle/60 bg-white">
+                              {filteredStoreBuyers.length === 0 ? (
+                                <tr>
+                                  <td colSpan={6} className="p-8 text-center text-ink-muted text-xs">
+                                    No candidate records found matching "{storeBuyerSearch}".
+                                  </td>
+                                </tr>
+                              ) : (
+                                filteredStoreBuyers.map(b => (
+                                  <tr key={b.id} className="hover:bg-[#FAF9F5]/70 transition-colors">
+                                    <td className="p-3 font-medium text-ink">{b.name}</td>
+                                    <td className="p-3 font-mono text-[11px] text-ink-muted">
+                                      <div>{b.email}</div>
+                                      <div>{b.mobile || '—'}</div>
+                                    </td>
+                                    <td className="p-3 font-mono text-[11px] text-ink-muted">{b.orderId}</td>
+                                    <td className="p-3 font-bold text-ink">₹{b.amountPaid}</td>
+                                    <td className="p-3">
+                                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                        b.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                                      }`}>
+                                        {b.isActive ? 'Active Pass' : 'Revoked'}
+                                      </span>
+                                    </td>
+                                    <td className="p-3 text-right">
+                                      <div className="flex items-center justify-end gap-3">
+                                        <button
+                                          onClick={async () => {
+                                            const res = await resendStoreConfirmationEmail(b.email);
+                                            triggerStoreToast(res.message || `Confirmation email resent to ${b.email}`);
+                                          }}
+                                          className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 hover:underline cursor-pointer"
+                                          title="Resend Purchase Confirmation Email with Student Dashboard URL"
+                                        >
+                                          <Mail className="w-3.5 h-3.5" />
+                                          <span>Resend Email</span>
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            toggleStoreBuyerAccess(b.id);
+                                            triggerStoreToast(`Access ${b.isActive ? 'revoked' : 'restored'} for ${b.name}`);
+                                          }}
+                                          className={`text-[11px] font-semibold underline cursor-pointer ${
+                                            b.isActive ? 'text-rose-700 hover:text-rose-900' : 'text-blue-700 hover:text-blue-900'
+                                          }`}
+                                        >
+                                          {b.isActive ? 'Revoke Access' : 'Grant Access'}
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUB-VIEW 2: MANUAL PASS GRANT */}
+                  {storeSubTab === 'manual_access' && (
+                    <form onSubmit={handleStoreAddManualBuyer} className="bg-white p-6 rounded-2xl border border-deckle shadow-xs space-y-4">
+                      <div>
+                        <h4 className="font-serif text-lg font-bold text-ink flex items-center gap-2">
+                          <Plus className="w-4 h-4 text-claret" />
+                          <span>Grant Instant Manual Access Pass</span>
+                        </h4>
+                        <p className="text-xs text-ink-muted mt-0.5">
+                          For students who paid via direct Google Pay, PhonePe, UPI QR code, or institutional cash registration. Instantly unlocks reading dossiers and CBT mock exams.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-ink mb-1">Student Full Name *</label>
+                          <input
+                            type="text"
+                            required
+                            value={storeManualName}
+                            onChange={e => setStoreManualName(e.target.value)}
+                            placeholder="e.g. Ramesh Patel"
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-ink mb-1">Student Email Address *</label>
+                          <input
+                            type="email"
+                            required
+                            value={storeManualEmail}
+                            onChange={e => setStoreManualEmail(e.target.value)}
+                            placeholder="e.g. ramesh.patel@gmail.com"
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-ink mb-1">Mobile Number</label>
+                          <input
+                            type="tel"
+                            value={storeManualMobile}
+                            onChange={e => setStoreManualMobile(e.target.value)}
+                            placeholder="9876543210"
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-ink mb-1">Amount Received (INR)</label>
+                          <input
+                            type="number"
+                            value={storeManualAmount}
+                            onChange={e => setStoreManualAmount(Number(e.target.value))}
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Activate Student Pass & Add to Registry</span>
+                      </button>
+                    </form>
+                  )}
+
+                  {/* SUB-VIEW 3: PRICING & OFFER COUNTDOWN */}
+                  {storeSubTab === 'pricing' && (
+                    <form onSubmit={handleStoreSavePricing} className="bg-white p-6 rounded-2xl border border-deckle shadow-xs space-y-4">
+                      <div>
+                        <h4 className="font-serif text-lg font-bold text-ink flex items-center gap-2">
+                          <DollarSign className="w-4 h-4 text-emerald-700" />
+                          <span>Store Pricing & Auto-Switch Cutoff Rules</span>
+                        </h4>
+                        <p className="text-xs text-ink-muted mt-0.5">
+                          Default schedule: <strong>₹799 Early-Bird offer until 10 Nov 2026, 11:59 pm IST</strong>, then auto-switches to <strong>₹999</strong> standard fee.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-ink mb-1">Early-Bird Price (INR)</label>
+                          <input
+                            type="number"
+                            value={storeEarlyPrice}
+                            onChange={e => setStoreEarlyPrice(Number(e.target.value))}
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-ink mb-1">Standard Price After Cutoff (INR)</label>
+                          <input
+                            type="number"
+                            value={storeStandardPrice}
+                            onChange={e => setStoreStandardPrice(Number(e.target.value))}
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-semibold text-ink mb-1">
+                            Early-Bird Cutoff Date & Time (Countdown Switch Point)
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={storeCutoffDate}
+                            onChange={e => setStoreCutoffDate(e.target.value)}
+                            className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Save & Synchronize Store Pricing</span>
+                      </button>
+                    </form>
+                  )}
+
+                  {/* SUB-VIEW 4: STUDY DOSSIERS & CBT MOCK TESTS */}
+                  {storeSubTab === 'content' && (
+                    <div className="space-y-6">
+                      {/* PDF Dossier Publisher */}
+                      <div className="bg-white p-6 rounded-2xl border border-deckle shadow-xs space-y-4">
+                        <div>
+                          <h4 className="font-serif text-lg font-bold text-ink flex items-center gap-2">
+                            <Upload className="w-4 h-4 text-claret" />
+                            <span>Publish Course Reading Dossier (PDF)</span>
+                          </h4>
+                          <p className="text-xs text-ink-muted mt-0.5">
+                            Upload or register high-yield PDF revision dossiers for enrolled candidates.
+                          </p>
+                        </div>
+
+                        <form onSubmit={handleStoreAddPdf} className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-semibold text-ink mb-1">Select PDF File (.pdf)</label>
+                              <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={handleStorePdfFileChange}
+                                className="w-full text-xs text-ink-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-claret/10 file:text-claret hover:file:bg-claret/20 cursor-pointer border border-deckle rounded-xl p-1.5 bg-[#FAF9F5]"
+                              />
+                              {storeSelectedPdfFile && (
+                                <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
+                                  Selected: <strong>{storeSelectedPdfFile.name}</strong> ({(storeSelectedPdfFile.size / (1024 * 1024)).toFixed(2)} MB)
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-semibold text-ink mb-1">Dossier / File Title *</label>
+                              <input
+                                type="text"
+                                required
+                                value={storePdfTitle}
+                                onChange={e => setStorePdfTitle(e.target.value)}
+                                placeholder="e.g. Unit 3: Cultural Studies High-Yield Notes"
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-ink mb-1">Subject Category</label>
+                              <select
+                                value={storePdfCategory}
+                                onChange={e => setStorePdfCategory(e.target.value)}
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                              >
+                                <option value="High-Yield Dossier">High-Yield Dossier</option>
+                                <option value="Literary Theory">Literary Theory</option>
+                                <option value="British Literature">British Literature</option>
+                                <option value="Pedagogy & ELT">Pedagogy & ELT</option>
+                                <option value="Research Methodology">Research Methodology</option>
+                                <option value="Indian English Writing">Indian English Writing</option>
+                                <option value="General Revision">General Revision</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-ink mb-1">File Size (MB)</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={storePdfSizeMb}
+                                onChange={e => setStorePdfSizeMb(Number(e.target.value))}
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                              />
+                            </div>
+
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-semibold text-ink mb-1">Description / Summary</label>
+                              <textarea
+                                rows={2}
+                                value={storePdfDescription}
+                                onChange={e => setStorePdfDescription(e.target.value)}
+                                placeholder="Key concepts, syllabus coverage, exam hints..."
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="px-5 py-2 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Publish Dossier to Students</span>
+                          </button>
+                        </form>
+
+                        {/* List of Published PDFs */}
+                        <div className="space-y-2 pt-2 border-t border-deckle/60">
+                          <span className="text-xs font-bold text-ink block">Published Reading Files ({storeReadingFiles.length})</span>
+                          {storeReadingFiles.map(file => (
+                            <div key={file.id} className="p-3 rounded-xl border border-deckle bg-[#FAF9F5] flex items-center justify-between text-xs">
+                              <div>
+                                <strong className="text-ink block">{file.title}</strong>
+                                <span className="text-ink-muted font-mono text-[11px]">{file.category} • {file.fileSizeMb} MB</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  deleteStoreReadingFile(file.id);
+                                  triggerStoreToast(`Removed ${file.title}`);
+                                }}
+                                className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                title="Remove File"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* NTA Test Scheduler */}
+                      <div className="bg-white p-6 rounded-2xl border border-deckle shadow-xs space-y-4">
+                        <div>
+                          <h4 className="font-serif text-lg font-bold text-ink flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-claret" />
+                            <span>Schedule NTA Mock Exam Module</span>
+                          </h4>
+                          <p className="text-xs text-ink-muted mt-0.5">
+                            Add upcoming computer-based mock tests with designated unlock dates for registered candidates.
+                          </p>
+                        </div>
+
+                        <form onSubmit={handleStoreAddTest} className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-semibold text-ink mb-1">Test Title *</label>
+                              <input
+                                type="text"
+                                required
+                                value={storeTestTitle}
+                                onChange={e => setStoreTestTitle(e.target.value)}
+                                placeholder="e.g. NET Mock 6: High-Frequency Theory & Critics"
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-ink mb-1">Category</label>
+                              <select
+                                value={storeTestCategory}
+                                onChange={e => setStoreTestCategory(e.target.value)}
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                              >
+                                <option value="Full Mock">Full Mock (100 Qs / 180 Min)</option>
+                                <option value="Unit Test">Unit Test (50 Qs / 90 Min)</option>
+                                <option value="Bonus Mock">Bonus Mock (50 Qs / 75 Min)</option>
+                                <option value="GSET Special">GSET Special</option>
+                                <option value="Grand Final">Grand Final</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-ink mb-1">Release Date & Time *</label>
+                              <input
+                                type="datetime-local"
+                                required
+                                value={storeTestReleaseDate}
+                                onChange={e => setStoreTestReleaseDate(e.target.value)}
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-ink mb-1">Questions Count</label>
+                              <input
+                                type="number"
+                                value={storeTestQuestions}
+                                onChange={e => setStoreTestQuestions(Number(e.target.value))}
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-semibold text-ink mb-1">Duration (Minutes)</label>
+                              <input
+                                type="number"
+                                value={storeTestDuration}
+                                onChange={e => setStoreTestDuration(Number(e.target.value))}
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none font-mono"
+                              />
+                            </div>
+
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-semibold text-ink mb-1">Short Description</label>
+                              <textarea
+                                rows={2}
+                                value={storeTestDescription}
+                                onChange={e => setStoreTestDescription(e.target.value)}
+                                placeholder="Syllabus focus, question composition..."
+                                className="w-full px-3.5 py-2 rounded-xl border border-deckle text-xs focus:ring-2 focus:ring-claret outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="px-5 py-2 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>Schedule Test in Test Hall</span>
+                          </button>
+                        </form>
+
+                        {/* List of Scheduled Tests */}
+                        <div className="space-y-2 pt-2 border-t border-deckle/60">
+                          <span className="text-xs font-bold text-ink block">Scheduled Test Modules ({storeTests.length})</span>
+                          {storeTests.map(test => {
+                            const isLocked = new Date() < new Date(test.releaseDate);
+                            const releaseText = new Date(test.releaseDate).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            });
+
+                            return (
+                              <div key={test.id} className="p-3 rounded-xl border border-deckle bg-[#FAF9F5] flex items-center justify-between text-xs">
+                                <div>
+                                  <strong className="text-ink block">{test.title}</strong>
+                                  <span className="text-ink-muted font-mono text-[11px]">
+                                    {test.category} • {test.totalQuestions} Qs • {isLocked ? `Opens ${releaseText}` : 'Active / Ready Now'}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    deleteStoreTest(test.id);
+                                    triggerStoreToast(`Removed ${test.title}`);
+                                  }}
+                                  className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Delete Test"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   )}

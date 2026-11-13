@@ -705,6 +705,8 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       const isStudioRoute = 
         hash === '#studio' || 
+        hash === '#store' || 
+        hash === '#store-admin' || 
         pathname === '/studio' || 
         pathname === '/studio/' || 
         search.includes('studio=true');
