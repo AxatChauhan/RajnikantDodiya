@@ -71,11 +71,26 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   });
   const [selectedPolicyTab, setSelectedPolicyTab] = useState<PolicyTab>(initialPolicyTab);
 
-  // Modals
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  // Modals & Checkout Config
+  const [checkoutConfig, setCheckoutConfig] = useState<{
+    isOpen: boolean;
+    initialExam: 'ugc' | 'gset';
+    initialProductId?: string;
+  }>({
+    isOpen: false,
+    initialExam: 'ugc'
+  });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleOpenCheckout = (productId?: string, exam?: 'ugc' | 'gset') => {
+    setCheckoutConfig({
+      isOpen: true,
+      initialExam: exam || activeExamStore,
+      initialProductId: productId
+    });
+  };
 
   // Discrete Administrative Gateway: URL Hash (#admin, #store-admin), Query (?admin=true), or Secret Keybind (Ctrl+Shift+A)
   useEffect(() => {
@@ -151,7 +166,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           </button>
 
           {/* Dual Storefront Switcher */}
-          <div className="hidden md:flex items-center bg-gray-100/90 p-0.5 rounded-xl border border-gray-200 text-xs font-semibold shrink-0">
+          <div className="hidden sm:flex items-center bg-gray-100/90 p-0.5 rounded-xl border border-gray-200 text-xs font-semibold shrink-0">
             <button
               onClick={() => { setActiveExamStore('ugc'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className={`px-2 lg:px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
@@ -180,10 +195,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-1.5 text-xs font-semibold text-gray-700 shrink-0">
+          <nav className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-gray-700 shrink-0">
             <button
               onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`hidden xl:inline-flex px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                 currentView === 'home' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
               }`}
             >
@@ -191,7 +206,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </button>
             <button
               onClick={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-2 lg:px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentView === 'sample' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
               }`}
             >
@@ -201,7 +216,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {onOpenBookstore && (
               <button
                 onClick={onOpenBookstore}
-                className="hidden xl:inline-flex px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-800 hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0"
+                className="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-800 hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0"
                 title="Browse Monographs & Print Editions"
               >
                 Bookstore
@@ -210,11 +225,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {onBackToAcademicSite && (
               <button
                 onClick={onBackToAcademicSite}
-                className="px-2 lg:px-2.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
+                className="px-2.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
                 title="Return to Academic Portfolio"
               >
-                <span className="hidden xl:inline">Academic Site</span>
-                <span className="xl:hidden">Academic</span>
+                <span>Academic Site</span>
                 <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             )}
@@ -247,18 +261,22 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
             {/* Buy CTA Button */}
             <button
-              onClick={() => setIsCheckoutOpen(true)}
-              className="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+              onClick={() => handleOpenCheckout(undefined, activeExamStore)}
+              className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                activeExamStore === 'gset'
+                  ? 'bg-emerald-700 hover:bg-emerald-800'
+                  : 'bg-blue-700 hover:bg-blue-800'
+              }`}
             >
               {activeExamStore === 'gset' ? (
                 <>
-                  <span className="hidden min-[400px]:inline">Enroll GSET (from ₹149)</span>
-                  <span className="min-[400px]:hidden">GSET ₹149</span>
+                  <span className="hidden sm:inline">Enroll GSET (from ₹149)</span>
+                  <span className="sm:hidden">GSET ₹149</span>
                 </>
               ) : (
                 <>
-                  <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
-                  <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
+                  <span className="hidden sm:inline">Enroll Bundle (₹{currentServerPrice})</span>
+                  <span className="sm:hidden">₹{currentServerPrice}</span>
                 </>
               )}
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
@@ -274,20 +292,20 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <span className="hidden lg:inline">Studio</span>
             </button>
 
-            {/* Mobile Hamburger Menu */}
+            {/* Mobile & Tablet Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
               aria-label="Toggle Navigation Menu"
-              className="md:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
+              className="xl:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Mobile & Tablet Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
+          <div className="xl:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
             {/* Student Account Card inside Mobile Drawer */}
             {buyerSession.isLoggedIn ? (
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
@@ -425,8 +443,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {/* Quick Action in Drawer */}
             <div className="pt-2 border-t border-gray-100">
               <button
-                onClick={() => { setIsCheckoutOpen(true); setMobileMenuOpen(false); }}
-                className="w-full py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+                onClick={() => { handleOpenCheckout(undefined, activeExamStore); setMobileMenuOpen(false); }}
+                className={`w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs ${
+                  activeExamStore === 'gset' ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
+                }`}
               >
                 <span>{activeExamStore === 'gset' ? 'Enroll GSET 2026 (from ₹149)' : 'Enroll UGC NET Bundle (₹499)'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -441,14 +461,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
         {currentView === 'home' && (
           activeExamStore === 'ugc' ? (
             <NetVidyaStoreHome
-              onOpenCheckout={() => setIsCheckoutOpen(true)}
+              onOpenCheckout={() => handleOpenCheckout('ugc-net-english-bundle', 'ugc')}
               onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               onOpenLogin={() => setIsLoginOpen(true)}
               onOpenBookstore={onOpenBookstore}
             />
           ) : (
             <NetVidyaGsetHome
-              onOpenCheckout={() => setIsCheckoutOpen(true)}
+              onOpenCheckout={(packId) => handleOpenCheckout(packId, 'gset')}
               onOpenDemoTest={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               currentServerPrice={currentServerPrice}
             />
@@ -457,14 +477,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
         {currentView === 'sample' && (
           <NetVidyaFreeSample
-            onOpenCheckout={() => setIsCheckoutOpen(true)}
+            onOpenCheckout={() => handleOpenCheckout()}
             onNavigateHome={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           />
         )}
 
         {currentView === 'dashboard' && (
           <NetVidyaDashboard
-            onOpenCheckout={() => setIsCheckoutOpen(true)}
+            onOpenCheckout={() => handleOpenCheckout()}
             onOpenPolicies={() => handleOpenPolicies('terms')}
           />
         )}
@@ -521,13 +541,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       </footer>
 
       {/* 4. MODALS */}
-      {isCheckoutOpen && (
+      {checkoutConfig.isOpen && (
         <NetVidyaCheckoutModal
-          isOpen={isCheckoutOpen}
-          onClose={() => setIsCheckoutOpen(false)}
+          isOpen={checkoutConfig.isOpen}
+          onClose={() => setCheckoutConfig(prev => ({ ...prev, isOpen: false }))}
           onOpenPolicy={handleOpenPolicies}
+          initialExam={checkoutConfig.initialExam}
+          initialProductId={checkoutConfig.initialProductId}
           onSuccess={() => {
-            setIsCheckoutOpen(false);
+            setCheckoutConfig(prev => ({ ...prev, isOpen: false }));
             setCurrentView('dashboard');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
@@ -540,7 +562,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           onClose={() => setIsLoginOpen(false)}
           onOpenCheckout={() => {
             setIsLoginOpen(false);
-            setIsCheckoutOpen(true);
+            handleOpenCheckout();
           }}
           onLoginSuccess={() => {
             setIsLoginOpen(false);

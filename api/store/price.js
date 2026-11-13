@@ -18,7 +18,7 @@ import {
 
 export const DEFAULT_PAYMENT_LINK = STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
 export const DEFAULT_PAYMENT_LINK_PRICE = STORE_PAYMENT_DEFAULTS.defaultPaymentLinkPrice;
-export { DEFAULT_STORE_SETTINGS };
+export { DEFAULT_STORE_SETTINGS, GSET_PRODUCTS, UGC_BUNDLE_PRODUCT };
 
 export function computeCurrentServerPrice(settings = DEFAULT_STORE_SETTINGS, simulatedNow = null) {
   const now = simulatedNow ? new Date(simulatedNow) : new Date();

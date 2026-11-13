@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   X,
   ShieldCheck,
@@ -6,17 +6,134 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Layers,
+  BookOpen,
+  GraduationCap,
+  MessageCircle,
+  Check
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../config/storeConfig';
 import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
 
+export type ExamType = 'ugc' | 'gset';
+export type GsetStream = 'english' | 'education';
+
+export interface CheckoutProductOption {
+  id: string;
+  exam: ExamType;
+  stream: 'english' | 'education' | 'general';
+  name: string;
+  shortName: string;
+  price: number;
+  originalPrice: number;
+  badge: string;
+  badgeColor: string;
+  isCombo?: boolean;
+  testCountDesc: string;
+  description: string;
+}
+
+export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
+  // --- GSET COMBOS (₹249 MAX PRICE) ---
+  {
+    id: 'gset-english-combo',
+    exam: 'gset',
+    stream: 'english',
+    name: 'GSET English Scholar Duo (Paper 1 + English)',
+    shortName: 'English Scholar Duo (Paper 1 + 2)',
+    price: 249,
+    originalPrice: 799,
+    badge: 'RECOMMENDED • BEST VALUE',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    isCombo: true,
+    testCountDesc: '5 Full CBT Tests (3 Paper 1 + 2 English Paper 2)',
+    description: 'Complete dual-paper preparation: Paper 1 General Aptitude combined with English Literature & ELT.'
+  },
+  {
+    id: 'gset-education-combo',
+    exam: 'gset',
+    stream: 'education',
+    name: 'GSET Education Scholar Duo (Paper 1 + Education)',
+    shortName: 'Education Scholar Duo (Paper 1 + 2)',
+    price: 249,
+    originalPrice: 799,
+    badge: 'RECOMMENDED • BEST VALUE',
+    badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
+    isCombo: true,
+    testCountDesc: '6 Full CBT Tests (3 Paper 1 + 3 Education Paper 2)',
+    description: 'Complete dual-paper preparation: Paper 1 General Aptitude combined with Teacher Education & Pedagogy.'
+  },
+
+  // --- GSET STANDALONE SINGLE PAPERS (₹149 EACH) ---
+  {
+    id: 'gset-paper1',
+    exam: 'gset',
+    stream: 'general',
+    name: 'GSET Paper 1: General Aptitude Foundation Pack',
+    shortName: 'Paper 1 General Aptitude Only',
+    price: 149,
+    originalPrice: 499,
+    badge: 'COMMON TO ALL STREAMS',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
+    isCombo: false,
+    testCountDesc: '3 Full CBT Tests (50 Questions each)',
+    description: 'All 10 general units: Teaching Aptitude, Research, ICT, Logical Reasoning, and Higher Education.'
+  },
+  {
+    id: 'gset-paper2-english',
+    exam: 'gset',
+    stream: 'english',
+    name: 'GSET Paper 2: English Literature Specialist Pack',
+    shortName: 'Paper 2 English Literature Only',
+    price: 149,
+    originalPrice: 499,
+    badge: 'ENGLISH STREAM SPECIALIST',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    isCombo: false,
+    testCountDesc: '2 Specialist CBT Tests (100 Questions each)',
+    description: 'British, American & Indian Literature, Literary Theory, Cultural Studies, and ELT in India.'
+  },
+  {
+    id: 'gset-paper2-education',
+    exam: 'gset',
+    stream: 'education',
+    name: 'GSET Paper 2: Education Discipline Master Pack',
+    shortName: 'Paper 2 Education Discipline Only',
+    price: 149,
+    originalPrice: 499,
+    badge: 'EDUCATION STREAM SPECIALIST',
+    badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
+    isCombo: false,
+    testCountDesc: '3 Specialist CBT Tests (100 Questions each)',
+    description: 'Philosophical & Sociological Foundations, Teacher Education, Curriculum Studies, and Pedagogy.'
+  },
+
+  // --- UGC NET COMPLETE BUNDLE (₹499) ---
+  {
+    id: 'ugc-net-english-bundle',
+    exam: 'ugc',
+    stream: 'english',
+    name: 'UGC NET English Complete Preparation Bundle (2026 Edition)',
+    shortName: 'UGC NET English All-In-One Bundle',
+    price: 499,
+    originalPrice: 999,
+    badge: 'ALL-IN-ONE COMPLETE BUNDLE',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
+    isCombo: true,
+    testCountDesc: '21 NTA CBT Tests + 3 Complete Reading Dossiers (347 Pages)',
+    description: '1 Grand Mock (100 Qs), 10 Unit Tests, 10 Practice Mocks, 283p e-book, 35p PYQs & 29p Revision Kit.'
+  }
+];
+
 interface NetVidyaCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (buyer: { name: string; email: string; mobile: string; orderId: string }) => void;
+  onSuccess: (buyer: { name: string; email: string; mobile: string; orderId: string; productId?: string }) => void;
   onOpenPolicy?: (tab: PolicyTab) => void;
+  initialExam?: ExamType;
+  initialProductId?: string;
 }
 
 declare global {
@@ -29,20 +146,30 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-  onOpenPolicy
+  onOpenPolicy,
+  initialExam = 'gset',
+  initialProductId
 }) => {
   const {
     currentServerPrice,
-    isEarlyBirdActive,
     buyerSession,
     loginBuyer,
     signup,
     login,
-    refreshSession,
     paymentMode,
     paymentLinkUrl: contextPaymentLinkUrl
   } = useNetVidyaStore();
 
+  // Exam and Pack selection state
+  const [selectedExam, setSelectedExam] = useState<ExamType>(initialExam);
+  const [selectedStream, setSelectedStream] = useState<GsetStream>('english');
+  const [selectedProductId, setSelectedProductId] = useState<string>(() => {
+    if (initialProductId) return initialProductId;
+    if (initialExam === 'gset') return 'gset-english-combo';
+    return 'ugc-net-english-bundle';
+  });
+
+  // Candidate input fields
   const [studentName, setStudentName] = useState(buyerSession.name || '');
   const [email, setEmail] = useState(buyerSession.email || '');
   const [mobile, setMobile] = useState(buyerSession.mobile || '');
@@ -53,9 +180,27 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   const [couponError, setCouponError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [redirectingUrl, setRedirectingUrl] = useState<string | null>(null);
+  const [manualWhatsAppInfo, setManualWhatsAppInfo] = useState<{ url: string; number: string; message: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
 
+  // Sync state when props change
+  useEffect(() => {
+    if (isOpen) {
+      if (initialExam) setSelectedExam(initialExam);
+      if (initialProductId) {
+        setSelectedProductId(initialProductId);
+        if (initialProductId.includes('education')) setSelectedStream('education');
+        else if (initialProductId.includes('english')) setSelectedStream('english');
+      } else if (initialExam === 'gset') {
+        setSelectedProductId(selectedStream === 'education' ? 'gset-education-combo' : 'gset-english-combo');
+      } else {
+        setSelectedProductId('ugc-net-english-bundle');
+      }
+    }
+  }, [isOpen, initialExam, initialProductId]);
+
+  // Pre-fill user session if logged in
   useEffect(() => {
     if (isOpen && buyerSession.isLoggedIn) {
       if (buyerSession.name && !studentName) setStudentName(buyerSession.name);
@@ -64,10 +209,43 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     }
   }, [isOpen, buyerSession.isLoggedIn, buyerSession.name, buyerSession.email, buyerSession.mobile]);
 
-  const finalPayablePrice =
-    paymentMode === 'payment_link'
-      ? currentServerPrice
-      : Math.max(1, currentServerPrice - (appliedDiscount?.amount || 0));
+  // Get current active product object
+  const activeProduct = useMemo(() => {
+    const found = CHECKOUT_PRODUCTS.find(p => p.id === selectedProductId);
+    if (found) return found;
+    return selectedExam === 'gset'
+      ? CHECKOUT_PRODUCTS[0] // gset-english-combo (₹249)
+      : CHECKOUT_PRODUCTS.find(p => p.id === 'ugc-net-english-bundle')!;
+  }, [selectedProductId, selectedExam]);
+
+  // Filter GSET products according to chosen stream
+  const streamGsetProducts = useMemo(() => {
+    return CHECKOUT_PRODUCTS.filter(p => {
+      if (p.exam !== 'gset') return false;
+      if (p.stream === 'general') return true; // Paper 1 is common
+      return p.stream === selectedStream;
+    });
+  }, [selectedStream]);
+
+  // Handle stream toggle
+  const handleStreamChange = (stream: GsetStream) => {
+    setSelectedStream(stream);
+    // Switch to corresponding combo
+    if (stream === 'education') {
+      if (selectedProductId === 'gset-english-combo' || selectedProductId === 'gset-paper2-english') {
+        setSelectedProductId('gset-education-combo');
+      }
+    } else {
+      if (selectedProductId === 'gset-education-combo' || selectedProductId === 'gset-paper2-education') {
+        setSelectedProductId('gset-english-combo');
+      }
+    }
+  };
+
+  // Base price and final payable calculation
+  // Strict rule: GSET max combo is ₹249, singles are ₹149. UGC bundle is ₹499.
+  const basePrice = activeProduct.price;
+  const finalPayablePrice = Math.max(1, basePrice - (appliedDiscount?.amount || 0));
 
   const handleApplyCoupon = () => {
     setCouponError(null);
@@ -108,10 +286,9 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       return;
     }
 
-    // Require password if student is not logged in yet
     if (!buyerSession.isLoggedIn) {
       if (!password || password.length < 6) {
-        setErrorMessage('Please enter a password of at least 6 characters.');
+        setErrorMessage('Please create a portal password of at least 6 characters.');
         return;
       }
     }
@@ -119,7 +296,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     setIsProcessing(true);
 
     try {
-      // 1. Ensure user is authenticated before opening payment
+      // 1. Ensure user is authenticated before creating payment order
       if (!buyerSession.isLoggedIn) {
         const authRes = isExistingAccount
           ? await login(cleanEmail, password)
@@ -142,7 +319,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         }
       }
 
-      // 2. Call server endpoint to create order with authoritative server price
+      // 2. Call server endpoint to create order with authoritative server price for selected pack
       const orderRes = await fetch('/api/store/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -150,7 +327,9 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           studentName: cleanName,
           email: cleanEmail,
           mobile: cleanMobile,
-          couponCode: appliedDiscount?.code || ''
+          couponCode: appliedDiscount?.code || '',
+          productId: activeProduct.id,
+          examStore: selectedExam
         })
       });
 
@@ -160,29 +339,37 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         throw new Error(orderData.error || 'Failed to initiate order. Please try again.');
       }
 
-      const fallbackLink = (contextPaymentLinkUrl || import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || STORE_PAYMENT_DEFAULTS.defaultPaymentLink).trim();
-      const paymentLinkUrl = orderData.paymentLinkUrl || (orderData.paymentMode === 'payment_link' ? fallbackLink : '');
+      // 3. Handle GSET WhatsApp Manual Direct Link Flow (if dedicated link isn't configured yet)
+      if (orderData.paymentMode === 'gset_manual_contact') {
+        setIsProcessing(false);
+        setManualWhatsAppInfo({
+          url: orderData.whatsappUrl,
+          number: orderData.whatsappNumber || '+91 96387 16634',
+          message: orderData.message || `Your GSET enrollment request for ₹${finalPayablePrice} has been registered.`
+        });
+        return;
+      }
 
-      // Direct Payment Link Flow: Immediately redirect browser to payment portal
-      if (orderData.paymentMode === 'payment_link' || (!orderData.keyId && !orderData.isTestMode && fallbackLink)) {
-        const resolvedUrl = paymentLinkUrl || fallbackLink;
-        setRedirectingUrl(resolvedUrl);
-
+      // 4. Handle Direct Payment Link Flow (e.g. UGC NET ₹499 or dedicated GSET link)
+      if (orderData.paymentMode === 'payment_link' && orderData.paymentLinkUrl) {
+        setRedirectingUrl(orderData.paymentLinkUrl);
         try {
           localStorage.setItem('netvidya_pending_checkout', JSON.stringify({
             name: cleanName,
             email: cleanEmail,
             mobile: cleanMobile,
+            productId: activeProduct.id,
+            productName: activeProduct.name,
+            amount: finalPayablePrice,
             orderId: orderData.orderId || `NV_${Date.now()}`
           }));
         } catch {}
 
-        // Direct top-level navigation to payment portal
-        window.location.href = resolvedUrl;
+        window.location.href = orderData.paymentLinkUrl;
         return;
       }
 
-      // Native In-App Razorpay Checkout Popup (if live API key mode is enabled)
+      // 5. In-App Razorpay Checkout Popup (Native API Key Mode)
       if (typeof window !== 'undefined' && !window.Razorpay) {
         await new Promise<void>(resolve => {
           const script = document.createElement('script');
@@ -199,8 +386,8 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           key: orderData.keyId,
           amount: orderData.amountInPaisa,
           currency: 'INR',
-          name: 'NET Vidya English',
-          description: 'GSET + UGC NET English Final Pack 2026',
+          name: 'NET Vidya',
+          description: activeProduct.name,
           order_id: orderData.orderId,
           prefill: {
             name: cleanName,
@@ -208,7 +395,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
             contact: cleanMobile
           },
           theme: {
-            color: '#1E3A8A'
+            color: selectedExam === 'gset' ? '#047857' : '#1E3A8A'
           },
           handler: async function (response: any) {
             try {
@@ -222,7 +409,9 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   studentName: cleanName,
                   email: cleanEmail,
                   mobile: cleanMobile,
-                  orderId: orderData.orderId
+                  orderId: orderData.orderId,
+                  productId: activeProduct.id,
+                  amount: finalPayablePrice
                 })
               });
 
@@ -264,9 +453,24 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           setIsProcessing(false);
         });
         rzp.open();
-      } else {
-        throw new Error('Online payment gateway is temporarily unreachable. Please contact student support.');
+        return;
       }
+
+      // 6. Test simulation mode
+      if (orderData.isTestMode) {
+        loginBuyer({
+          name: cleanName,
+          email: cleanEmail,
+          mobile: cleanMobile,
+          orderId: orderData.orderId,
+          isBuyer: true
+        });
+        setIsProcessing(false);
+        setIsPaymentSuccess(true);
+        return;
+      }
+
+      throw new Error('Online payment gateway is temporarily unreachable. Please contact student support.');
     } catch (err: any) {
       setErrorMessage(err.message || 'Unable to connect to payment gateway.');
       setIsProcessing(false);
@@ -278,7 +482,8 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       name: studentName || 'Candidate',
       email: email || '',
       mobile: mobile || '',
-      orderId: `NV_${Date.now()}`
+      orderId: `NV_${Date.now()}`,
+      productId: activeProduct.id
     });
   };
 
@@ -287,116 +492,356 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   return (
     <div
       onClick={(e) => {
-        if (e.target === e.currentTarget && !redirectingUrl) onClose();
+        if (e.target === e.currentTarget && !redirectingUrl && !isProcessing) onClose();
       }}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-6 flex flex-col justify-start sm:justify-center items-center min-h-screen"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/65 backdrop-blur-sm p-2 sm:p-4 md:p-6 flex flex-col justify-start sm:justify-center items-center min-h-screen"
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
     >
-      <div className="relative w-full max-w-lg my-auto bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col max-h-[calc(100dvh-2rem)] overflow-hidden animate-scale-up">
+      <div className="relative w-full max-w-xl my-auto bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col max-h-[calc(100dvh-1.5rem)] overflow-hidden animate-scale-up">
         
-        {/* Sticky Pinned Header (Never cut off or scrolled out of view) */}
-        <div className="p-5 sm:p-6 pb-4 border-b border-gray-100 flex items-start justify-between shrink-0 bg-white">
-          <div className="space-y-1 pr-6">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full">
-                Single Final Pack 2026
-              </span>
-              {isEarlyBirdActive && (
-                <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                  Early-Bird Active
+        {/* Sticky Header with Exam Switcher */}
+        <div className="p-4 sm:p-5 border-b border-gray-100 shrink-0 bg-white space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded-full">
+                  Official NET Vidya Store
                 </span>
-              )}
+                <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                  2026 Examination Pass
+                </span>
+              </div>
+              <h2 id="checkout-modal-title" className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
+                {selectedExam === 'gset' ? 'GSET 2026 Examination Enrollment' : 'UGC NET English Bundle Enrollment'}
+              </h2>
+              <p className="text-[11px] text-gray-500">
+                Sold by {STORE_MERCHANT.brandName} ({STORE_MERCHANT.proprietor}) • Curated by {STORE_MERCHANT.curatorShort}
+              </p>
             </div>
-            <h2 id="checkout-modal-title" className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
-              GSET + UGC NET English Final Pack 2026
-            </h2>
-            <p className="text-xs text-gray-500">
-              Sold by {STORE_MERCHANT.brandName} ({STORE_MERCHANT.proprietor}) • Content by {STORE_MERCHANT.curatorShort}
-            </p>
+            {!redirectingUrl && (
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
+                title="Close Checkout"
+                aria-label="Close Checkout"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
-          {!redirectingUrl && (
+
+          {/* Exam Switcher Tabs */}
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-gray-100/90 rounded-xl text-xs font-semibold">
             <button
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
-              title="Close Checkout"
-              aria-label="Close Checkout"
+              type="button"
+              onClick={() => {
+                setSelectedExam('gset');
+                setSelectedProductId(selectedStream === 'education' ? 'gset-education-combo' : 'gset-english-combo');
+                setErrorMessage(null);
+              }}
+              className={`py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
+                selectedExam === 'gset'
+                  ? 'bg-white text-emerald-950 font-bold shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
             >
-              <X className="w-5 h-5" />
+              <GraduationCap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>GSET 2026 (from ₹149)</span>
             </button>
-          )}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedExam('ugc');
+                setSelectedProductId('ugc-net-english-bundle');
+                setErrorMessage(null);
+              }}
+              className={`py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
+                selectedExam === 'ugc'
+                  ? 'bg-white text-blue-950 font-bold shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>UGC NET English (₹499)</span>
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
 
-          {/* Price Summary Banner */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 to-indigo-50/50 border border-blue-200/80 flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">Payable Enrollment Fee</span>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-3xl font-extrabold text-blue-950 font-serif">₹{finalPayablePrice}</span>
-                <span className="text-xs text-blue-700 font-medium">INR (All Inclusive)</span>
+          {/* GSET STREAM & PACK SELECTION SECTION */}
+          {selectedExam === 'gset' && (
+            <div className="space-y-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">
+                    Step 1: Choose Your Qualifying Stream
+                  </span>
+                  <p className="text-[11px] text-gray-500">
+                    English Literature &amp; Teacher Education are separate streams and exams.
+                  </p>
+                </div>
               </div>
-              {appliedDiscount && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold mt-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Saved ₹{appliedDiscount.amount} with code {appliedDiscount.code}</span>
-                </span>
-              )}
+
+              {/* Stream Switcher Pills */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleStreamChange('english')}
+                  className={`p-2 rounded-xl border text-left transition-all ${
+                    selectedStream === 'english'
+                      ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold shadow-2xs ring-1 ring-emerald-400'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span>English Stream</span>
+                    {selectedStream === 'english' && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                  </div>
+                  <p className="text-[10px] text-emerald-800 font-normal mt-0.5">
+                    Paper 1 + Paper 2 English
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleStreamChange('education')}
+                  className={`p-2 rounded-xl border text-left transition-all ${
+                    selectedStream === 'education'
+                      ? 'bg-purple-50 border-purple-400 text-purple-950 font-bold shadow-2xs ring-1 ring-purple-400'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span>Education Stream</span>
+                    {selectedStream === 'education' && <Check className="w-3.5 h-3.5 text-purple-600" />}
+                  </div>
+                  <p className="text-[10px] text-purple-800 font-normal mt-0.5">
+                    Paper 1 + Paper 2 Education
+                  </p>
+                </button>
+              </div>
+
+              {/* PACK SELECTION CARDS (REQUIRE USER TO SELECT A PACK) */}
+              <div className="pt-2">
+                <label className="block text-xs font-bold text-gray-900 uppercase tracking-wide mb-2">
+                  Step 2: Select Your Enrollment Pack (Single ₹149 or Duo ₹249)
+                </label>
+
+                <div className="space-y-2">
+                  {streamGsetProducts.map((pack) => {
+                    const isSelected = selectedProductId === pack.id;
+                    return (
+                      <div
+                        key={pack.id}
+                        onClick={() => setSelectedProductId(pack.id)}
+                        className={`p-3 rounded-xl border transition-all cursor-pointer relative ${
+                          isSelected
+                            ? pack.isCombo
+                              ? 'bg-emerald-50/70 border-emerald-500 shadow-sm ring-2 ring-emerald-500/20'
+                              : 'bg-blue-50/70 border-blue-500 shadow-sm ring-2 ring-blue-500/20'
+                            : 'bg-white border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2.5 min-w-0">
+                            <input
+                              type="radio"
+                              name="gset-pack-radio"
+                              checked={isSelected}
+                              onChange={() => setSelectedProductId(pack.id)}
+                              className="mt-0.5 text-emerald-600 focus:ring-emerald-500 shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={`text-[9px] font-mono uppercase font-bold px-1.5 py-0.2 rounded border ${pack.badgeColor}`}>
+                                  {pack.badge}
+                                </span>
+                              </div>
+                              <h4 className="text-xs sm:text-sm font-bold text-gray-900 mt-0.5 leading-snug">
+                                {pack.name}
+                              </h4>
+                              <p className="text-[11px] text-gray-600 mt-0.5 font-medium">
+                                {pack.testCountDesc}
+                              </p>
+                              <p className="text-[10px] text-gray-500 mt-0.5">
+                                {pack.description}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <div className="flex items-baseline gap-1 justify-end">
+                              <span className="text-base sm:text-lg font-extrabold text-gray-950 font-serif">
+                                ₹{pack.price}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-gray-400 line-through block">
+                              ₹{pack.originalPrice}
+                            </span>
+                            {pack.isCombo && (
+                              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded">
+                                SAVE 69%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-            <div className="text-right text-xs text-blue-900">
-              <span className="text-[11px] text-blue-700 block font-medium">Access Validity</span>
-              <strong className="text-blue-950 font-bold">{STORE_MERCHANT.accessExpiryLabel}</strong>
+          )}
+
+          {/* UGC NET SELECTION SECTION */}
+          {selectedExam === 'ugc' && (
+            <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <span className="text-[9px] font-mono uppercase bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded border border-blue-200">
+                    ALL-IN-ONE NATIONAL PASS
+                  </span>
+                  <h4 className="text-sm font-bold text-blue-950">
+                    UGC NET English Complete Preparation Bundle (2026 Edition)
+                  </h4>
+                  <p className="text-xs text-blue-800 font-medium">
+                    21 Authentic NTA CBT Mock Simulations + 3 Complete Online Reading Dossiers (347 Pages).
+                  </p>
+                  <p className="text-[11px] text-gray-600">
+                    Includes Grand Mock (100 Qs), 10 Unit Tests, 10 Practice Mocks, E-Book (283p), PYQ Bank (35p), and Quick Revision Kit (29p).
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline gap-1 justify-end">
+                    <span className="text-xl font-extrabold text-blue-950 font-serif">
+                      ₹499
+                    </span>
+                  </div>
+                  <span className="text-xs text-gray-400 line-through block">₹999</span>
+                  <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
+                    50% OFF
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* DYNAMIC PRICE SUMMARY BANNER */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-gray-900 to-slate-900 text-white shadow-sm flex items-center justify-between">
+            <div className="min-w-0 pr-3">
+              <span className="text-[10px] uppercase font-bold text-blue-300 tracking-wider block truncate">
+                Selected: {activeProduct.shortName}
+              </span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-2xl sm:text-3xl font-extrabold text-white font-serif">
+                  ₹{finalPayablePrice}
+                </span>
+                <span className="text-xs text-gray-300">INR (All Inclusive)</span>
+                {appliedDiscount && (
+                  <span className="text-xs text-emerald-400 font-bold">
+                    (₹{appliedDiscount.amount} Off)
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="text-right text-xs shrink-0">
+              <span className="text-[10px] text-gray-400 block">Digital Access Validity</span>
+              <strong className="text-white font-semibold">Through 31 Dec 2026</strong>
             </div>
           </div>
 
           {/* Error Banner */}
           {errorMessage && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
               <p className="leading-relaxed">{errorMessage}</p>
             </div>
           )}
 
-          {/* VIEW STATE 1: REDIRECTING DIRECTLY TO PAYMENT PORTAL */}
+          {/* REDIRECTING URL VIEW */}
           {redirectingUrl ? (
-            <div className="py-10 text-center space-y-4 animate-scale-up">
-              <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="py-8 text-center space-y-4 animate-scale-up">
+              <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Connecting to Payment...
+                <h3 className="text-base font-bold text-gray-900">
+                  Connecting to Razorpay Checkout...
                 </h3>
                 <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
-                  Taking you directly to the secure checkout for <strong>₹{finalPayablePrice}</strong>. Once paid, you will be automatically returned to your unlocked dashboard.
+                  Navigating to secure payment for <strong>₹{finalPayablePrice}</strong> ({activeProduct.shortName}). Once confirmed, you will be redirected to your active student hall.
                 </p>
               </div>
-              <div className="pt-3">
+              <div className="pt-2">
                 <a
                   href={redirectingUrl}
                   className="inline-block px-5 py-2.5 rounded-xl bg-blue-700 text-white font-bold text-xs hover:bg-blue-800 transition-colors shadow-sm"
                 >
-                  Pay
+                  Pay ₹{finalPayablePrice} Now →
                 </a>
               </div>
             </div>
-          ) : isPaymentSuccess ? (
-            /* VIEW STATE 2: PAYMENT SUCCESS CELEBRATION */
-            <div className="py-4 text-center space-y-4 animate-scale-up">
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                <CheckCircle2 className="w-10 h-10" />
+          ) : manualWhatsAppInfo ? (
+            /* GSET MANUAL DIRECT LINK RESOLUTION (WhatsApp Link View) */
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3 animate-scale-up">
+              <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto">
+                <MessageCircle className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-extrabold text-gray-900">
-                  Payment Verified! Access Active
+                <h3 className="text-sm sm:text-base font-bold text-emerald-950">
+                  GSET Registration Confirmed (₹{finalPayablePrice})
                 </h3>
-                <p className="text-xs text-gray-600 max-w-sm mx-auto leading-relaxed">
-                  Congratulations! Your digital pass for the GSET + UGC NET English Final Pack 2026 is unlocked through {STORE_MERCHANT.accessExpiryLabel}.
+                <p className="text-xs text-emerald-900 leading-relaxed max-w-sm mx-auto">
+                  Your seat for <strong>{activeProduct.name}</strong> has been registered. Connect directly on WhatsApp with Dr. Rajnikant Dodiya / Nilam Dodiya for instant GSET payment link generation &amp; immediate test hall activation.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-left space-y-2 text-xs">
+              <div className="pt-2 flex flex-col gap-2 max-w-xs mx-auto">
+                <a
+                  href={manualWhatsAppInfo.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Receive Payment Link on WhatsApp</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginBuyer({
+                      name: studentName,
+                      email,
+                      mobile,
+                      orderId: `NV_GSET_${Date.now()}`,
+                      isBuyer: true
+                    });
+                    setIsPaymentSuccess(true);
+                  }}
+                  className="text-[11px] text-emerald-800 hover:text-emerald-950 underline font-medium"
+                >
+                  Already paid? Open My Dashboard
+                </button>
+              </div>
+            </div>
+          ) : isPaymentSuccess ? (
+            /* PAYMENT SUCCESS CELEBRATION */
+            <div className="py-4 text-center space-y-3 animate-scale-up">
+              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle2 className="w-9 h-9" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-extrabold text-gray-900">
+                  Enrollment Active &amp; Verified!
+                </h3>
+                <p className="text-xs text-gray-600 max-w-sm mx-auto leading-relaxed">
+                  Congratulations! Your digital pass for <strong>{activeProduct.name}</strong> is unlocked through 31 Dec 2026.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-left space-y-1.5 text-xs">
                 <div className="flex justify-between text-gray-600">
                   <span>Candidate:</span>
                   <strong className="text-gray-900">{studentName}</strong>
@@ -404,6 +849,10 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 <div className="flex justify-between text-gray-600">
                   <span>Registered Email:</span>
                   <strong className="text-gray-900 font-mono">{email}</strong>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Enrolled Pack:</span>
+                  <strong className="text-gray-900">{activeProduct.shortName}</strong>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Amount:</span>
@@ -414,16 +863,16 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={handleCompleteSuccess}
-                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Open Student Dashboard & Test Hall</span>
+                <span>Open Student Dashboard &amp; Test Hall</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           ) : (
-            /* VIEW STATE 3: CLEAN CANDIDATE DETAILS FORM */
-            <form onSubmit={handleInitiatePayment} className="space-y-4">
+            /* CANDIDATE REGISTRATION & PAYMENT FORM */
+            <form onSubmit={handleInitiatePayment} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Full Candidate Name *
@@ -434,7 +883,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   value={studentName}
                   onChange={e => setStudentName(e.target.value)}
                   placeholder="e.g. Aarav Patel"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                 />
               </div>
 
@@ -448,10 +897,10 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="e.g. aarav@gmail.com"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                 />
-                <span className="text-[11px] text-gray-500 mt-0.5 block">
-                  Your official digital student pass and confirmation will be sent here.
+                <span className="text-[10px] text-gray-500 mt-0.5 block">
+                  Official enrollment receipt and test hall pass will be dispatched here.
                 </span>
               </div>
 
@@ -460,7 +909,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   WhatsApp / Mobile Number *
                 </label>
                 <div className="flex">
-                  <span className="px-3.5 py-2.5 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-xs font-semibold text-gray-600 flex items-center">
+                  <span className="px-3 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-xs font-semibold text-gray-600 flex items-center">
                     +91
                   </span>
                   <input
@@ -470,14 +919,14 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                     value={mobile}
                     onChange={e => setMobile(e.target.value.replace(/\D/g, ''))}
                     placeholder="9876543210"
-                    className="w-full px-4 py-2.5 rounded-r-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none font-mono"
+                    className="w-full px-3.5 py-2 rounded-r-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none font-mono"
                   />
                 </div>
               </div>
 
-              {/* Seamless Password Entry if candidate is not signed in yet */}
+              {/* Password Setup for seamless Student Portal sign-in */}
               {!buyerSession.isLoggedIn && (
-                <div className="p-3.5 bg-gray-50/80 rounded-2xl border border-gray-200 space-y-2">
+                <div className="p-3 bg-gray-50/80 rounded-xl border border-gray-200 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-gray-700">
                       {isExistingAccount ? 'Portal Password *' : 'Create Portal Password *'}
@@ -488,7 +937,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                         setIsExistingAccount(!isExistingAccount);
                         setErrorMessage(null);
                       }}
-                      className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline"
+                      className="text-[10px] text-blue-700 hover:text-blue-900 font-semibold underline"
                     >
                       {isExistingAccount ? 'New student? Create account' : 'Already have account? Sign in'}
                     </button>
@@ -499,23 +948,18 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                     minLength={6}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder={isExistingAccount ? 'Enter your portal password' : 'Create a password (min 6 chars)'}
-                    className="w-full px-4 py-2 rounded-xl border border-gray-300 text-sm bg-white focus:ring-2 focus:ring-blue-600 outline-none"
+                    placeholder={isExistingAccount ? 'Enter existing password' : 'Set a password (min 6 characters)'}
+                    className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs bg-white focus:ring-2 focus:ring-blue-600 outline-none"
                   />
-                  <p className="text-[11px] text-gray-500">
-                    {isExistingAccount
-                      ? 'Sign in to link this purchase to your existing student profile.'
-                      : 'Used to log into your Test Hall & Dossiers from any phone or laptop.'}
-                  </p>
                 </div>
               )}
 
-              {/* Optional Coupon Code (Available in API Checkout mode) */}
+              {/* Optional Coupon Code */}
               {paymentMode === 'api_checkout' && (
-                <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
+                <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-200 space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-gray-700">Scholarship / Referral Code</span>
-                    <span className="text-[11px] text-gray-400 font-mono">Optional</span>
+                    <span className="text-[10px] text-gray-400 font-mono">Optional</span>
                   </div>
                   <div className="flex gap-2">
                     <input
@@ -534,13 +978,13 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                     </button>
                   </div>
                   {appliedDiscount && (
-                    <p className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <p className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
                       <span>{appliedDiscount.message} (Code: {appliedDiscount.code})</span>
                     </p>
                   )}
                   {couponError && (
-                    <p className="text-[11px] text-rose-600 font-medium">
+                    <p className="text-[10px] text-rose-600 font-medium">
                       {couponError}
                     </p>
                   )}
@@ -552,17 +996,23 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                  className={`w-full py-3 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer ${
+                    selectedExam === 'gset'
+                      ? 'bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white'
+                      : 'bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white'
+                  }`}
                 >
                   {isProcessing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Connecting to Payment...</span>
+                      <span>Connecting to Payment Gateway...</span>
                     </>
                   ) : (
                     <>
-                      <Lock className="w-4 h-4 text-blue-200" />
-                      <span>Pay</span>
+                      <Lock className="w-4 h-4 text-white/80" />
+                      <span>
+                        Pay ₹{finalPayablePrice} INR • Enroll in {activeProduct.shortName}
+                      </span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -573,15 +1023,15 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
 
         </div>
 
-        {/* Sticky Pinned Footer with Trust Badges & Compliance Links */}
-        <div className="p-4 sm:p-5 bg-gray-50 border-t border-gray-100 shrink-0 space-y-2">
-          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2.5 text-[11px] text-gray-500">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+        {/* Sticky Pinned Footer with Trust Badges & Policies */}
+        <div className="p-3.5 sm:p-4 bg-gray-50 border-t border-gray-100 shrink-0 space-y-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-gray-500">
+            <div className="flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>256-Bit SSL Encrypted</span>
             </div>
-            <span>Razorpay Verified</span>
-            <span>Instant Digital Access</span>
+            <span>Razorpay Verified Gateway</span>
+            <span>Continuous Access Through 31 Dec 2026</span>
           </div>
           {onOpenPolicy && (
             <StorePolicyLinks

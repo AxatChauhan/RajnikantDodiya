@@ -3,18 +3,20 @@ import {
   DEFAULT_PAYMENT_LINK,
   DEFAULT_PAYMENT_LINK_PRICE,
   DEFAULT_STORE_SETTINGS,
-  fetchStoreSettings
+  fetchStoreSettings,
+  GSET_PRODUCTS,
+  UGC_BUNDLE_PRODUCT
 } from './price.js';
 import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../lib/store-config.js';
 
 /**
  * Vercel Serverless Function: Create Razorpay Order
- * NET Vidya English Student Store • "GSET + UGC NET English Final Pack 2026"
+ * NET Vidya English Student Store
  * 
- * Security Rule:
- * Price is calculated strictly on the server (₹799 early-bird or ₹999 standard).
- * Client price parameters are completely ignored.
- * Merchant descriptor: Nilam Dodiya (NET Vidya)
+ * Strict Pricing Engine:
+ * - GSET Single Paper Packs: ₹149 each (Paper 1, Paper 2 English, Paper 2 Education)
+ * - GSET Scholar Duo Combos: ₹249 each (English Duo, Education Duo) - Max GSET price
+ * - UGC NET Complete Bundle: ₹499 (all 21 CBTs + 3 Dossiers)
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { studentName, email, mobile, couponCode } = req.body || {};
+    const { studentName, email, mobile, couponCode, productId, examStore } = req.body || {};
 
     if (!studentName || !email || !mobile) {
       return res.status(400).json({
@@ -31,27 +33,104 @@ export default async function handler(req, res) {
       });
     }
 
-    // 1. Authoritative Server-Side Price Calculation (client price completely ignored)
-    const simulatedNow = req.query?.now || req.headers?.['x-simulated-date'] || req.body?.simulatedNow;
+    // 1. Authoritative Product & Server-Side Price Resolution
+    let resolvedProduct = null;
+    let basePrice = 499;
+    let productName = 'UGC NET English Complete Preparation Bundle (2026 Edition)';
+
+    if (productId === 'gset-paper1') {
+      resolvedProduct = GSET_PRODUCTS.paper1;
+      basePrice = 149;
+      productName = GSET_PRODUCTS.paper1.name;
+    } else if (productId === 'gset-paper2-english' || productId === 'gset-paper2_eng') {
+      resolvedProduct = GSET_PRODUCTS.paper2_eng;
+      basePrice = 149;
+      productName = GSET_PRODUCTS.paper2_eng.name;
+    } else if (productId === 'gset-paper2-education' || productId === 'gset-paper2_edu') {
+      resolvedProduct = GSET_PRODUCTS.paper2_edu;
+      basePrice = 149;
+      productName = GSET_PRODUCTS.paper2_edu.name;
+    } else if (productId === 'gset-english-combo' || productId === 'gset-combo_eng') {
+      resolvedProduct = GSET_PRODUCTS.combo_eng;
+      basePrice = 249;
+      productName = GSET_PRODUCTS.combo_eng.name;
+    } else if (productId === 'gset-education-combo' || productId === 'gset-combo_edu') {
+      resolvedProduct = GSET_PRODUCTS.combo_edu;
+      basePrice = 249;
+      productName = GSET_PRODUCTS.combo_edu.name;
+    } else {
+      resolvedProduct = UGC_BUNDLE_PRODUCT;
+      basePrice = 499;
+      productName = UGC_BUNDLE_PRODUCT.name;
+    }
+
     const settings = await fetchStoreSettings();
-    const priceCalculation = computeCurrentServerPrice(settings, simulatedNow);
 
     // Server-enforced coupon code validation from centralized store-config
     const cleanCoupon = (couponCode || '').toString().trim().toUpperCase();
     const couponEntry = STORE_PAYMENT_DEFAULTS.validCoupons[cleanCoupon];
     const discount = couponEntry?.amount || 0;
-    const finalPrice = Math.max(1, priceCalculation.price - discount);
+    const finalPrice = Math.max(1, basePrice - discount);
     const amountInPaisa = finalPrice * 100; // Razorpay expects amount in paise
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    const rawPaymentLink =
-      process.env.RAZORPAY_PAYMENT_LINK ??
-      process.env.VITE_RAZORPAY_PAYMENT_LINK ??
-      DEFAULT_PAYMENT_LINK;
-    const paymentLinkUrl = rawPaymentLink.trim();
 
-    const receipt = `NV_ORD_${Date.now().toString().slice(-8)}`;
+    // Resolve dedicated product payment links (Supports both individual links and unified single-link mode)
+    let targetPaymentLink = '';
+    if (resolvedProduct.id === 'gset-paper2-education') {
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_EDU_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_EDU_149 ||
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        ''
+      ).trim();
+    } else if (resolvedProduct.id === 'gset-paper2-english') {
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_ENG_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_ENG_149 ||
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        ''
+      ).trim();
+    } else if (resolvedProduct.id === 'gset-paper1') {
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_P1_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_P1_149 ||
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        ''
+      ).trim();
+    } else if (resolvedProduct.id === 'gset-education-combo') {
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_EDU_249 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_EDU_249 ||
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_249 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 ||
+        ''
+      ).trim();
+    } else if (resolvedProduct.id === 'gset-english-combo') {
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_ENG_249 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_ENG_249 ||
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_249 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 ||
+        ''
+      ).trim();
+    } else if (basePrice === 149) {
+      targetPaymentLink = (process.env.RAZORPAY_PAYMENT_LINK_GSET_149 || process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 || '').trim();
+    } else if (basePrice === 249) {
+      targetPaymentLink = (process.env.RAZORPAY_PAYMENT_LINK_GSET_249 || process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 || '').trim();
+    } else {
+      const rawPaymentLink =
+        process.env.RAZORPAY_PAYMENT_LINK ??
+        process.env.VITE_RAZORPAY_PAYMENT_LINK ??
+        DEFAULT_PAYMENT_LINK;
+      targetPaymentLink = (rawPaymentLink || '').trim();
+    }
+
+    const receipt = `NV_${Date.now().toString().slice(-8)}`;
 
     // 2. If Razorpay server API credentials exist, call Razorpay Orders API (Native In-App Checkout)
     if (keyId && keySecret) {
@@ -68,7 +147,8 @@ export default async function handler(req, res) {
           receipt,
           notes: {
             merchant: 'Nilam Dodiya (NET Vidya)',
-            product: 'GSET + UGC NET English Final Pack 2026',
+            product: productName,
+            product_id: resolvedProduct.id,
             seller: settings.sellerLine,
             student_name: studentName.trim(),
             email: email.trim().toLowerCase(),
@@ -90,45 +170,90 @@ export default async function handler(req, res) {
         success: true,
         paymentMode: 'api_checkout',
         orderId: orderData.id,
-        amount: priceCalculation.price,
+        productId: resolvedProduct.id,
+        productName,
+        amount: finalPrice,
         amountInPaisa,
         currency: 'INR',
         keyId,
         studentName,
         email,
         mobile,
-        isEarlyBird: priceCalculation.isEarlyBird,
-        accessExpiryDate: priceCalculation.accessExpiryDate
+        accessExpiryDate: '2026-12-31T23:59:59+05:30'
       });
     }
 
-    // 3. Verified Payment Link + Webhook Mode (before live website API keys are activated)
-    if (paymentLinkUrl && paymentLinkUrl !== 'disabled') {
+    // 3. Payment Link Mode: If a valid payment link exists for this product/price
+    if (targetPaymentLink && targetPaymentLink !== 'disabled') {
       const linkOrderId = `order_link_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-      const linkAmount = Number(process.env.RAZORPAY_PAYMENT_LINK_AMOUNT || DEFAULT_PAYMENT_LINK_PRICE);
+      let finalLinkUrl = targetPaymentLink;
+      try {
+        const u = new URL(targetPaymentLink);
+        if (studentName && !u.searchParams.has('name')) u.searchParams.set('name', studentName.trim());
+        if (email && !u.searchParams.has('email')) u.searchParams.set('email', email.trim().toLowerCase());
+        if (mobile && !u.searchParams.has('contact')) u.searchParams.set('contact', mobile.trim());
+        if (!u.searchParams.has('notes[product_id]')) u.searchParams.set('notes[product_id]', resolvedProduct.id);
+        if (!u.searchParams.has('notes[product_name]')) u.searchParams.set('notes[product_name]', productName);
+        finalLinkUrl = u.toString();
+      } catch {
+        finalLinkUrl = targetPaymentLink;
+      }
+
       return res.status(200).json({
         success: true,
         paymentMode: 'payment_link',
-        paymentLinkUrl,
+        paymentLinkUrl: finalLinkUrl,
         orderId: linkOrderId,
-        amount: linkAmount,
-        amountInPaisa: linkAmount * 100,
+        productId: resolvedProduct.id,
+        productName,
+        amount: finalPrice,
+        amountInPaisa,
         currency: 'INR',
         studentName,
         email: email.trim().toLowerCase(),
         mobile: mobile.trim(),
-        isEarlyBird: priceCalculation.isEarlyBird,
-        accessExpiryDate: priceCalculation.accessExpiryDate
+        accessExpiryDate: '2026-12-31T23:59:59+05:30'
       });
     }
 
-    // 4. Reject unconfigured production checkouts (never expose free auto-unlocks in production)
+    // 4. If this is GSET and no specific payment link or API key is set yet:
+    // DO NOT charge ₹499! Instead, provide direct WhatsApp connection with Dr. Rajnikant Dodiya / Nilam Dodiya for instant enrollment link
+    if (basePrice !== 499) {
+      const pendingOrderId = `NV_GSET_${Date.now()}`;
+      const waMsg = encodeURIComponent(
+        `Hello Dr. Rajnikant Dodiya, I want to enroll in ${productName} (₹${finalPrice}).\n` +
+        `Candidate Name: ${studentName.trim()}\n` +
+        `Email: ${email.trim()}\n` +
+        `Mobile: ${mobile.trim()}\n` +
+        `Please share the GSET payment link for ₹${finalPrice}.`
+      );
+      const whatsappUrl = `https://wa.me/919638716634?text=${waMsg}`;
+
+      return res.status(200).json({
+        success: true,
+        paymentMode: 'gset_manual_contact',
+        orderId: pendingOrderId,
+        productId: resolvedProduct.id,
+        productName,
+        amount: finalPrice,
+        amountInPaisa,
+        currency: 'INR',
+        studentName,
+        email: email.trim().toLowerCase(),
+        mobile: mobile.trim(),
+        whatsappUrl,
+        whatsappNumber: '+91 96387 16634',
+        message: `Your GSET registration for ${productName} (₹${finalPrice}) is registered. Click below to connect on WhatsApp (+91 96387 16634) for your instant payment link.`
+      });
+    }
+
+    // 5. Reject unconfigured production checkouts for UGC if link is disabled
     const isProduction = Boolean(
       process.env.VERCEL ||
       process.env.VERCEL_ENV === 'production' ||
       process.env.NODE_ENV === 'production'
     );
-    if (isProduction) {
+    if (isProduction && !targetPaymentLink) {
       return res.status(503).json({
         success: false,
         paymentMode: 'unconfigured',
@@ -136,21 +261,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // 5. Local Development & Automated Test Fallback Order Generation
+    // 6. Local Development & Automated Test Fallback
     const testOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     return res.status(200).json({
       success: true,
       paymentMode: 'test_simulation',
       orderId: testOrderId,
-      amount: priceCalculation.price,
+      productId: resolvedProduct.id,
+      productName,
+      amount: finalPrice,
       amountInPaisa,
       currency: 'INR',
       keyId: keyId || 'rzp_test_netvidya_key',
       studentName,
       email,
       mobile,
-      isEarlyBird: priceCalculation.isEarlyBird,
-      accessExpiryDate: priceCalculation.accessExpiryDate,
+      accessExpiryDate: '2026-12-31T23:59:59+05:30',
       isTestMode: true
     });
   } catch (err) {

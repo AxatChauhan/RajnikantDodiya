@@ -153,14 +153,9 @@ export default async function handler(req, res) {
 
     const settings = await fetchStoreSettings();
     const priceInfo = computeCurrentServerPrice(settings);
-    const baselineRupees = Math.min(
-      Number(settings.earlyBirdPrice || 799),
-      Number(settings.standardPrice || 999),
-      Number(priceInfo.price || 799),
-      799
-    );
+    // Dynamic minimum allowed amount across UGC NET (₹499-₹999) and GSET (₹149-₹249) packs
     const minValidPaise = Number(
-      process.env.RAZORPAY_MIN_AMOUNT_PAISE || Math.max(100, (baselineRupees - 150) * 100)
+      process.env.RAZORPAY_MIN_AMOUNT_PAISE || 4900 // Minimum ₹49 for micro-packs with discounts
     );
 
     if (amountPaise !== null && (!Number.isFinite(amountPaise) || amountPaise < minValidPaise)) {
@@ -192,6 +187,7 @@ export default async function handler(req, res) {
     const orderId = payment?.order_id || orderEntity?.id || paymentLink?.id || `ORD_WH_${Date.now()}`;
     const amountPaid = amountPaise !== null ? amountPaise / 100 : 799;
     const expiresAt = settings.accessExpiryDate || DEFAULT_ACCESS_EXPIRY;
+    const productId = notes.product_id || (amountPaid <= 149 ? 'gset-paper2-english' : (amountPaid <= 249 ? 'gset-english-combo' : 'ugc-bundle'));
 
     if (!email || !email.includes('@')) {
       return res.status(200).json({
@@ -213,6 +209,7 @@ export default async function handler(req, res) {
       razorpayPaymentId: paymentId,
       razorpayOrderId: payment?.order_id || orderEntity?.id || null,
       amountPaid,
+      productId,
       paymentMethod: event === 'payment_link.paid' ? 'razorpay_link' : 'razorpay_webhook',
       expiresAt
     });

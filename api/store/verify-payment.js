@@ -29,7 +29,9 @@ export default async function handler(req, res) {
       studentName,
       email,
       mobile,
-      orderId
+      orderId,
+      productId,
+      amount
     } = req.body || {};
 
     const cleanEmail = (email || '').trim().toLowerCase();
@@ -91,10 +93,30 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Authoritative Server Price & Order Identification
+    // 3. Authoritative Product & Price Resolution
     const settings = await fetchStoreSettings();
-    const priceInfo = computeCurrentServerPrice(settings);
-    const amountPaid = priceInfo.price;
+    let resolvedProductName = 'UGC NET English Complete Preparation Bundle (2026 Edition)';
+    let amountPaid = 499;
+
+    if (productId === 'gset-paper1') {
+      resolvedProductName = 'GSET Paper 1: General Aptitude Foundation Pack';
+      amountPaid = 149;
+    } else if (productId === 'gset-paper2-english' || productId === 'gset-paper2_eng') {
+      resolvedProductName = 'GSET Paper 2: English Literature Specialist Pack';
+      amountPaid = 149;
+    } else if (productId === 'gset-paper2-education' || productId === 'gset-paper2_edu') {
+      resolvedProductName = 'GSET Paper 2: Education Discipline Master Pack';
+      amountPaid = 149;
+    } else if (productId === 'gset-english-combo' || productId === 'gset-combo_eng') {
+      resolvedProductName = 'GSET English Scholar Duo (Paper 1 + English)';
+      amountPaid = 249;
+    } else if (productId === 'gset-education-combo' || productId === 'gset-combo_edu') {
+      resolvedProductName = 'GSET Education Scholar Duo (Paper 1 + Education)';
+      amountPaid = 249;
+    } else if (amount) {
+      amountPaid = Number(amount);
+    }
+
     const finalOrderId = razorpay_order_id || orderId || `NV_${Date.now()}`;
     const accessExpiresAt = settings.accessExpiryDate || DEFAULT_ACCESS_EXPIRY;
 
@@ -139,6 +161,7 @@ export default async function handler(req, res) {
       razorpayPaymentId: razorpay_payment_id,
       razorpayOrderId: razorpay_order_id || null,
       amountPaid,
+      productId,
       paymentMethod: 'razorpay',
       expiresAt: accessExpiresAt
     })) || { dbRecorded: false };
@@ -177,7 +200,8 @@ export default async function handler(req, res) {
         mobile: cleanMobile,
         orderId: finalOrderId,
         amountPaid,
-        product: 'GSET + UGC NET English Final Pack 2026',
+        product: resolvedProductName,
+        productId,
         accessValidThrough: '31 Dec 2026',
         dbRecorded
       }
