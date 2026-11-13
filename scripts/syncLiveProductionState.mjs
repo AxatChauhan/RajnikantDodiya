@@ -61,6 +61,14 @@ async function syncLiveState() {
       syncedAt: new Date().toISOString()
     };
 
+    // Guarantee authoritative pricing for UGC NET Bundle = ₹499
+    if (merged.store && merged.store.settings) {
+      merged.store.settings.earlyBirdPrice = 499;
+      merged.store.settings.standardPrice = 499;
+      merged.store.settings.productSlug = 'ugc-net-bundle';
+      merged.store.settings.productName = 'UGC NET English Complete Preparation Bundle (2026 Edition)';
+    }
+
     fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(merged, null, 2) + '\n', 'utf8');
     console.log(`[Sync] Successfully updated local snapshot at src/data/live_studio_state.json`);
     console.log(`[Sync] Version: ${merged.version || 1}, Last Modified: ${merged.updatedAt || merged.syncedAt}`);

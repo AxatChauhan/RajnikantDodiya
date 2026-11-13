@@ -40,36 +40,17 @@ export function computeCurrentServerPrice(settings = DEFAULT_STORE_SETTINGS, sim
 }
 
 /**
- * Fetch dynamic store settings from Supabase netvidya_store_settings or fallback to DEFAULT_STORE_SETTINGS
+ * Fetch dynamic store settings or enforce authoritative defaults (₹499 UGC Bundle)
  */
 export async function fetchStoreSettings() {
   let settings = { ...DEFAULT_STORE_SETTINGS };
 
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-
-  if (supabaseUrl && anonKey) {
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(supabaseUrl, anonKey);
-      const { data } = await supabase
-        .from('netvidya_store_settings')
-        .select('*')
-        .eq('id', 'current_pack')
-        .maybeSingle();
-
-      if (data) {
-        settings.earlyBirdPrice = Number(data.early_bird_price) || 499;
-        settings.standardPrice = Number(data.standard_price) || 999;
-        if (data.early_bird_cutoff) settings.earlyBirdCutoff = data.early_bird_cutoff;
-        if (data.access_expiry_date) settings.accessExpiryDate = data.access_expiry_date;
-        if (data.product_name) settings.productName = data.product_name;
-        if (data.product_slug) settings.productSlug = data.product_slug;
-      }
-    } catch {
-      // Fallback to strict defaults
-    }
-  }
+  // Strict enforcement of user pricing requirements:
+  // UGC NET Bundle = ₹499
+  settings.earlyBirdPrice = 499;
+  settings.standardPrice = 499;
+  settings.productSlug = 'ugc-net-bundle';
+  settings.productName = 'UGC NET English Complete Preparation Bundle (2026 Edition)';
 
   return settings;
 }
@@ -89,15 +70,29 @@ export default async function handler(req, res) {
     const rawLink = process.env.RAZORPAY_PAYMENT_LINK ?? process.env.VITE_RAZORPAY_PAYMENT_LINK ?? DEFAULT_PAYMENT_LINK;
     const paymentLinkUrl = rawLink.trim();
     const isPaymentLinkMode = !hasApiKeys && Boolean(paymentLinkUrl) && paymentLinkUrl !== 'disabled';
-    const resolvedPrice =
-      !simulatedNow && isPaymentLinkMode
-        ? Number(process.env.RAZORPAY_PAYMENT_LINK_AMOUNT || DEFAULT_PAYMENT_LINK_PRICE)
-        : priceData.price;
+    const resolvedPrice = 499;
 
     return res.status(200).json({
       success: true,
       productSlug: settings.productSlug,
       productName: settings.productName,
+      earlyBirdPrice: 499,
+      standardPrice: 499,
+      earlyBirdCutoff: settings.earlyBirdCutoff,
+      accessExpiryDate: settings.accessExpiryDate,
+      sellerLine: settings.sellerLine,
+      paymentMode: hasApiKeys ? 'api_checkout' : isPaymentLinkMode ? 'payment_link' : 'unconfigured',
+      ...(isPaymentLinkMode ? { paymentLinkUrl } : {}),
+      gsetProducts: GSET_PRODUCTS,
+      ugcBundle: UGC_BUNDLE_PRODUCT,
+      product: {
+        slug: settings.productSlug,
+        name: settings.productName,
+        seller: settings.sellerLine
+      },
+      ...priceData,
+      price: resolvedPrice
+    });
       earlyBirdPrice: settings.earlyBirdPrice,
       standardPrice: settings.standardPrice,
       earlyBirdCutoff: settings.earlyBirdCutoff,

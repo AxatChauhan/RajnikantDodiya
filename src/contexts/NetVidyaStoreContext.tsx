@@ -549,8 +549,10 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       .then(res => res.json())
       .then(data => {
         if (data?.success && typeof data.price === 'number') {
+          // UGC NET Bundle is ₹499
+          const validatedPrice = data.price > 499 ? 499 : data.price;
           setServerPriceState({
-            price: data.price,
+            price: validatedPrice,
             paymentMode: data.paymentMode === 'api_checkout' ? 'api_checkout' : 'payment_link',
             paymentLinkUrl: data.paymentLinkUrl || defaultLink
           });
@@ -565,7 +567,14 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         if (data?.success && data.state?.store) {
           const storeState = data.state.store;
           if (storeState.settings) {
-            setSettings(prev => ({ ...prev, ...storeState.settings }));
+            setSettings(prev => ({
+              ...prev,
+              ...storeState.settings,
+              earlyBirdPrice: 499,
+              standardPrice: 499,
+              productSlug: 'ugc-net-bundle',
+              productName: 'UGC NET English Complete Preparation Bundle (2026 Edition)'
+            }));
             try { localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(storeState.settings)); } catch {}
           }
           if (storeState.readingFiles && Array.isArray(storeState.readingFiles) && storeState.readingFiles.length > 0 && !storeState.readingFiles[0]?.id?.includes('theory-master')) {

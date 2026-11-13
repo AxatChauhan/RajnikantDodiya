@@ -288,27 +288,42 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
         )}
       </div>
 
-      {/* Cross-link to NET Vidya Final Pack 2026 Store */}
+      {/* Cross-link to NET Vidya UGC NET & GSET Storefronts */}
       {onNavigate && (
-        <section className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-50 via-white to-indigo-50 border border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+        <section className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-50 via-white to-emerald-50 border border-blue-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
           <div className="space-y-1">
             <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-blue-700">
-              {STORE_MERCHANT.storeTitle} • Flagship Competitive Batch
+              {STORE_MERCHANT.storeTitle} • Examination Storefronts
             </span>
             <h2 className="font-serif text-lg sm:text-xl text-ink font-medium">
-              GSET + UGC NET English Final Pack 2026
+              UGC NET English (₹499) &amp; GSET 2026 (from ₹149)
             </h2>
             <p className="text-xs text-ink-muted font-reading leading-relaxed">
-              Full 10+ NTA CBT mock tests, model explanations &amp; revision dossiers curated by {STORE_MERCHANT.curator}. {STORE_MERCHANT.sellerLine}
+              Full Computer-Based (CBT) mock tests, unit tests, and online reading dossiers curated by {STORE_MERCHANT.curator}.
             </p>
           </div>
-          <button
-            onClick={() => onNavigate('store')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 shrink-0"
-          >
-            <span>Open Final Pack Store</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              onClick={() => {
+                window.location.hash = '#store';
+                onNavigate('store');
+              }}
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5"
+            >
+              <span>UGC NET Store (₹499)</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => {
+                window.location.hash = '#gset';
+                onNavigate('store');
+              }}
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5"
+            >
+              <span>GSET 2026 Store (from ₹149)</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </section>
       )}
 
