@@ -21,6 +21,18 @@ import {
 export const TEST_HALL_SCHEDULE = [
   // UGC NET Tests (NTA Simulation)
   {
+    id: 'test-net-mock-1',
+    file: 'NET_Mock_01.html',
+    title: 'NET Mock 1: Full-Length Paper II NTA Simulation',
+    category: 'NET Mock',
+    exam: 'ugc',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Comprehensive 100-question Paper II English Literature NTA simulation with countdown timer, question palette, and detailed explanations.'
+  },
+  {
     id: 'ugc-net-mock-1',
     file: 'NET_Mock_01.html',
     title: 'NET Mock 1: Full-Length Paper II NTA Simulation',

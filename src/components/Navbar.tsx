@@ -13,7 +13,8 @@ import {
   Users,
   Mail,
   FileText,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 import { PROFESSOR_INFO, SOCIAL_LINKS } from '../data/professorData';
 import { useScholarSession } from '../hooks/useScholarSession';
@@ -139,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { session } = useScholarSession();
-  const { profile, alertBanner, layoutSettings } = useSiteContent();
+  const { profile, alertBanner, layoutSettings, openStudio } = useSiteContent();
   const { buyerSession } = useNetVidyaStore();
 
   const isScholarActive = Boolean(

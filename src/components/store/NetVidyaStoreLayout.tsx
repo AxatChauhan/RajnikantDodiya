@@ -257,14 +257,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 </>
               ) : (
                 <>
-                  <span className="hidden min-[400px]:inline">Enroll Bundle (₹499)</span>
-                  <span className="min-[400px]:hidden">Buy ₹499</span>
+                  <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
+                  <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
                 </>
               )}
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
 
-            {/* Author Studio Trigger Button */}
+            {/* Admin Trigger Button & Author Studio */}
             <button
               onClick={() => openStudio('store')}
               title="Open Author Studio (NET Vidya Store & Enrolled Scholars)"
