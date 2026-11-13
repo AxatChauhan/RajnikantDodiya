@@ -42,7 +42,16 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 }) => {
   const { currentServerPrice, isEarlyBirdActive, buyerSession } = useNetVidyaStore();
 
-  const [currentView, setCurrentView] = useState<StoreView>(initialView);
+  const [currentView, setCurrentView] = useState<StoreView>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+      if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
+        return 'dashboard';
+      }
+    }
+    return initialView;
+  });
   const [selectedPolicyTab, setSelectedPolicyTab] = useState<PolicyTab>(initialPolicyTab);
 
   // Modals
@@ -59,6 +68,9 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       const search = window.location.search.toLowerCase();
       if (hash === '#admin' || hash === '#store-admin' || search.includes('admin=true')) {
         setIsAdminOpen(true);
+      }
+      if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
+        setCurrentView('dashboard');
       }
     };
     checkAdminRoute();

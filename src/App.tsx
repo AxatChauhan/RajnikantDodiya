@@ -128,6 +128,11 @@ function AppInner() {
         return;
       }
 
+      if (route === 'dashboard' || route === 'store-dashboard') {
+        setActiveTab('store');
+        return;
+      }
+
       const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'bookstore', 'contact', 'store', 'policies'];
       if (validTabs.includes(route as MainTab)) {
         setActiveTab(route as MainTab);

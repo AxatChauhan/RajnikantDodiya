@@ -6,8 +6,6 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  ExternalLink,
-  RefreshCw,
   Sparkles
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
@@ -54,20 +52,9 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number; message: string } | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [redirectingUrl, setRedirectingUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Payment Link & Webhook Polling State
-  const [paymentLinkState, setPaymentLinkState] = useState<{
-    url: string;
-    orderId: string;
-    amount: number;
-    name: string;
-    email: string;
-    mobile: string;
-  } | null>(null);
-  const [isCheckingWebhook, setIsCheckingWebhook] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
-  const [statusNotice, setStatusNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && buyerSession.isLoggedIn) {
@@ -77,32 +64,10 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     }
   }, [isOpen, buyerSession.isLoggedIn, buyerSession.name, buyerSession.email, buyerSession.mobile]);
 
-  // Automated background polling for webhook payment verification
-  useEffect(() => {
-    if (!isOpen || !paymentLinkState || isPaymentSuccess) return;
-
-    let isMounted = true;
-    const interval = setInterval(async () => {
-      try {
-        const res = await refreshSession();
-        if (isMounted && res.isBuyer) {
-          setIsPaymentSuccess(true);
-        }
-      } catch {}
-    }, 3000);
-
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, [isOpen, paymentLinkState, isPaymentSuccess, refreshSession]);
-
   const finalPayablePrice =
     paymentMode === 'payment_link'
       ? currentServerPrice
       : Math.max(1, currentServerPrice - (appliedDiscount?.amount || 0));
-
-  const displayedPrice = paymentLinkState ? paymentLinkState.amount : finalPayablePrice;
 
   const handleApplyCoupon = () => {
     setCouponError(null);
@@ -123,7 +88,6 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   const handleInitiatePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-    setStatusNotice(null);
 
     const cleanName = studentName.trim();
     const cleanEmail = email.trim().toLowerCase();
@@ -171,7 +135,6 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           throw new Error(authRes.error || 'Account setup failed. Please check your credentials.');
         }
 
-        // If they already bought previously and are just logging in
         if (authRes.isBuyer) {
           setIsPaymentSuccess(true);
           setIsProcessing(false);
@@ -200,25 +163,26 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       const fallbackLink = (contextPaymentLinkUrl || import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || STORE_PAYMENT_DEFAULTS.defaultPaymentLink).trim();
       const paymentLinkUrl = orderData.paymentLinkUrl || (orderData.paymentMode === 'payment_link' ? fallbackLink : '');
 
-      // Branch A: Verified Payment Link + Webhook Mode
+      // Direct Payment Link Flow: Immediately redirect browser to payment portal
       if (orderData.paymentMode === 'payment_link' || (!orderData.keyId && !orderData.isTestMode && fallbackLink)) {
         const resolvedUrl = paymentLinkUrl || fallbackLink;
-        setPaymentLinkState({
-          url: resolvedUrl,
-          orderId: orderData.orderId || `NV_LINK_${Date.now()}`,
-          amount: orderData.amount || finalPayablePrice,
-          name: cleanName,
-          email: cleanEmail,
-          mobile: cleanMobile
-        });
-        setIsProcessing(false);
+        setRedirectingUrl(resolvedUrl);
+
         try {
-          window.open(resolvedUrl, '_blank', 'noopener,noreferrer');
+          localStorage.setItem('netvidya_pending_checkout', JSON.stringify({
+            name: cleanName,
+            email: cleanEmail,
+            mobile: cleanMobile,
+            orderId: orderData.orderId || `NV_${Date.now()}`
+          }));
         } catch {}
+
+        // Direct top-level navigation to payment portal
+        window.location.href = resolvedUrl;
         return;
       }
 
-      // Branch B: Razorpay Standard Checkout Popup (Native API Key Mode)
+      // Native In-App Razorpay Checkout Popup (if live API key mode is enabled)
       if (typeof window !== 'undefined' && !window.Razorpay) {
         await new Promise<void>(resolve => {
           const script = document.createElement('script');
@@ -309,30 +273,12 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     }
   };
 
-  const handleManualCheck = async () => {
-    setIsCheckingWebhook(true);
-    setErrorMessage(null);
-    setStatusNotice(null);
-    try {
-      const res = await refreshSession();
-      if (res.isBuyer) {
-        setIsPaymentSuccess(true);
-      } else {
-        setStatusNotice('Payment not detected yet. If you just completed the payment, please allow 5–10 seconds for Razorpay to sync.');
-      }
-    } catch {
-      setStatusNotice('Network error while checking status. Please try again in a few moments.');
-    } finally {
-      setIsCheckingWebhook(false);
-    }
-  };
-
   const handleCompleteSuccess = () => {
     onSuccess({
-      name: paymentLinkState?.name || studentName || 'Candidate',
-      email: paymentLinkState?.email || email || '',
-      mobile: paymentLinkState?.mobile || mobile || '',
-      orderId: paymentLinkState?.orderId || `NV_${Date.now()}`
+      name: studentName || 'Candidate',
+      email: email || '',
+      mobile: mobile || '',
+      orderId: `NV_${Date.now()}`
     });
   };
 
@@ -341,7 +287,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   return (
     <div
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !redirectingUrl) onClose();
       }}
       className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-6 flex flex-col justify-start sm:justify-center items-center min-h-screen"
       role="dialog"
@@ -370,14 +316,16 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               Sold by {STORE_MERCHANT.brandName} ({STORE_MERCHANT.proprietor}) • Content by {STORE_MERCHANT.curatorShort}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
-            title="Close Checkout"
-            aria-label="Close Checkout"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {!redirectingUrl && (
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
+              title="Close Checkout"
+              aria-label="Close Checkout"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Scrollable Content Body */}
@@ -388,10 +336,10 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
             <div>
               <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wider block">Payable Enrollment Fee</span>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-3xl font-extrabold text-blue-950 font-serif">₹{displayedPrice}</span>
+                <span className="text-3xl font-extrabold text-blue-950 font-serif">₹{finalPayablePrice}</span>
                 <span className="text-xs text-blue-700 font-medium">INR (All Inclusive)</span>
               </div>
-              {!paymentLinkState && appliedDiscount && (
+              {appliedDiscount && (
                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold mt-1">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Saved ₹{appliedDiscount.amount} with code {appliedDiscount.code}</span>
@@ -412,16 +360,29 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
             </div>
           )}
 
-          {/* Status Notice */}
-          {statusNotice && (
-            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
-              <p className="leading-relaxed">{statusNotice}</p>
+          {/* VIEW STATE 1: REDIRECTING DIRECTLY TO PAYMENT PORTAL */}
+          {redirectingUrl ? (
+            <div className="py-10 text-center space-y-4 animate-scale-up">
+              <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Connecting to Payment...
+                </h3>
+                <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
+                  Taking you directly to the secure checkout for <strong>₹{finalPayablePrice}</strong>. Once paid, you will be automatically returned to your unlocked dashboard.
+                </p>
+              </div>
+              <div className="pt-3">
+                <a
+                  href={redirectingUrl}
+                  className="inline-block px-5 py-2.5 rounded-xl bg-blue-700 text-white font-bold text-xs hover:bg-blue-800 transition-colors shadow-sm"
+                >
+                  Pay
+                </a>
+              </div>
             </div>
-          )}
-
-          {/* VIEW STATE 1: PAYMENT SUCCESS CELEBRATION */}
-          {isPaymentSuccess ? (
+          ) : isPaymentSuccess ? (
+            /* VIEW STATE 2: PAYMENT SUCCESS CELEBRATION */
             <div className="py-4 text-center space-y-4 animate-scale-up">
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <CheckCircle2 className="w-10 h-10" />
@@ -438,15 +399,15 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-left space-y-2 text-xs">
                 <div className="flex justify-between text-gray-600">
                   <span>Candidate:</span>
-                  <strong className="text-gray-900">{paymentLinkState?.name || studentName}</strong>
+                  <strong className="text-gray-900">{studentName}</strong>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Registered Email:</span>
-                  <strong className="text-gray-900 font-mono">{paymentLinkState?.email || email}</strong>
+                  <strong className="text-gray-900 font-mono">{email}</strong>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Amount Paid:</span>
-                  <strong className="text-emerald-700 font-bold">₹{displayedPrice} INR</strong>
+                  <span>Amount:</span>
+                  <strong className="text-emerald-700 font-bold">₹{finalPayablePrice} INR</strong>
                 </div>
               </div>
 
@@ -459,77 +420,6 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 <span>Open Student Dashboard & Test Hall</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
-            </div>
-          ) : paymentLinkState ? (
-            /* VIEW STATE 2: AWAITING PAYMENT (Clean, Automatic, Zero-Jargon) */
-            <div className="space-y-4 animate-scale-up">
-              <div className="p-5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-3.5 text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/80 text-blue-800 text-xs font-bold">
-                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
-                  <span>Awaiting Razorpay Payment</span>
-                </div>
-
-                <div className="space-y-1">
-                  <h4 className="text-base font-bold text-gray-900">
-                    Complete Your Payment in the Razorpay Tab
-                  </h4>
-                  <p className="text-xs text-gray-600 leading-relaxed max-w-sm mx-auto">
-                    We opened your secure payment window in a new tab. Please complete your payment of <strong>₹{paymentLinkState.amount}</strong> to continue.
-                  </p>
-                </div>
-
-                <div className="p-3 bg-white rounded-xl border border-blue-200/80 text-left space-y-1 text-xs">
-                  <div className="flex justify-between text-gray-500">
-                    <span>Enrolling as:</span>
-                    <strong className="text-gray-900 truncate max-w-[200px]">{paymentLinkState.name}</strong>
-                  </div>
-                  <div className="flex justify-between text-gray-500">
-                    <span>Pass will unlock for:</span>
-                    <strong className="text-gray-900 font-mono truncate max-w-[200px]">{paymentLinkState.email}</strong>
-                  </div>
-                </div>
-
-                <a
-                  href={paymentLinkState.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  <Lock className="w-4 h-4" />
-                  <span>Open Razorpay Payment Page</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-
-              {/* Automatic detection notice & manual refresh option */}
-              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-center space-y-2.5">
-                <p className="text-xs text-gray-600">
-                  This window will <strong>automatically detect</strong> your confirmation and unlock your dashboard as soon as you finish paying.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleManualCheck}
-                  disabled={isCheckingWebhook}
-                  className="px-4 py-2 rounded-xl bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold text-xs transition-all inline-flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isCheckingWebhook ? 'animate-spin' : ''}`} />
-                  <span>{isCheckingWebhook ? 'Verifying with Gateway...' : 'Already Paid? Check Confirmation Now'}</span>
-                </button>
-              </div>
-
-              <div className="text-center pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentLinkState(null);
-                    setErrorMessage(null);
-                    setStatusNotice(null);
-                  }}
-                  className="text-xs text-gray-500 hover:text-gray-800 underline font-medium"
-                >
-                  ← Change candidate details or phone number
-                </button>
-              </div>
             </div>
           ) : (
             /* VIEW STATE 3: CLEAN CANDIDATE DETAILS FORM */
@@ -657,22 +547,22 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 </div>
               )}
 
-              {/* Secure Payment Trigger Button */}
+              {/* Pay Trigger Button */}
               <div className="pt-1">
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {isProcessing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Opening Secure Checkout...</span>
+                      <span>Connecting to Payment...</span>
                     </>
                   ) : (
                     <>
                       <Lock className="w-4 h-4 text-blue-200" />
-                      <span>Proceed to Secure Payment — ₹{finalPayablePrice}</span>
+                      <span>Pay</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
