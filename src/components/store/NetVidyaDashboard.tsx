@@ -404,81 +404,95 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tests.map(test => {
-              const now = new Date();
-              const releaseTime = new Date(test.releaseDate);
-              const isLocked = now < releaseTime;
-              const formattedDate = releaseTime.toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-              });
+          {tests.length === 0 ? (
+            <div className="bg-white rounded-3xl p-8 sm:p-12 border border-blue-100 text-center space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mx-auto">
+                <Sparkles className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">Academic Tests Under Active Curation</h3>
+                <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                  Dr. Rajnikant Dodiya is preparing the newly structured 2026 test series. Scheduled mock tests will appear here directly upon administrative release.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {tests.map(test => {
+                const now = new Date();
+                const releaseTime = new Date(test.releaseDate);
+                const isLocked = now < releaseTime;
+                const formattedDate = releaseTime.toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric'
+                });
 
-              return (
-                <div
-                  key={test.id}
-                  className={`bg-white rounded-3xl p-6 border shadow-sm flex flex-col justify-between transition-all ${
-                    isLocked
-                      ? 'border-gray-200 opacity-90'
-                      : 'border-blue-200 hover:shadow-md hover:border-blue-400'
-                  }`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">
-                        {test.category}
-                      </span>
+                return (
+                  <div
+                    key={test.id}
+                    className={`bg-white rounded-3xl p-6 border shadow-sm flex flex-col justify-between transition-all ${
+                      isLocked
+                        ? 'border-gray-200 opacity-90'
+                        : 'border-blue-200 hover:shadow-md hover:border-blue-400'
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono uppercase bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">
+                          {test.category}
+                        </span>
+                        {isLocked ? (
+                          <span className="text-[11px] font-mono text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+                            <Lock className="w-3 h-3" />
+                            <span>Opens {formattedDate}</span>
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Ready Now</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="text-base font-bold text-gray-900 leading-snug">
+                        {test.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">
+                        {test.description}
+                      </p>
+
+                      <div className="pt-2 flex items-center gap-4 text-xs text-gray-600 font-mono">
+                        <span>{test.totalQuestions} Questions</span>
+                        <span>•</span>
+                        <span>{test.durationMinutes} Minutes</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-6">
                       {isLocked ? (
-                        <span className="text-[11px] font-mono text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
-                          <Lock className="w-3 h-3" />
-                          <span>Opens {formattedDate}</span>
-                        </span>
+                        <button
+                          disabled
+                          className="w-full py-2.5 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold cursor-not-allowed flex items-center justify-center gap-2 border border-gray-200"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>Opens on {formattedDate}</span>
+                        </button>
                       ) : (
-                        <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>Ready Now</span>
-                        </span>
+                        <button
+                          onClick={() => handleLaunchTest(test)}
+                          className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-2"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Launch CBT Test</span>
+                        </button>
                       )}
                     </div>
-
-                    <h3 className="text-base font-bold text-gray-900 leading-snug">
-                      {test.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">
-                      {test.description}
-                    </p>
-
-                    <div className="pt-2 flex items-center gap-4 text-xs text-gray-600 font-mono">
-                      <span>{test.totalQuestions} Questions</span>
-                      <span>•</span>
-                      <span>{test.durationMinutes} Minutes</span>
-                    </div>
                   </div>
-
-                  <div className="pt-6">
-                    {isLocked ? (
-                      <button
-                        disabled
-                        className="w-full py-2.5 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold cursor-not-allowed flex items-center justify-center gap-2 border border-gray-200"
-                      >
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>Opens on {formattedDate}</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleLaunchTest(test)}
-                        className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-2"
-                      >
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                        <span>Launch CBT Test</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -497,54 +511,68 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
             </span>
           </div>
 
-          <div className="space-y-4">
-            {readingFiles.map(file => (
-              <div
-                key={file.id}
-                className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200 shadow-xs hover:shadow-sm transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <FileText className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono uppercase bg-gray-100 text-gray-700 font-bold px-2 py-0.5 rounded">
-                        {file.category}
-                      </span>
-                      <span className="text-[11px] text-gray-400 font-mono">
-                        {file.fileSizeMb} MB
-                      </span>
-                    </div>
-                    <h3 className="text-sm sm:text-base font-bold text-gray-900">
-                      {file.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed max-w-2xl">
-                      {file.description}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleDownloadFile(file)}
-                  disabled={downloadingId === file.id}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
-                >
-                  {downloadingId === file.id ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Signing Link...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4" />
-                      <span>Download PDF</span>
-                    </>
-                  )}
-                </button>
+          {readingFiles.length === 0 ? (
+            <div className="bg-white rounded-3xl p-8 sm:p-12 border border-blue-100 text-center space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mx-auto">
+                <FileText className="w-7 h-7" />
               </div>
-            ))}
-          </div>
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">Study Dossiers Under Active Curation</h3>
+                <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                  High-yield study materials and revision dossiers are being curated by Dr. Rajnikant Dodiya. Newly published reading files will appear here upon release.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {readingFiles.map(file => (
+                <div
+                  key={file.id}
+                  className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200 shadow-xs hover:shadow-sm transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                      <FileText className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono uppercase bg-gray-100 text-gray-700 font-bold px-2 py-0.5 rounded">
+                          {file.category}
+                        </span>
+                        <span className="text-[11px] text-gray-400 font-mono">
+                          {file.fileSizeMb} MB
+                        </span>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900">
+                        {file.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 leading-relaxed max-w-2xl">
+                        {file.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleDownloadFile(file)}
+                    disabled={downloadingId === file.id}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+                  >
+                    {downloadingId === file.id ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Signing Link...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        <span>Download PDF</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

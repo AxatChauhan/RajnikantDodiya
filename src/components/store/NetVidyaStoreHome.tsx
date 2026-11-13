@@ -107,13 +107,13 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
         {/* Main Headline & Subtitle */}
         <div className="text-center space-y-3">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
-            GSET + UGC NET English <br className="hidden sm:inline" />
+            UGC NET English <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 bg-clip-text text-transparent">
               Final Pack 2026
             </span>
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            The definitive all-in-one preparation bundle: authentic NTA computer-based test simulations, comprehensive pedagogical explanations, and downloadable high-yield revision dossiers.
+            The definitive national preparation bundle: authentic NTA computer-based test simulations, comprehensive pedagogical explanations, and downloadable high-yield revision dossiers.
           </p>
         </div>
 
@@ -236,7 +236,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             </div>
             <h3 className="text-lg font-bold text-gray-900">NTA Computer-Based Mock Tests</h3>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Full 100-question Paper II simulations matching the official UGC-NET / GSET screen layout, countdown timer, question palette, and negative marking rules.
+              Full 100-question Paper II simulations matching the official NTA UGC-NET screen layout, countdown timer, question palette, and negative marking rules.
             </p>
           </div>
 

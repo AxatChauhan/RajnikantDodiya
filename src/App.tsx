@@ -133,6 +133,11 @@ function AppInner() {
         return;
       }
 
+      if (route === 'gset' || route === 'gset-2026') {
+        setActiveTab('store');
+        return;
+      }
+
       const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'bookstore', 'contact', 'store', 'policies'];
       if (validTabs.includes(route as MainTab)) {
         setActiveTab(route as MainTab);
@@ -158,7 +163,7 @@ function AppInner() {
       learn: `Study Materials & Examination Prep | NET Vidya English`,
       bookstore: `Academic Bookstore & Study Materials | Dr. Rajnikant Dodiya`,
       contact: `Contact & Collaboration | Dr. Rajnikant Dodiya`,
-      store: 'GSET + UGC NET English Final Pack 2026 | NET Vidya English by Dr. Rajnikant Dodiya',
+      store: 'UGC NET English & GSET 2026 Preparation Suite | NET Vidya by Dr. Rajnikant Dodiya',
       policies: 'Store Policies, Terms, Privacy & Refunds | NET Vidya English'
     };
 
@@ -172,7 +177,7 @@ function AppInner() {
       learn: 'Comprehensive UGC NET & GSET English syllabus modules, mock test papers, and learning resources by Dr. Rajnikant Dodiya.',
       bookstore: 'Browse published educational texts, monograph chapters, and research volumes authored by Dr. Rajnikant Dodiya.',
       contact: 'Get in touch with Dr. Rajnikant Dodiya for academic collaboration, lecture invitations, and NET Vidya student inquiries.',
-      store: 'Enroll in the GSET + UGC NET English Final Pack 2026. 10 full NTA CBT mocks, model explanations, and revision dossiers curated by Dr. Rajnikant Dodiya.',
+      store: 'Enroll in the UGC NET English Final Pack 2026 or GSET 2026 Preparation Suite. Authentic NTA computer-based mocks, pedagogical explanations, and revision dossiers curated by Dr. Rajnikant Dodiya.',
       policies: 'Official Terms & Conditions, Privacy Policy, Cancellation & Refund Policy, Digital Delivery Policy, and Merchant Contact for NET Vidya English.'
     };
 
@@ -207,9 +212,11 @@ function AppInner() {
   }, [activeTab, activeSubSection]);
 
   if (activeTab === 'store') {
+    const isGset = typeof window !== 'undefined' && (window.location.hash.includes('gset') || window.location.pathname.includes('gset'));
     return (
       <Suspense fallback={<AcademicLoadingFallback />}>
         <NetVidyaStoreLayout
+          initialExamStore={isGset ? 'gset' : 'ugc'}
           onBackToAcademicSite={() => handleNavigate('home')}
           onOpenBookstore={() => handleNavigate('bookstore')}
         />

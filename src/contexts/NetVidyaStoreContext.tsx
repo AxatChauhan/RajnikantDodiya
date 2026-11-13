@@ -65,129 +65,10 @@ export interface EnrolledBuyerRecord {
   isActive: boolean;
 }
 
-// Initial Sample Content for "GSET + UGC NET English Final Pack 2026"
-export const INITIAL_READING_FILES: ReadingFileItem[] = [
-  {
-    id: 'rf-theory-master',
-    title: 'Literary Theory & Cultural Studies High-Yield Dossier (2026 Edition)',
-    category: 'Literary Theory',
-    description: 'Concise, high-impact breakdown of Structuralism, Poststructuralism, Deconstruction, Postcolonialism, and Ecocriticism with key theorists and core terms.',
-    fileSizeMb: 6.8,
-    downloadCount: 142,
-    dateAdded: '2026-11-01'
-  },
-  {
-    id: 'rf-postmethod-pedagogy',
-    title: 'Post-Method Pedagogy & English Language Teaching in India (ELT Guide)',
-    category: 'Pedagogy & ELT',
-    description: 'Dr. Rajnikant Dodiya’s specialized research monograph notes on Kumaravadivelu’s 3 Ps, NEP 2020 translanguaging, and second-language classroom heuristics.',
-    fileSizeMb: 5.2,
-    downloadCount: 98,
-    dateAdded: '2026-11-01'
-  },
-  {
-    id: 'rf-british-drama-poetry',
-    title: 'British Literature Chronology & Major Works Summary (Chaucer to Modern)',
-    category: 'British Literature',
-    description: 'Quick-revision tables of Elizabethan dramatists, Jacobean tragedy, Romantic poetics, Victorian realism, and Modernist manifestos.',
-    fileSizeMb: 8.4,
-    downloadCount: 185,
-    dateAdded: '2026-11-01'
-  },
-  {
-    id: 'rf-research-methodology',
-    title: 'Paper I & II Research Methodology & Citation Style Sheets (MLA 9th / APA 7th)',
-    category: 'Research Methodology',
-    description: 'Essential rules for parenthetical documentation, core elements template, sampling paradigms, and thesis formatting for UGC-NET.',
-    fileSizeMb: 4.1,
-    downloadCount: 76,
-    dateAdded: '2026-11-02'
-  }
-];
+// Initial Content: Clean zeroed-out state for new segregated 2026 packs (Under Active Curation)
+export const INITIAL_READING_FILES: ReadingFileItem[] = [];
 
-export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
-  {
-    id: 'test-net-mock-1',
-    title: 'NET Mock 1: Full-Length Paper II NTA Simulation',
-    category: 'Full Mock',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-11-01T00:00:00+05:30', // Ready now
-    description: 'Full 100-question Paper II English Literature NTA simulation with real-time countdown timer, question palette, and detailed explanatory notes.'
-  },
-  {
-    id: 'test-unit-1',
-    title: 'Unit Test 1: British Drama & Elizabethan Poetry',
-    category: 'Unit Test',
-    totalQuestions: 50,
-    durationMinutes: 90,
-    releaseDate: '2026-11-01T00:00:00+05:30', // Ready now
-    description: 'High-frequency exam questions spanning Shakespeare, Marlowe, University Wits, and Metaphysical poets.'
-  },
-  {
-    id: 'test-bonus-practice-1',
-    title: 'Bonus Practice Mock A: Quick Speed Revision',
-    category: 'Bonus Mock',
-    totalQuestions: 50,
-    durationMinutes: 75,
-    releaseDate: '2026-11-01T00:00:00+05:30', // Ready now
-    description: 'Rapid-fire speed test designed to enhance accuracy under time pressure.'
-  },
-  {
-    id: 'test-net-mock-2',
-    title: 'NET Mock 2: Full-Length Literature & Literary Theory',
-    category: 'Full Mock',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-11-06T00:00:00+05:30',
-    description: 'Intensive Paper II exam focusing on Poststructuralism, Deconstruction, Postcolonialism, and Feminist Criticism.'
-  },
-  {
-    id: 'test-net-mock-3',
-    title: 'NET Mock 3: Grand Mid-Term Diagnostic Mock',
-    category: 'Full Mock',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-11-10T00:00:00+05:30',
-    description: 'Comprehensive mock scheduled for the final day of the early-bird window.'
-  },
-  {
-    id: 'test-net-mock-4',
-    title: 'NET Mock 4: Cultural Studies & English in India',
-    category: 'Full Mock',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-11-14T00:00:00+05:30',
-    description: 'Deep dive into Macaulay’s Minute, NEP 2020 pedagogical transitions, and Stuart Hall cultural theory.'
-  },
-  {
-    id: 'test-net-mock-5',
-    title: 'NET Mock 5: Research Methods & Pedagogy Master Mock',
-    category: 'Full Mock',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-11-21T00:00:00+05:30',
-    description: 'Comprehensive Paper II testing with dedicated focus on ELT classroom methodology and MLA 9th style sheets.'
-  },
-  {
-    id: 'test-gset-special-1',
-    title: 'GSET Special Simulation Exam 1',
-    category: 'GSET Special',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-11-28T00:00:00+05:30',
-    description: 'Tailored specifically to the Gujarat State Eligibility Test pattern and syllabus weightage.'
-  },
-  {
-    id: 'test-grand-final-booster',
-    title: 'Grand Final Rank Booster Exam 2026',
-    category: 'Grand Final',
-    totalQuestions: 100,
-    durationMinutes: 180,
-    releaseDate: '2026-12-05T00:00:00+05:30',
-    description: 'The definitive final revision simulation before the university examination session.'
-  }
-];
+export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [];
 
 // Initial Empty Content for Enrolled Candidate Registry (No test candidates)
 export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [];
@@ -229,8 +110,8 @@ interface NetVidyaStoreContextType {
 
 const STORAGE_KEY_SESSION = 'netvidya_buyer_session_v1';
 const STORAGE_KEY_SETTINGS = 'netvidya_store_settings_v1';
-const STORAGE_KEY_FILES = 'netvidya_reading_files_v1';
-const STORAGE_KEY_TESTS = 'netvidya_tests_v1';
+const STORAGE_KEY_FILES = 'netvidya_reading_files_v2';
+const STORAGE_KEY_TESTS = 'netvidya_tests_v2';
 const STORAGE_KEY_BUYERS = 'netvidya_buyers_registry_v1';
 
 const NetVidyaStoreContext = createContext<NetVidyaStoreContextType | undefined>(undefined);
@@ -264,24 +145,20 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 3. Reading Files Catalog (Snapshot fallback)
   const [readingFiles, setReadingFiles] = useState<ReadingFileItem[]>(() => {
-    const snapshotFiles = (LIVE_STUDIO_SNAPSHOT as any)?.store?.readingFiles;
-    const baseFiles = (snapshotFiles && Array.isArray(snapshotFiles) && snapshotFiles.length > 0) ? snapshotFiles : INITIAL_READING_FILES;
     try {
       const cached = localStorage.getItem(STORAGE_KEY_FILES);
       if (cached) return JSON.parse(cached);
     } catch {}
-    return baseFiles;
+    return INITIAL_READING_FILES;
   });
 
   // 4. Test Hall Catalog (Snapshot fallback)
   const [tests, setTests] = useState<TestHallItem[]>(() => {
-    const snapshotTests = (LIVE_STUDIO_SNAPSHOT as any)?.store?.tests;
-    const baseTests = (snapshotTests && Array.isArray(snapshotTests) && snapshotTests.length > 0) ? snapshotTests : INITIAL_TEST_HALL_ITEMS;
     try {
       const cached = localStorage.getItem(STORAGE_KEY_TESTS);
       if (cached) return JSON.parse(cached);
     } catch {}
-    return baseTests;
+    return INITIAL_TEST_HALL_ITEMS;
   });
 
   // 5. Buyers Registry (Admin view)
@@ -346,11 +223,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
             setSettings(prev => ({ ...prev, ...storeState.settings }));
             try { localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(storeState.settings)); } catch {}
           }
-          if (storeState.readingFiles && Array.isArray(storeState.readingFiles) && storeState.readingFiles.length > 0) {
+          if (storeState.readingFiles && Array.isArray(storeState.readingFiles) && storeState.readingFiles.length > 0 && !storeState.readingFiles[0]?.id?.includes('theory-master')) {
             setReadingFiles(storeState.readingFiles);
             try { localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(storeState.readingFiles)); } catch {}
           }
-          if (storeState.tests && Array.isArray(storeState.tests) && storeState.tests.length > 0) {
+          if (storeState.tests && Array.isArray(storeState.tests) && storeState.tests.length > 0 && !storeState.tests[0]?.id?.includes('test-net-mock-1')) {
             setTests(storeState.tests);
             try { localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(storeState.tests)); } catch {}
           }

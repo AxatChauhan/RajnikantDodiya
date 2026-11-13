@@ -22,6 +22,7 @@ import { NetVidyaStudentLoginModal } from './NetVidyaStudentLoginModal';
 import { NetVidyaPolicies, PolicyTab } from './NetVidyaPolicies';
 import { NetVidyaAdminModal } from './NetVidyaAdminModal';
 import { NetVidyaWhatsAppWidget } from './NetVidyaWhatsAppWidget';
+import { NetVidyaGsetHome } from './gset/NetVidyaGsetHome';
 import { STORE_MERCHANT } from '../../config/storeConfig';
 import { StorePolicyLinks } from '../common/StorePolicyLinks';
 
@@ -32,15 +33,28 @@ interface NetVidyaStoreLayoutProps {
   onOpenBookstore?: () => void;
   initialView?: StoreView;
   initialPolicyTab?: PolicyTab;
+  initialExamStore?: 'ugc' | 'gset';
 }
 
 export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   onBackToAcademicSite,
   onOpenBookstore,
   initialView = 'home',
-  initialPolicyTab = 'terms'
+  initialPolicyTab = 'terms',
+  initialExamStore = 'ugc'
 }) => {
   const { currentServerPrice, isEarlyBirdActive, buyerSession } = useNetVidyaStore();
+
+  const [activeExamStore, setActiveExamStore] = useState<'ugc' | 'gset'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase();
+      const pathname = window.location.pathname.toLowerCase();
+      if (hash.includes('gset') || pathname.includes('gset')) {
+        return 'gset';
+      }
+    }
+    return initialExamStore;
+  });
 
   const [currentView, setCurrentView] = useState<StoreView>(() => {
     if (typeof window !== 'undefined') {
@@ -71,6 +85,11 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       }
       if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
         setCurrentView('dashboard');
+      }
+      if (hash === '#gset' || hash.startsWith('#gset') || search.includes('store=gset')) {
+        setActiveExamStore('gset');
+      } else if (hash === '#ugc' || hash === '#ugc-net' || hash === '#store') {
+        setActiveExamStore('ugc');
       }
     };
     checkAdminRoute();
@@ -125,10 +144,37 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 </span>
               </div>
               <p className="text-[10px] sm:text-[11px] text-gray-500 font-normal truncate hidden sm:block">
-                GSET + UGC NET English Final Pack 2026
+                {activeExamStore === 'ugc' ? 'UGC NET English Final Pack 2026' : 'GSET 2026 Examination Storefront'}
               </p>
             </div>
           </button>
+
+          {/* Dual Storefront Switcher */}
+          <div className="hidden lg:flex items-center bg-gray-100/90 p-1 rounded-2xl border border-gray-200 text-xs font-semibold">
+            <button
+              onClick={() => { setActiveExamStore('ugc'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                activeExamStore === 'ugc'
+                  ? 'bg-white text-blue-900 shadow-xs font-bold'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              UGC NET English
+            </button>
+            <button
+              onClick={() => { setActiveExamStore('gset'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                activeExamStore === 'gset'
+                  ? 'bg-white text-emerald-900 shadow-xs font-bold'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <span>GSET 2026</span>
+              <span className="text-[9px] font-mono uppercase bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-bold">
+                NEW
+              </span>
+            </button>
+          </div>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-gray-700">
@@ -261,6 +307,33 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               </div>
             )}
 
+            {/* Mobile Store Switcher */}
+            <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl text-xs font-semibold">
+              <button
+                onClick={() => { setActiveExamStore('ugc'); setCurrentView('home'); setMobileMenuOpen(false); }}
+                className={`py-2 px-3 rounded-lg text-center transition-all ${
+                  activeExamStore === 'ugc'
+                    ? 'bg-white text-blue-900 font-bold shadow-2xs'
+                    : 'text-gray-600'
+                }`}
+              >
+                UGC NET English
+              </button>
+              <button
+                onClick={() => { setActiveExamStore('gset'); setCurrentView('home'); setMobileMenuOpen(false); }}
+                className={`py-2 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1 ${
+                  activeExamStore === 'gset'
+                    ? 'bg-white text-emerald-900 font-bold shadow-2xs'
+                    : 'text-gray-600'
+                }`}
+              >
+                <span>GSET 2026</span>
+                <span className="text-[8px] bg-emerald-100 text-emerald-800 px-1 rounded font-bold">
+                  NEW
+                </span>
+              </button>
+            </div>
+
             {/* Drawer Navigation Links */}
             <div className="space-y-1 pt-1">
               <button
@@ -342,12 +415,20 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       {/* 2. MAIN STORE VIEW CONTAINER */}
       <main className="flex-1">
         {currentView === 'home' && (
-          <NetVidyaStoreHome
-            onOpenCheckout={() => setIsCheckoutOpen(true)}
-            onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            onOpenLogin={() => setIsLoginOpen(true)}
-            onOpenBookstore={onOpenBookstore}
-          />
+          activeExamStore === 'ugc' ? (
+            <NetVidyaStoreHome
+              onOpenCheckout={() => setIsCheckoutOpen(true)}
+              onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onOpenLogin={() => setIsLoginOpen(true)}
+              onOpenBookstore={onOpenBookstore}
+            />
+          ) : (
+            <NetVidyaGsetHome
+              onOpenCheckout={() => setIsCheckoutOpen(true)}
+              onOpenDemoTest={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              currentServerPrice={currentServerPrice}
+            />
+          )
         )}
 
         {currentView === 'sample' && (
