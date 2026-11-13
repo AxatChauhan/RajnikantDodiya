@@ -93,23 +93,6 @@ export default async function handler(req, res) {
       ...priceData,
       price: resolvedPrice
     });
-      earlyBirdPrice: settings.earlyBirdPrice,
-      standardPrice: settings.standardPrice,
-      earlyBirdCutoff: settings.earlyBirdCutoff,
-      accessExpiryDate: settings.accessExpiryDate,
-      sellerLine: settings.sellerLine,
-      paymentMode: hasApiKeys ? 'api_checkout' : isPaymentLinkMode ? 'payment_link' : 'unconfigured',
-      ...(isPaymentLinkMode ? { paymentLinkUrl } : {}),
-      gsetProducts: GSET_PRODUCTS,
-      ugcBundle: UGC_BUNDLE_PRODUCT,
-      product: {
-        slug: settings.productSlug,
-        name: settings.productName,
-        seller: settings.sellerLine
-      },
-      ...priceData,
-      price: resolvedPrice
-    });
   } catch (err) {
     const fallback = computeCurrentServerPrice(DEFAULT_STORE_SETTINGS);
     return res.status(200).json({
