@@ -18,7 +18,7 @@ import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../config/storeConfig
 import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
 
 export type ExamType = 'ugc' | 'gset';
-export type GsetStream = 'english' | 'education';
+export type GsetStream = 'english' | 'education' | 'all';
 
 export interface CheckoutProductOption {
   id: string;
@@ -222,6 +222,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   const streamGsetProducts = useMemo(() => {
     return CHECKOUT_PRODUCTS.filter(p => {
       if (p.exam !== 'gset') return false;
+      if (selectedStream === 'all') return true;
       if (p.stream === 'general') return true; // Paper 1 is common
       return p.stream === selectedStream;
     });
@@ -235,7 +236,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       if (selectedProductId === 'gset-english-combo' || selectedProductId === 'gset-paper2-english') {
         setSelectedProductId('gset-education-combo');
       }
-    } else {
+    } else if (stream === 'english') {
       if (selectedProductId === 'gset-education-combo' || selectedProductId === 'gset-paper2-education') {
         setSelectedProductId('gset-english-combo');
       }
@@ -587,40 +588,58 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               </div>
 
               {/* Stream Switcher Pills */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 <button
                   type="button"
                   onClick={() => handleStreamChange('english')}
-                  className={`p-2 rounded-xl border text-left transition-all ${
+                  className={`p-2 rounded-xl border text-center transition-all ${
                     selectedStream === 'english'
                       ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold shadow-2xs ring-1 ring-emerald-400'
                       : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-center gap-1 text-xs">
                     <span>English Stream</span>
-                    {selectedStream === 'english' && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                    {selectedStream === 'english' && <Check className="w-3 h-3 text-emerald-600" />}
                   </div>
-                  <p className="text-[10px] text-emerald-800 font-normal mt-0.5">
-                    Paper 1 + Paper 2 English
+                  <p className="text-[9px] text-emerald-800 font-normal mt-0.5">
+                    Paper 1 + English (₹249)
                   </p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleStreamChange('education')}
-                  className={`p-2 rounded-xl border text-left transition-all ${
+                  className={`p-2 rounded-xl border text-center transition-all ${
                     selectedStream === 'education'
                       ? 'bg-purple-50 border-purple-400 text-purple-950 font-bold shadow-2xs ring-1 ring-purple-400'
                       : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-center gap-1 text-xs">
                     <span>Education Stream</span>
-                    {selectedStream === 'education' && <Check className="w-3.5 h-3.5 text-purple-600" />}
+                    {selectedStream === 'education' && <Check className="w-3 h-3 text-purple-600" />}
                   </div>
-                  <p className="text-[10px] text-purple-800 font-normal mt-0.5">
-                    Paper 1 + Paper 2 Education
+                  <p className="text-[9px] text-purple-800 font-normal mt-0.5">
+                    Paper 1 + Education (₹249)
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleStreamChange('all')}
+                  className={`p-2 rounded-xl border text-center transition-all ${
+                    selectedStream === 'all'
+                      ? 'bg-blue-50 border-blue-400 text-blue-950 font-bold shadow-2xs ring-1 ring-blue-400'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-1 text-xs">
+                    <span>All Packs</span>
+                    {selectedStream === 'all' && <Check className="w-3 h-3 text-blue-600" />}
+                  </div>
+                  <p className="text-[9px] text-blue-800 font-normal mt-0.5">
+                    Both Combos &amp; Singles
                   </p>
                 </button>
               </div>

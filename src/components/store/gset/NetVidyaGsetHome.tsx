@@ -268,122 +268,218 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
             Step 2: Select Your Preferred Package
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-            {selectedStream === 'english' ? 'GSET English Preparation Options' : 'GSET Education Preparation Options'}
+            GSET 2026 Examination Packages
           </h2>
+          <p className="text-xs sm:text-sm text-gray-500 max-w-xl mx-auto">
+            Choose either an all-inclusive Complete Scholar Duo (Paper 1 + Paper 2) for ₹249 or single standalone papers for ₹149.
+          </p>
         </div>
 
-        {/* A. FLAGSHIP COMBO CARD (FEATURED) */}
-        <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-500 shadow-lg relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-emerald-600 text-white text-[10px] font-mono font-bold tracking-widest uppercase px-4 py-1.5 rounded-bl-xl shadow-xs">
-            {activeCombo.badge}
+        {/* A. FLAGSHIP COMBO CARDS (BOTH ₹249 DUOS DISPLAYED SIDE-BY-SIDE) */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-mono uppercase text-emerald-900 font-bold tracking-wider">
+              Flagship Complete Duos (Paper 1 + Paper 2) • ₹249 Each
+            </span>
+            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-bold">
+              MAX GSET COMBO PRICE: ₹249
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-7 space-y-4">
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono uppercase text-emerald-800 font-bold tracking-wider">
-                  Complete Qualifying Duo
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-                  {activeCombo.name}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  {activeCombo.description}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* 1. English Scholar Duo (₹249) */}
+            <div className={`rounded-3xl p-6 sm:p-7 border-2 shadow-lg relative flex flex-col justify-between transition-all ${
+              selectedStream === 'english'
+                ? 'bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-white border-emerald-500 ring-2 ring-emerald-500/20'
+                : 'bg-white border-gray-200 hover:border-emerald-300'
+            }`}>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    ENGLISH STREAM DUO
+                  </span>
+                  <span className="text-[10px] font-mono uppercase bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded">
+                    Paper 1 + English
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug">
+                    {englishCombo.name}
+                  </h3>
+                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                    {englishCombo.description}
+                  </p>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-gray-100">
+                  {englishCombo.features.map((feat, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-xs text-gray-700">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-6 mt-6 border-t border-gray-100 text-center space-y-3">
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-emerald-950 font-serif">₹249</span>
+                  <span className="text-sm text-gray-400 line-through">₹799</span>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    Save 69%
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => onOpenCheckout('gset-english-combo')}
+                  className="w-full py-3 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Enroll in English Duo (₹249)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <p className="text-[10px] text-gray-400 font-mono">
+                  3 Paper 1 Mocks + 2 English Paper 2 Mocks (5 Total Tests)
                 </p>
               </div>
-
-              <div className="space-y-2 pt-2">
-                {activeCombo.features.map((feat, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{feat}</span>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-emerald-200 text-center space-y-4 shadow-sm">
-              <div className="space-y-1">
-                <span className="text-[11px] font-mono text-gray-500 uppercase tracking-wider block">
-                  Limited Enrollment Price
-                </span>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-4xl font-extrabold text-emerald-900">₹{activeCombo.price}</span>
-                  <span className="text-base text-gray-400 line-through">₹{activeCombo.originalPrice}</span>
+            {/* 2. Education Scholar Duo (₹249) */}
+            <div className={`rounded-3xl p-6 sm:p-7 border-2 shadow-lg relative flex flex-col justify-between transition-all ${
+              selectedStream === 'education'
+                ? 'bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-white border-purple-500 ring-2 ring-purple-500/20'
+                : 'bg-white border-gray-200 hover:border-purple-300'
+            }`}>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-300">
+                    EDUCATION STREAM DUO
+                  </span>
+                  <span className="text-[10px] font-mono uppercase bg-purple-50 text-purple-700 font-bold px-2 py-0.5 rounded">
+                    Paper 1 + Education
+                  </span>
                 </div>
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full inline-block">
-                  Save ₹{activeCombo.originalPrice - activeCombo.price} (20% Off)
-                </span>
+
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug">
+                    {educationCombo.name}
+                  </h3>
+                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                    {educationCombo.description}
+                  </p>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-gray-100">
+                  {educationCombo.features.map((feat, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-xs text-gray-700">
+                      <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <button
-                onClick={() => onOpenCheckout(activeCombo.id)}
-                className="w-full py-3 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-              >
-                <span>Enroll in Complete Duo (₹{activeCombo.price})</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="pt-6 mt-6 border-t border-gray-100 text-center space-y-3">
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-purple-950 font-serif">₹249</span>
+                  <span className="text-sm text-gray-400 line-through">₹799</span>
+                  <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">
+                    Save 69%
+                  </span>
+                </div>
 
-              <div className="flex items-center justify-center gap-4 text-[11px] text-gray-500 font-mono">
-                <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Instant Activation
-                </span>
-                <span>•</span>
-                <span>Access till 31 Dec 2026</span>
+                <button
+                  onClick={() => onOpenCheckout('gset-education-combo')}
+                  className="w-full py-3 px-5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Enroll in Education Duo (₹249)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <p className="text-[10px] text-gray-400 font-mono">
+                  3 Paper 1 Mocks + 3 Education Paper 2 Mocks (6 Total Tests)
+                </p>
               </div>
             </div>
+
           </div>
         </div>
 
-        {/* B. STANDALONE PACKS (MODULAR OPTIONS) */}
+        {/* B. STANDALONE PACKS (MODULAR OPTIONS - ALL ₹149) */}
         <div className="space-y-4 pt-4">
           <div className="text-center sm:text-left">
             <h3 className="text-base sm:text-lg font-bold text-gray-900">
-              Need Only a Single Paper? Choose Standalone Packs
+              Need Only a Single Paper? Choose Standalone Packs (₹149 each)
             </h3>
             <p className="text-xs text-gray-500">
-              Modular options for candidates seeking targeted preparation in either Paper 1 or Paper 2
+              Modular single-paper options for candidates preparing targeted papers
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {standalonePacks.map(pack => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                id: 'gset-paper1',
+                name: 'GSET Paper 1: General Aptitude Foundation Pack',
+                badge: 'COMMON TO ALL STREAMS',
+                badgeClass: 'bg-blue-100 text-blue-800',
+                price: 149,
+                originalPrice: 499,
+                description: 'All 10 general units: Teaching, Research, ICT, Logical Reasoning, and Higher Education.',
+                tests: '3 Full CBT Tests (50 Qs each)'
+              },
+              {
+                id: 'gset-paper2-english',
+                name: 'GSET Paper 2: English Literature Specialist Pack',
+                badge: 'ENGLISH STREAM ONLY',
+                badgeClass: 'bg-emerald-100 text-emerald-800',
+                price: 149,
+                originalPrice: 499,
+                description: 'Paper 2 English Literature, Criticism, Literary Theory, Cultural Studies, and ELT in India.',
+                tests: '2 Full CBT Tests (100 Qs each)'
+              },
+              {
+                id: 'gset-paper2-education',
+                name: 'GSET Paper 2: Education Discipline Master Pack',
+                badge: 'EDUCATION STREAM ONLY',
+                badgeClass: 'bg-purple-100 text-purple-800',
+                price: 149,
+                originalPrice: 499,
+                description: 'Paper 2 Education: Philosophy, Psychology, Learner Development, Pedagogy, and NEP 2020.',
+                tests: '3 Full CBT Tests (100 Qs each)'
+              }
+            ].map(pack => (
               <div
                 key={pack.id}
-                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
               >
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono uppercase bg-gray-100 text-gray-700 font-bold px-2 py-0.5 rounded">
+                    <span className={`text-[9px] font-mono uppercase font-bold px-2 py-0.5 rounded ${pack.badgeClass}`}>
                       {pack.badge}
                     </span>
                     <div className="text-right">
-                      <span className="text-xl font-bold text-gray-900">₹{pack.price}</span>
-                      <span className="text-xs text-gray-400 line-through ml-1.5">₹{pack.originalPrice}</span>
+                      <span className="text-lg font-bold text-gray-900">₹{pack.price}</span>
+                      <span className="text-[11px] text-gray-400 line-through ml-1">₹{pack.originalPrice}</span>
                     </div>
                   </div>
 
-                  <h4 className="text-base font-bold text-gray-900 leading-snug">
+                  <h4 className="text-sm font-bold text-gray-900 leading-snug">
                     {pack.name}
                   </h4>
-                  <p className="text-xs text-gray-500 leading-relaxed">
+                  <p className="text-[11px] text-emerald-800 font-semibold">
+                    {pack.tests}
+                  </p>
+                  <p className="text-[11px] text-gray-500 leading-relaxed">
                     {pack.description}
                   </p>
-
-                  <div className="space-y-1.5 pt-2">
-                    {pack.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-start gap-1.5 text-xs text-gray-600">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
 
                 <button
                   onClick={() => onOpenCheckout(pack.id)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full py-2 px-3 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>Enroll in Pack (₹{pack.price})</span>
                   <ArrowRight className="w-3.5 h-3.5" />
