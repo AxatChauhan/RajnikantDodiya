@@ -131,8 +131,14 @@ function AppInner() {
         return;
       }
 
-      if (route === 'admin' || route === 'store-admin') {
+      if (route === 'admin' || route === 'store-admin' || route === 'store-studio') {
         setActiveTab('store');
+        openStudio('store');
+        return;
+      }
+
+      if (route === 'studio') {
+        openStudio('theme');
         return;
       }
 

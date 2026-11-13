@@ -23,6 +23,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { useSiteContent } from '../../contexts/SiteContentContext';
 
 interface NetVidyaAdminModalProps {
   isOpen: boolean;
@@ -51,6 +52,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
     currentServerPrice,
     isEarlyBirdActive
   } = useNetVidyaStore();
+  const { openStudio } = useSiteContent();
 
   const [activeTab, setActiveTab] = useState<'upload_pdf' | 'upload_test' | 'pricing' | 'buyers' | 'manual_access'>('upload_pdf');
 
@@ -271,6 +273,27 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
               )}
             </button>
           </form>
+
+          {/* Direct Link to Unified Author Studio */}
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-left space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900">
+              <Shield className="w-3.5 h-3.5 text-blue-700" />
+              <span>Unified Author Studio</span>
+            </div>
+            <p className="text-[11px] text-blue-700 leading-snug">
+              Store administration, mock test scheduling, and student dossiers have been merged into the main Author Studio.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                openStudio('store');
+              }}
+              className="w-full py-2 px-3 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+            >
+              <span>Open Unified Author Studio</span>
+            </button>
+          </div>
 
           <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
             <span>Author Management Portal</span>
