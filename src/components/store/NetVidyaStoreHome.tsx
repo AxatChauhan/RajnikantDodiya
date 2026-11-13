@@ -222,42 +222,129 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
       <section className="max-w-6xl mx-auto px-4 space-y-10">
         <div className="text-center space-y-2">
           <span className="text-xs font-mono uppercase font-bold text-blue-700 tracking-wider">
-            What You Get Inside Your Dashboard
+            All-In-One Study Bundle Breakdown
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Comprehensive Paper II English Preparation
+            What You Get Inside the ₹499 Complete Bundle
           </h2>
+          <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto">
+            Everything you need for UGC NET English Paper II: authentic NTA computer-based CBT mock tests and complete high-yield online reading dossiers.
+          </p>
         </div>
 
+        {/* Deliverables Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm space-y-3">
+          <div className="p-6 rounded-3xl bg-white border border-blue-200 shadow-sm space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
               <Clock className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">NTA Computer-Based Mock Tests</h3>
+            <h3 className="text-lg font-bold text-gray-900">21 NTA Computer-Based Tests</h3>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Full 100-question Paper II simulations matching the official NTA UGC-NET screen layout, countdown timer, question palette, and negative marking rules.
+              1 Full NET Mock (100 Qs), 10 Practice Mocks A–J (100 Qs each), and 10 Unit Tests (50 Qs each) with official question palette and real-time timer.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm space-y-3">
+          <div className="p-6 rounded-3xl bg-white border border-emerald-200 shadow-sm space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
               <BookOpen className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Analytical Model Rationale</h3>
+            <h3 className="text-lg font-bold text-gray-900">3 Online Reading Dossiers (347 Pages)</h3>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Not just answer keys: complete pedagogical explanations citing critical texts, theoretical authorities, and reasons why tricky distractors are eliminated.
+              Complete E-book (283 pages), PYQ Trend Analysis (35 pages), and Last 30 Days Revision Kit (29 pages) with continuous online access till 31 Dec 2026.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm space-y-3">
+          <div className="p-6 rounded-3xl bg-white border border-amber-200 shadow-sm space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-              <FileText className="w-6 h-6" />
+              <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Downloadable Reading Dossiers</h3>
+            <h3 className="text-lg font-bold text-gray-900">Free Public Demo Available</h3>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Instant PDF downloads of high-yield revision summaries: Literary Theory, Post-Method Pedagogy, Cultural Studies, and Research Methodology style sheets.
+              Test-drive the real NTA test simulator with our 10-Question Demo Test and read the 15-page sample notes viewer right now with zero login required.
             </p>
+          </div>
+        </div>
+
+        {/* Detailed Modules Grid */}
+        <div className="bg-slate-50/80 rounded-3xl p-6 sm:p-8 border border-slate-200/80 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <span className="text-[11px] font-mono uppercase text-blue-700 font-bold">Curriculum Inventory</span>
+              <h3 className="text-xl font-bold text-gray-900">Included Study Modules & Tests</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenSample}
+                className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Try Free Demo (No Login)</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Column 1: Reading Dossiers */}
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-2xs space-y-3">
+              <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+                <BookOpen className="w-4 h-4 text-emerald-600" />
+                <span>3 High-Yield Reading Dossiers (Online Readers)</span>
+              </div>
+              <ul className="text-xs text-gray-600 space-y-2.5">
+                <li className="flex items-start gap-2 p-2 rounded-lg bg-emerald-50/50 border border-emerald-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900 block font-semibold">1. Complete E-book (283 Pages)</strong>
+                    <span className="text-gray-500 text-[11px]">Comprehensive coverage: Chaucer to Contemporary World Literature, Literary Theory & ELT.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2 p-2 rounded-lg bg-emerald-50/50 border border-emerald-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900 block font-semibold">2. PYQ Trend Analysis (35 Pages)</strong>
+                    <span className="text-gray-500 text-[11px]">Analytical question patterns, distractor elimination methods, and recurring author themes.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2 p-2 rounded-lg bg-emerald-50/50 border border-emerald-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900 block font-semibold">3. Last 30 Days Quick Revision Kit (29 Pages)</strong>
+                    <span className="text-gray-500 text-[11px]">Sprint revision summaries, key dates, works, theories, and critical terms.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 2: Computer-Based CBT Tests */}
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-2xs space-y-3">
+              <div className="flex items-center gap-2 text-blue-800 font-bold text-sm">
+                <Clock className="w-4 h-4 text-blue-600" />
+                <span>21 Computer-Based Tests (CBT Test Hall)</span>
+              </div>
+              <ul className="text-xs text-gray-600 space-y-2.5">
+                <li className="flex items-start gap-2 p-2 rounded-lg bg-blue-50/50 border border-blue-100">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900 block font-semibold">Grand NET Mock 1 (100 Qs • 120 min)</strong>
+                    <span className="text-gray-500 text-[11px]">Full-length Paper II simulation with question palette and model solutions.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2 p-2 rounded-lg bg-blue-50/50 border border-blue-100">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900 block font-semibold">10 Unit Tests (50 Qs each • 60 min)</strong>
+                    <span className="text-gray-500 text-[11px]">Drama, Poetry, Fiction, Prose, Language, English in India, Cultural Studies, Criticism, Theory, Research.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2 p-2 rounded-lg bg-blue-50/50 border border-blue-100">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900 block font-semibold">10 Practice Mocks A to J (100 Qs each • 120 min)</strong>
+                    <span className="text-gray-500 text-[11px]">Speed and stamina boosters replicating the real computer-based exam.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
