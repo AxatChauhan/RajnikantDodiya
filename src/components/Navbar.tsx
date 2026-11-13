@@ -226,14 +226,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
 
         {/* ROW 1: Brand Identity & Utility Bar */}
-        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-3">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-3">
           
           {/* Brand Logo & Name */}
           <button
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-2 sm:gap-3 text-left group shrink min-w-0 py-1"
           >
-            <ProfessorCrestIcon className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
+            <ProfessorCrestIcon className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" />
             <div className="min-w-0 pr-1">
               <h1 className="font-serif text-sm sm:text-base font-semibold text-ink group-hover:text-claret transition-colors leading-tight truncate">
                 {profile.name || PROFESSOR_INFO.name}

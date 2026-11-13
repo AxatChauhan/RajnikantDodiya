@@ -124,38 +124,33 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       
       {/* 1. TOP COMMERCIAL HEADER BAR */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-15 sm:h-18 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Brand Logo & Title */}
           <button
             onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="flex items-center gap-2 sm:gap-2.5 text-left group min-w-0 flex-1 sm:flex-initial"
+            className="flex items-center gap-2 sm:gap-2.5 text-left group min-w-0 shrink-0"
           >
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex items-center justify-center font-bold shadow-xs shrink-0">
-              <GraduationCap className="w-4 h-4 sm:w-6 sm:h-6" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex items-center justify-center font-bold shadow-xs shrink-0">
+              <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h1 className="font-bold text-xs sm:text-base text-gray-900 group-hover:text-blue-700 transition-colors leading-tight truncate">
-                  NET Vidya
-                </h1>
-                <span className="text-[9px] sm:text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0">
-                  Store
-                </span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-gray-500 font-normal truncate hidden sm:block">
-                {activeExamStore === 'ugc' ? 'UGC NET English Final Pack 2026' : 'GSET 2026 Examination Storefront'}
-              </p>
+            <div className="min-w-0 flex items-center gap-1.5">
+              <span className="font-bold text-sm sm:text-base text-gray-900 group-hover:text-blue-700 transition-colors leading-none whitespace-nowrap">
+                NET Vidya
+              </span>
+              <span className="text-[9px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0 leading-none">
+                Store
+              </span>
             </div>
           </button>
 
           {/* Dual Storefront Switcher */}
-          <div className="hidden lg:flex items-center bg-gray-100/90 p-1 rounded-2xl border border-gray-200 text-xs font-semibold">
+          <div className="hidden lg:flex items-center bg-gray-100/90 p-0.5 rounded-xl border border-gray-200 text-xs font-semibold shrink-0">
             <button
               onClick={() => { setActiveExamStore('ugc'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeExamStore === 'ugc'
-                  ? 'bg-white text-blue-900 shadow-xs font-bold'
+                  ? 'bg-white text-blue-900 shadow-2xs font-bold'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -163,9 +158,9 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </button>
             <button
               onClick={() => { setActiveExamStore('gset'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeExamStore === 'gset'
-                  ? 'bg-white text-emerald-900 shadow-xs font-bold'
+                  ? 'bg-white text-emerald-900 shadow-2xs font-bold'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -177,10 +172,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+          <nav className="hidden md:flex items-center gap-1 lg:gap-1.5 text-xs font-semibold text-gray-700 shrink-0">
             <button
               onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-3 py-1.5 rounded-xl transition-colors ${
+              className={`px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                 currentView === 'home' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
               }`}
             >
@@ -188,28 +183,28 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </button>
             <button
               onClick={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 ${
+              className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentView === 'sample' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Free Demo Test</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Free Demo</span>
             </button>
             {buyerSession.isLoggedIn && (
               <button
                 onClick={() => { setCurrentView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className={`px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 ${
+                className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   currentView === 'dashboard' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
                 }`}
               >
-                <Clock className="w-3.5 h-3.5 text-blue-700" />
-                <span>My Dashboard</span>
+                <Clock className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                <span>Dashboard</span>
               </button>
             )}
             {onOpenBookstore && (
               <button
                 onClick={onOpenBookstore}
-                className="px-3 py-1.5 rounded-xl text-gray-600 hover:text-blue-800 hover:bg-gray-100 transition-colors"
+                className="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-800 hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0"
                 title="Browse Monographs & Print Editions"
               >
                 Bookstore
@@ -218,31 +213,32 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {onBackToAcademicSite && (
               <button
                 onClick={onBackToAcademicSite}
-                className="px-3 py-1.5 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="px-2.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
                 title="Return to Academic Portfolio"
               >
-                Academic Site →
+                <span>Academic Site</span>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             )}
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Student Login / Dashboard Button */}
             {buyerSession.isLoggedIn ? (
               <button
                 onClick={() => { setCurrentView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1 sm:gap-1.5 shadow-2xs"
+                className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0"
                 title="Open Student Dashboard"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span className="truncate max-w-[65px] sm:max-w-[120px]">{buyerSession.name}</span>
+                <span className="truncate max-w-[70px] sm:max-w-[100px]">{buyerSession.name}</span>
               </button>
             ) : (
               <button
                 onClick={() => setIsLoginOpen(true)}
-                className="px-2 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1 sm:gap-1.5"
+                className="px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
                 title="Student Login"
               >
                 <KeyRound className="w-3.5 h-3.5 shrink-0" />
@@ -253,18 +249,18 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {/* Buy CTA Button */}
             <button
               onClick={() => setIsCheckoutOpen(true)}
-              className="px-2 sm:px-4 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0"
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             >
-              <span className="hidden sm:inline">Buy Final Pack (₹{currentServerPrice})</span>
-              <span className="sm:hidden">Buy ₹{currentServerPrice}</span>
-              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+              <span className="hidden xl:inline">Buy Final Pack (₹{currentServerPrice})</span>
+              <span className="xl:hidden">Buy ₹{currentServerPrice}</span>
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
 
             {/* Mobile Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
               aria-label="Toggle Navigation Menu"
-              className="md:hidden p-1.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
+              className="md:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

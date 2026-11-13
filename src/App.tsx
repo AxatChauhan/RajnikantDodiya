@@ -247,8 +247,8 @@ function AppInner() {
       {/* Main Container */}
       <main className={`max-w-7xl mx-auto px-3 sm:px-6 md:px-8 min-h-[75vh] ${
         layoutSettings?.showEmergencyAlert && alertBanner?.enabled
-          ? 'pt-28 sm:pt-32 lg:pt-40'
-          : 'pt-20 sm:pt-24 lg:pt-36'
+          ? 'pt-24 sm:pt-28 lg:pt-36'
+          : 'pt-18 sm:pt-20 lg:pt-28'
       }`}>
         <AcademicErrorBoundary fallbackTitle="Academic Section Interrupted">
           <Suspense fallback={<AcademicLoadingFallback />}>
