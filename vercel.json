@@ -74,6 +74,14 @@
       "destination": "/api/$1"
     },
     {
+      "source": "/study-vault/(.*)",
+      "destination": "/study-vault/$1"
+    },
+    {
+      "source": "/sample-materials/(.*)",
+      "destination": "/sample-materials/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
