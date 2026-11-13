@@ -168,6 +168,26 @@ export default async function handler(req, res) {
         enrolledAt: new Date().toISOString()
       });
 
+      // Seed official Razorpay verification account
+      buyersMap.set('razorpay.test@rajnikantdodiya.com', {
+        id: 'usr_rzp_verifier',
+        name: 'Razorpay Verification Officer',
+        student_name: 'Razorpay Verification Officer',
+        email: 'razorpay.test@rajnikantdodiya.com',
+        mobile: '9876543210',
+        orderId: 'NV_RZP_VERIFY_2026',
+        order_id: 'NV_RZP_VERIFY_2026',
+        amount: 799,
+        amount_paid: 799,
+        amountPaid: 799,
+        paymentMethod: 'razorpay_verification',
+        payment_method: 'razorpay_verification',
+        is_active: true,
+        isActive: true,
+        enrolled_at: new Date().toISOString(),
+        enrolledAt: new Date().toISOString()
+      });
+
       // Fetch from test simulation DB
       const simDb = await getSimulatedDb();
       if (simDb?.buyers) {

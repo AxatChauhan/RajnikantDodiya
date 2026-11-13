@@ -159,6 +159,16 @@ export const simulatedDb = {
       is_active: true,
       amount_paid: 799,
       enrolled_at: new Date().toISOString()
+    }],
+    ['razorpay.test@rajnikantdodiya.com', {
+      id: 'usr_rzp_verifier',
+      student_name: 'Razorpay Verification Officer',
+      name: 'Razorpay Verification Officer',
+      email: 'razorpay.test@rajnikantdodiya.com',
+      mobile: '9876543210',
+      is_active: true,
+      amount_paid: 799,
+      enrolled_at: new Date().toISOString()
     }]
   ]), // email -> buyer record
   resetTokens: new Map(), // token -> { email, expiresAt }
