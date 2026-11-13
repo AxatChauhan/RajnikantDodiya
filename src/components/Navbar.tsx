@@ -18,6 +18,7 @@ import {
 import { PROFESSOR_INFO, SOCIAL_LINKS } from '../data/professorData';
 import { useScholarSession } from '../hooks/useScholarSession';
 import { useSiteContent } from '../contexts/SiteContentContext';
+import { useNetVidyaStore } from '../contexts/NetVidyaStoreContext';
 import { ProfessorCrestIcon } from './common/ProfessorCrestIcon';
 
 export type MainTab =
@@ -123,6 +124,7 @@ interface NavbarProps {
   onOpenCompendium?: () => void;
   onOpenAuthModal?: () => void;
   onOpenStore?: () => void;
+  onOpenStudentLogin?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -130,13 +132,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   onOpenCompendium,
   onOpenAuthModal,
-  onOpenStore
+  onOpenStore,
+  onOpenStudentLogin
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { session } = useScholarSession();
   const { profile, alertBanner, layoutSettings } = useSiteContent();
+  const { buyerSession } = useNetVidyaStore();
 
   const isScholarActive = Boolean(
     session.unlockedItems && session.unlockedItems.length > 0 && session.mobile
@@ -316,38 +320,35 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-serif">Bookstore</span>
             </button>
 
-            {/* BUTTON 2: [Student Login / Store] */}
-            {onOpenStore ? (
+            {/* BUTTON 2: [Student Login / Dashboard] */}
+            {buyerSession?.isLoggedIn ? (
               <button
-                onClick={onOpenStore}
+                onClick={() => {
+                  if (onOpenStore) onOpenStore();
+                  window.location.hash = '#dashboard';
+                }}
+                className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-9 sm:h-10 min-h-[36px]"
+                title="Open Student Dashboard"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="truncate max-w-[80px] sm:max-w-[110px]">{buyerSession.name || 'Dashboard'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  if (onOpenStudentLogin) {
+                    onOpenStudentLogin();
+                  } else if (onOpenStore) {
+                    onOpenStore();
+                  }
+                }}
                 className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-9 sm:h-10 min-h-[36px]"
-                title="Open NET Vidya Student Store & Login"
+                title="Open Student Login Portal"
               >
                 <KeyRound className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Student Login</span>
                 <span className="sm:hidden">Login</span>
               </button>
-            ) : onOpenAuthModal && (
-              isScholarActive ? (
-                <button
-                  onClick={onOpenAuthModal}
-                  className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 font-semibold hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-9 sm:h-10 min-h-[36px]"
-                  title="View your active student pass"
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="truncate max-w-[80px] sm:max-w-[110px]">{session.name}</span>
-                </button>
-              ) : (
-                <button
-                  onClick={onOpenAuthModal}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-9 sm:h-10 min-h-[36px]"
-                  title="Sign in with your verified WhatsApp number"
-                >
-                  <KeyRound className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Student Login</span>
-                  <span className="sm:hidden">Login</span>
-                </button>
-              )
             )}
 
             {/* Mobile Hamburger Menu Toggle */}
@@ -445,24 +446,36 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="lg:hidden border-t border-deckle bg-white/98 backdrop-blur-lg px-4 py-4 max-h-[calc(100dvh-130px)] pb-24 overflow-y-auto space-y-4 animate-fade-in shadow-2xl">
             
             {/* Quick Actions in Mobile Drawer */}
-            {(onOpenStore || onOpenAuthModal) && (
-              <div className="pb-3 border-b border-deckle">
+            <div className="pb-3 border-b border-deckle">
+              {buyerSession?.isLoggedIn ? (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    if (onOpenStore) {
+                    if (onOpenStore) onOpenStore();
+                    window.location.hash = '#dashboard';
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-2xs min-h-[42px]"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>My Dashboard ({buyerSession.name || 'Student'})</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (onOpenStudentLogin) {
+                      onOpenStudentLogin();
+                    } else if (onOpenStore) {
                       onOpenStore();
-                    } else if (onOpenAuthModal) {
-                      onOpenAuthModal();
                     }
                   }}
                   className="w-full py-2.5 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-sans font-medium flex items-center justify-center gap-1.5 shadow-xs min-h-[42px]"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>{isScholarActive ? 'My Pass' : 'Student Login & Store'}</span>
+                  <span>Student Login Portal</span>
                 </button>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Featured Academic Bookstore Card in Mobile Drawer */}
             <button

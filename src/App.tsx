@@ -7,7 +7,7 @@ import { Feather, ExternalLink } from 'lucide-react';
 import { AcademicErrorBoundary } from './components/common/AcademicErrorBoundary';
 import { handleGoogleAuthRedirect } from './lib/googleAuth';
 import { SiteContentProvider, useSiteContent } from './contexts/SiteContentContext';
-import { NetVidyaStoreProvider } from './contexts/NetVidyaStoreContext';
+import { NetVidyaStoreProvider, useNetVidyaStore } from './contexts/NetVidyaStoreContext';
 import { NetVidyaWhatsAppWidget } from './components/store/NetVidyaWhatsAppWidget';
 import { StorePolicyLinks, PolicyTab } from './components/common/StorePolicyLinks';
 import { STORE_MERCHANT } from './config/storeConfig';
@@ -31,6 +31,7 @@ const ExamPortal = lazy(() => import('./components/library-store/ExamPortal').th
 const AuthorStudioModal = lazy(() => import('./components/studio/AuthorStudioModal').then(m => ({ default: m.AuthorStudioModal })));
 const NetVidyaStoreLayout = lazy(() => import('./components/store/NetVidyaStoreLayout').then(m => ({ default: m.NetVidyaStoreLayout })));
 const NetVidyaPolicies = lazy(() => import('./components/store/NetVidyaPolicies').then(m => ({ default: m.NetVidyaPolicies })));
+const NetVidyaStudentLoginModal = lazy(() => import('./components/store/NetVidyaStudentLoginModal').then(m => ({ default: m.NetVidyaStudentLoginModal })));
 
 const POLICY_ROUTE_MAP: Record<string, PolicyTab> = {
   policies: 'terms',
@@ -71,6 +72,7 @@ function AppInner() {
   const [activeSubSection, setActiveSubSection] = useState<string | undefined>(undefined);
   const [isCompendiumOpen, setIsCompendiumOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isStudentLoginOpen, setIsStudentLoginOpen] = useState(false);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isExamOpen, setIsExamOpen] = useState(false);
   const [activePolicyTab, setActivePolicyTab] = useState<PolicyTab>('terms');
@@ -90,6 +92,7 @@ function AppInner() {
 
   const { session, sessionTransferred, setSessionTransferred, isBookOwned, isExamOwned, isComplimentaryOwned } = useScholarSession();
   const { alertBanner, layoutSettings, profile } = useSiteContent();
+  const { buyerSession } = useNetVidyaStore();
 
   const handleNavigate = (tab: MainTab, subSection?: string) => {
     setActiveTab(tab);
@@ -120,6 +123,11 @@ function AppInner() {
       if (POLICY_ROUTE_MAP[route]) {
         setActivePolicyTab(POLICY_ROUTE_MAP[route]);
         setActiveTab('policies');
+        return;
+      }
+
+      if (route === 'login' || route === 'signin' || route === 'student-login') {
+        setIsStudentLoginOpen(true);
         return;
       }
 
@@ -242,6 +250,7 @@ function AppInner() {
         onOpenCompendium={() => setIsCompendiumOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenStore={() => handleNavigate('store')}
+        onOpenStudentLogin={() => setIsStudentLoginOpen(true)}
       />
 
       {/* Main Container */}
@@ -297,7 +306,7 @@ function AppInner() {
             )}
             {activeTab === 'bookstore' && (
               <AcademicStorePage
-                onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                onOpenAuthModal={() => setIsStudentLoginOpen(true)}
                 onNavigate={handleNavigate}
                 onOpenPolicy={handleOpenPolicyModal}
               />
@@ -400,6 +409,25 @@ function AppInner() {
             isOpen={isPolicyModalOpen}
             asModal={true}
             onClose={() => setIsPolicyModalOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Global Student Login Portal Modal */}
+      {isStudentLoginOpen && (
+        <Suspense fallback={null}>
+          <NetVidyaStudentLoginModal
+            isOpen={isStudentLoginOpen}
+            onClose={() => setIsStudentLoginOpen(false)}
+            onLoginSuccess={() => {
+              setIsStudentLoginOpen(false);
+              handleNavigate('store');
+              window.location.hash = '#dashboard';
+            }}
+            onOpenCheckout={() => {
+              setIsStudentLoginOpen(false);
+              handleNavigate('store');
+            }}
           />
         </Suspense>
       )}

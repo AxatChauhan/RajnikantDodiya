@@ -73,7 +73,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
       'Full Paper 1: All 10 General Aptitude & Teaching/Research Units',
       'Full Paper 2: Philosophical, Sociological & Psychological Foundations of Education',
       'Curriculum Studies, Teacher Education & Educational Technology Modules',
-      'Specialized Pedagogy dossiers by HMPIETR / Sardar Patel University Faculty',
+      'Specialized Pedagogy & English Language Teaching dossiers by Veteran Academic Mentors',
       'Watermarked Digital Access valid till 31 Dec 2026',
       'Priority WhatsApp Academic Guidance with Mentor'
     ],
@@ -204,7 +204,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
               Ph.D. in English • 2× UGC NET & GSET Qualified Scholar
             </p>
             <p className="text-xs text-gray-600 leading-relaxed max-w-xl">
-              Assistant Professor of English at HMPIETR, Sardar Patel University. Personally qualified GSET and UGC-NET, curating authoritative subject materials for Gujarat candidates.
+              Assistant Professor of English & Doctoral Researcher in Language Education. Personally qualified GSET and UGC-NET, curating authoritative subject materials for Gujarat candidates.
             </p>
           </div>
         </div>
