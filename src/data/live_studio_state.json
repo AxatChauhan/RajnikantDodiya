@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-13T12:44:22.761Z",
+  "updatedAt": "2026-11-13T13:31:47.816Z",
   "theme": {
     "fontPreset": "oxford-classical",
     "colorPalette": "oxford-navy",
@@ -25,7 +25,7 @@
     ]
   },
   "layout": {
-    "showEmergencyAlert": true,
+    "showEmergencyAlert": false,
     "showTrackRecordBoxes": true,
     "showHighlights": true,
     "showFeaturedMonograph": true,
@@ -33,7 +33,7 @@
     "showContactForm": true
   },
   "banner": {
-    "enabled": true,
+    "enabled": false,
     "text": "Admissions Open: Caiele National FDP on AI in Language Teaching (Nov 2026 Batch)",
     "badgeText": "Institutional Notice",
     "badgeType": "gold",
@@ -259,5 +259,5 @@
       }
     ]
   },
-  "syncedAt": "2026-11-13T13:21:27.593Z"
+  "syncedAt": "2026-11-13T13:34:46.010Z"
 }

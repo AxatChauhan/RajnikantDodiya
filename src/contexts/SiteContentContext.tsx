@@ -431,7 +431,7 @@ export interface LayoutSettingsState {
 }
 
 export const DEFAULT_ALERT_BANNER: AlertBannerState = {
-  enabled: true,
+  enabled: false,
   text: 'Admissions Open: Caiele National FDP on AI in Language Teaching (Nov 2026 Batch)',
   badgeText: 'Institutional Notice',
   badgeType: 'gold',
@@ -441,7 +441,7 @@ export const DEFAULT_ALERT_BANNER: AlertBannerState = {
 };
 
 export const DEFAULT_LAYOUT_SETTINGS: LayoutSettingsState = {
-  showEmergencyAlert: true,
+  showEmergencyAlert: false,
   showTrackRecordBoxes: true,
   showHighlights: true,
   showFeaturedMonograph: true,
@@ -498,7 +498,7 @@ interface SiteContentContextType {
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
 
 // Storage Cache Keys
-const STORAGE_PREFIX = 'atheneum_cms_content_v1_';
+const STORAGE_PREFIX = 'atheneum_cms_content_v2_';
 const STORAGE_KEY_THEME = `${STORAGE_PREFIX}theme`;
 const STORAGE_KEY_PROFILE = `${STORAGE_PREFIX}profile`;
 const STORAGE_KEY_BOOKS = `${STORAGE_PREFIX}books`;

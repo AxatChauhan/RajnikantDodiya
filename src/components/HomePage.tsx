@@ -90,13 +90,32 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
           {/* Primary Action Buttons */}
           <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+            {/* Button 1: UGC NET English 2026 */}
             <button
-              onClick={() => onNavigate('store')}
-              className="w-full sm:w-auto justify-center px-6 py-3 sm:py-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-[14px] font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px] sm:min-h-[48px]"
+              onClick={() => {
+                window.location.hash = '#store';
+                onNavigate('store');
+              }}
+              className="w-full sm:w-auto justify-center px-5 py-3 sm:py-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-[14px] font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px] sm:min-h-[48px] group"
+              title="Open UGC NET English 2026 Storefront"
             >
               <Zap className="w-4 h-4 text-amber-300 shrink-0" />
-              <span>GSET + UGC NET Final Pack 2026</span>
-              <ArrowRight className="w-4 h-4 ml-1 shrink-0" />
+              <span>UGC NET English 2026</span>
+              <ArrowRight className="w-4 h-4 ml-0.5 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+
+            {/* Button 2: GSET 2026 */}
+            <button
+              onClick={() => {
+                window.location.hash = '#gset';
+                onNavigate('store');
+              }}
+              className="w-full sm:w-auto justify-center px-5 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-emerald-800 to-teal-900 hover:from-emerald-900 hover:to-teal-950 text-white text-xs sm:text-[14px] font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 min-h-[46px] sm:min-h-[48px] group border border-emerald-700/40"
+              title="Open Dedicated GSET 2026 Examination Storefront"
+            >
+              <GraduationCap className="w-4 h-4 text-emerald-300 shrink-0" />
+              <span>GSET 2026</span>
+              <ArrowRight className="w-4 h-4 ml-0.5 shrink-0 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             <a
