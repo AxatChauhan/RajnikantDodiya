@@ -140,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { session } = useScholarSession();
-  const { profile, alertBanner, layoutSettings, openStudio } = useSiteContent();
+  const { profile, alertBanner, layoutSettings } = useSiteContent();
   const { buyerSession } = useNetVidyaStore();
 
   const isScholarActive = Boolean(
@@ -583,23 +583,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   WhatsApp Channel (Education)
                 </a>
               </div>
-            </div>
-
-            {/* Author Studio Direct Access */}
-            <div className="pt-3 border-t border-deckle">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openStudio('theme');
-                }}
-                className="w-full py-2.5 px-3 rounded-xl bg-parchment-warm hover:bg-parchment border border-deckle text-ink text-xs font-serif font-medium flex items-center justify-between transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-claret" />
-                  <span>Author Studio Gateway</span>
-                </div>
-                <span className="text-[11px] text-ink-muted">Master Admin →</span>
-              </button>
             </div>
 
           </div>

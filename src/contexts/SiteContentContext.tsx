@@ -771,6 +771,8 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         hash === '#admin' || 
         hash === '#store-admin' || 
         hash === '#store-studio' || 
+        pathname === '/admin' ||
+        pathname === '/admin/' ||
         search.includes('tab=store') || 
         search.includes('admin=true');
 

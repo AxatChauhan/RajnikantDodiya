@@ -77,6 +77,11 @@ export default async function handler(req, res) {
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
     // Resolve dedicated product payment links (Supports both individual links and unified single-link mode)
+    const defaultProductLink =
+      STORE_PAYMENT_DEFAULTS.paymentLinksByProduct[resolvedProduct.id] ||
+      STORE_PAYMENT_DEFAULTS.paymentLinksByAmount[basePrice] ||
+      STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
+
     let targetPaymentLink = '';
     if (resolvedProduct.id === 'gset-paper2-education') {
       targetPaymentLink = (
@@ -84,7 +89,7 @@ export default async function handler(req, res) {
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_EDU_149 ||
         process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
-        ''
+        defaultProductLink
       ).trim();
     } else if (resolvedProduct.id === 'gset-paper2-english') {
       targetPaymentLink = (
@@ -92,7 +97,7 @@ export default async function handler(req, res) {
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_ENG_149 ||
         process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
-        ''
+        defaultProductLink
       ).trim();
     } else if (resolvedProduct.id === 'gset-paper1') {
       targetPaymentLink = (
@@ -100,7 +105,7 @@ export default async function handler(req, res) {
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_P1_149 ||
         process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
-        ''
+        defaultProductLink
       ).trim();
     } else if (resolvedProduct.id === 'gset-education-combo') {
       targetPaymentLink = (
@@ -108,7 +113,7 @@ export default async function handler(req, res) {
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_EDU_249 ||
         process.env.RAZORPAY_PAYMENT_LINK_GSET_249 ||
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 ||
-        ''
+        defaultProductLink
       ).trim();
     } else if (resolvedProduct.id === 'gset-english-combo') {
       targetPaymentLink = (
@@ -116,17 +121,27 @@ export default async function handler(req, res) {
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_ENG_249 ||
         process.env.RAZORPAY_PAYMENT_LINK_GSET_249 ||
         process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 ||
-        ''
+        defaultProductLink
       ).trim();
     } else if (basePrice === 149) {
-      targetPaymentLink = (process.env.RAZORPAY_PAYMENT_LINK_GSET_149 || process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 || '').trim();
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_149 ||
+        defaultProductLink
+      ).trim();
     } else if (basePrice === 249) {
-      targetPaymentLink = (process.env.RAZORPAY_PAYMENT_LINK_GSET_249 || process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 || '').trim();
+      targetPaymentLink = (
+        process.env.RAZORPAY_PAYMENT_LINK_GSET_249 ||
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_GSET_249 ||
+        defaultProductLink
+      ).trim();
     } else {
       const rawPaymentLink =
+        process.env.RAZORPAY_PAYMENT_LINK_UGC_499 ??
+        process.env.VITE_RAZORPAY_PAYMENT_LINK_UGC_499 ??
         process.env.RAZORPAY_PAYMENT_LINK ??
         process.env.VITE_RAZORPAY_PAYMENT_LINK ??
-        DEFAULT_PAYMENT_LINK;
+        defaultProductLink;
       targetPaymentLink = (rawPaymentLink || '').trim();
     }
 
@@ -152,7 +167,11 @@ export default async function handler(req, res) {
             seller: settings.sellerLine,
             student_name: studentName.trim(),
             email: email.trim().toLowerCase(),
-            mobile: mobile.trim()
+            mobile: mobile.trim(),
+            coupon_code: cleanCoupon || 'NONE',
+            discount: discount > 0 ? `₹${discount}` : '₹0',
+            final_price: `₹${finalPrice}`,
+            exam_category: examStore === 'gset' ? 'GSET 2026' : 'UGC NET English 2026'
           }
         })
       });

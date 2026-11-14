@@ -185,9 +185,9 @@ export default async function handler(req, res) {
     const mobile = (notes.mobile || notes.contact || payment?.contact || customer.contact || '').toString().trim();
     const paymentId = payment?.id || null;
     const orderId = payment?.order_id || orderEntity?.id || paymentLink?.id || `ORD_WH_${Date.now()}`;
-    const amountPaid = amountPaise !== null ? amountPaise / 100 : 799;
+    const amountPaid = amountPaise !== null ? amountPaise / 100 : 499;
     const expiresAt = settings.accessExpiryDate || DEFAULT_ACCESS_EXPIRY;
-    const productId = notes.product_id || (amountPaid <= 149 ? 'gset-paper2-english' : (amountPaid <= 249 ? 'gset-english-combo' : 'ugc-bundle'));
+    const productId = notes.product_id || (amountPaid <= 149 ? 'gset-paper1' : (amountPaid <= 249 ? 'gset-english-combo' : 'ugc-net-english-bundle'));
 
     if (!email || !email.includes('@')) {
       return res.status(200).json({

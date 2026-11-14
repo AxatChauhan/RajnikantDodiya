@@ -234,6 +234,8 @@ function AppInner() {
           onBackToAcademicSite={() => handleNavigate('home')}
           onOpenBookstore={() => handleNavigate('bookstore')}
         />
+        {/* Global Author Studio & Store Admin Modal */}
+        <AuthorStudioModal />
       </Suspense>
     );
   }

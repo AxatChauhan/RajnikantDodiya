@@ -20,6 +20,8 @@ interface NetVidyaStudentLoginModalProps {
   onClose: () => void;
   onOpenCheckout: () => void;
   onLoginSuccess: () => void;
+  requiredForEnrollment?: boolean;
+  pendingProductName?: string;
 }
 
 type TabType = 'login' | 'signup' | 'forgot';
@@ -28,7 +30,9 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   isOpen,
   onClose,
   onOpenCheckout,
-  onLoginSuccess
+  onLoginSuccess,
+  requiredForEnrollment = false,
+  pendingProductName
 }) => {
   const { login, signup, forgotPassword, resetPassword, currentServerPrice } = useNetVidyaStore();
 
@@ -212,6 +216,19 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             Access your GSET & UGC NET English Reading Files & Test Hall.
           </p>
         </div>
+
+        {/* Compulsory Enrollment Login Banner */}
+        {requiredForEnrollment && (
+          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5 shadow-xs animate-scale-up">
+            <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <strong className="font-bold text-amber-950 block">Compulsory Candidate Login:</strong>
+              <p className="text-amber-800 leading-relaxed">
+                Please sign in or create an account to enroll in <strong>{pendingProductName || 'your selected package'}</strong>. Your checkout will open automatically once you are logged in.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Navigation Tabs */}
         <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold">

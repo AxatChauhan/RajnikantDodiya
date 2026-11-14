@@ -22,6 +22,7 @@ export async function sendPurchaseConfirmationEmail({
   orderId = '',
   amount = 799,
   paymentId = '',
+  productName = DEFAULT_STORE_SETTINGS.productName,
   dashboardUrl = STORE_MERCHANT.dashboardUrl
 }) {
   const cleanEmail = (to || '').trim().toLowerCase();
@@ -30,16 +31,17 @@ export async function sendPurchaseConfirmationEmail({
     return { success: false, error: 'Invalid recipient email' };
   }
 
-  const subject = `Purchase Confirmation: ${DEFAULT_STORE_SETTINGS.productName} (${orderId})`;
+  const cleanProductName = productName || DEFAULT_STORE_SETTINGS.productName;
+  const subject = `Purchase Confirmation: ${cleanProductName} (${orderId})`;
 
   const textContent = `
 Dear ${studentName},
 
-Thank you for enrolling in the GSET + UGC NET English Final Pack 2026!
+Thank you for enrolling in ${cleanProductName}!
 Your payment of ₹${amount} (Payment ID: ${paymentId}) has been successfully verified.
 
 Order ID: ${orderId}
-Product: ${DEFAULT_STORE_SETTINGS.productName}
+Product: ${cleanProductName}
 Access Validity: Through ${STORE_MERCHANT.accessExpiryLabel}
 ${STORE_MERCHANT.sellerLine}
 
@@ -63,7 +65,7 @@ NET Vidya English Team
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;">
     <div style="background-color: #1e3a8a; padding: 24px; text-align: center; color: #ffffff;">
       <h1 style="margin: 0; font-size: 22px;">${STORE_MERCHANT.storeTitle}</h1>
-      <p style="margin: 6px 0 0; font-size: 14px; color: #93c5fd;">${DEFAULT_STORE_SETTINGS.productName}</p>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #93c5fd;">${cleanProductName}</p>
     </div>
     
     <div style="padding: 24px;">
@@ -73,6 +75,10 @@ NET Vidya English Team
       <div style="background-color: #f1f5f9; border-radius: 8px; padding: 16px; margin: 20px 0;">
         <h3 style="margin-top: 0; color: #0f172a; font-size: 15px;">Order Summary</h3>
         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr>
+            <td style="padding: 6px 0; color: #64748b;">Enrolled Course:</td>
+            <td style="padding: 6px 0; font-weight: bold; text-align: right;">${cleanProductName}</td>
+          </tr>
           <tr>
             <td style="padding: 6px 0; color: #64748b;">Order Reference:</td>
             <td style="padding: 6px 0; font-weight: bold; text-align: right;">${orderId}</td>

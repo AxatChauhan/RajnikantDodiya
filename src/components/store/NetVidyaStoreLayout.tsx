@@ -19,7 +19,7 @@ import { useSiteContent } from '../../contexts/SiteContentContext';
 import { NetVidyaStoreHome } from './NetVidyaStoreHome';
 import { NetVidyaFreeSample } from './NetVidyaFreeSample';
 import { NetVidyaDashboard } from './NetVidyaDashboard';
-import { NetVidyaCheckoutModal } from './NetVidyaCheckoutModal';
+import { NetVidyaCheckoutModal, CHECKOUT_PRODUCTS } from './NetVidyaCheckoutModal';
 import { NetVidyaStudentLoginModal } from './NetVidyaStudentLoginModal';
 import { NetVidyaPolicies, PolicyTab } from './NetVidyaPolicies';
 import { NetVidyaAdminModal } from './NetVidyaAdminModal';
@@ -80,25 +80,57 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
     isOpen: false,
     initialExam: 'ugc'
   });
+  const [pendingCheckout, setPendingCheckout] = useState<{
+    productId?: string;
+    exam: 'ugc' | 'gset';
+    productName?: string;
+  } | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleOpenCheckout = (productId?: string, exam?: 'ugc' | 'gset') => {
+    const targetExam = exam || activeExamStore;
+    const targetProduct = CHECKOUT_PRODUCTS.find(p => p.id === productId) ||
+      (targetExam === 'gset' ? CHECKOUT_PRODUCTS[0] : CHECKOUT_PRODUCTS.find(p => p.id === 'ugc-net-english-bundle'));
+
+    // Compulsory candidate login required before proceeding to checkout / buying
+    if (!buyerSession.isLoggedIn) {
+      setPendingCheckout({
+        productId,
+        exam: targetExam,
+        productName: targetProduct?.name || (targetExam === 'gset' ? 'GSET 2026 Examination Pack' : 'UGC NET English Bundle')
+      });
+      setIsLoginOpen(true);
+      return;
+    }
+
     setCheckoutConfig({
       isOpen: true,
-      initialExam: exam || activeExamStore,
+      initialExam: targetExam,
       initialProductId: productId
     });
   };
 
-  // Discrete Administrative Gateway: URL Hash (#admin, #store-admin), Query (?admin=true), or Secret Keybind (Ctrl+Shift+A)
+  // Discrete Administrative Gateway: URL Direct Entry Only (#admin, #studio, #store-admin, ?admin=true)
   useEffect(() => {
     const checkAdminRoute = () => {
       if (typeof window === 'undefined') return;
       const hash = window.location.hash.toLowerCase();
+      const pathname = window.location.pathname.toLowerCase();
       const search = window.location.search.toLowerCase();
-      if (hash === '#admin' || hash === '#store-admin' || hash === '#store-studio' || search.includes('admin=true')) {
+      if (
+        hash === '#admin' ||
+        hash === '#store-admin' ||
+        hash === '#store-studio' ||
+        hash === '#studio' ||
+        pathname === '/admin' ||
+        pathname === '/admin/' ||
+        pathname === '/studio' ||
+        pathname === '/studio/' ||
+        search.includes('admin=true') ||
+        search.includes('studio=true')
+      ) {
         openStudio('store');
       }
       if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
@@ -120,18 +152,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       window.removeEventListener('hashchange', checkAdminRoute);
       window.removeEventListener('popstate', checkAdminRoute);
     };
-  }, [openStudio]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Secret key combination: Ctrl+Shift+A (or Cmd+Shift+A) opens unified Author Studio
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        openStudio('store');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [openStudio]);
 
   const handleOpenPolicies = (tab: PolicyTab = 'terms') => {
@@ -282,16 +302,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
 
-            {/* Admin Trigger Button & Author Studio */}
-            <button
-              onClick={() => openStudio('store')}
-              title="Open Author Studio (NET Vidya Store & Enrolled Scholars)"
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-900 text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0"
-            >
-              <Shield className="w-3.5 h-3.5 text-blue-700 shrink-0" />
-              <span className="hidden lg:inline">Studio</span>
-            </button>
-
             {/* Mobile & Tablet Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
@@ -428,16 +438,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   <ChevronRight className="w-4 h-4 text-blue-500" />
                 </button>
               )}
-              <button
-                onClick={() => { openStudio('store'); setMobileMenuOpen(false); }}
-                className="w-full text-left p-2.5 rounded-lg hover:bg-blue-50 text-blue-800 flex items-center justify-between font-bold border border-blue-100"
-              >
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-700" />
-                  <span>Author Studio (Store Admin)</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-blue-500" />
-              </button>
             </div>
 
             {/* Quick Action in Drawer */}
@@ -559,15 +559,30 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       {isLoginOpen && (
         <NetVidyaStudentLoginModal
           isOpen={isLoginOpen}
-          onClose={() => setIsLoginOpen(false)}
+          requiredForEnrollment={Boolean(pendingCheckout)}
+          pendingProductName={pendingCheckout?.productName}
+          onClose={() => {
+            setIsLoginOpen(false);
+            setPendingCheckout(null);
+          }}
           onOpenCheckout={() => {
             setIsLoginOpen(false);
             handleOpenCheckout();
           }}
           onLoginSuccess={() => {
             setIsLoginOpen(false);
-            setCurrentView('dashboard');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (pendingCheckout) {
+              const pending = pendingCheckout;
+              setPendingCheckout(null);
+              setCheckoutConfig({
+                isOpen: true,
+                initialExam: pending.exam,
+                initialProductId: pending.productId
+              });
+            } else {
+              setCurrentView('dashboard');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
           }}
         />
       )}

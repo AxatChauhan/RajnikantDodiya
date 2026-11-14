@@ -18,12 +18,20 @@ export declare const STORE_MERCHANT: {
 export declare const STORE_PAYMENT_DEFAULTS: {
   defaultPaymentLink: string;
   defaultPaymentLinkPrice: number;
+  gsetPaymentLink149: string;
+  gsetPaymentLink249: string;
+  ugcPaymentLink499: string;
+  paymentLinksByAmount: Record<number, string>;
+  paymentLinksByProduct: Record<string, string>;
   defaultEarlyBirdPrice: number;
   defaultStandardPrice: number;
   defaultEarlyBirdCutoff: string;
   defaultAccessExpiry: string;
   validCoupons: Record<string, { amount: number; message: string }>;
 };
+
+export declare const GSET_PRODUCTS: Record<string, any>;
+export declare const UGC_BUNDLE_PRODUCT: Record<string, any>;
 
 export declare const DEFAULT_STORE_SETTINGS: {
   productSlug: string;

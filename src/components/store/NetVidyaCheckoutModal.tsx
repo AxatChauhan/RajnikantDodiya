@@ -33,6 +33,7 @@ export interface CheckoutProductOption {
   isCombo?: boolean;
   testCountDesc: string;
   description: string;
+  paymentLink: string;
 }
 
 export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
@@ -45,6 +46,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     shortName: 'English Scholar Duo (Paper 1 + 2)',
     price: 249,
     originalPrice: 799,
+    paymentLink: 'https://rzp.io/rzp/oXfY4Va',
     badge: 'RECOMMENDED • BEST VALUE',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     isCombo: true,
@@ -59,6 +61,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     shortName: 'Education Scholar Duo (Paper 1 + 2)',
     price: 249,
     originalPrice: 799,
+    paymentLink: 'https://rzp.io/rzp/oXfY4Va',
     badge: 'RECOMMENDED • BEST VALUE',
     badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
     isCombo: true,
@@ -75,6 +78,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     shortName: 'Paper 1 General Aptitude Only',
     price: 149,
     originalPrice: 499,
+    paymentLink: 'https://rzp.io/rzp/5RjuNNp',
     badge: 'COMMON TO ALL STREAMS',
     badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
     isCombo: false,
@@ -89,6 +93,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     shortName: 'Paper 2 English Literature Only',
     price: 149,
     originalPrice: 499,
+    paymentLink: 'https://rzp.io/rzp/5RjuNNp',
     badge: 'ENGLISH STREAM SPECIALIST',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     isCombo: false,
@@ -103,6 +108,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     shortName: 'Paper 2 Education Discipline Only',
     price: 149,
     originalPrice: 499,
+    paymentLink: 'https://rzp.io/rzp/5RjuNNp',
     badge: 'EDUCATION STREAM SPECIALIST',
     badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
     isCombo: false,
@@ -119,6 +125,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     shortName: 'UGC NET English All-In-One Bundle',
     price: 499,
     originalPrice: 999,
+    paymentLink: 'https://rzp.io/rzp/locBUA0o',
     badge: 'ALL-IN-ONE COMPLETE BUNDLE',
     badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
     isCombo: true,
@@ -264,6 +271,12 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     }
   };
 
+  const handleRemoveCoupon = () => {
+    setAppliedDiscount(null);
+    setCouponCode('');
+    setCouponError(null);
+  };
+
   const handleInitiatePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -351,9 +364,26 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         return;
       }
 
-      // 4. Handle Direct Payment Link Flow (e.g. UGC NET ₹499 or dedicated GSET link)
-      if (orderData.paymentMode === 'payment_link' && orderData.paymentLinkUrl) {
-        setRedirectingUrl(orderData.paymentLinkUrl);
+      // 4. Handle Direct Payment Link Flow (e.g. ₹149 singles, ₹249 combos, or ₹499 UGC NET)
+      const targetPaymentLink = (orderData.paymentMode === 'payment_link' && orderData.paymentLinkUrl)
+        ? orderData.paymentLinkUrl
+        : (activeProduct.paymentLink && orderData.paymentMode !== 'api_checkout' ? activeProduct.paymentLink : null);
+
+      if (targetPaymentLink) {
+        let finalLinkUrl = targetPaymentLink;
+        try {
+          const u = new URL(targetPaymentLink);
+          if (cleanName && !u.searchParams.has('name')) u.searchParams.set('name', cleanName);
+          if (cleanEmail && !u.searchParams.has('email')) u.searchParams.set('email', cleanEmail);
+          if (cleanMobile && !u.searchParams.has('contact')) u.searchParams.set('contact', cleanMobile);
+          if (!u.searchParams.has('notes[product_id]')) u.searchParams.set('notes[product_id]', activeProduct.id);
+          if (!u.searchParams.has('notes[product_name]')) u.searchParams.set('notes[product_name]', activeProduct.name);
+          finalLinkUrl = u.toString();
+        } catch {
+          finalLinkUrl = targetPaymentLink;
+        }
+
+        setRedirectingUrl(finalLinkUrl);
         try {
           localStorage.setItem('netvidya_pending_checkout', JSON.stringify({
             name: cleanName,
@@ -366,7 +396,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           }));
         } catch {}
 
-        window.location.href = orderData.paymentLinkUrl;
+        window.location.href = finalLinkUrl;
         return;
       }
 
@@ -444,13 +474,15 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           modal: {
             ondismiss: function () {
               setIsProcessing(false);
+              setErrorMessage('Payment window was closed. Your selected package and details are preserved—click "Pay & Enroll" below whenever you are ready to complete your enrollment.');
             }
           }
         };
 
         const rzp = new window.Razorpay(options);
         rzp.on('payment.failed', function (resp: any) {
-          setErrorMessage(`Payment declined: ${resp.error?.description || 'Transaction incomplete.'}`);
+          const desc = resp.error?.description || 'Transaction was declined by your bank or UPI provider.';
+          setErrorMessage(`Payment not completed: ${desc}. Your form details are saved—you can retry with Google Pay, PhonePe, UPI QR code, or a different card.`);
           setIsProcessing(false);
         });
         rzp.open();
@@ -473,6 +505,32 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
 
       throw new Error('Online payment gateway is temporarily unreachable. Please contact student support.');
     } catch (err: any) {
+      if (activeProduct?.paymentLink) {
+        let fallbackUrl = activeProduct.paymentLink;
+        try {
+          const u = new URL(activeProduct.paymentLink);
+          if (cleanName && !u.searchParams.has('name')) u.searchParams.set('name', cleanName);
+          if (cleanEmail && !u.searchParams.has('email')) u.searchParams.set('email', cleanEmail);
+          if (cleanMobile && !u.searchParams.has('contact')) u.searchParams.set('contact', cleanMobile);
+          u.searchParams.set('notes[product_id]', activeProduct.id);
+          u.searchParams.set('notes[product_name]', activeProduct.name);
+          fallbackUrl = u.toString();
+        } catch {}
+        setRedirectingUrl(fallbackUrl);
+        try {
+          localStorage.setItem('netvidya_pending_checkout', JSON.stringify({
+            name: cleanName,
+            email: cleanEmail,
+            mobile: cleanMobile,
+            productId: activeProduct.id,
+            productName: activeProduct.name,
+            amount: finalPayablePrice,
+            orderId: `NV_${Date.now()}`
+          }));
+        } catch {}
+        window.location.href = fallbackUrl;
+        return;
+      }
       setErrorMessage(err.message || 'Unable to connect to payment gateway.');
       setIsProcessing(false);
     }
@@ -874,24 +932,56 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   <strong className="text-gray-900">{activeProduct.shortName}</strong>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Amount:</span>
+                  <span>Amount Paid:</span>
                   <strong className="text-emerald-700 font-bold">₹{finalPayablePrice} INR</strong>
+                </div>
+                <div className="flex justify-between text-gray-600 items-center">
+                  <span>Enrollment Status:</span>
+                  <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px]">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> VERIFIED &amp; UNLOCKED
+                  </span>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleCompleteSuccess}
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Open Student Dashboard &amp; Test Hall</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleCompleteSuccess}
+                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Open Student Dashboard &amp; Test Hall</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <p className="text-[11px] text-gray-500">
+                  A purchase confirmation email with your dashboard link has also been dispatched to your email.
+                </p>
+              </div>
             </div>
           ) : (
             /* CANDIDATE REGISTRATION & PAYMENT FORM */
             <form onSubmit={handleInitiatePayment} className="space-y-3.5">
+              {buyerSession.isLoggedIn ? (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0 pr-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="truncate">Signed in as: <strong className="text-emerald-950">{buyerSession.email}</strong></span>
+                  </div>
+                  <span className="text-[10px] uppercase font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded shrink-0">
+                    Verified Candidate
+                  </span>
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-amber-950">
+                    <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                    <span>Candidate Account Required</span>
+                  </div>
+                  <p className="text-amber-800 leading-relaxed text-[11px]">
+                    Create your portal password below or sign in to link your study materials and test hall access directly to your student account.
+                  </p>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Full Candidate Name *
@@ -980,27 +1070,43 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                     <span className="font-semibold text-gray-700">Scholarship / Referral Code</span>
                     <span className="text-[10px] text-gray-400 font-mono">Optional</span>
                   </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={e => setCouponCode(e.target.value.toUpperCase())}
-                      placeholder="e.g. GSET50 or NET100"
-                      className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono uppercase focus:ring-2 focus:ring-blue-600 outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleApplyCoupon}
-                      className="px-3 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-bold transition-colors"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  {appliedDiscount && (
-                    <p className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                      <span>{appliedDiscount.message} (Code: {appliedDiscount.code})</span>
-                    </p>
+                  {appliedDiscount ? (
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs">
+                      <div className="flex items-center gap-1.5 text-emerald-800 font-medium">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span><strong>{appliedDiscount.code}</strong>: {appliedDiscount.message}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        className="text-[11px] text-rose-600 hover:text-rose-800 underline font-medium cursor-pointer shrink-0 ml-2"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleApplyCoupon();
+                          }
+                        }}
+                        placeholder="e.g. GSET50 or NET100"
+                        className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono uppercase focus:ring-2 focus:ring-blue-600 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        className="px-3 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Apply
+                      </button>
+                    </div>
                   )}
                   {couponError && (
                     <p className="text-[10px] text-rose-600 font-medium">

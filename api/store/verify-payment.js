@@ -174,7 +174,8 @@ export default async function handler(req, res) {
         studentName: cleanName,
         orderId: finalOrderId,
         amount: amountPaid,
-        paymentId: razorpay_payment_id
+        paymentId: razorpay_payment_id,
+        productName: resolvedProductName
       });
     } catch (emailErr) {
       console.warn('Email dispatch warning:', emailErr);

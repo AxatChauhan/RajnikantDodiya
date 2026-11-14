@@ -83,6 +83,8 @@ export default async function handler(req, res) {
       sellerLine: settings.sellerLine,
       paymentMode: hasApiKeys ? 'api_checkout' : isPaymentLinkMode ? 'payment_link' : 'unconfigured',
       ...(isPaymentLinkMode ? { paymentLinkUrl } : {}),
+      paymentLinks: STORE_PAYMENT_DEFAULTS.paymentLinksByAmount,
+      paymentLinksByProduct: STORE_PAYMENT_DEFAULTS.paymentLinksByProduct,
       gsetProducts: GSET_PRODUCTS,
       ugcBundle: UGC_BUNDLE_PRODUCT,
       product: {
