@@ -257,7 +257,21 @@
         "releaseDate": "2026-12-05T00:00:00+05:30",
         "description": "The definitive final revision simulation before the university examination session."
       }
+    ],
+    "buyers": [
+      {
+        "id": "buy_nilam_dodiya",
+        "name": "Nilam Dodiya",
+        "email": "nilamdodiya21@gmail.com",
+        "mobile": "9974845911",
+        "orderId": "order_U01cA4TjQfPCD6",
+        "razorpayPaymentId": "pay_U01dCsc7irC6LP",
+        "amountPaid": 499,
+        "paymentMethod": "upi_qr",
+        "enrolledAt": "2026-11-14T10:39:06.000Z",
+        "isActive": true
+      }
     ]
   },
-  "syncedAt": "2026-11-14T10:40:09.785Z"
+  "syncedAt": "2026-11-14T11:20:44.160Z"
 }

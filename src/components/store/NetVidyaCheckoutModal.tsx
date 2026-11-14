@@ -169,7 +169,6 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
 
   // Exam and Pack selection state
   const [selectedExam, setSelectedExam] = useState<ExamType>(initialExam);
-  const [selectedStream, setSelectedStream] = useState<GsetStream>('english');
   const [selectedProductId, setSelectedProductId] = useState<string>(() => {
     if (initialProductId) return initialProductId;
     if (initialExam === 'gset') return 'gset-english-combo';
@@ -197,10 +196,8 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       if (initialExam) setSelectedExam(initialExam);
       if (initialProductId) {
         setSelectedProductId(initialProductId);
-        if (initialProductId.includes('education')) setSelectedStream('education');
-        else if (initialProductId.includes('english')) setSelectedStream('english');
       } else if (initialExam === 'gset') {
-        setSelectedProductId(selectedStream === 'education' ? 'gset-education-combo' : 'gset-english-combo');
+        setSelectedProductId('gset-english-combo');
       } else {
         setSelectedProductId('ugc-net-english-bundle');
       }
@@ -225,30 +222,10 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       : CHECKOUT_PRODUCTS.find(p => p.id === 'ugc-net-english-bundle')!;
   }, [selectedProductId, selectedExam]);
 
-  // Filter GSET products according to chosen stream
-  const streamGsetProducts = useMemo(() => {
-    return CHECKOUT_PRODUCTS.filter(p => {
-      if (p.exam !== 'gset') return false;
-      if (selectedStream === 'all') return true;
-      if (p.stream === 'general') return true; // Paper 1 is common
-      return p.stream === selectedStream;
-    });
-  }, [selectedStream]);
-
-  // Handle stream toggle
-  const handleStreamChange = (stream: GsetStream) => {
-    setSelectedStream(stream);
-    // Switch to corresponding combo
-    if (stream === 'education') {
-      if (selectedProductId === 'gset-english-combo' || selectedProductId === 'gset-paper2-english') {
-        setSelectedProductId('gset-education-combo');
-      }
-    } else if (stream === 'english') {
-      if (selectedProductId === 'gset-education-combo' || selectedProductId === 'gset-paper2-education') {
-        setSelectedProductId('gset-english-combo');
-      }
-    }
-  };
+  // All GSET products
+  const gsetProducts = useMemo(() => {
+    return CHECKOUT_PRODUCTS.filter(p => p.exam === 'gset');
+  }, []);
 
   // Base price and final payable calculation
   // Strict rule: GSET max combo is ₹249, singles are ₹149. UGC bundle is ₹499.
@@ -597,7 +574,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               type="button"
               onClick={() => {
                 setSelectedExam('gset');
-                setSelectedProductId(selectedStream === 'education' ? 'gset-education-combo' : 'gset-english-combo');
+                setSelectedProductId('gset-english-combo');
                 setErrorMessage(null);
               }}
               className={`py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
@@ -631,85 +608,22 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         {/* Scrollable Content Body */}
         <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
 
-          {/* GSET STREAM & PACK SELECTION SECTION */}
+          {/* GSET PACK SELECTION SECTION */}
           {selectedExam === 'gset' && (
             <div className="space-y-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">
-                    Step 1: Choose Your Qualifying Stream
+                    Select Your Enrollment Pack
                   </span>
                   <p className="text-[11px] text-gray-500">
-                    English Literature &amp; Teacher Education are separate streams and exams.
+                    Choose from all-inclusive duos (₹249) or standalone single papers (₹149).
                   </p>
                 </div>
               </div>
 
-              {/* Stream Switcher Pills */}
-              <div className="grid grid-cols-3 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleStreamChange('english')}
-                  className={`p-2 rounded-xl border text-center transition-all ${
-                    selectedStream === 'english'
-                      ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold shadow-2xs ring-1 ring-emerald-400'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-1 text-xs">
-                    <span>English Stream</span>
-                    {selectedStream === 'english' && <Check className="w-3 h-3 text-emerald-600" />}
-                  </div>
-                  <p className="text-[9px] text-emerald-800 font-normal mt-0.5">
-                    Paper 1 + English (₹249)
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleStreamChange('education')}
-                  className={`p-2 rounded-xl border text-center transition-all ${
-                    selectedStream === 'education'
-                      ? 'bg-purple-50 border-purple-400 text-purple-950 font-bold shadow-2xs ring-1 ring-purple-400'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-1 text-xs">
-                    <span>Education Stream</span>
-                    {selectedStream === 'education' && <Check className="w-3 h-3 text-purple-600" />}
-                  </div>
-                  <p className="text-[9px] text-purple-800 font-normal mt-0.5">
-                    Paper 1 + Education (₹249)
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleStreamChange('all')}
-                  className={`p-2 rounded-xl border text-center transition-all ${
-                    selectedStream === 'all'
-                      ? 'bg-blue-50 border-blue-400 text-blue-950 font-bold shadow-2xs ring-1 ring-blue-400'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-1 text-xs">
-                    <span>All Packs</span>
-                    {selectedStream === 'all' && <Check className="w-3 h-3 text-blue-600" />}
-                  </div>
-                  <p className="text-[9px] text-blue-800 font-normal mt-0.5">
-                    Both Combos &amp; Singles
-                  </p>
-                </button>
-              </div>
-
-              {/* PACK SELECTION CARDS (REQUIRE USER TO SELECT A PACK) */}
-              <div className="pt-2">
-                <label className="block text-xs font-bold text-gray-900 uppercase tracking-wide mb-2">
-                  Step 2: Select Your Enrollment Pack (Single ₹149 or Duo ₹249)
-                </label>
-
-                <div className="space-y-2">
-                  {streamGsetProducts.map((pack) => {
+              <div className="space-y-2">
+                {gsetProducts.map((pack) => {
                     const isSelected = selectedProductId === pack.id;
                     return (
                       <div
@@ -771,7 +685,6 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   })}
                 </div>
               </div>
-            </div>
           )}
 
           {/* UGC NET SELECTION SECTION */}

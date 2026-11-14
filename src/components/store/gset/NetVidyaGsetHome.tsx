@@ -41,7 +41,6 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
   onOpenDemoTest,
   currentServerPrice
 }) => {
-  const [selectedStream, setSelectedStream] = useState<'english' | 'education'>('english');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const englishCombo: GsetProductItem = {
@@ -81,61 +80,6 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     ],
     isCombo: true
   };
-
-  const standalonePacks: GsetProductItem[] = [
-    {
-      id: 'gset-paper1',
-      name: 'GSET Paper 1: General Aptitude Foundation Pack',
-      stream: 'general',
-      price: 149,
-      originalPrice: 499,
-      badge: 'COMMON TO ALL STREAMS',
-      description: 'Master all 10 general units: Teaching Aptitude, Research Methodology, Comprehension, Mathematical & Logical Reasoning, ICT, and Higher Education.',
-      features: [
-        '3 Full Computer-Based CBT Mock Exams (50 Qs each)',
-        '10 Core Foundation Units High-Yield Coverage',
-        'Bilingual Gujarati/English interface & explanations',
-        'Digital Access valid till 31 Dec 2026'
-      ]
-    },
-    ...(selectedStream === 'english'
-      ? [
-          {
-            id: 'gset-paper2-english',
-            name: 'GSET Paper 2: English Literature Specialist Pack',
-            stream: 'english' as const,
-            price: 149,
-            originalPrice: 499,
-            badge: 'ENGLISH SUBJECT SPECIALIST',
-            description: 'Focused exclusively on Paper 2 English Literature, Literary Criticism & Theory, Post-Method Pedagogy, and ELT in India.',
-            features: [
-              '2 Full Literature & Pedagogy CBT Mock Exams (100 Qs each)',
-              'Chaucer to Contemporary World Literature Breakdown',
-              'Literary Theory, Structuralism & Cultural Studies Guide',
-              'Digital Access valid till 31 Dec 2026'
-            ]
-          }
-        ]
-      : [
-          {
-            id: 'gset-paper2-education',
-            name: 'GSET Paper 2: Education Discipline Master Pack',
-            stream: 'education' as const,
-            price: 149,
-            originalPrice: 499,
-            badge: 'EDUCATION SUBJECT SPECIALIST',
-            description: 'Focused exclusively on Paper 2 Education: Philosophy, Psychology, Learner Development, Teacher Training, and Educational Research.',
-            features: [
-              '3 Full Education Discipline CBT Mock Exams (100 Qs each)',
-              'Western & Indian Philosophical Systems in Education',
-              'Teacher Education Models & Policy Reforms (NEP 2020)',
-              'Digital Access valid till 31 Dec 2026'
-            ]
-          }
-        ])
-  ];
-
-  const activeCombo = selectedStream === 'english' ? englishCombo : educationCombo;
 
   const gsetFaqs = [
     {
@@ -214,58 +158,13 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
             </p>
           </div>
         </div>
-
-        {/* 2. DISCIPLINE / STREAM SELECTOR */}
-        <div className="max-w-2xl mx-auto pt-4 space-y-3">
-          <div className="text-center space-y-1">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-bold">
-              Step 1: Choose Your Examination Subject Stream
-            </span>
-            <p className="text-xs text-gray-500">
-              Select your subject to view tailored Paper 1 and Paper 2 package offerings
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 p-1.5 bg-gray-100/80 rounded-2xl border border-gray-200">
-            <button
-              onClick={() => setSelectedStream('english')}
-              className={`py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-2 ${
-                selectedStream === 'english'
-                  ? 'bg-white text-emerald-900 shadow-sm border border-emerald-200'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
-              }`}
-            >
-              <BookOpen className="w-4 h-4 text-emerald-700" />
-              <span>English Literature Stream</span>
-            </button>
-            <button
-              onClick={() => setSelectedStream('education')}
-              className={`py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-2 ${
-                selectedStream === 'education'
-                  ? 'bg-white text-emerald-900 shadow-sm border border-emerald-200'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
-              }`}
-            >
-              <GraduationCap className="w-4 h-4 text-teal-700" />
-              <span>Education (Pedagogy) Stream</span>
-            </button>
-          </div>
-
-          {/* Stream Distinction Notice */}
-          <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs flex items-center gap-2.5">
-            <span className="shrink-0 w-2 h-2 rounded-full bg-amber-500" />
-            <p className="leading-relaxed">
-              <strong>Distinct Subject Streams:</strong> English Literature and Teacher Education are two separate qualification disciplines with completely different Paper 2 examinations. Paper 1 General Aptitude is common to both.
-            </p>
-          </div>
-        </div>
       </section>
 
-      {/* 3. PACKAGES & PRICING DISPLAY */}
+      {/* 2. PACKAGES & PRICING DISPLAY */}
       <section className="max-w-5xl mx-auto px-4 space-y-8">
         <div className="text-center space-y-1">
           <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-800 font-bold">
-            Step 2: Select Your Preferred Package
+            Select Your Examination Package
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
             GSET 2026 Examination Packages
@@ -289,11 +188,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* 1. English Scholar Duo (₹249) */}
-            <div className={`rounded-3xl p-6 sm:p-7 border-2 shadow-lg relative flex flex-col justify-between transition-all ${
-              selectedStream === 'english'
-                ? 'bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-white border-emerald-500 ring-2 ring-emerald-500/20'
-                : 'bg-white border-gray-200 hover:border-emerald-300'
-            }`}>
+            <div className="rounded-3xl p-6 sm:p-7 border-2 border-emerald-400 hover:border-emerald-600 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-white shadow-lg hover:shadow-xl relative flex flex-col justify-between transition-all">
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
@@ -347,11 +242,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
             </div>
 
             {/* 2. Education Scholar Duo (₹249) */}
-            <div className={`rounded-3xl p-6 sm:p-7 border-2 shadow-lg relative flex flex-col justify-between transition-all ${
-              selectedStream === 'education'
-                ? 'bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-white border-purple-500 ring-2 ring-purple-500/20'
-                : 'bg-white border-gray-200 hover:border-purple-300'
-            }`}>
+            <div className="rounded-3xl p-6 sm:p-7 border-2 border-purple-400 hover:border-purple-600 bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-white shadow-lg hover:shadow-xl relative flex flex-col justify-between transition-all">
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-300">
@@ -490,7 +381,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
         </div>
       </section>
 
-      {/* 3.5 GSET 2026 LIVE CBT EXAMINATION HALL */}
+      {/* 3. GSET 2026 LIVE CBT EXAMINATION HALL */}
       <section className="max-w-5xl mx-auto px-4 space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
@@ -498,9 +389,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
             <span>Interactive CBT Test Hall</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-            {selectedStream === 'english'
-              ? 'GSET English Examination Simulators'
-              : 'GSET Education Examination Simulators'}
+            GSET 2026 Examination Simulators
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Authentic computer-based examination interface replicating the official MSU Baroda GSET pattern: real-time timer, bilingual question palette, and instant diagnostic rationales.
@@ -575,80 +464,46 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
           </div>
         </div>
 
-        {/* Part B: Paper 2 Subject Stream Tests */}
+        {/* Part B: Paper 2 English Literature Specialist Tests */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
             <div>
-              <span className="text-[10px] font-mono uppercase bg-blue-50 text-blue-800 font-bold px-2.5 py-0.5 rounded-full border border-blue-200">
-                {selectedStream === 'english'
-                  ? 'Paper 2 • English Literature Specialist'
-                  : 'Paper 2 • Education Discipline Specialist'}
+              <span className="text-[10px] font-mono uppercase bg-emerald-50 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Paper 2 • English Literature Specialist
               </span>
               <h3 className="text-lg font-bold text-gray-900 mt-1">
-                {selectedStream === 'english'
-                  ? 'Paper 2: English Literature, Criticism, Theory & ELT'
-                  : 'Paper 2: Education, Teacher Training & Pedagogical Foundations'}
+                Paper 2: English Literature, Criticism, Theory & ELT
               </h3>
             </div>
-            <span className="text-xs text-gray-500 font-mono">
-              {selectedStream === 'english' ? '2 Full CBT Mocks' : '3 Full CBT Mocks'}
-            </span>
+            <span className="text-xs text-gray-500 font-mono">2 Full CBT Mocks</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {(selectedStream === 'english'
-              ? [
-                  {
-                    id: 'p2-eng-m1',
-                    title: 'GSET English Paper 2 — CBT Mock 01',
-                    file: 'GSET_English_Paper2_Mock01_CBT.html',
-                    qs: 100,
-                    mins: 120,
-                    desc: 'Chaucer to Modern English Poetry, Drama, Fiction, Post-Method Pedagogy & ELT in India.'
-                  },
-                  {
-                    id: 'p2-eng-m3',
-                    title: 'GSET English Paper 2 — CBT Mock 03',
-                    file: 'GSET_English_Paper2_Mock03_CBT.html',
-                    qs: 100,
-                    mins: 120,
-                    desc: 'Literary Criticism, Structuralism to Deconstruction, Cultural Studies & MLA 9th Research.'
-                  }
-                ]
-              : [
-                  {
-                    id: 'p2-edu-m1',
-                    title: 'GSET Education Paper 2 — CBT Mock 01',
-                    file: 'GSET_Paper2_Education_Mock01_CBT.html',
-                    qs: 100,
-                    mins: 120,
-                    desc: 'Philosophical & Sociological Foundations, Western & Indian thinkers, Curriculum Studies.'
-                  },
-                  {
-                    id: 'p2-edu-m2',
-                    title: 'GSET Education Paper 2 — CBT Mock 02',
-                    file: 'GSET_Paper2_Education_Mock02_CBT.html',
-                    qs: 100,
-                    mins: 120,
-                    desc: 'Psychology of Learner, Teacher Education Reforms (NEP 2020) & Educational Research.'
-                  },
-                  {
-                    id: 'p2-edu-m3',
-                    title: 'GSET Education Paper 2 — CBT Mock 03',
-                    file: 'GSET_Paper2_Education_Mock03_CBT.html',
-                    qs: 100,
-                    mins: 120,
-                    desc: 'Educational Technology, Special & Inclusive Education, Assessment & Evaluative Heuristics.'
-                  }
-                ]
-            ).map(test => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              {
+                id: 'p2-eng-m1',
+                title: 'GSET English Paper 2 — CBT Mock 01',
+                file: 'GSET_English_Paper2_Mock01_CBT.html',
+                qs: 100,
+                mins: 120,
+                desc: 'Chaucer to Modern English Poetry, Drama, Fiction, Post-Method Pedagogy & ELT in India.'
+              },
+              {
+                id: 'p2-eng-m3',
+                title: 'GSET English Paper 2 — CBT Mock 03',
+                file: 'GSET_English_Paper2_Mock03_CBT.html',
+                qs: 100,
+                mins: 120,
+                desc: 'Literary Criticism, Structuralism to Deconstruction, Cultural Studies & MLA 9th Research.'
+              }
+            ].map(test => (
               <div
                 key={test.id}
-                className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4 hover:border-blue-300 hover:bg-blue-50/30 transition-all shadow-2xs"
+                className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all shadow-2xs"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-blue-800 bg-blue-100/70 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded">
                       {test.qs} Qs • {test.mins} Min
                     </span>
                     <span className="text-[10px] font-mono text-gray-500">100% CBT</span>
@@ -659,7 +514,75 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
 
                 <button
                   onClick={() => window.open(`/study-vault/gset/tests/${test.file}`, '_blank')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Launch CBT Exam</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Part C: Paper 2 Education Discipline Specialist Tests */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+            <div>
+              <span className="text-[10px] font-mono uppercase bg-purple-50 text-purple-800 font-bold px-2.5 py-0.5 rounded-full border border-purple-200">
+                Paper 2 • Education Discipline Specialist
+              </span>
+              <h3 className="text-lg font-bold text-gray-900 mt-1">
+                Paper 2: Education, Teacher Training & Pedagogical Foundations
+              </h3>
+            </div>
+            <span className="text-xs text-gray-500 font-mono">3 Full CBT Mocks</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                id: 'p2-edu-m1',
+                title: 'GSET Education Paper 2 — CBT Mock 01',
+                file: 'GSET_Paper2_Education_Mock01_CBT.html',
+                qs: 100,
+                mins: 120,
+                desc: 'Philosophical & Sociological Foundations, Western & Indian thinkers, Curriculum Studies.'
+              },
+              {
+                id: 'p2-edu-m2',
+                title: 'GSET Education Paper 2 — CBT Mock 02',
+                file: 'GSET_Paper2_Education_Mock02_CBT.html',
+                qs: 100,
+                mins: 120,
+                desc: 'Psychology of Learner, Teacher Education Reforms (NEP 2020) & Educational Research.'
+              },
+              {
+                id: 'p2-edu-m3',
+                title: 'GSET Education Paper 2 — CBT Mock 03',
+                file: 'GSET_Paper2_Education_Mock03_CBT.html',
+                qs: 100,
+                mins: 120,
+                desc: 'Educational Technology, Special & Inclusive Education, Assessment & Evaluative Heuristics.'
+              }
+            ].map(test => (
+              <div
+                key={test.id}
+                className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4 hover:border-purple-300 hover:bg-purple-50/30 transition-all shadow-2xs"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-purple-800 bg-purple-100/70 px-2 py-0.5 rounded">
+                      {test.qs} Qs • {test.mins} Min
+                    </span>
+                    <span className="text-[10px] font-mono text-gray-500">100% CBT</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-900 leading-snug">{test.title}</h4>
+                  <p className="text-[11px] text-gray-600 leading-relaxed">{test.desc}</p>
+                </div>
+
+                <button
+                  onClick={() => window.open(`/study-vault/gset/tests/${test.file}`, '_blank')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
                   <span>Launch CBT Exam</span>

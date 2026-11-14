@@ -28,7 +28,14 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
   onOpenPolicies,
   onOpenLogin
 }) => {
-  const { buyerSession, logoutBuyer, readingFiles, tests, currentServerPrice } = useNetVidyaStore();
+  const {
+    buyerSession,
+    logoutBuyer,
+    readingFiles,
+    tests,
+    currentServerPrice,
+    verifyPaymentAndActivate
+  } = useNetVidyaStore();
 
   const [activeTab, setActiveTab] = useState<'reading' | 'tests'>('tests');
   const [activeTestToRun, setActiveTestToRun] = useState<TestHallItem | null>(null);
@@ -36,6 +43,23 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
   const [downloadNotice, setDownloadNotice] = useState<string | null>(null);
   const [testNotice, setTestNotice] = useState<string | null>(null);
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+
+  // Instant Activation state
+  const [activationInput, setActivationInput] = useState('');
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationMsg, setActivationMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Background auto-verification for logged-in candidates who completed payment
+  React.useEffect(() => {
+    if (!buyerSession.isBuyer && buyerSession.email) {
+      verifyPaymentAndActivate({ email: buyerSession.email }).then(res => {
+        if (res.success) {
+          setDownloadNotice(res.message || 'Payment verified! Materials unlocked.');
+          setTimeout(() => setDownloadNotice(null), 5000);
+        }
+      });
+    }
+  }, [buyerSession.isBuyer, buyerSession.email, verifyPaymentAndActivate]);
 
   // Student progress tracking in localStorage
   const [completedItems, setCompletedItems] = useState<{ files: string[]; tests: string[]; lastItem?: string }>(() => {
@@ -90,6 +114,58 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
           >
             Enroll Now (Early-Bird ₹{currentServerPrice})
           </button>
+        </div>
+
+        {/* Quick Activation for Paid Visitors */}
+        <div className="pt-6 border-t border-gray-100 text-left max-w-md mx-auto">
+          <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200/90 space-y-2.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-gray-900">
+              <Sparkles className="w-4 h-4 text-blue-700 shrink-0" />
+              <span>Already Paid? Instant Activation</span>
+            </div>
+            <p className="text-[11px] text-gray-600">
+              Enter your registered Email or Razorpay Payment ID (<code className="font-mono text-blue-700 font-bold">pay_...</code>) to unlock your dashboard:
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                value={activationInput}
+                onChange={(e) => setActivationInput(e.target.value)}
+                placeholder="e.g. nilamdodiya21@gmail.com or pay_..."
+                className="flex-1 px-3 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+              />
+              <button
+                onClick={async () => {
+                  if (!activationInput.trim()) return;
+                  setIsActivating(true);
+                  setActivationMsg(null);
+                  const isEmail = activationInput.includes('@');
+                  const res = await verifyPaymentAndActivate({
+                    paymentId: isEmail ? undefined : activationInput.trim(),
+                    email: isEmail ? activationInput.trim() : undefined
+                  });
+                  setIsActivating(false);
+                  if (res.success) {
+                    setActivationMsg({ type: 'success', text: res.message || 'Access unlocked!' });
+                  } else {
+                    setActivationMsg({ type: 'error', text: res.error || 'Could not verify payment.' });
+                  }
+                }}
+                disabled={isActivating || !activationInput.trim()}
+                className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white text-xs font-bold transition-all shrink-0"
+              >
+                {isActivating ? 'Verifying...' : 'Unlock Materials'}
+              </button>
+            </div>
+            {activationMsg && (
+              <div className={`p-2 rounded-xl text-xs flex items-center gap-2 ${
+                activationMsg.type === 'success' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'
+              }`}>
+                {activationMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                <span>{activationMsg.text}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -173,17 +249,102 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
             </div>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={onOpenCheckout}
-              className="px-8 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all inline-flex items-center justify-center gap-2"
             >
               <span>Enroll Now for ₹{currentServerPrice}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-            <p className="text-[11px] text-gray-400 mt-2">
-              Instant activation • 100% digital access delivered immediately.
-            </p>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1">
+            Instant activation • 100% digital access delivered immediately.
+          </p>
+
+          {/* Already Paid / Instant Self-Service Activation */}
+          <div className="mt-8 border-t border-gray-100 pt-6 text-left max-w-xl mx-auto">
+            <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-3">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">
+                    Already Made Payment via UPI / QR / Card?
+                  </h3>
+                  <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                    If you paid via Google Pay, PhonePe, UPI QR code, or Razorpay, activate your access immediately without paying again.
+                  </p>
+                </div>
+              </div>
+
+              {buyerSession.email && (
+                <div className="pt-1">
+                  <button
+                    onClick={async () => {
+                      setIsActivating(true);
+                      setActivationMsg(null);
+                      const res = await verifyPaymentAndActivate({ email: buyerSession.email });
+                      setIsActivating(false);
+                      if (res.success) {
+                        setActivationMsg({ type: 'success', text: res.message || 'Access unlocked!' });
+                      } else {
+                        setActivationMsg({ type: 'error', text: res.error || 'Verification failed.' });
+                      }
+                    }}
+                    disabled={isActivating}
+                    className="w-full py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2"
+                  >
+                    {isActivating ? 'Verifying with Razorpay...' : `Verify Payment for ${buyerSession.email}`}
+                  </button>
+                </div>
+              )}
+
+              <div className="pt-2">
+                <label className="text-[11px] font-semibold text-gray-700 block mb-1">
+                  Or enter your Razorpay Payment ID (<code className="font-mono text-blue-700 font-bold">pay_...</code> from UPI/SMS):
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={activationInput}
+                    onChange={(e) => setActivationInput(e.target.value)}
+                    placeholder="e.g. pay_U01dCsc7irC6LP or email"
+                    className="flex-1 px-3 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!activationInput.trim()) return;
+                      setIsActivating(true);
+                      setActivationMsg(null);
+                      const isEmail = activationInput.includes('@');
+                      const res = await verifyPaymentAndActivate({
+                        paymentId: isEmail ? undefined : activationInput.trim(),
+                        email: isEmail ? activationInput.trim() : undefined
+                      });
+                      setIsActivating(false);
+                      if (res.success) {
+                        setActivationMsg({ type: 'success', text: res.message || 'Access unlocked!' });
+                      } else {
+                        setActivationMsg({ type: 'error', text: res.error || 'Could not verify payment.' });
+                      }
+                    }}
+                    disabled={isActivating || !activationInput.trim()}
+                    className="px-4 py-2 rounded-xl bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white text-xs font-bold transition-all shrink-0"
+                  >
+                    {isActivating ? 'Verifying...' : 'Activate Access'}
+                  </button>
+                </div>
+              </div>
+
+              {activationMsg && (
+                <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
+                  activationMsg.type === 'success' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'
+                }`}>
+                  {activationMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  <span>{activationMsg.text}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

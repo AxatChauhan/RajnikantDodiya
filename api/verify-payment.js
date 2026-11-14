@@ -63,41 +63,55 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
 
-    if (!keySecret) {
-      return res.status(500).json({
-        success: false,
-        error: 'RAZORPAY_KEY_SECRET is not configured on server environment.'
-      });
-    }
-
-    if (!razorpay_payment_id || !razorpay_signature) {
+    if (!razorpay_payment_id) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required Razorpay payment verification parameters.'
+        error: 'Missing required Razorpay payment ID parameter.'
       });
     }
 
-    // Cryptographic signature check: HMAC-SHA256(order_id + '|' + payment_id, secret)
-    const payload = razorpay_order_id
-      ? `${razorpay_order_id}|${razorpay_payment_id}`
-      : razorpay_payment_id;
+    let isValid = false;
 
-    const expectedSignature = crypto
-      .createHmac('sha256', keySecret)
-      .update(payload)
-      .digest('hex');
+    // Method 1: Cryptographic HMAC-SHA256 signature check
+    if (keySecret && razorpay_signature) {
+      const payload = razorpay_order_id
+        ? `${razorpay_order_id}|${razorpay_payment_id}`
+        : razorpay_payment_id;
 
-    const expectedBuf = Buffer.from(expectedSignature, 'utf8');
-    const receivedBuf = Buffer.from(razorpay_signature, 'utf8');
+      const expectedSignature = crypto
+        .createHmac('sha256', keySecret)
+        .update(payload)
+        .digest('hex');
 
-    const isValid = expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf);
+      const expectedBuf = Buffer.from(expectedSignature, 'utf8');
+      const receivedBuf = Buffer.from(razorpay_signature, 'utf8');
+
+      isValid = expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf);
+    }
+
+    // Method 2: Direct Razorpay API verification for payment ID
+    if (!isValid && keyId && keySecret && razorpay_payment_id) {
+      try {
+        const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+        const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
+          headers: { Authorization: `Basic ${auth}` }
+        });
+        if (rzpRes.ok) {
+          const rzpData = await rzpRes.json();
+          if (rzpData.status === 'captured') {
+            isValid = true;
+          }
+        }
+      } catch {}
+    }
 
     if (!isValid) {
       return res.status(400).json({
         success: false,
         verified: false,
-        error: 'Security Alert: Razorpay signature mismatch. Payment tampering detected.'
+        error: 'Security Alert: Payment verification failed or signature mismatch.'
       });
     }
 

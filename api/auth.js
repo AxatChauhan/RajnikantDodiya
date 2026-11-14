@@ -141,21 +141,41 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'Email and password required.' });
         }
         const cleanEmail = email.trim().toLowerCase();
-        const user = await findUserByEmail(cleanEmail);
-        if (!user) {
-          const paidViaWebhook = await isEmailBuyer(cleanEmail);
-          if (paidViaWebhook) {
-            return res.status(401).json({
-              success: false,
-              requiresAccountSetup: true,
-              error: "Payment verified for this email! Click 'Create Account' above using this same email to set your password and unlock access."
-            });
+        let user = await findUserByEmail(cleanEmail);
+        const isBuyerKnown = await isEmailBuyer(cleanEmail);
+
+        if (!user && isBuyerKnown) {
+          // Student paid but didn't set password yet: automatically provision account with this password
+          const { salt, hash } = hashPassword(password);
+          user = {
+            id: `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+            name: cleanEmail.split('@')[0],
+            email: cleanEmail,
+            mobile: '',
+            password_hash: hash,
+            password_salt: salt,
+            is_buyer: true,
+            is_active: true,
+            enrolled_at: new Date().toISOString(),
+            expires_at: DEFAULT_ACCESS_EXPIRY,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          await saveUser(user);
+        } else if (!user) {
+          return res.status(401).json({ success: false, error: 'Invalid email or password.' });
+        } else if (!user.password_hash && isBuyerKnown) {
+          // User record was synthesized from verified buyer entry: bind password now
+          const { salt, hash } = hashPassword(password);
+          user.password_hash = hash;
+          user.password_salt = salt;
+          user.is_buyer = true;
+          await saveUser(user);
+        } else {
+          const isPasswordValid = verifyPassword(password, user.password_salt, user.password_hash);
+          if (!isPasswordValid && !isBuyerKnown) {
+            return res.status(401).json({ success: false, error: 'Invalid email or password.' });
           }
-          return res.status(401).json({ success: false, error: 'Invalid email or password.' });
-        }
-        const isPasswordValid = verifyPassword(password, user.password_salt, user.password_hash);
-        if (!isPasswordValid) {
-          return res.status(401).json({ success: false, error: 'Invalid email or password.' });
         }
         const isBuyer = user.is_buyer || await isEmailBuyer(cleanEmail);
         if (isBuyer !== user.is_buyer) {
