@@ -260,18 +260,19 @@
     ],
     "buyers": [
       {
-        "id": "buy_nilam_dodiya",
+        "id": "usr_nilam_dodiya",
         "name": "Nilam Dodiya",
         "email": "nilamdodiya21@gmail.com",
-        "mobile": "9974845911",
-        "orderId": "order_U01cA4TjQfPCD6",
-        "razorpayPaymentId": "pay_U01dCsc7irC6LP",
+        "mobile": "+919974845911",
+        "product": "UGC NET English Complete Preparation Bundle (2026 Edition)",
+        "productId": "ugc-net-bundle",
         "amountPaid": 499,
-        "paymentMethod": "upi_qr",
-        "enrolledAt": "2026-11-14T10:39:06.000Z",
-        "isActive": true
+        "enrolledAt": "2026-11-14T10:39:06Z",
+        "orderId": "order_U01cA4TjQfPCD6",
+        "paymentId": "pay_U01dCsc7irC6LP",
+        "status": "captured"
       }
     ]
   },
-  "syncedAt": "2026-11-14T11:20:44.160Z"
+  "syncedAt": "2026-11-14T11:27:22.820Z"
 }

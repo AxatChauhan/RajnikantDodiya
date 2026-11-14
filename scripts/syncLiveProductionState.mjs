@@ -55,9 +55,41 @@ async function syncLiveState() {
       } catch {}
     }
 
+    const existingBuyers = Array.isArray(existing?.store?.buyers) ? existing.store.buyers : [];
+    const liveBuyers = Array.isArray(liveState?.store?.buyers) ? liveState.store.buyers : [];
+    
+    // Seed verified buyers
+    const verifiedSeed = [
+      {
+        id: 'usr_nilam_dodiya',
+        name: 'Nilam Dodiya',
+        email: 'nilamdodiya21@gmail.com',
+        mobile: '+919974845911',
+        product: 'UGC NET English Complete Preparation Bundle (2026 Edition)',
+        productId: 'ugc-net-bundle',
+        amountPaid: 499,
+        enrolledAt: '2026-11-14T10:39:06Z',
+        orderId: 'order_U01cA4TjQfPCD6',
+        paymentId: 'pay_U01dCsc7irC6LP',
+        status: 'captured'
+      }
+    ];
+
+    const buyersMap = new Map();
+    for (const b of [...verifiedSeed, ...existingBuyers, ...liveBuyers]) {
+      if (b && (b.email || b.id)) {
+        buyersMap.set((b.email || b.id).toLowerCase(), b);
+      }
+    }
+
     const merged = {
       ...existing,
       ...liveState,
+      store: {
+        ...(existing.store || {}),
+        ...(liveState.store || {}),
+        buyers: Array.from(buyersMap.values())
+      },
       syncedAt: new Date().toISOString()
     };
 
