@@ -887,7 +887,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
 
         {/* Footer */}
         <div className="border-t border-gray-200 pt-3 flex items-center justify-between text-xs text-gray-500 shrink-0">
-          <span>Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.</span>
+          <span>Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.</span>
           <div className="flex items-center gap-2">
             <button
               onClick={adminLogout}

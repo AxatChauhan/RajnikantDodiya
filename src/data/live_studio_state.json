@@ -133,7 +133,7 @@
       "standardPrice": 499,
       "earlyBirdCutoff": "2026-11-10T23:59:59+05:30",
       "accessExpiryDate": "2026-12-31T23:59:59+05:30",
-      "sellerLine": "Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.",
+      "sellerLine": "Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.",
       "supportEmail": "netvidyaenglish@gmail.com",
       "supportPhone": "+919638716634"
     },
@@ -258,21 +258,7 @@
         "description": "The definitive final revision simulation before the university examination session."
       }
     ],
-    "buyers": [
-      {
-        "id": "usr_nilam_dodiya",
-        "name": "Nilam Dodiya",
-        "email": "nilamdodiya21@gmail.com",
-        "mobile": "+919974845911",
-        "product": "UGC NET English Complete Preparation Bundle (2026 Edition)",
-        "productId": "ugc-net-bundle",
-        "amountPaid": 499,
-        "enrolledAt": "2026-11-14T10:39:06Z",
-        "orderId": "order_U01cA4TjQfPCD6",
-        "paymentId": "pay_U01dCsc7irC6LP",
-        "status": "captured"
-      }
-    ]
+    "buyers": []
   },
-  "syncedAt": "2026-11-14T11:35:57.051Z"
+  "syncedAt": "2026-11-14T11:58:00.230Z"
 }

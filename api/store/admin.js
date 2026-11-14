@@ -103,7 +103,6 @@ export default async function handler(req, res) {
         'dr_rajnikant_admin_2026',
         'admin123',
         '2026',
-        'nilam2026',
         'rajnikant2026'
       ].filter(Boolean);
 

@@ -270,7 +270,7 @@ export function generate25QuestionMiniMockPdf() {
   doc.addHeading('NET Vidya English: 25-Question Mini Mock Examination', 16, [0.086, 0.165, 0.271]);
   doc.addSubHeading('Paper II English Literature & Cultural Studies • Diagnostic Benchmark Test', 11, [0.2, 0.35, 0.6]);
   doc.addParagraph(
-    'Curated by Dr. Rajnikant Dodiya (Ph.D., 2× NET & GSET Qualified). Sold by NET Vidya (Proprietor: Nilam Dodiya). This public sample contains 25 authentic examination-standard multiple-choice questions with answer key representing the actual syllabus domains of UGC NET / GSET 2026.',
+    'Curated by Dr. Rajnikant Dodiya (Ph.D., 2× NET & GSET Qualified). Sold by NET Vidya. This public sample contains 25 authentic examination-standard multiple-choice questions with answer key representing the actual syllabus domains of UGC NET / GSET 2026.',
     'F3', 8.5, [0.35, 0.35, 0.35], 11
   );
   doc.currentPage.y -= 8;
@@ -561,7 +561,7 @@ export function generateModelAnswersSamplePdf() {
   doc.addHeading('NET Vidya English: Model Answers & Pedagogical Rationales', 16, [0.086, 0.165, 0.271]);
   doc.addSubHeading('Comprehensive Distractor Analysis & Syllabus Mapping Dossier', 11, [0.2, 0.35, 0.6]);
   doc.addParagraph(
-    'Prepared by Dr. Rajnikant Dodiya (Ph.D., 2× NET & GSET Qualified). Sold by NET Vidya (Proprietor: Nilam Dodiya). In NTA examinations, choosing the right answer requires deep theoretical grounding and systematic elimination of subtly flawed distractors. This dossier demonstrates our pedagogical rationale method across key syllabus units.',
+    'Prepared by Dr. Rajnikant Dodiya (Ph.D., 2× NET & GSET Qualified). Sold by NET Vidya. In NTA examinations, choosing the right answer requires deep theoretical grounding and systematic elimination of subtly flawed distractors. This dossier demonstrates our pedagogical rationale method across key syllabus units.',
     'F3', 8.5, [0.35, 0.35, 0.35], 11
   );
   doc.currentPage.y -= 10;

@@ -500,7 +500,7 @@ async function runPricingEngineSuite() {
     assert('3.2.1 GET /api/store/price returns 200 OK', res.status === 200 && res.data.success === true);
     assert('3.2.2 Product slug matches canonical final-pack-2026', res.data.productSlug === 'final-pack-2026');
     assert('3.2.3 Does NOT return fake MRP strike-through originalPrice (undefined or null)', res.data.originalPrice === undefined || res.data.originalPrice === null);
-    assert('3.2.4 Seller attribution matches Nilam Dodiya / Dr Rajnikant Dodiya', res.data.sellerLine.includes('Nilam Dodiya') && res.data.sellerLine.includes('Dr Rajnikant Dodiya'));
+    assert('3.2.4 Seller attribution matches NET Vidya / Dr. Rajnikant Dodiya', res.data.sellerLine.includes('NET Vidya') && res.data.sellerLine.includes('Dr. Rajnikant Dodiya'));
   }
 
   // 3.3 Client Price Tampering Attack on POST /api/store/create-order
@@ -547,7 +547,7 @@ async function runAdminPinGateSuite() {
   console.log('======================================================================');
 
   // Verify PIN Authentication logic matching NetVidyaStoreContext.tsx
-  const validPins = ['dr_rajnikant_admin_2026', 'admin123', '2026', 'nilam2026', 'rajnikant2026'];
+  const validPins = ['dr_rajnikant_admin_2026', 'admin123', '2026', 'rajnikant2026'];
 
   function testAdminLogin(pinInput) {
     if (!pinInput || typeof pinInput !== 'string') {
@@ -637,8 +637,8 @@ async function runExcelOpenXmlSuite() {
     const sampleBuyers = [
       {
         id: 'b-1',
-        name: 'Nilam Dodiya',
-        email: 'nilam@netvidya.in',
+        name: 'Pooja Sharma',
+        email: 'pooja@netvidya.in',
         mobile: '9825123456',
         orderId: 'NV_ORD_1001',
         amountPaid: 799,

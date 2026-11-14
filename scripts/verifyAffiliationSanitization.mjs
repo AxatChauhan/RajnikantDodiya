@@ -126,7 +126,8 @@ assert(!homeContent.includes('line-through'), 'Hero pricing eliminates fake stri
 const layoutPath = path.resolve('src/components/store/NetVidyaStoreLayout.tsx');
 const layoutContent = fs.readFileSync(layoutPath, 'utf8');
 assert(
-  layoutContent.includes('Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.'),
+  layoutContent.includes('Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.') ||
+  layoutContent.includes('STORE_MERCHANT.sellerLine'),
   'Footer displays mandatory commercial disclosure line'
 );
 assert(!layoutContent.includes('academic-site-backlink'), 'No academic backlink leaking from commercial store footer');

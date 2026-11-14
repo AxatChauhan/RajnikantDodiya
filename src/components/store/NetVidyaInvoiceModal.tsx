@@ -169,7 +169,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
               * Academic direction, syllabus curation, and test authoring provided by Dr. Rajnikant S. Dodiya (2× UGC NET & GSET Qualified).
             </p>
             <p className="text-gray-400">
-              Merchant: NET Vidya (Nilam Dodiya) • Gujarat, India • Support: netvidyaenglish@gmail.com
+              Merchant: NET Vidya • Gujarat, India • Support: netvidyaenglish@gmail.com
             </p>
           </div>
         </div>

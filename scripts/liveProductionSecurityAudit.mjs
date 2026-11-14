@@ -245,7 +245,7 @@ async function runLiveAudit() {
     assert('2.3 Product slug is final-pack-2026', priceData.productSlug === 'final-pack-2026');
     assert('2.4 Payment mode is payment_link', priceData.paymentMode === 'payment_link');
     assert('2.5 Payment link URL points to https://rzp.io/rzp/locBUA0o', priceData.paymentLinkUrl === 'https://rzp.io/rzp/locBUA0o');
-    assert('2.6 Seller disclosure mentions Nilam Dodiya / Dr Rajnikant Dodiya', priceData.sellerLine?.includes('Nilam Dodiya'));
+    assert('2.6 Seller disclosure mentions NET Vidya / Dr. Rajnikant Dodiya', priceData.sellerLine?.includes('NET Vidya') && priceData.sellerLine?.includes('Dr. Rajnikant Dodiya'));
 
     // Attacker tampering create-order amount
     const orderRes = await fetch(`${LIVE_BASE}/api/store/create-order`, {

@@ -327,7 +327,7 @@ $$;
 -- ==============================================================================
 -- NET VIDYA ENGLISH STUDENT STORE DATABASE SCHEMA
 -- Sole Product: "GSET + UGC NET English Final Pack 2026"
--- Merchant / Proprietor: Nilam Dodiya (NET Vidya)
+-- Merchant: NET Vidya
 -- Academic Director: Dr. Rajnikant S. Dodiya
 -- ==============================================================================
 

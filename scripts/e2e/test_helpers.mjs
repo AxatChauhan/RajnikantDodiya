@@ -179,7 +179,7 @@ export const simulatedDb = {
     standardPrice: 999,
     earlyBirdCutoff: '2026-11-10T23:59:59+05:30',
     accessExpiryDate: '2026-12-31T23:59:59+05:30',
-    sellerLine: 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.'
+    sellerLine: 'Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.'
   },
   readingFiles: [
     { id: 'unit-1', title: 'Unit 1: British Drama & Literary Terms Dossier', category: 'High-Yield Dossier' },

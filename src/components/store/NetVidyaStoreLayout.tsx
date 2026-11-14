@@ -509,7 +509,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             <div>
               <strong className="text-gray-900 font-bold text-sm block">{STORE_MERCHANT.storeTitle}</strong>
               <p className="mt-0.5 text-gray-600">
-                {STORE_MERCHANT.sellerLine || 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.'}
+                {STORE_MERCHANT.sellerLine || 'Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.'}
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4">

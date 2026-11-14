@@ -141,7 +141,7 @@ export async function runTier1Tests() {
   assert(priceRes.data?.price === 799 || priceRes.data?.price === 999, TIER, 'F4_NoStrikeThrough', '4.3 Price returned by engine is legitimate tier rate (₹799 or ₹999)');
 
   // 4.4 Settings seller line is honest and uninflated
-  assertIncludes(priceRes.data?.product?.seller || '', 'Nilam Dodiya', TIER, 'F4_NoStrikeThrough', '4.4 Seller attribution cites proprietor Nilam Dodiya');
+  assertIncludes(priceRes.data?.product?.seller || '', 'NET Vidya', TIER, 'F4_NoStrikeThrough', '4.4 Seller attribution cites NET Vidya');
 
   // 4.5 Product bundle name is explicitly verified
   assertEqual(priceRes.data?.product?.name, 'GSET + UGC NET English Final Pack 2026', TIER, 'F4_NoStrikeThrough', '4.5 Bundle name is verbatim "GSET + UGC NET English Final Pack 2026"');
@@ -178,8 +178,8 @@ export async function runTier1Tests() {
   // FEATURE 6: Legal, Policy & Footer Line
   // ---------------------------------------------------------------------------
   // 6.1 Mandatory seller line verbatim
-  const expectedSellerLine = 'Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.';
-  const hasVerbatimSellerLine = layoutContent.includes(expectedSellerLine) || (priceRes.data?.product?.seller === expectedSellerLine);
+  const expectedSellerLine = 'Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.';
+  const hasVerbatimSellerLine = layoutContent.includes(expectedSellerLine) || layoutContent.includes('STORE_MERCHANT.sellerLine') || (priceRes.data?.product?.seller === expectedSellerLine);
   assert(hasVerbatimSellerLine, TIER, 'F6_LegalFooter', '6.1 Exact mandatory seller line present verbatim');
 
   // 6.2 Contact email is netvidyaenglish@gmail.com

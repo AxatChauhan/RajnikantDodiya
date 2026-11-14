@@ -59,26 +59,14 @@ async function syncLiveState() {
     const liveBuyers = Array.isArray(liveState?.store?.buyers) ? liveState.store.buyers : [];
     
     // Seed verified buyers
-    const verifiedSeed = [
-      {
-        id: 'usr_nilam_dodiya',
-        name: 'Nilam Dodiya',
-        email: 'nilamdodiya21@gmail.com',
-        mobile: '+919974845911',
-        product: 'UGC NET English Complete Preparation Bundle (2026 Edition)',
-        productId: 'ugc-net-bundle',
-        amountPaid: 499,
-        enrolledAt: '2026-11-14T10:39:06Z',
-        orderId: 'order_U01cA4TjQfPCD6',
-        paymentId: 'pay_U01dCsc7irC6LP',
-        status: 'captured'
-      }
-    ];
+    const verifiedSeed = [];
 
     const buyersMap = new Map();
     for (const b of [...verifiedSeed, ...existingBuyers, ...liveBuyers]) {
       if (b && (b.email || b.id)) {
-        buyersMap.set((b.email || b.id).toLowerCase(), b);
+        const key = (b.email || b.id).toLowerCase();
+        if (key.includes('nilam')) continue;
+        buyersMap.set(key, b);
       }
     }
 
@@ -93,12 +81,13 @@ async function syncLiveState() {
       syncedAt: new Date().toISOString()
     };
 
-    // Guarantee authoritative pricing for UGC NET Bundle = ₹499
+    // Guarantee authoritative pricing for UGC NET Bundle = ₹499 & clean attribution
     if (merged.store && merged.store.settings) {
       merged.store.settings.earlyBirdPrice = 499;
       merged.store.settings.standardPrice = 499;
       merged.store.settings.productSlug = 'ugc-net-bundle';
       merged.store.settings.productName = 'UGC NET English Complete Preparation Bundle (2026 Edition)';
+      merged.store.settings.sellerLine = 'Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.';
     }
 
     fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(merged, null, 2) + '\n', 'utf8');

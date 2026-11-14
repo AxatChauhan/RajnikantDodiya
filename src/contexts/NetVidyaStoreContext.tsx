@@ -416,19 +416,7 @@ export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
 ];
 
 // Initial Content for Enrolled Candidate Registry
-export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [
-  {
-    id: 'buy_nilam_dodiya',
-    name: 'Nilam Dodiya',
-    email: 'nilamdodiya21@gmail.com',
-    mobile: '9974845911',
-    orderId: 'order_U01cA4TjQfPCD6',
-    amountPaid: 499,
-    paymentMethod: 'upi_qr',
-    enrolledAt: '2026-11-14T10:39:06.000Z',
-    isActive: true
-  }
-];
+export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [];
 
 interface NetVidyaStoreContextType {
   settings: NetVidyaStoreSettings;
@@ -492,7 +480,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       const cachedStr = localStorage.getItem(STORAGE_KEY_SESSION);
       if (cachedStr) {
         const cached = JSON.parse(cachedStr);
-        if (cached && (cached.email?.toLowerCase() === 'nilamdodiya21@gmail.com' || cached.email?.toLowerCase() === 'rajnikantdodiya2@gmail.com')) {
+        if (cached && cached.email?.toLowerCase() === 'rajnikantdodiya2@gmail.com') {
           cached.isBuyer = true;
           cached.isLoggedIn = true;
         }

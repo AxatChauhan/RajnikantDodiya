@@ -182,7 +182,7 @@ export default async function handler(req, res) {
           currency: 'INR',
           receipt,
           notes: {
-            merchant: 'Nilam Dodiya (NET Vidya)',
+            merchant: 'NET Vidya',
             product: productName,
             product_id: resolvedProduct.id,
             seller: settings.sellerLine,
@@ -257,7 +257,7 @@ export default async function handler(req, res) {
     }
 
     // 4. If this is GSET and no specific payment link or API key is set yet:
-    // DO NOT charge ₹499! Instead, provide direct WhatsApp connection with Dr. Rajnikant Dodiya / Nilam Dodiya for instant enrollment link
+    // DO NOT charge ₹499! Instead, provide direct WhatsApp connection with Dr. Rajnikant Dodiya for instant enrollment link
     if (basePrice !== 499) {
       const pendingOrderId = `NV_GSET_${Date.now()}`;
       const waMsg = encodeURIComponent(

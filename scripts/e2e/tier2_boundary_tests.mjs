@@ -153,8 +153,8 @@ export async function runTier2Tests() {
   const layoutTsx = path.join(PROJECT_ROOT, 'src', 'components', 'store', 'NetVidyaStoreLayout.tsx');
   const layoutContent = fs.existsSync(layoutTsx) ? fs.readFileSync(layoutTsx, 'utf8') : '';
 
-  // 6.1 Exact case-sensitive match of proprietor Nilam Dodiya
-  assertIncludes(priceRes.data?.product?.seller || '', 'Nilam Dodiya', TIER, 'F6_LegalFooter_Boundary', '6.1 Seller string cites Nilam Dodiya with exact capitalization');
+  // 6.1 Exact match of NET Vidya in seller line
+  assertIncludes(priceRes.data?.product?.seller || '', 'NET Vidya', TIER, 'F6_LegalFooter_Boundary', '6.1 Seller string cites NET Vidya');
 
   // 6.2 Exact match of Dr Rajnikant Dodiya for content
   assertIncludes(priceRes.data?.product?.seller || '', 'Dr Rajnikant Dodiya', TIER, 'F6_LegalFooter_Boundary', '6.2 Seller string cites Dr Rajnikant Dodiya with exact capitalization');

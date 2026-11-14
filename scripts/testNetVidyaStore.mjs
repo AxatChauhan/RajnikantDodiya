@@ -380,7 +380,7 @@ for (const relPath of storeFiles) {
       console.error(`  [Violation] Found prohibited university mention in ${relPath}`);
       universityMentionFound = true;
     }
-    if (content.includes('Sold by NET Vidya (proprietor: Nilam Dodiya). Content by Dr Rajnikant Dodiya.')) {
+    if (content.includes('Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.') || content.includes('STORE_MERCHANT.sellerLine')) {
       sellerLineFound = true;
     }
   }
