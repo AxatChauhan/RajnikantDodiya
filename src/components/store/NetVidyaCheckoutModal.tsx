@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   X,
   ShieldCheck,
@@ -167,13 +167,43 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     paymentLinkUrl: contextPaymentLinkUrl
   } = useNetVidyaStore();
 
+  // Automatically resolve the exam context from product ID, explicit prop, or URL route
+  const resolvedExam: ExamType = useMemo(() => {
+    if (initialProductId?.startsWith('gset-')) return 'gset';
+    if (initialProductId?.startsWith('ugc-')) return 'ugc';
+    if (initialExam === 'gset' || initialExam === 'ugc') return initialExam;
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase();
+      const pathname = window.location.pathname.toLowerCase();
+      if (hash.includes('gset') || pathname.includes('gset')) return 'gset';
+    }
+    return 'ugc';
+  }, [initialProductId, initialExam]);
+
   // Exam and Pack selection state
-  const [selectedExam, setSelectedExam] = useState<ExamType>(initialExam);
+  const [selectedExam, setSelectedExam] = useState<ExamType>(resolvedExam);
   const [selectedProductId, setSelectedProductId] = useState<string>(() => {
     if (initialProductId) return initialProductId;
-    if (initialExam === 'gset') return 'gset-english-combo';
+    if (resolvedExam === 'gset') return 'gset-english-combo';
     return 'ugc-net-english-bundle';
   });
+
+  // Modal scroll container ref
+  const modalBodyRef = useRef<HTMLDivElement>(null);
+
+  // Background body and root scroll lock
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, [isOpen]);
 
   // Candidate input fields
   const [studentName, setStudentName] = useState(buyerSession.name || '');
@@ -193,16 +223,16 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   // Sync state when props change
   useEffect(() => {
     if (isOpen) {
-      if (initialExam) setSelectedExam(initialExam);
+      setSelectedExam(resolvedExam);
       if (initialProductId) {
         setSelectedProductId(initialProductId);
-      } else if (initialExam === 'gset') {
+      } else if (resolvedExam === 'gset') {
         setSelectedProductId('gset-english-combo');
       } else {
         setSelectedProductId('ugc-net-english-bundle');
       }
     }
-  }, [isOpen, initialExam, initialProductId]);
+  }, [isOpen, resolvedExam, initialProductId]);
 
   // Pre-fill user session if logged in
   useEffect(() => {
@@ -530,27 +560,44 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget && !redirectingUrl && !isProcessing) onClose();
       }}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/65 backdrop-blur-sm p-2 sm:p-4 md:p-6 flex flex-col justify-start sm:justify-center items-center min-h-screen"
+      onWheel={(e) => {
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      className="fixed inset-0 z-50 overflow-hidden bg-black/65 backdrop-blur-sm p-2 sm:p-4 md:p-6 flex flex-col justify-center items-center overscroll-contain select-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
     >
-      <div className="relative w-full max-w-xl my-auto bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col max-h-[calc(100dvh-1.5rem)] overflow-hidden animate-scale-up">
+      <div
+        onWheel={(e) => {
+          if (modalBodyRef.current && !modalBodyRef.current.contains(e.target as Node)) {
+            modalBodyRef.current.scrollTop += e.deltaY;
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
+        className="relative w-full max-w-xl my-auto bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col max-h-[calc(100dvh-2rem)] overflow-hidden animate-scale-up overscroll-contain select-text"
+      >
         
-        {/* Sticky Header with Exam Switcher */}
-        <div className="p-4 sm:p-5 border-b border-gray-100 shrink-0 bg-white space-y-3">
+        {/* Sticky Header with Context Badge */}
+        <div className="p-4 sm:p-5 border-b border-gray-100 shrink-0 bg-white space-y-2">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded-full">
                   Official NET Vidya Store
                 </span>
-                <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                  2026 Examination Pass
+                <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded-full ${
+                  resolvedExam === 'gset' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {resolvedExam === 'gset' ? 'GSET 2026 Examination Pass' : 'UGC NET National Pass'}
                 </span>
               </div>
               <h2 id="checkout-modal-title" className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
-                {selectedExam === 'gset' ? 'GSET 2026 Examination Enrollment' : 'UGC NET English Bundle Enrollment'}
+                {resolvedExam === 'gset' ? 'GSET 2026 Examination Enrollment' : 'UGC NET English Bundle Enrollment'}
               </h2>
               <p className="text-[11px] text-gray-500">
                 Sold by {STORE_MERCHANT.brandName} ({STORE_MERCHANT.proprietor}) • Curated by {STORE_MERCHANT.curatorShort}
@@ -567,46 +614,13 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               </button>
             )}
           </div>
-
-          {/* Exam Switcher Tabs */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 bg-gray-100/90 rounded-xl text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedExam('gset');
-                setSelectedProductId('gset-english-combo');
-                setErrorMessage(null);
-              }}
-              className={`py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
-                selectedExam === 'gset'
-                  ? 'bg-white text-emerald-950 font-bold shadow-xs'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>GSET 2026 (from ₹149)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedExam('ugc');
-                setSelectedProductId('ugc-net-english-bundle');
-                setErrorMessage(null);
-              }}
-              className={`py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 ${
-                selectedExam === 'ugc'
-                  ? 'bg-white text-blue-950 font-bold shadow-xs'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span>UGC NET English (₹499)</span>
-            </button>
-          </div>
         </div>
 
-        {/* Scrollable Content Body */}
-        <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+        {/* Scrollable Content Body with overscroll containment */}
+        <div
+          ref={modalBodyRef}
+          className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 overscroll-contain"
+        >
 
           {/* GSET PACK SELECTION SECTION */}
           {selectedExam === 'gset' && (

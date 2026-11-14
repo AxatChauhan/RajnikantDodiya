@@ -90,7 +90,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleOpenCheckout = (productId?: string, exam?: 'ugc' | 'gset') => {
-    const targetExam = exam || activeExamStore;
+    let targetExam = exam || activeExamStore;
+    if (productId?.startsWith('gset-')) targetExam = 'gset';
+    else if (productId?.startsWith('ugc-')) targetExam = 'ugc';
+
     const targetProduct = CHECKOUT_PRODUCTS.find(p => p.id === productId) ||
       (targetExam === 'gset' ? CHECKOUT_PRODUCTS[0] : CHECKOUT_PRODUCTS.find(p => p.id === 'ugc-net-english-bundle'));
 
@@ -567,7 +570,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           }}
           onOpenCheckout={() => {
             setIsLoginOpen(false);
-            handleOpenCheckout();
+            handleOpenCheckout(pendingCheckout?.productId, pendingCheckout?.exam || activeExamStore);
           }}
           onLoginSuccess={() => {
             setIsLoginOpen(false);

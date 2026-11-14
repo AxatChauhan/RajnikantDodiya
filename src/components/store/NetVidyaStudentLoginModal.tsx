@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   LogIn,
@@ -62,6 +62,20 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Background body and root scroll lock
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -225,9 +239,15 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
+      onWheel={(e) => {
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden overscroll-contain select-none"
     >
-      <div className="relative w-full max-w-md my-auto bg-white rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-4 sm:space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <div className="relative w-full max-w-md my-auto bg-white rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-gray-200 space-y-4 sm:space-y-5 animate-scale-up max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain select-text">
         
         {/* Close Button */}
         <button
