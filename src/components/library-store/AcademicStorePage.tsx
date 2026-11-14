@@ -31,6 +31,7 @@ import {
 import { MainTab } from '../Navbar';
 import { STORE_MERCHANT } from '../../config/storeConfig';
 import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 // Lazily loaded checkout modal, DRM reader modal, and CBT exam portal
 const CirculationDeskModal = lazy(() =>
@@ -97,6 +98,9 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
   } | null>(null);
 
   const [copiedCitation, setCopiedCitation] = useState(false);
+
+  // Universal Escape key listener for book inspection modal
+  useModalEscape(Boolean(inspectedBook), () => setInspectedBook(null));
 
   // Synchronized active scholar session
   const {
@@ -742,7 +746,9 @@ export const AcademicStorePage: React.FC<AcademicStorePageProps> = ({
               </div>
               <button
                 onClick={() => setInspectedBook(null)}
-                className="p-1.5 rounded-full hover:bg-parchment-warm text-ink-muted hover:text-ink transition-colors"
+                className="p-1.5 rounded-full hover:bg-parchment-warm text-ink-muted hover:text-ink transition-colors cursor-pointer"
+                title="Close (Esc)"
+                aria-label="Close (Esc)"
               >
                 <X className="w-5 h-5" />
               </button>

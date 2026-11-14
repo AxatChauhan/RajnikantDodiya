@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Award, Printer, Copy, Check, Sparkles, Feather } from 'lucide-react';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface Props {
   isOpen: boolean;
@@ -16,6 +17,9 @@ export const HonoraryDiplomaModal: React.FC<Props> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const displayName = userName.trim() || 'Distinguished Salon Scholar';
@@ -30,7 +34,7 @@ export const HonoraryDiplomaModal: React.FC<Props> = ({
   };
 
   const handleCopyCitation = () => {
-    const citation = `🎓 DIPLOMA OF HONORARY FELLOWSHIP 🎓\n\nH. M. Patel Institute of English Training & Research\nThe Literary Salon & Athenaeum\n\nThis is to certify that:\n${displayName}\n\nHas been admitted as an HONORARY FELLOW OF THE ATHENAEUM\nIn recognition of demonstrated philosophical wit, contemplative vision, and literary creative spirit.\n\nAttested: Dr. Rajnikant S. Dodiya\nConvener, English Language Education Forum | IQAC Coordinator\nDate: ${currentDate}`;
+    const citation = `🎓 DIPLOMA OF HONORARY FELLOWSHIP 🎓\n\nThe Digital Literary Salon & Athenaeum\nCurated by Dr. Rajnikant Dodiya\n\nThis is to certify that:\n${displayName}\n\nHas been admitted as an HONORARY FELLOW OF THE ATHENAEUM\nIn recognition of demonstrated philosophical wit, contemplative vision, and literary creative spirit.\n\nAttested: Dr. Rajnikant S. Dodiya\nConvener, English Language Education Forum\nDate: ${currentDate}`;
     navigator.clipboard.writeText(citation);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -48,7 +52,9 @@ export const HonoraryDiplomaModal: React.FC<Props> = ({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors cursor-pointer"
+          title="Close Diploma (Esc)"
+          aria-label="Close Diploma (Esc)"
         >
           <X className="w-5 h-5" />
         </button>
@@ -94,10 +100,10 @@ export const HonoraryDiplomaModal: React.FC<Props> = ({
           {/* Header Heraldry */}
           <div className="space-y-1.5">
             <span className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.25em] text-ink-muted font-bold block">
-              H. M. Patel Institute of English Training & Research
+              The Digital Literary Salon &amp; Athenaeum
             </span>
             <span className="text-[11px] font-mono text-claret tracking-widest uppercase font-semibold block">
-              The Digital Literary Salon & Athenaeum
+              Curated by Dr. Rajnikant Dodiya
             </span>
             <div className="w-16 h-0.5 bg-brass mx-auto my-2" />
           </div>
@@ -159,6 +165,17 @@ export const HonoraryDiplomaModal: React.FC<Props> = ({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Bottom Exit Navigation */}
+        <div className="pt-2 text-center print:hidden">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-mono font-medium border border-deckle transition-all cursor-pointer"
+          >
+            ← Close Diploma &amp; Return to Salon
+          </button>
         </div>
 
       </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BOOKS, Book } from '../data/professorData';
 import { BookOpen, X, ExternalLink, Bookmark, Award, Layers, Sparkles } from 'lucide-react';
+import { useModalEscape } from '../hooks/useModalEscape';
 
 interface VirtualBookshelfProps {
   onNavigate?: (tab: 'home' | 'research' | 'salon' | 'store' | 'leadership' | 'contact' | 'about') => void;
@@ -9,6 +10,9 @@ interface VirtualBookshelfProps {
 export const VirtualBookshelf: React.FC<VirtualBookshelfProps> = ({ onNavigate }) => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'authored' | 'edited'>('all');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+
+  // Universal Escape key listener
+  useModalEscape(Boolean(selectedBook), () => setSelectedBook(null));
 
   const filteredBooks = BOOKS.filter(b => {
     if (activeFilter === 'authored') return b.type === 'authored';
@@ -160,8 +164,9 @@ export const VirtualBookshelf: React.FC<VirtualBookshelfProps> = ({ onNavigate }
               </div>
               <button
                 onClick={() => setSelectedBook(null)}
-                aria-label="Close reading room"
-                className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Close reading room (Esc)"
+                title="Close reading room (Esc)"
+                className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -204,7 +209,7 @@ export const VirtualBookshelf: React.FC<VirtualBookshelfProps> = ({ onNavigate }
             {/* Footer Buttons */}
             <div className="pt-4 border-t border-deckle flex flex-col sm:flex-row items-center justify-between gap-3">
               <span className="text-[11px] font-mono text-ink-faint">
-                H.M. Patel Institute of English Training & Research Library Catalog
+                Curated by Dr. Rajnikant Dodiya • Published Oeuvre Catalog
               </span>
               <div className="flex items-center gap-2">
                 {onNavigate && (selectedBook.isbn === '978-81-937539-0-3' || selectedBook.title.toLowerCase().includes('kalam')) && (

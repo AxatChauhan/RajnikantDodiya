@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldAlert, X, RotateCcw, Smartphone, Laptop } from 'lucide-react';
 import { detectDeviceType } from '../../lib/deviceSecurity';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface DeviceTransferredModalProps {
   isOpen: boolean;
@@ -23,6 +24,9 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
     }
   }, [isOpen]);
 
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const currentType = detectDeviceType();
@@ -39,7 +43,9 @@ export const DeviceTransferredModal: React.FC<DeviceTransferredModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors cursor-pointer"
+          title="Close modal (Esc)"
+          aria-label="Close modal (Esc)"
         >
           <X className="w-4 h-4" />
         </button>

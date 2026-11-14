@@ -257,8 +257,9 @@ const CitationModal: React.FC<{ isOpen: boolean; onClose: () => void }> = React.
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-ink-muted hover:text-claret transition-colors"
-            aria-label="Close citation modal"
+            className="p-1.5 rounded-lg text-ink-muted hover:text-claret transition-colors cursor-pointer"
+            aria-label="Close citation modal (Esc)"
+            title="Close citation modal (Esc)"
           >
             <X className="w-5 h-5" />
           </button>
@@ -286,13 +287,21 @@ const CitationModal: React.FC<{ isOpen: boolean; onClose: () => void }> = React.
 
         <div className="flex items-center justify-between pt-1">
           <span className="text-[11px] font-mono text-ink-faint">ISBN: 978-81-937539-0-3</span>
-          <button
-            onClick={handleCopy}
-            className="w-44 py-2.5 rounded-xl bg-claret text-white hover:bg-claret-light text-xs font-sans font-medium flex items-center justify-center gap-2 shadow-xs transition-colors shrink-0"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Copied to Clipboard!' : 'Copy Citation'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-3.5 py-2.5 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink text-xs font-sans transition-colors cursor-pointer"
+            >
+              Close
+            </button>
+            <button
+              onClick={handleCopy}
+              className="w-40 py-2.5 rounded-xl bg-claret text-white hover:bg-claret-light text-xs font-sans font-medium flex items-center justify-center gap-2 shadow-xs transition-colors shrink-0 cursor-pointer"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'Copied!' : 'Copy Citation'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

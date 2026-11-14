@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QUALIFICATIONS, ELIGIBILITIES, INVITED_TALKS, CONFERENCE_PAPERS, SESSION_CHAIRS, FDP_TRAININGS } from '../data/professorData';
 import { X, Award, GraduationCap, Mic, BookOpen, Users, FileText, CheckCircle2 } from 'lucide-react';
+import { useModalEscape } from '../hooks/useModalEscape';
 
 interface AcademicCompendiumModalProps {
   isOpen: boolean;
@@ -26,6 +27,9 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
     }
   }, [isOpen]);
 
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
@@ -48,8 +52,9 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
           </div>
           <button
             onClick={onClose}
-            aria-label="Close archive"
-            className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close archive (Esc)"
+            title="Close archive (Esc)"
+            className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -387,11 +392,11 @@ export const AcademicCompendiumModal: React.FC<AcademicCompendiumModalProps> = (
         {/* Footer */}
         <div className="pt-3 border-t border-deckle flex items-center justify-between gap-3 text-xs shrink-0">
           <span className="hidden sm:inline font-mono text-ink-faint text-[11px] truncate">
-            H. M. Patel Institute of English Training & Research Institutional Portfolio
+            Official Scholarly Compendium &amp; Documentation • Dr. Rajnikant Dodiya
           </span>
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-claret text-white text-xs font-medium hover:bg-claret-light transition-all shadow-xs min-h-[44px] justify-center flex items-center"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-claret text-white text-xs font-medium hover:bg-claret-light transition-all shadow-xs min-h-[44px] justify-center flex items-center cursor-pointer"
           >
             Close Archive
           </button>

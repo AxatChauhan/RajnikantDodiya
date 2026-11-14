@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import { useSiteContent } from '../../contexts/SiteContentContext';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface NetVidyaAdminModalProps {
   isOpen: boolean;
@@ -92,6 +93,9 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
   const [buyerSearch, setBuyerSearch] = useState('');
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -215,7 +219,9 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
         <div className="bg-white rounded-3xl max-w-md w-full my-auto p-5 sm:p-7 shadow-2xl border border-gray-200 space-y-5 relative animate-fade-in text-center max-h-[calc(100dvh-2rem)] overflow-y-auto">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+            title="Close (Esc)"
+            aria-label="Close (Esc)"
           >
             <X className="w-5 h-5" />
           </button>
@@ -361,7 +367,9 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+              title="Close Admin Studio (Esc)"
+              aria-label="Close Admin Studio (Esc)"
             >
               <X className="w-5 h-5" />
             </button>

@@ -5,6 +5,7 @@ import { STUDY_TRACKS, StudyTrackId, StudyTrack, StudyBundleOption } from '../da
 import { useScholarSession, ScholarSession } from '../hooks/useScholarSession';
 import { signInScholar, signUpScholar, signOutScholar } from '../lib/credentialAuth';
 import { validateIndianMobile, validateEmail, generateSecureDeviceToken } from '../lib/security';
+import { useModalEscape } from '../hooks/useModalEscape';
 import {
   BookOpen,
   GraduationCap,
@@ -118,6 +119,9 @@ export const LearnPage: React.FC<LearnPageProps> = ({
   // Interactive Demo PDF Reader Modal
   const [isDemoViewerOpen, setIsDemoViewerOpen] = useState(false);
   const [demoActiveTab, setDemoActiveTab] = useState<'overview' | 'questions' | 'notes'>('overview');
+
+  // Universal Escape key listener for demo PDF modal
+  useModalEscape(isDemoViewerOpen, () => setIsDemoViewerOpen(false));
 
   // AI Tutor State
   const [aiQuestion, setAiQuestion] = useState('');
@@ -969,8 +973,9 @@ export const LearnPage: React.FC<LearnPageProps> = ({
               </div>
               <button
                 onClick={() => setIsDemoViewerOpen(false)}
-                className="p-1.5 rounded-lg bg-parchment-warm hover:bg-parchment-deep text-ink-muted"
-                aria-label="Close reader"
+                className="p-1.5 rounded-lg bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors cursor-pointer"
+                aria-label="Close reader (Esc)"
+                title="Close reader (Esc)"
               >
                 ✕
               </button>
