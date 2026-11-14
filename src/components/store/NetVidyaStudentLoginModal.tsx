@@ -15,6 +15,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface NetVidyaStudentLoginModalProps {
   isOpen: boolean;
@@ -76,6 +77,9 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       document.documentElement.style.overflow = originalHtmlOverflow;
     };
   }, [isOpen]);
+
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose, !isSubmitting);
 
   if (!isOpen) return null;
 
@@ -252,8 +256,9 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors z-10"
-          title="Close Modal"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors z-10 cursor-pointer"
+          title="Close Modal (Esc)"
+          aria-label="Close Modal"
         >
           <X className="w-5 h-5" />
         </button>
@@ -688,11 +693,20 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               onClose();
               onOpenCheckout();
             }}
-            className="text-xs font-bold text-blue-700 hover:text-blue-900 underline inline-flex items-center gap-1"
+            className="text-xs font-bold text-blue-700 hover:text-blue-900 underline inline-flex items-center gap-1 cursor-pointer"
           >
             <span>Enroll Now (₹{currentServerPrice})</span>
             <span>→</span>
           </button>
+          <div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs text-gray-500 hover:text-gray-800 transition-colors py-1.5 px-3 rounded-lg hover:bg-gray-100 font-medium inline-block cursor-pointer mt-1"
+            >
+              ← Cancel and Return to Store
+            </button>
+          </div>
         </div>
 
       </div>

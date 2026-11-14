@@ -321,18 +321,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-serif">Bookstore</span>
             </button>
 
-            {/* BUTTON 2: [Student Login / Dashboard] */}
+            {/* BUTTON 2: [Student Login / My Materials] */}
             {buyerSession?.isLoggedIn ? (
               <button
                 onClick={() => {
                   if (onOpenStore) onOpenStore();
-                  window.location.hash = '#dashboard';
+                  window.location.hash = '#materials';
                 }}
                 className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs shrink-0 h-9 sm:h-10 min-h-[36px]"
-                title="Open Student Dashboard"
+                title="Open My Materials"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span className="truncate max-w-[80px] sm:max-w-[110px]">{buyerSession.name || 'Dashboard'}</span>
+                <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                <span className="truncate max-w-[80px] sm:max-w-[110px]">My Materials</span>
               </button>
             ) : (
               <button
@@ -453,12 +453,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => {
                     setMobileMenuOpen(false);
                     if (onOpenStore) onOpenStore();
-                    window.location.hash = '#dashboard';
+                    window.location.hash = '#materials';
                   }}
                   className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-2xs min-h-[42px]"
                 >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>My Dashboard ({buyerSession.name || 'Student'})</span>
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>My Materials ({buyerSession.name || 'Student'})</span>
                 </button>
               ) : (
                 <button

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useScholarSession } from '../../hooks/useScholarSession';
 import { signInScholar, signUpScholar, signOutScholar } from '../../lib/credentialAuth';
 import { detectDeviceType, getDeviceDescription } from '../../lib/deviceSecurity';
+import { useModalEscape } from '../../hooks/useModalEscape';
 import {
   X,
   ShieldCheck,
@@ -65,6 +66,9 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
       };
     }
   }, [isOpen]);
+
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose, !isSubmitting);
 
   if (!isOpen) return null;
 
@@ -150,8 +154,9 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors z-10"
-          aria-label="Close modal"
+          className="absolute top-4 right-4 p-2 rounded-xl bg-parchment-warm hover:bg-parchment-deep text-ink-muted hover:text-ink transition-colors z-10 cursor-pointer"
+          aria-label="Close modal (Esc)"
+          title="Close modal (Esc)"
         >
           <X className="w-4 h-4" />
         </button>
@@ -600,6 +605,17 @@ export const ScholarAuthModal: React.FC<ScholarAuthModalProps> = ({
             <div className="pt-2 border-t border-deckle flex items-center justify-between text-[11px] font-mono text-ink-faint">
               <span>Dual-Device Access Active</span>
               <span className="text-claret font-semibold">1 Phone + 1 Laptop</span>
+            </div>
+
+            {/* Bottom Dismiss Navigation */}
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-xs text-ink-muted hover:text-ink font-mono py-1 cursor-pointer transition-colors"
+              >
+                ← Cancel and Continue as Guest
+              </button>
             </div>
           </div>
         )}

@@ -32,6 +32,7 @@ declare global {
 
 import { STORE_MERCHANT } from '../../config/storeConfig';
 import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface CirculationDeskModalProps {
   isOpen: boolean;
@@ -81,6 +82,9 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
       };
     }
   }, [isOpen]);
+
+  // Universal Escape key listener
+  useModalEscape(isOpen, onClose, !isProcessing);
 
   if (!isOpen) return null;
 
@@ -312,11 +316,11 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
         
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-deckle pb-4">
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold">
+          <div className="min-w-0 flex-1 pr-4">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-claret font-bold block">
               The Circulation Desk • Academic Licensing
             </span>
-            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-ink mt-0.5">
+            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-ink mt-0.5 leading-snug">
               Acquire Scholar Access
             </h3>
             <p className="text-xs text-ink-muted font-reading font-light mt-0.5">
@@ -325,8 +329,9 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close checkout"
-            className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close checkout (Esc)"
+            title="Close checkout (Esc)"
+            className="p-2 rounded-xl bg-parchment-warm text-ink-muted hover:text-claret transition-colors shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -507,21 +512,31 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
             </div>
 
             {/* Submit Action Button */}
-            <button
-              type="submit"
-              disabled={isProcessing}
-              className="w-full py-3.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center justify-center gap-2 min-h-[48px] disabled:opacity-50"
-            >
-              {isProcessing ? (
-                <span>Verifying Payment & Generating License...</span>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span>Proceed to Secure Payment (₹{activeProduct.price})</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
+            <div className="space-y-2">
+              <button
+                type="submit"
+                disabled={isProcessing}
+                className="w-full py-3.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs transition-all flex items-center justify-center gap-2 min-h-[48px] disabled:opacity-50 cursor-pointer"
+              >
+                {isProcessing ? (
+                  <span>Verifying Payment & Generating License...</span>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    <span>Proceed to Secure Payment (₹{activeProduct.price})</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full py-2 text-center text-xs text-ink-muted hover:text-ink font-mono transition-colors block cursor-pointer"
+              >
+                ← Cancel and Return to Library
+              </button>
+            </div>
 
             {onOpenPolicy && (
               <div className="pt-2 border-t border-deckle/70 space-y-1.5 text-center">
@@ -612,6 +627,14 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                 </p>
               </div>
             )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-2 text-center text-xs text-ink-muted hover:text-ink font-mono transition-colors block cursor-pointer"
+            >
+              ← Cancel and Return to Library
+            </button>
           </form>
         )}
 
@@ -656,15 +679,24 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleEnterPortal}
-              className="px-8 py-3.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-sans font-medium transition-all shadow-xs inline-flex items-center gap-2 min-h-[48px]"
-            >
-              <Sparkles className="w-4 h-4 text-emerald-300" />
-              <span>Enter Unlocked Reading Room / Exam Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleEnterPortal}
+                className="w-full px-8 py-3.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-sans font-medium transition-all shadow-xs inline-flex items-center justify-center gap-2 min-h-[48px] cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-emerald-300" />
+                <span>Enter Unlocked Reading Room / Exam Portal</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full py-2 text-center text-xs text-ink-muted hover:text-ink font-mono transition-colors block cursor-pointer"
+              >
+                Close Receipt &amp; Return to Library
+              </button>
+            </div>
           </div>
         )}
 

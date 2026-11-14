@@ -3,6 +3,7 @@ import { STORE_PRODUCTS, StoreProduct } from '../../data/storeCatalogData';
 import { BOOKS } from '../../data/professorData';
 import { useScholarSession, ScholarSession } from '../../hooks/useScholarSession';
 import { generateSecureDeviceToken } from '../../lib/security';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 // Lazily loaded on-demand checkout, reader, and exam portal
 const CirculationDeskModal = lazy(() => import('./CirculationDeskModal').then(m => ({ default: m.CirculationDeskModal })));
@@ -90,6 +91,9 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
   } | null>(null);
 
   const [copiedCitation, setCopiedCitation] = useState(false);
+
+  // Universal Escape key listener for Oak Reading Plinth modal
+  useModalEscape(Boolean(inspectedBook), () => setInspectedBook(null));
 
   // Synchronized active scholar session state across the entire site
   const { session: studentSession, isBookOwned, isExamOwned, isBundleOwned, isComplimentaryOwned, saveSession, clearSession: handleClearSession } = useScholarSession();
@@ -968,7 +972,10 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
       {/* SECTION 4: THE OAK INSPECTION PLINTH MODAL (PULL OFF SHELF)*/}
       {/* ========================================================= */}
       {inspectedBook && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+        <div
+          onClick={() => setInspectedBook(null)}
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+        >
           <div
             className="w-[94vw] max-w-2xl max-h-[88vh] rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#1C0F08] via-[#2B170D] to-[#140703] border-2 sm:border-4 border-[#C5A059] shadow-2xl text-white relative flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
@@ -1084,6 +1091,13 @@ export const LibraryStorePage: React.FC<LibraryStorePageProps> = ({ onOpenAuthMo
               </span>
 
               <div className="flex items-center gap-1.5 ml-auto">
+                <button
+                  type="button"
+                  onClick={() => setInspectedBook(null)}
+                  className="px-3 py-1.5 rounded-lg bg-[#2E160C] hover:bg-[#3D1E10] text-[#D7C3B0] hover:text-white border border-[#5C321E] text-xs font-sans font-medium transition-all cursor-pointer"
+                >
+                  Close
+                </button>
                 {inspectedBook.isCoreProduct === 'book' ? (
                   <>
                     <button

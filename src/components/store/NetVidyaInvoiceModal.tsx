@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Printer, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { NetVidyaBuyerSession } from '../../contexts/NetVidyaStoreContext';
 import { DEFAULT_STORE_SETTINGS, STORE_MERCHANT } from '../../config/storeConfig';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface NetVidyaInvoiceModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
   buyerSession,
   amount = DEFAULT_STORE_SETTINGS.earlyBirdPrice
 }) => {
+  useModalEscape(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const invoiceNumber = `NV-2026-${(buyerSession.email || 'STUDENT').slice(0, 4).toUpperCase()}-${Date.now().toString().slice(-6)}`;
@@ -77,7 +80,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
               </span>
               <h1 className="text-2xl font-black text-gray-950 mt-1">{STORE_MERCHANT.storeTitle}</h1>
               <p className="text-xs text-gray-600 mt-1">
-                Sold by <strong>{STORE_MERCHANT.brandName}</strong> (Proprietor: {STORE_MERCHANT.proprietor})
+                Sold by <strong>{STORE_MERCHANT.brandName}</strong>
               </p>
               <p className="text-xs text-gray-500">
                 Academic Direction & Mentorship: <strong>{STORE_MERCHANT.curator}</strong>
@@ -171,6 +174,27 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
             <p className="text-gray-400">
               Merchant: NET Vidya • Gujarat, India • Support: netvidyaenglish@gmail.com
             </p>
+          </div>
+
+          {/* Bottom Action Bar (Hidden when printing) */}
+          <div className="pt-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 print:hidden">
+            <span className="text-xs text-gray-500 font-mono text-center sm:text-left">
+              Official Receipt No: {invoiceNumber}
+            </span>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button
+                onClick={handlePrint}
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Print / Save PDF
+              </button>
+              <button
+                onClick={onClose}
+                className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-black text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
+              >
+                Close Receipt
+              </button>
+            </div>
           </div>
         </div>
       </div>

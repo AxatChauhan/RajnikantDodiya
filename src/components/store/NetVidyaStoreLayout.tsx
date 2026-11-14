@@ -19,6 +19,7 @@ import { useSiteContent } from '../../contexts/SiteContentContext';
 import { NetVidyaStoreHome } from './NetVidyaStoreHome';
 import { NetVidyaFreeSample } from './NetVidyaFreeSample';
 import { NetVidyaDashboard } from './NetVidyaDashboard';
+import { MyMaterials } from './MyMaterials';
 import { NetVidyaCheckoutModal, CHECKOUT_PRODUCTS } from './NetVidyaCheckoutModal';
 import { NetVidyaStudentLoginModal } from './NetVidyaStudentLoginModal';
 import { NetVidyaPolicies, PolicyTab } from './NetVidyaPolicies';
@@ -28,7 +29,7 @@ import { NetVidyaGsetHome } from './gset/NetVidyaGsetHome';
 import { STORE_MERCHANT } from '../../config/storeConfig';
 import { StorePolicyLinks } from '../common/StorePolicyLinks';
 
-export type StoreView = 'home' | 'sample' | 'dashboard' | 'policies';
+export type StoreView = 'home' | 'sample' | 'dashboard' | 'materials' | 'policies';
 
 interface NetVidyaStoreLayoutProps {
   onBackToAcademicSite?: () => void;
@@ -63,8 +64,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.toLowerCase();
       const search = window.location.search.toLowerCase();
-      if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
-        return 'dashboard';
+      if (
+        hash === '#materials' ||
+        hash === '#my-materials' ||
+        hash === '#dashboard' ||
+        hash === '#store-dashboard' ||
+        search.includes('view=materials') ||
+        search.includes('view=dashboard')
+      ) {
+        return 'materials';
       }
     }
     return initialView;
@@ -136,8 +144,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       ) {
         openStudio('store');
       }
-      if (hash === '#dashboard' || hash === '#store-dashboard' || search.includes('view=dashboard')) {
-        setCurrentView('dashboard');
+      if (
+        hash === '#materials' ||
+        hash === '#my-materials' ||
+        hash === '#dashboard' ||
+        hash === '#store-dashboard' ||
+        search.includes('view=materials') ||
+        search.includes('view=dashboard')
+      ) {
+        setCurrentView('materials');
       }
       if (hash === '#login' || hash === '#signin' || hash === '#student-login' || search.includes('login=true')) {
         setIsLoginOpen(true);
@@ -236,6 +251,17 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Free Demo</span>
             </button>
+            {buyerSession.isLoggedIn && (
+              <button
+                onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  currentView === 'materials' ? 'bg-emerald-50 text-emerald-800 font-bold border border-emerald-200' : 'text-emerald-700 hover:bg-emerald-50 font-semibold'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                <span>My Materials</span>
+              </button>
+            )}
             {onOpenBookstore && (
               <button
                 onClick={onOpenBookstore}
@@ -263,9 +289,9 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {/* Student Login / Dashboard Button */}
             {buyerSession.isLoggedIn ? (
               <button
-                onClick={() => { setCurrentView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0"
-                title="Open Student Dashboard"
+                title="Open My Materials"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <span className="truncate max-w-[65px] sm:max-w-[85px] xl:max-w-[110px]">{buyerSession.name}</span>
@@ -293,13 +319,13 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             >
               {activeExamStore === 'gset' ? (
                 <>
-                  <span className="hidden sm:inline">Enroll GSET (from ₹149)</span>
-                  <span className="sm:hidden">GSET ₹149</span>
+                  <span className="hidden min-[400px]:inline">Enroll GSET (from ₹149)</span>
+                  <span className="min-[400px]:hidden">GSET ₹149</span>
                 </>
               ) : (
                 <>
-                  <span className="hidden sm:inline">Enroll Bundle (₹{currentServerPrice})</span>
-                  <span className="sm:hidden">₹{currentServerPrice}</span>
+                  <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
+                  <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
                 </>
               )}
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
@@ -330,10 +356,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   </div>
                 </div>
                 <button
-                  onClick={() => { setCurrentView('dashboard'); setMobileMenuOpen(false); }}
+                  onClick={() => { setCurrentView('materials'); setMobileMenuOpen(false); }}
                   className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] shrink-0 hover:bg-emerald-700"
                 >
-                  Dashboard
+                  My Materials
                 </button>
               </div>
             ) : (
@@ -404,14 +430,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               </button>
               {buyerSession.isLoggedIn && (
                 <button
-                  onClick={() => { setCurrentView('dashboard'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setCurrentView('materials'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
-                    currentView === 'dashboard' ? 'bg-blue-50 text-blue-900 font-bold' : 'hover:bg-gray-100 text-gray-700'
+                    currentView === 'materials' ? 'bg-emerald-50 text-emerald-900 font-bold' : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-blue-700" />
-                    <span>My Dashboard (Test Hall & PDFs)</span>
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>My Materials (Tests &amp; Study Notes)</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
                 </button>
@@ -485,10 +511,19 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           />
         )}
 
-        {currentView === 'dashboard' && (
-          <NetVidyaDashboard
-            onOpenCheckout={() => handleOpenCheckout()}
+        {currentView === 'materials' && (
+          <MyMaterials
+            onOpenCheckout={(packId) => handleOpenCheckout(packId)}
             onOpenPolicies={() => handleOpenPolicies('terms')}
+            onOpenLogin={() => setIsLoginOpen(true)}
+          />
+        )}
+
+        {currentView === 'dashboard' && (
+          <MyMaterials
+            onOpenCheckout={(packId) => handleOpenCheckout(packId)}
+            onOpenPolicies={() => handleOpenPolicies('terms')}
+            onOpenLogin={() => setIsLoginOpen(true)}
           />
         )}
 
@@ -553,7 +588,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           initialProductId={checkoutConfig.initialProductId}
           onSuccess={() => {
             setCheckoutConfig(prev => ({ ...prev, isOpen: false }));
-            setCurrentView('dashboard');
+            setCurrentView('materials');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
@@ -583,7 +618,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 initialProductId: pending.productId
               });
             } else {
-              setCurrentView('dashboard');
+              setCurrentView('materials');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }
           }}

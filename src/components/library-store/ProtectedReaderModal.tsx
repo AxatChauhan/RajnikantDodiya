@@ -29,6 +29,7 @@ import {
   Sparkles,
   FileText
 } from 'lucide-react';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface ProtectedReaderModalProps {
   isOpen: boolean;
@@ -227,6 +228,8 @@ const CITATIONS = {
 const CitationModal: React.FC<{ isOpen: boolean; onClose: () => void }> = React.memo(({ isOpen, onClose }) => {
   const [format, setFormat] = useState<'apa' | 'mla' | 'chicago' | 'bibtex'>('apa');
   const [copied, setCopied] = useState(false);
+
+  useModalEscape(isOpen, onClose);
 
   if (!isOpen) return null;
 

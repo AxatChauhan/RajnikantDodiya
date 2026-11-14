@@ -142,7 +142,7 @@ function AppInner() {
         return;
       }
 
-      if (route === 'dashboard' || route === 'store-dashboard') {
+      if (route === 'dashboard' || route === 'store-dashboard' || route === 'materials' || route === 'my-materials') {
         setActiveTab('store');
         return;
       }
@@ -430,7 +430,7 @@ function AppInner() {
             onLoginSuccess={() => {
               setIsStudentLoginOpen(false);
               handleNavigate('store');
-              window.location.hash = '#dashboard';
+              window.location.hash = '#materials';
             }}
             onOpenCheckout={() => {
               setIsStudentLoginOpen(false);

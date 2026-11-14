@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, FileText, RotateCcw, Truck, Mail, Phone, X } from 'lucide-react';
 import { STORE_MERCHANT, STORE_POLICIES } from '../../config/storeConfig';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 export type PolicyTab = 'terms' | 'privacy' | 'refund' | 'delivery' | 'contact';
 
@@ -40,6 +41,9 @@ export const NetVidyaPolicies: React.FC<NetVidyaPoliciesProps> = ({
     setActiveTab(initialTab);
   }, [initialTab]);
 
+  // Universal Escape key listener for modal view
+  useModalEscape(Boolean(isOpen && asModal && onClose), onClose || (() => {}));
+
   if (!isOpen) return null;
 
   const activePolicy = STORE_POLICIES[activeTab];
@@ -48,11 +52,11 @@ export const NetVidyaPolicies: React.FC<NetVidyaPoliciesProps> = ({
     <div className={asModal ? 'space-y-5' : 'max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6'}>
       {/* Header */}
       <div className="border-b border-gray-200 pb-4 flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0 flex-1 pr-2">
           <span className="text-xs font-mono uppercase font-bold text-blue-700 tracking-wider">
             Legal & Compliance
           </span>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mt-1 leading-snug">
             Store Policies & Commercial Disclosures
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
@@ -62,8 +66,9 @@ export const NetVidyaPolicies: React.FC<NetVidyaPoliciesProps> = ({
         {asModal && onClose && (
           <button
             onClick={onClose}
-            aria-label="Close Policies"
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
+            aria-label="Close Policies (Esc)"
+            title="Close Policies (Esc)"
+            className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

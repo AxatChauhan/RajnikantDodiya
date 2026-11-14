@@ -13,6 +13,7 @@ import {
   extractBearerToken,
   findUserByEmail,
   isEmailBuyer,
+  getUserEnrolledPacks,
   saveUser,
   saveResetToken,
   findResetToken,
@@ -110,12 +111,14 @@ export default async function handler(req, res) {
           updated_at: new Date().toISOString()
         };
         await saveUser(newUser);
+        const enrolledPacks = await getUserEnrolledPacks(newUser.email);
         const token = createSessionToken({
           id: newUser.id,
           name: newUser.name,
           email: newUser.email,
           mobile: newUser.mobile,
           isBuyer: newUser.is_buyer,
+          enrolledPacks,
           expiresAt: newUser.expires_at
         });
         return res.status(200).json({
@@ -127,6 +130,7 @@ export default async function handler(req, res) {
             email: newUser.email,
             mobile: newUser.mobile,
             isBuyer: newUser.is_buyer,
+            enrolledPacks,
             expiresAt: newUser.expires_at
           }
         });
@@ -182,12 +186,14 @@ export default async function handler(req, res) {
           user.is_buyer = isBuyer;
           await saveUser(user);
         }
+        const enrolledPacks = await getUserEnrolledPacks(cleanEmail);
         const token = createSessionToken({
           id: user.id,
           name: user.name,
           email: user.email,
           mobile: user.mobile,
           isBuyer: user.is_buyer,
+          enrolledPacks,
           expiresAt: user.expires_at
         });
         return res.status(200).json({
@@ -199,6 +205,7 @@ export default async function handler(req, res) {
             email: user.email,
             mobile: user.mobile,
             isBuyer: user.is_buyer,
+            enrolledPacks,
             expiresAt: user.expires_at
           }
         });
@@ -228,6 +235,8 @@ export default async function handler(req, res) {
           isBuyer,
           expiresAt: user?.expires_at || payload.expiresAt || DEFAULT_ACCESS_EXPIRY
         };
+        const enrolledPacks = await getUserEnrolledPacks(resolvedUser.email);
+        resolvedUser.enrolledPacks = enrolledPacks;
         const refreshedToken = isBuyer && !payload.isBuyer
           ? createSessionToken(resolvedUser)
           : undefined;

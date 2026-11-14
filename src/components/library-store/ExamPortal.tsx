@@ -6,6 +6,7 @@ import {
 import { useSiteContent, StudioExamTest } from '../../contexts/SiteContentContext';
 import { unmaskAnswer } from '../../lib/security';
 import { Clock, CheckCircle2, AlertCircle, Bookmark, Award, X, RotateCcw, ChevronRight, ChevronLeft, ShieldCheck, FileText, Lock } from 'lucide-react';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 interface ExamPortalProps {
   isOpen: boolean;
@@ -107,6 +108,7 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
   });
 
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
   const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
   const [focusLossWarnings, setFocusLossWarnings] = useState<number>(0);
@@ -177,6 +179,15 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
       };
     }
   }, [isOpen]);
+
+  // Universal Escape key listener: confirm if active, exit directly if submitted
+  useModalEscape(isOpen, () => {
+    if (examSubmitted) {
+      onClose();
+    } else {
+      setShowExitConfirm(true);
+    }
+  });
 
   if (!isOpen) return null;
 
@@ -449,9 +460,16 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
             </div>
 
             <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-ink-muted hover:text-claret transition-colors"
-              aria-label="Exit exam"
+              onClick={() => {
+                if (examSubmitted) {
+                  onClose();
+                } else {
+                  setShowExitConfirm(true);
+                }
+              }}
+              className="p-1.5 rounded-lg text-ink-muted hover:text-claret transition-colors cursor-pointer"
+              aria-label="Exit exam (Esc)"
+              title="Exit exam (Esc)"
             >
               <X className="w-5 h-5" />
             </button>
@@ -982,6 +1000,37 @@ export const ExamPortal: React.FC<ExamPortalProps> = ({
                   className="px-5 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-medium shadow-xs min-h-[44px] transition-all"
                 >
                   Yes, Submit Exam
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal before Exiting Active Exam */}
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-[75] flex items-center justify-center p-4 bg-ink-pure/75 backdrop-blur-xs animate-fade-in">
+            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-book-xl border border-deckle space-y-4">
+              <h4 className="font-serif text-xl text-ink font-normal">Exit Active CBT Exam?</h4>
+              <p className="text-xs text-ink-muted font-reading leading-relaxed">
+                Your examination timer is active ({formatTime(timeLeft)} remaining). Exiting will pause your session. Are you sure you want to return to the library?
+              </p>
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowExitConfirm(false)}
+                  className="px-4 py-2.5 rounded-xl bg-parchment-warm hover:bg-parchment text-ink text-xs min-h-[44px] font-medium transition-all cursor-pointer"
+                >
+                  Resume Exam
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowExitConfirm(false);
+                    onClose();
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-[#2C1810] hover:bg-[#3D2012] text-white text-xs font-medium shadow-xs min-h-[44px] transition-all cursor-pointer"
+                >
+                  Exit Exam
                 </button>
               </div>
             </div>

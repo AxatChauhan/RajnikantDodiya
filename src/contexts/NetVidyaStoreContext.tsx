@@ -29,6 +29,7 @@ export interface NetVidyaBuyerSession {
   token?: string;
   role?: 'student' | 'author_admin';
   expiresAt?: string;
+  enrolledPacks?: string[];
 }
 
 export interface ReadingFileItem {
@@ -422,7 +423,7 @@ interface NetVidyaStoreContextType {
   settings: NetVidyaStoreSettings;
   updateSettings: (newSettings: Partial<NetVidyaStoreSettings>) => void;
   buyerSession: NetVidyaBuyerSession;
-  loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean }) => void;
+  loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean; enrolledPacks?: string[] }) => void;
   verifyPaymentAndActivate: (query: { paymentId?: string; email?: string; mobile?: string }) => Promise<{ success: boolean; message?: string; error?: string }>;
   logoutBuyer: () => void;
   login: (email: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; error?: string }>;
@@ -483,6 +484,14 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         if (cached && cached.email?.toLowerCase() === 'rajnikantdodiya2@gmail.com') {
           cached.isBuyer = true;
           cached.isLoggedIn = true;
+          cached.enrolledPacks = [
+            'ugc-net-english-bundle',
+            'gset-paper1',
+            'gset-paper2-english',
+            'gset-paper2-education',
+            'gset-english-combo',
+            'gset-education-combo'
+          ];
         }
         return cached;
       }
@@ -678,7 +687,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         mobile: data.user?.mobile || '',
         token: data.token,
         role: 'student',
-        expiresAt: data.user?.expiresAt
+        expiresAt: data.user?.expiresAt,
+        enrolledPacks: data.user?.enrolledPacks || (data.user?.isBuyer ? ['ugc-net-english-bundle'] : [])
       };
       setBuyerSession(session);
       try {
@@ -710,7 +720,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         mobile: data.user?.mobile || mobile,
         token: data.token,
         role: 'student',
-        expiresAt: data.user?.expiresAt
+        expiresAt: data.user?.expiresAt,
+        enrolledPacks: data.user?.enrolledPacks || []
       };
       setBuyerSession(session);
       try {
@@ -773,7 +784,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   // Backward-compatible buyer session setter (used by payment verification flow)
-  const loginBuyer = useCallback((data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean }) => {
+  const loginBuyer = useCallback((data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean; enrolledPacks?: string[] }) => {
     const sessionToken = data.token || `nv_buyer_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const session: NetVidyaBuyerSession = {
       isLoggedIn: true,
@@ -784,7 +795,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       orderId: data.orderId || `NV_${Date.now()}`,
       enrolledAt: new Date().toISOString(),
       token: sessionToken,
-      role: 'student'
+      role: 'student',
+      enrolledPacks: data.enrolledPacks || (data.isBuyer !== false ? ['ugc-net-english-bundle'] : [])
     };
     setBuyerSession(session);
     try {
@@ -869,7 +881,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
             email: data.user.email || prev.email,
             mobile: data.user.mobile || prev.mobile,
             token: nextToken,
-            expiresAt: data.user.expiresAt || prev.expiresAt
+            expiresAt: data.user.expiresAt || prev.expiresAt,
+            enrolledPacks: data.user.enrolledPacks || prev.enrolledPacks || (resolvedIsBuyer ? ['ugc-net-english-bundle'] : [])
           };
           try {
             localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(updated));

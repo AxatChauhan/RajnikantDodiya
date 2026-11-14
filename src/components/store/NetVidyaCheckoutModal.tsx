@@ -16,6 +16,7 @@ import {
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../config/storeConfig';
 import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
+import { useModalEscape } from '../../hooks/useModalEscape';
 
 export type ExamType = 'ugc' | 'gset';
 export type GsetStream = 'english' | 'education' | 'all';
@@ -219,6 +220,9 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   const [manualWhatsAppInfo, setManualWhatsAppInfo] = useState<{ url: string; number: string; message: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+
+  // Universal Escape key listener to close modal safely
+  useModalEscape(isOpen, onClose, !redirectingUrl && !isProcessing);
 
   // Sync state when props change
   useEffect(() => {
@@ -612,37 +616,38 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         className="relative w-full max-w-xl my-auto bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col max-h-[calc(100dvh-2rem)] overflow-hidden animate-scale-up overscroll-contain select-text"
       >
         
+        {/* Unclippable Top-Right Close Button with absolute anchoring */}
+        {!redirectingUrl && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-50 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 shadow-xs border border-gray-200 transition-all cursor-pointer flex items-center justify-center min-w-[36px] min-h-[36px]"
+            title="Close Checkout (Esc)"
+            aria-label="Close Checkout"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+
         {/* Sticky Header with Context Badge */}
-        <div className="p-4 sm:p-5 border-b border-gray-100 shrink-0 bg-white space-y-2">
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded-full">
-                  Official NET Vidya Store
-                </span>
-                <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded-full ${
-                  resolvedExam === 'gset' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
-                }`}>
-                  {resolvedExam === 'gset' ? 'GSET 2026 Examination Pass' : 'UGC NET National Pass'}
-                </span>
-              </div>
-              <h2 id="checkout-modal-title" className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
-                {resolvedExam === 'gset' ? 'GSET 2026 Examination Enrollment' : 'UGC NET English Bundle Enrollment'}
-              </h2>
-              <p className="text-[11px] text-gray-500">
-                Sold by {STORE_MERCHANT.brandName} • Curated by {STORE_MERCHANT.curatorShort}
-              </p>
+        <div className="p-3.5 sm:p-5 border-b border-gray-100 shrink-0 bg-white space-y-1.5">
+          <div className="space-y-1 min-w-0 pr-12">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded-full">
+                Official NET Vidya Store
+              </span>
+              <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded-full ${
+                resolvedExam === 'gset' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
+              }`}>
+                {resolvedExam === 'gset' ? 'GSET 2026 Examination Pass' : 'UGC NET National Pass'}
+              </span>
             </div>
-            {!redirectingUrl && (
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors shrink-0"
-                title="Close Checkout"
-                aria-label="Close Checkout"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
+            <h2 id="checkout-modal-title" className="text-sm sm:text-lg font-bold text-gray-900 leading-snug">
+              {resolvedExam === 'gset' ? 'GSET 2026 Examination Enrollment' : 'UGC NET English Bundle Enrollment'}
+            </h2>
+            <p className="text-[10px] sm:text-[11px] text-gray-500 truncate">
+              Sold by {STORE_MERCHANT.brandName} • Curated by {STORE_MERCHANT.curatorShort}
+            </p>
           </div>
         </div>
 
@@ -733,25 +738,22 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
 
           {/* UGC NET SELECTION SECTION */}
           {selectedExam === 'ugc' && (
-            <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2">
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-1">
               <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0 flex-1">
                   <span className="text-[9px] font-mono uppercase bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded border border-blue-200">
                     ALL-IN-ONE NATIONAL PASS
                   </span>
-                  <h4 className="text-sm font-bold text-blue-950">
+                  <h4 className="text-xs sm:text-sm font-bold text-blue-950 leading-snug">
                     UGC NET English Complete Preparation Bundle (2026 Edition)
                   </h4>
-                  <p className="text-xs text-blue-800 font-medium">
+                  <p className="text-[11px] sm:text-xs text-blue-800 font-medium">
                     21 Authentic NTA CBT Mock Simulations + 3 Complete Online Reading Dossiers (347 Pages).
-                  </p>
-                  <p className="text-[11px] text-gray-600">
-                    Includes Grand Mock (100 Qs), 10 Unit Tests, 10 Practice Mocks, E-Book (283p), PYQ Bank (35p), and Quick Revision Kit (29p).
                   </p>
                 </div>
                 <div className="text-right shrink-0">
                   <div className="flex items-baseline gap-1 justify-end">
-                    <span className="text-xl font-extrabold text-blue-950 font-serif">
+                    <span className="text-lg sm:text-xl font-extrabold text-blue-950 font-serif">
                       ₹499
                     </span>
                   </div>
@@ -909,6 +911,13 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   <Sparkles className="w-4 h-4" />
                   <span>Open Student Dashboard &amp; Test Hall</span>
                   <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full py-2 text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors cursor-pointer text-center block"
+                >
+                  Close Receipt
                 </button>
                 <p className="text-[11px] text-gray-500">
                   A purchase confirmation email with your dashboard link has also been dispatched to your email.
@@ -1104,7 +1113,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               </div>
 
               {/* Pay Trigger Button */}
-              <div className="pt-1">
+              <div className="pt-1 space-y-2">
                 <button
                   type="submit"
                   disabled={isProcessing}
@@ -1136,6 +1145,14 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full py-2 text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors cursor-pointer text-center block"
+                >
+                  ← Cancel and Return to Store
                 </button>
               </div>
             </form>

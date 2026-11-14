@@ -712,11 +712,11 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
             <div>
               <h2 className="text-xl font-bold text-gray-900">Protected Reading Materials & Dossiers</h2>
               <p className="text-xs text-gray-500">
-                Authoritative revision PDFs curated by Dr. Rajnikant Dodiya. Delivered via secure 10-minute temporary signed links.
+                Authoritative study dossiers curated by Dr. Rajnikant Dodiya. Read directly in our on-site reader.
               </p>
             </div>
             <span className="text-xs font-mono text-emerald-700 font-semibold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 self-start sm:self-auto">
-              Downloadable for Enrolled Scholars
+              Online Reading for Enrolled Scholars
             </span>
           </div>
 
@@ -762,35 +762,16 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-                    {file.sampleUrl && (
-                      <button
-                        onClick={() => {
-                          window.open(file.sampleUrl, '_blank');
-                          markItemCompleted(file.id, 'file', file.title);
-                        }}
-                        className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
-                      >
-                        <BookOpen className="w-4 h-4" />
-                        <span>Open Online Reader</span>
-                      </button>
-                    )}
-
                     <button
-                      onClick={() => handleDownloadFile(file)}
-                      disabled={downloadingId === file.id}
-                      className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                      onClick={() => {
+                        const targetUrl = file.sampleUrl || '/study-vault/ugc/reading/ebook/index.html';
+                        window.open(targetUrl, '_blank');
+                        markItemCompleted(file.id, 'file', file.title);
+                      }}
+                      className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
                     >
-                      {downloadingId === file.id ? (
-                        <>
-                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>Signing Link...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Download className="w-4 h-4" />
-                          <span>Download PDF</span>
-                        </>
-                      )}
+                      <BookOpen className="w-4 h-4" />
+                      <span>Read Online</span>
                     </button>
                   </div>
                 </div>
