@@ -260,7 +260,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
   // Base price and final payable calculation
   // Strict rule: GSET max combo is ₹249, singles are ₹149. UGC bundle is ₹499.
   const basePrice = activeProduct.price;
-  const finalPayablePrice = Math.max(1, basePrice - (appliedDiscount?.amount || 0));
+  const finalPayablePrice = Math.max(0, basePrice - (appliedDiscount?.amount || 0));
 
   const handleApplyCoupon = () => {
     setCouponError(null);
@@ -498,13 +498,43 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
 
       // 6. Test simulation mode
       if (orderData.isTestMode) {
-        loginBuyer({
-          name: cleanName,
-          email: cleanEmail,
-          mobile: cleanMobile,
-          orderId: orderData.orderId,
-          isBuyer: true
-        });
+        try {
+          const verifyRes = await fetch('/api/store/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: orderData.orderId,
+              studentName: cleanName,
+              email: cleanEmail,
+              mobile: cleanMobile,
+              productId: activeProduct.id,
+              amount: 0,
+              couponCode: appliedDiscount?.code || 'SIMULATE'
+            })
+          });
+          const verifyData = await verifyRes.json().catch(() => ({}));
+          if (verifyData.token) {
+            try {
+              localStorage.setItem('netvidya_auth_token_v1', verifyData.token);
+            } catch {}
+          }
+          loginBuyer({
+            name: cleanName,
+            email: cleanEmail,
+            mobile: cleanMobile,
+            orderId: orderData.orderId,
+            token: verifyData.token,
+            isBuyer: true
+          });
+        } catch {
+          loginBuyer({
+            name: cleanName,
+            email: cleanEmail,
+            mobile: cleanMobile,
+            orderId: orderData.orderId,
+            isBuyer: true
+          });
+        }
         setIsProcessing(false);
         setIsPaymentSuccess(true);
         return;

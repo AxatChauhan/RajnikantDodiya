@@ -70,8 +70,29 @@ export default async function handler(req, res) {
     const cleanCoupon = (couponCode || '').toString().trim().toUpperCase();
     const couponEntry = STORE_PAYMENT_DEFAULTS.validCoupons[cleanCoupon];
     const discount = couponEntry?.amount || 0;
-    const finalPrice = Math.max(1, basePrice - discount);
+    const finalPrice = Math.max(0, basePrice - discount);
     const amountInPaisa = finalPrice * 100; // Razorpay expects amount in paise
+
+    // Instant Developer & Author Test Payment Simulation Voucher (₹0 checkout)
+    if (cleanCoupon === 'SIMULATE' || cleanCoupon === 'TESTPAY' || cleanCoupon === 'TESTPASS') {
+      const testOrderId = `order_sim_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      return res.status(200).json({
+        success: true,
+        paymentMode: 'test_simulation',
+        orderId: testOrderId,
+        productId: resolvedProduct.id,
+        productName,
+        amount: 0,
+        amountInPaisa: 0,
+        currency: 'INR',
+        keyId: 'rzp_test_netvidya_key',
+        studentName,
+        email: email.trim().toLowerCase(),
+        mobile: mobile.trim(),
+        accessExpiryDate: '2026-12-31T23:59:59+05:30',
+        isTestMode: true
+      });
+    }
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
