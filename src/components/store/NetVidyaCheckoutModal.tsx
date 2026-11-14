@@ -630,7 +630,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 {resolvedExam === 'gset' ? 'GSET 2026 Examination Enrollment' : 'UGC NET English Bundle Enrollment'}
               </h2>
               <p className="text-[11px] text-gray-500">
-                Sold by {STORE_MERCHANT.brandName} ({STORE_MERCHANT.proprietor}) • Curated by {STORE_MERCHANT.curatorShort}
+                Sold by {STORE_MERCHANT.brandName} • Curated by {STORE_MERCHANT.curatorShort}
               </p>
             </div>
             {!redirectingUrl && (
@@ -828,7 +828,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   GSET Registration Confirmed (₹{finalPayablePrice})
                 </h3>
                 <p className="text-xs text-emerald-900 leading-relaxed max-w-sm mx-auto">
-                  Your seat for <strong>{activeProduct.name}</strong> has been registered. Connect directly on WhatsApp with Dr. Rajnikant Dodiya / Nilam Dodiya for instant GSET payment link generation &amp; immediate test hall activation.
+                  Your seat for <strong>{activeProduct.name}</strong> has been registered. Connect directly on WhatsApp with Dr. Rajnikant Dodiya for instant GSET payment link generation &amp; immediate test hall activation.
                 </p>
               </div>
 
@@ -1020,28 +1020,29 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 </div>
               )}
 
-              {/* Optional Coupon Code */}
-              {paymentMode === 'api_checkout' && (
-                <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-200 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-gray-700">Scholarship / Referral Code</span>
-                    <span className="text-[10px] text-gray-400 font-mono">Optional</span>
-                  </div>
-                  {appliedDiscount ? (
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs">
-                      <div className="flex items-center gap-1.5 text-emerald-800 font-medium">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span><strong>{appliedDiscount.code}</strong>: {appliedDiscount.message}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleRemoveCoupon}
-                        className="text-[11px] text-rose-600 hover:text-rose-800 underline font-medium cursor-pointer shrink-0 ml-2"
-                      >
-                        Remove
-                      </button>
+              {/* Scholarship / Referral Code & Simulation Mode */}
+              <div className="bg-gray-50 p-2.5 sm:p-3 rounded-xl border border-gray-200 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-gray-700">Scholarship / Referral Code</span>
+                  <span className="text-[10px] text-gray-400 font-mono">Optional</span>
+                </div>
+
+                {appliedDiscount ? (
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs">
+                    <div className="flex items-center gap-1.5 text-emerald-800 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span><strong>{appliedDiscount.code}</strong>: {appliedDiscount.message}</span>
                     </div>
-                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-[11px] text-rose-600 hover:text-rose-800 underline font-medium cursor-pointer shrink-0 ml-2"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <>
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -1053,7 +1054,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                             handleApplyCoupon();
                           }
                         }}
-                        placeholder="e.g. GSET50 or NET100"
+                        placeholder="e.g. SIMULATE, GSET50, or NET100"
                         className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono uppercase focus:ring-2 focus:ring-blue-600 outline-none"
                       />
                       <button
@@ -1064,14 +1065,43 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                         Apply
                       </button>
                     </div>
-                  )}
-                  {couponError && (
-                    <p className="text-[10px] text-rose-600 font-medium">
-                      {couponError}
-                    </p>
-                  )}
-                </div>
-              )}
+
+                    {/* Method A: Dedicated 1-Click Payment Simulation Button */}
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-xs">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                        <div>
+                          <strong className="text-amber-950 font-bold block text-[11px]">Testing / Demo Mode:</strong>
+                          <span className="text-[10px] text-amber-800 leading-tight block">Simulate paying ₹0 without real bank charge</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!studentName.trim()) setStudentName('Scholar Tester');
+                          if (!email.trim()) setEmail('scholar.test@example.com');
+                          if (!mobile.trim()) setMobile('9876543210');
+                          if (!password) setPassword('testpass123');
+                          setCouponCode('SIMULATE');
+                          setCouponError(null);
+                          const sim = STORE_PAYMENT_DEFAULTS.validCoupons['SIMULATE'];
+                          if (sim) {
+                            setAppliedDiscount({ code: 'SIMULATE', ...sim });
+                          }
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-all shadow-2xs shrink-0 cursor-pointer"
+                      >
+                        ⚡ 1-Click Simulate (₹0)
+                      </button>
+                    </div>
+                  </>
+                )}
+                {couponError && (
+                  <p className="text-[10px] text-rose-600 font-medium">
+                    {couponError}
+                  </p>
+                )}
+              </div>
 
               {/* Pay Trigger Button */}
               <div className="pt-1">
@@ -1079,7 +1109,9 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   type="submit"
                   disabled={isProcessing}
                   className={`w-full py-3 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer ${
-                    selectedExam === 'gset'
+                    appliedDiscount?.code === 'SIMULATE'
+                      ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white'
+                      : selectedExam === 'gset'
                       ? 'bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white'
                       : 'bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white'
                   }`}
@@ -1087,7 +1119,13 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   {isProcessing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Connecting to Payment Gateway...</span>
+                      <span>{appliedDiscount?.code === 'SIMULATE' ? 'Simulating ₹0 Payment...' : 'Connecting to Payment Gateway...'}</span>
+                    </>
+                  ) : appliedDiscount?.code === 'SIMULATE' ? (
+                    <>
+                      <Sparkles className="w-4 h-4 text-amber-300" />
+                      <span>Simulate ₹0 Payment &amp; Unlock Dashboard Now</span>
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   ) : (
                     <>

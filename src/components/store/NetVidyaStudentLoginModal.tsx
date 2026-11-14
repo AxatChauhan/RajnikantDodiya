@@ -646,6 +646,18 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               <p className="text-[11px] text-gray-500 mt-1">
                 Found in your UPI confirmation SMS, bank app, or Razorpay payment receipt email.
               </p>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActivateInput('pay_simulated_test');
+                  }}
+                  className="text-[11px] text-emerald-700 hover:text-emerald-900 font-semibold underline inline-flex items-center gap-1"
+                >
+                  <span>🧪 Use Demo Test Simulation ID (₹0 Pass)</span>
+                  <span>→</span>
+                </button>
+              </div>
             </div>
 
             <button
