@@ -328,7 +328,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <button
                 onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer"
-                title="Open My Materials & Test Hall"
+                title="Open My Materials"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden min-[400px]:inline">Access Materials</span>
@@ -394,7 +394,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-bold text-gray-900 text-xs">Enrolled Candidate?</p>
-                  <p className="text-[11px] text-gray-500 truncate">Sign in to open your Test Hall & PDFs.</p>
+                  <p className="text-[11px] text-gray-500 truncate">Sign in to open your Materials &amp; CBT Tests.</p>
                 </div>
                 <button
                   onClick={() => { setIsLoginOpen(true); setMobileMenuOpen(false); }}
@@ -505,7 +505,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Access My Materials &amp; Test Hall</span>
+                  <span>Access My Materials</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               ) : (
@@ -529,7 +529,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
         {currentView === 'home' && (
           activeExamStore === 'ugc' ? (
             <NetVidyaStoreHome
-              onOpenCheckout={() => handleOpenCheckout('ugc-net-english-bundle', 'ugc')}
+              onOpenCheckout={(prodId) => handleOpenCheckout(prodId || 'ugc-net-english-bundle', prodId?.startsWith('gset-') ? 'gset' : 'ugc')}
               onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               onOpenLogin={() => setIsLoginOpen(true)}
               onOpenBookstore={onOpenBookstore}

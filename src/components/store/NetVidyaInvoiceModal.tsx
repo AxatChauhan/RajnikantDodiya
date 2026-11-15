@@ -119,7 +119,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
                 Course Enrolled
               </span>
               <p className="text-sm font-bold text-gray-900">GSET + UGC NET English Final Pack 2026</p>
-              <p className="text-gray-600 mt-0.5">Mode: Student Dashboard • Reading Files & Test Hall</p>
+              <p className="text-gray-600 mt-0.5">Mode: Student Dashboard • Reading Files &amp; CBT Tests</p>
               <p className="text-emerald-700 font-semibold mt-1">Payment Channel: Razorpay Verified</p>
             </div>
           </div>
@@ -141,7 +141,7 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
                     <p className="text-gray-500 text-[11px] mt-0.5">
                       • Full Private Reading Files (PDF Downloads)
                       <br />
-                      • Complete Online NTA-Style Test Hall Access
+                      • Complete Online NTA-Style CBT Test Access
                       <br />
                       • Dedicated Student Dashboard Access through 31 Dec 2026
                     </p>

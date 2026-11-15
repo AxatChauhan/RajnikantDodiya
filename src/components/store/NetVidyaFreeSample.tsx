@@ -61,7 +61,7 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
           <span>100% Free Public Sample • No Login Required</span>
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-          Experience the NTA Test Hall & Sample Materials
+          Experience the NTA CBT Tests &amp; Sample Materials
         </h1>
         <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
           Test-drive the actual online computer-based exam environment, inspect our analytical answer explanations, and download free revision study samples before enrolling.
@@ -235,7 +235,7 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-              <span>Access My Materials &amp; Test Hall</span>
+              <span>Access My Materials</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (

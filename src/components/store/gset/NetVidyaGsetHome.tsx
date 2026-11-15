@@ -57,7 +57,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     price: 249,
     originalPrice: 799,
     badge: 'MOST POPULAR • COMPLETE ENGLISH PASS',
-    description: 'The definitive all-in-one preparation package for GSET English aspirants: comprehensive Paper 1 General Aptitude combined with specialized Paper 2 English Literature & ELT.',
+    description: 'The definitive complete preparation package for GSET English aspirants: comprehensive Paper 1 General Aptitude combined with specialized Paper 2 English Literature & ELT.',
     features: [
       'Full Paper 1: 3 Computer-Based CBT Tests (General Aptitude)',
       'Full Paper 2: 2 Computer-Based CBT Tests (English Literature, Theory & ELT)',
@@ -103,7 +103,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     },
     {
       q: 'How do I access the CBT mock exams?',
-      a: 'Immediately upon checkout via Razorpay, your account is activated. Simply log in with your email to access your personal dashboard and launch the authentic computer-based CBT test hall with real timer and question palette.'
+      a: 'Immediately upon checkout via Razorpay, your account is activated. Simply log in with your email to access your personal dashboard and launch authentic computer-based CBT mock tests with real timer and question palette.'
     },
     {
       q: 'How long is my access valid?',
@@ -177,7 +177,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
             GSET 2026 Examination Packages
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 max-w-xl mx-auto">
-            Choose either an all-inclusive Complete Scholar Duo (Paper 1 + Paper 2) for ₹249 or single standalone papers for ₹149.
+            Choose either a Flagship Scholar Duo (Paper 1 + Paper 2) for ₹249 or single standalone papers for ₹149.
           </p>
         </div>
 
@@ -327,14 +327,14 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
           </div>
         </div>
 
-        {/* B. STANDALONE PACKS (MODULAR OPTIONS - ALL ₹149) */}
+        {/* B. STANDALONE PACKS (MODULAR OPTIONS - ₹149 EACH) */}
         <div className="space-y-6 pt-4">
           <div className="text-center sm:text-left">
             <h3 className="text-base sm:text-lg font-bold text-gray-900">
               Need Only a Single Paper? Choose Standalone Packs (₹149 each)
             </h3>
             <p className="text-xs text-gray-500">
-              Modular single-paper options for candidates preparing targeted papers. All included mock tests are unlocked upon enrollment.
+              Modular single-paper options for candidates preparing targeted papers. Included mock tests are unlocked upon enrollment.
             </p>
           </div>
 
@@ -343,11 +343,11 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
               {
                 id: 'gset-paper1',
                 name: 'GSET Paper 1: General Aptitude Foundation Pack',
-                badge: 'COMMON TO ALL STREAMS',
+                badge: 'GENERAL APTITUDE (COMMON)',
                 badgeClass: 'bg-blue-100 text-blue-800',
                 price: 149,
                 originalPrice: 499,
-                description: 'All 10 general units: Teaching, Research, ICT, Logical Reasoning, and Higher Education.',
+                description: '10 general units: Teaching, Research, ICT, Logical Reasoning, and Higher Education.',
                 testsLabel: '3 Full CBT Tests (50 Qs each)',
                 tests: [
                   {

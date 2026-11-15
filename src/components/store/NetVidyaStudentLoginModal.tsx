@@ -272,7 +272,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             NET Vidya Student Portal
           </h2>
           <p className="text-xs text-gray-500">
-            Access your GSET & UGC NET English Reading Files & Test Hall.
+            Access your GSET &amp; UGC NET English Reading Files &amp; CBT Tests.
           </p>
         </div>
 

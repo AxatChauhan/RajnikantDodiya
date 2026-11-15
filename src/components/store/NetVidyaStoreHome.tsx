@@ -14,7 +14,13 @@ import {
   Award,
   Layers,
   GraduationCap,
-  ExternalLink
+  ExternalLink,
+  Star,
+  Calendar,
+  Zap,
+  Check,
+  Package,
+  Monitor
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import {
@@ -23,7 +29,7 @@ import {
 } from '../../config/storeConfig';
 
 interface NetVidyaStoreHomeProps {
-  onOpenCheckout: () => void;
+  onOpenCheckout: (productId?: string) => void;
   onOpenSample: () => void;
   onOpenLogin: () => void;
   onOpenBookstore?: () => void;
@@ -78,9 +84,27 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
 
   return (
     <div className="space-y-16 sm:space-y-24 animate-fade-in pb-12">
+
+      {/* Top E-Commerce Trust Announcement Ticker */}
+      <div className="bg-slate-900 text-white py-2 px-3 text-[11px] sm:text-xs -mt-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 sm:gap-8 flex-wrap text-center">
+          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+            <Zap className="w-3.5 h-3.5" /> Instant Digital Access
+          </span>
+          <span className="hidden sm:flex items-center gap-1.5 text-blue-300 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" /> SSL Secured Razorpay
+          </span>
+          <span className="flex items-center gap-1.5 text-amber-300 font-medium">
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 4.9 Rating (850+)
+          </span>
+          <span className="flex items-center gap-1.5 text-slate-300 font-medium">
+            <Calendar className="w-3.5 h-3.5" /> Valid 31 Dec 2026
+          </span>
+        </div>
+      </div>
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-6 sm:pt-10 max-w-5xl mx-auto px-4 space-y-8">
+      <section className="relative pt-4 sm:pt-6 max-w-5xl mx-auto px-4 space-y-8">
         
         {/* Offer / Access Status Badge */}
         <div className="text-center px-2">
@@ -96,10 +120,9 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             </div>
           ) : (
             <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
-              <span>
-                {paymentMode === 'payment_link' && currentServerPrice < settings.standardPrice
-                  ? `Direct Enrollment Offer: ₹${currentServerPrice} • Access till ${STORE_MERCHANT.accessExpiryLabel}`
-                  : `Enrollment Open • Access till ${STORE_MERCHANT.accessExpiryLabel}`}
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                <span>Continuous access through <strong>31 December 2026</strong></span>
               </span>
             </div>
           )}
@@ -133,13 +156,13 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100/80 text-blue-800 text-[11px] font-bold tracking-wide uppercase">
               <GraduationCap className="w-3.5 h-3.5 text-blue-700" />
-              <span>Academic Mentor & Content Creator</span>
+              <span>Academic Mentor &amp; Content Creator</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               Dr. Rajnikant Dodiya
             </h2>
             <p className="text-xs sm:text-sm font-semibold text-blue-900">
-              Ph.D. in English • 2× UGC NET & GSET Qualified
+              Ph.D. in English • 2× UGC NET &amp; GSET Qualified
             </p>
             <p className="text-xs text-gray-600 leading-relaxed max-w-xl">
               Personally curated and validated 100% of the mock questions, analytical model rationales, and high-yield reading files to help candidates excel in the upcoming examinations.
@@ -147,88 +170,391 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
           </div>
         </div>
 
-        {/* Pricing & Enrollment Card */}
-        <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-lg mx-auto border border-blue-200 shadow-xl space-y-5 relative overflow-hidden">
-          <div className="flex flex-col items-center justify-center gap-2 text-center">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
-              <span className="text-4xl sm:text-5xl font-black text-blue-950 font-mono">₹{currentServerPrice}</span>
-              {isEarlyBirdActive ? (
-                <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-                  Early-Bird Price (Standard ₹{settings.standardPrice} after 10 Nov)
+        {/* Pricing & Enrollment Card (Image 1 Redesign: Non-Wrapping, E-Commerce Polish) */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg mx-auto border border-blue-200 shadow-xl space-y-4 relative overflow-hidden">
+          {isEnrolled ? (
+            /* Active Candidate Pass Card */
+            <div className="space-y-4 text-center">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Verified Candidate Pass Active</span>
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-gray-900">
+                  UGC NET English Complete Bundle
+                </h3>
+                <p className="text-xs text-gray-600 mt-1">
+                  Candidate access verified • Unlocked through 31 Dec 2026
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-3 text-xs text-gray-600 flex-wrap pt-1">
+                <span className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 font-medium">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-600" /> 31 Dec 2026
                 </span>
-              ) : paymentMode === 'payment_link' && currentServerPrice < settings.standardPrice ? (
-                <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-                  Direct Link Offer (Standard ₹{settings.standardPrice})
+                <span className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 font-medium">
+                  <Clock className="w-3.5 h-3.5 text-blue-600" /> 21 CBT Tests
                 </span>
-              ) : (
-                <span className="text-xs font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-full">
-                  Standard Enrollment Fee
+                <span className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 font-medium">
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600" /> 3 Dossiers
                 </span>
-              )}
+              </div>
+              <div className="space-y-2.5 pt-2">
+                <button
+                  onClick={onNavigateToMaterials || (() => onOpenCheckout('ugc-net-english-bundle'))}
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] cursor-pointer"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>Open My Materials</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={onOpenSample}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 text-blue-700 fill-current" />
+                  <span>Try Free Demo (10 Qs + Sample)</span>
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Prospective Candidate E-Commerce Pricing Card */
+            <div className="space-y-4 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  <Star className="w-3 h-3 fill-amber-500 text-amber-500" /> 4.9 (850+)
+                </span>
+                {isEarlyBirdActive ? (
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    Early-Bird Price
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded-full border border-blue-200">
+                    Standard Price
+                  </span>
+                )}
+              </div>
 
-          <p className="text-xs text-gray-500 text-center">
-            One-time enrollment fee • Server-verified pricing • Continuous access through <strong>31 December 2026</strong>
-          </p>
+              <div className="flex items-baseline justify-center gap-2.5">
+                <span className="text-4xl sm:text-5xl font-black text-blue-950 font-mono">₹{currentServerPrice}</span>
+                <span className="text-base sm:text-lg text-gray-400 line-through">₹999</span>
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  50% OFF
+                </span>
+              </div>
 
-          {/* Primary Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            {isEnrolled ? (
-              <button
-                onClick={onNavigateToMaterials || onOpenCheckout}
-                className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
-              >
-                <CheckCircle2 className="w-5 h-5 text-emerald-300" />
-                <span>✓ National Pass Active • Open My Materials &amp; Test Hall</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={onOpenCheckout}
-                className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
-              >
-                <span>Enroll in Complete Bundle (₹{currentServerPrice})</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
-            <button
-              onClick={onOpenSample}
-              className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Play className="w-4 h-4 text-blue-700 fill-current" />
-              <span>Try Free Demo (10 Qs + Sample)</span>
-            </button>
-          </div>
+              <div className="flex items-center justify-center gap-2.5 text-xs text-gray-500 flex-wrap">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-blue-600" /> 21 CBT Tests
+                </span>
+                <span className="flex items-center gap-1">
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-600" /> 3 Dossiers (347 Pages)
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-gray-500" /> Till 31 Dec 2026
+                </span>
+              </div>
 
-          {/* Already Enrolled Link */}
-          {!isEnrolled && (
-            <div className="pt-2 text-center text-xs text-gray-500">
-              <span>Already enrolled? </span>
-              <button
-                onClick={onOpenLogin}
-                className="font-bold text-blue-700 hover:underline cursor-pointer"
-              >
-                Student Login here →
-              </button>
+              <div className="space-y-2.5 pt-2">
+                <button
+                  onClick={() => onOpenCheckout('ugc-net-english-bundle')}
+                  className="w-full py-3.5 px-6 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] cursor-pointer"
+                >
+                  <Lock className="w-4 h-4 text-blue-200" />
+                  <span>Enroll in Complete Bundle (₹{currentServerPrice})</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={onOpenSample}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 text-blue-700 fill-current" />
+                  <span>Try Free Demo (10 Qs + Sample)</span>
+                </button>
+              </div>
+
+              <div className="pt-1 text-center text-xs text-gray-500">
+                <span>Already enrolled? </span>
+                <button
+                  onClick={onOpenLogin}
+                  className="font-bold text-blue-700 hover:underline cursor-pointer"
+                >
+                  Student Login here →
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Mini Trust Row */}
+        {/* Mini Trust Row with Icons */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500 pt-1">
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <Zap className="w-4 h-4 text-emerald-600" />
             <span>Instant Digital Access</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Razorpay Secured</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <BookOpen className="w-4 h-4 text-emerald-600" />
+            <GraduationCap className="w-4 h-4 text-emerald-600" />
             <span>Curated by Dr. Rajnikant Dodiya</span>
           </div>
+        </div>
+      </section>
+
+      {/* NEW E-COMMERCE FEATURED PACKAGES CATALOG GRID */}
+      <section className="max-w-6xl mx-auto px-4 space-y-6">
+        <div className="text-center space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-900 text-xs font-bold">
+            <Package className="w-3.5 h-3.5 text-blue-700" />
+            <span>Storefront Catalog</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+            Featured Examination Packages
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-600 max-w-xl mx-auto">
+            Choose your target examination below for instant digital activation and continuous access through 31 December 2026.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* 1. UGC NET English Bundle */}
+          <div className="p-5 rounded-2xl bg-white border border-blue-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded border border-blue-200">
+                  NATIONAL PASS
+                </span>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-gray-900 leading-snug">
+                UGC NET English Complete Bundle
+              </h3>
+              <p className="text-[11px] text-gray-500 line-clamp-2">
+                21 authentic CBT mock tests + 3 online reading dossiers (347 pages).
+              </p>
+              <div className="space-y-1.5 pt-1 text-[11px] text-gray-600">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>21 CBT Tests</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>3 Reading Dossiers</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-gray-900 font-mono">₹499</span>
+                  <span className="text-xs text-gray-400 line-through">₹999</span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  50% OFF
+                </span>
+              </div>
+              {checkPackEnrolled('ugc-net-english-bundle') ? (
+                <button
+                  onClick={onNavigateToMaterials || (() => onOpenCheckout('ugc-net-english-bundle'))}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Open Materials</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onOpenCheckout('ugc-net-english-bundle')}
+                  className="w-full py-2 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Enroll Now (₹499)</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 2. GSET English Scholar Duo */}
+          <div className="p-5 rounded-2xl bg-white border border-emerald-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-300">
+                  FLAGSHIP DUO
+                </span>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-gray-900 leading-snug">
+                GSET English Scholar Duo
+              </h3>
+              <p className="text-[11px] text-gray-500 line-clamp-2">
+                Paper 1 General Aptitude combined with Paper 2 English Literature.
+              </p>
+              <div className="space-y-1.5 pt-1 text-[11px] text-gray-600">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>5 CBT Tests (3 P1 + 2 P2)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Paper 1 + English Paper 2</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-gray-900 font-mono">₹249</span>
+                  <span className="text-xs text-gray-400 line-through">₹799</span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  69% OFF
+                </span>
+              </div>
+              {checkPackEnrolled('gset-english-combo') ? (
+                <button
+                  onClick={onNavigateToMaterials || (() => onOpenCheckout('gset-english-combo'))}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Open Materials</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onOpenCheckout('gset-english-combo')}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Enroll Now (₹249)</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 3. GSET Education Scholar Duo */}
+          <div className="p-5 rounded-2xl bg-white border border-purple-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded border border-purple-300">
+                  FLAGSHIP DUO
+                </span>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-gray-900 leading-snug">
+                GSET Education Scholar Duo
+              </h3>
+              <p className="text-[11px] text-gray-500 line-clamp-2">
+                Paper 1 General Aptitude combined with Paper 2 Education &amp; Pedagogy.
+              </p>
+              <div className="space-y-1.5 pt-1 text-[11px] text-gray-600">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  <span>6 CBT Tests (3 P1 + 3 P2)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  <span>Paper 1 + Education Paper 2</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-gray-900 font-mono">₹249</span>
+                  <span className="text-xs text-gray-400 line-through">₹799</span>
+                </div>
+                <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
+                  69% OFF
+                </span>
+              </div>
+              {checkPackEnrolled('gset-education-combo') ? (
+                <button
+                  onClick={onNavigateToMaterials || (() => onOpenCheckout('gset-education-combo'))}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Open Materials</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onOpenCheckout('gset-education-combo')}
+                  className="w-full py-2 px-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Enroll Now (₹249)</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 4. GSET Paper 1 Foundation */}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-800 font-bold px-2 py-0.5 rounded border border-slate-200">
+                  SINGLE PAPER
+                </span>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.8
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-gray-900 leading-snug">
+                GSET Paper 1 Foundation Pack
+              </h3>
+              <p className="text-[11px] text-gray-500 line-clamp-2">
+                10 general units: Teaching, Research, ICT, Logic &amp; Higher Education.
+              </p>
+              <div className="space-y-1.5 pt-1 text-[11px] text-gray-600">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                  <span>3 CBT Tests (50 Qs each)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                  <span>Paper 1 General Aptitude</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-gray-900 font-mono">₹149</span>
+                  <span className="text-xs text-gray-400 line-through">₹499</span>
+                </div>
+                <span className="text-[10px] font-bold text-slate-700 bg-slate-50 px-1.5 py-0.5 rounded">
+                  70% OFF
+                </span>
+              </div>
+              {checkPackEnrolled('gset-paper1') ? (
+                <button
+                  onClick={onNavigateToMaterials || (() => onOpenCheckout('gset-paper1'))}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Open Materials</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onOpenCheckout('gset-paper1')}
+                  className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Enroll Now (₹149)</span>
+                </button>
+              )}
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -236,7 +562,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
       <section className="max-w-6xl mx-auto px-4 space-y-10">
         <div className="text-center space-y-2">
           <span className="text-xs font-mono uppercase font-bold text-blue-700 tracking-wider">
-            All-In-One Study Bundle Breakdown
+            Complete Study Bundle Curriculum
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             What You Get Inside the ₹{currentServerPrice} Complete Bundle
@@ -333,7 +659,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-2xs space-y-3">
               <div className="flex items-center gap-2 text-blue-800 font-bold text-sm">
                 <Clock className="w-4 h-4 text-blue-600" />
-                <span>21 Computer-Based Tests (CBT Test Hall)</span>
+                <span>21 Computer-Based CBT Tests</span>
               </div>
               <ul className="text-xs text-gray-600 space-y-2.5">
                 <li className="flex items-start gap-2 p-2 rounded-lg bg-blue-50/50 border border-blue-100">
@@ -469,14 +795,14 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               {isEnrolled ? "You're Enrolled in the UGC NET Complete Bundle" : "Enroll in the Final Pack 2026 Today"}
             </h2>
             <p className="text-xs sm:text-sm text-blue-200 leading-relaxed">
-              {isEnrolled ? `Your candidate account is fully active. Access all 21 NTA mock tests and reading dossiers anytime through ${STORE_MERCHANT.accessExpiryFullLabel}.` : `Get immediate access to all 21 NTA mock tests and high-yield revision dossiers for ₹${currentServerPrice} through ${STORE_MERCHANT.accessExpiryFullLabel}.`}
+              {isEnrolled ? `Your candidate account is fully active. Access 21 NTA mock tests and reading dossiers anytime through ${STORE_MERCHANT.accessExpiryFullLabel}.` : `Get immediate access to 21 NTA mock tests and high-yield revision dossiers for ₹${currentServerPrice} through ${STORE_MERCHANT.accessExpiryFullLabel}.`}
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {isEnrolled ? (
               <button
-                onClick={onNavigateToMaterials || onOpenCheckout}
+                onClick={onNavigateToMaterials || (() => onOpenCheckout('ugc-net-english-bundle'))}
                 className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
               >
                 <CheckCircle2 className="w-5 h-5 text-emerald-200" />
@@ -485,7 +811,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               </button>
             ) : (
               <button
-                onClick={onOpenCheckout}
+                onClick={() => onOpenCheckout('ugc-net-english-bundle')}
                 className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
               >
                 <span>Enroll Now for ₹{currentServerPrice}</span>
@@ -502,7 +828,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
 
           <div className="space-y-2">
             <p className="text-[11px] text-blue-300">
-              Instant electronic activation • All 10+ Mocks & Reading Files included • Access till {STORE_MERCHANT.accessExpiryLabel}
+              Instant electronic activation • 21 Mocks &amp; 3 Reading Files included • Access till {STORE_MERCHANT.accessExpiryLabel}
             </p>
             {onOpenBookstore && (
               <button
