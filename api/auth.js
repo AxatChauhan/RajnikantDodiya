@@ -104,6 +104,9 @@ export default async function handler(req, res) {
         if (!name || !email || !password || typeof password !== 'string' || password.length === 0) {
           return res.status(400).json({ success: false, error: 'Name, email, and password are required.' });
         }
+        if (name.length > 100 || email.length > 254 || password.length > 128) {
+          return res.status(400).json({ success: false, error: 'Input length exceeds maximum security limit.' });
+        }
         const cleanEmail = email.trim().toLowerCase();
         if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
           return res.status(400).json({ success: false, error: 'Invalid email format.' });
@@ -163,6 +166,9 @@ export default async function handler(req, res) {
         const { email, password } = req.body || {};
         if (!email || !password || typeof password !== 'string' || password.length === 0) {
           return res.status(400).json({ success: false, error: 'Email and password required.' });
+        }
+        if (email.length > 254 || password.length > 128) {
+          return res.status(401).json({ success: false, error: 'Invalid email or password.' });
         }
         const cleanEmail = email.trim().toLowerCase();
         let user = await findUserByEmail(cleanEmail);
@@ -433,6 +439,9 @@ export default async function handler(req, res) {
         const { token, otp, email, newPassword } = req.body || {};
         if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length === 0) {
           return res.status(400).json({ success: false, error: 'New password is required.' });
+        }
+        if (newPassword.length > 128) {
+          return res.status(400).json({ success: false, error: 'New password must not exceed 128 characters.' });
         }
 
         let targetEmail = '';
