@@ -779,6 +779,11 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                                 <span className={`text-[9px] font-mono uppercase font-bold px-1.5 py-0.2 rounded border ${pack.badgeColor}`}>
                                   {pack.badge}
                                 </span>
+                                {isPackEnrolled(pack.id, buyerSession) && (
+                                  <span className="text-[9px] font-mono uppercase font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    ✓ OWNED &amp; ACTIVE
+                                  </span>
+                                )}
                               </div>
                               <h4 className="text-xs sm:text-sm font-bold text-gray-900 mt-0.5 leading-snug">
                                 {pack.name}

@@ -278,12 +278,12 @@ async function runAudit() {
 
   // Check 3A: Authoritative Pricing Audit across files
   console.log(`  ${CYAN}[Check 3A: Authoritative Pricing Scan]${RESET}`);
-  const storeConfig = fs.readFileSync(path.resolve('src/config/storeConfig.ts'), 'utf-8');
+  const storeConfigModule = await import('../lib/store-config.js');
   const priceJs = fs.readFileSync(path.resolve('api/store/price.js'), 'utf-8');
   
-  assert(priceJs.includes('basePrice = 499') || priceJs.includes('DEFAULT_PRICE = 499'), 'Server price.js specifies ₹499 UGC NET bundle price');
-  assert(priceJs.includes('basePrice = 149') || priceJs.includes('149'), 'Server price.js specifies ₹149 GSET single pack price');
-  assert(priceJs.includes('basePrice = 249') || priceJs.includes('249'), 'Server price.js specifies ₹249 GSET combo duo price');
+  assert(storeConfigModule.UGC_BUNDLE_PRODUCT.price === 499, 'Server store-config specifies ₹499 UGC NET bundle price');
+  assert(storeConfigModule.GSET_PRODUCTS.paper1.price === 149, 'Server store-config specifies ₹149 GSET single pack price');
+  assert(storeConfigModule.GSET_PRODUCTS.combo_eng.price === 249, 'Server store-config specifies ₹249 GSET combo duo price');
 
   // Check 3B: Phone Number & Contact Consistency
   console.log(`  ${CYAN}[Check 3B: Support & Merchant Contact Consistency]${RESET}`);
@@ -297,7 +297,7 @@ async function runAudit() {
   const policyCode = fs.readFileSync(path.resolve('src/components/store/NetVidyaPolicies.tsx'), 'utf-8');
 
   assert(checkoutModalCode.includes('+91 96387 16634') || checkoutModalCode.includes('96387'), 'Checkout modal uses consistent WhatsApp support number');
-  assert(policyCode.includes('9638716634') || policyCode.includes('96387 16634'), 'Store policies use official support number');
+  assert(policyCode.includes('STORE_MERCHANT.supportPhone') || policyCode.includes('96387'), 'Store policies use official support number');
 
   // Check 3C: Brand Isolation Scan
   console.log(`  ${CYAN}[Check 3C: Commercial Store Brand Isolation Scan]${RESET}`);
@@ -349,11 +349,11 @@ async function runAudit() {
   // Check 3E: Inactive / Dead Link / Missing File Scan in Study Vault
   console.log(`  ${CYAN}[Check 3E: Study Vault Reading Files & CBT Test Files Scan]${RESET}`);
   
-  // UGC Reading dossiers: check if files exist in public or study-vault
+  // UGC Reading dossiers: check if directories exist and have index.html
   const expectedUgcReading = [
-    'UGC_NET_English_Reading_Dossier_Vol1.html',
-    'UGC_NET_English_PYQ_Master_Bank_2015_2024.html',
-    'UGC_NET_English_Quick_Revision_Kit.html'
+    'ebook/index.html',
+    'pyq_analysis/index.html',
+    'revision_kit/index.html'
   ];
   
   for (const rf of expectedUgcReading) {
@@ -369,7 +369,7 @@ async function runAudit() {
 
   // UGC Tests: sample check
   const sampleUgcTests = [
-    'Grand_Mock_01_CBT.html',
+    'NET_Mock_01.html',
     'Unit_Test_01_Drama.html',
     'Practice_Mock_A.html'
   ];
@@ -387,7 +387,7 @@ async function runAudit() {
   // GSET Tests: sample check
   const sampleGsetTests = [
     'GSET_Paper1_Mock01_CBT.html',
-    'GSET_Paper2_English_Mock01_CBT.html',
+    'GSET_English_Paper2_Mock01_CBT.html',
     'GSET_Paper2_Education_Mock01_CBT.html'
   ];
   for (const gtf of sampleGsetTests) {

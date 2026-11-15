@@ -19,6 +19,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useNetVidyaStore, ReadingFileItem, TestHallItem } from '../../contexts/NetVidyaStoreContext';
+import { isAuthorEmail } from '../../config/storeConfig';
 import { NtaTestRunnerModal } from './NtaTestRunnerModal';
 import { NetVidyaInvoiceModal } from './NetVidyaInvoiceModal';
 
@@ -72,7 +73,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
 
     const enrolled = buyerSession.enrolledPacks || [];
     const isGeneralBuyer = buyerSession.isBuyer;
-    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+    const isAuthor = isAuthorEmail(buyerSession.email);
 
     const packs: CoursePackSummary[] = [];
 
@@ -129,14 +130,14 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
 
   // User enrolled reading files (UGC NET Pack)
   const userReadingFiles = useMemo(() => {
-    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+    const isAuthor = isAuthorEmail(buyerSession.email);
     const hasUgc = isAuthor || userPacks.some(p => p.id === 'ugc-net-english-bundle');
     return hasUgc ? readingFiles : [];
   }, [buyerSession, userPacks, readingFiles]);
 
   // Grouped tests under enrolled packs according to subjects
   const subjectTestGroups = useMemo(() => {
-    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+    const isAuthor = isAuthorEmail(buyerSession.email);
     const groups: {
       packId: string;
       subjectTitle: string;
@@ -222,7 +223,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
       year: 'numeric'
     });
 
-    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+    const isAuthor = isAuthorEmail(buyerSession.email);
 
     if (now < releaseTime && !isAuthor) {
       showToast(`This test opens on ${formattedDate}`, 'alert');
@@ -659,7 +660,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
                   {group.tests.map((test) => {
                     const now = new Date();
                     const releaseDate = new Date(test.releaseDate);
-                    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+                    const isAuthor = isAuthorEmail(buyerSession.email);
                     const isAvailable = now >= releaseDate || isAuthor;
                     const formattedDate = releaseDate.toLocaleDateString('en-IN', {
                       day: 'numeric',

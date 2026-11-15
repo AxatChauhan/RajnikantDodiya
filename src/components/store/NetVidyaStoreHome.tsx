@@ -466,10 +466,10 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
         <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 rounded-3xl p-8 sm:p-12 text-white text-center space-y-6 shadow-2xl border border-blue-800">
           <div className="space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Enroll in the Final Pack 2026 Today
+              {isEnrolled ? "You're Enrolled in the UGC NET Complete Bundle" : "Enroll in the Final Pack 2026 Today"}
             </h2>
             <p className="text-xs sm:text-sm text-blue-200 leading-relaxed">
-              Get immediate access to all 10+ mock tests and high-yield revision dossiers for ₹{currentServerPrice} through {STORE_MERCHANT.accessExpiryFullLabel}.
+              {isEnrolled ? `Your candidate account is fully active. Access all 21 NTA mock tests and reading dossiers anytime through ${STORE_MERCHANT.accessExpiryFullLabel}.` : `Get immediate access to all 21 NTA mock tests and high-yield revision dossiers for ₹${currentServerPrice} through ${STORE_MERCHANT.accessExpiryFullLabel}.`}
             </p>
           </div>
 

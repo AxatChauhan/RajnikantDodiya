@@ -16,13 +16,16 @@ import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 interface NetVidyaFreeSampleProps {
   onOpenCheckout: () => void;
   onNavigateHome: () => void;
+  onNavigateToMaterials?: () => void;
 }
 
 export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
   onOpenCheckout,
-  onNavigateHome
+  onNavigateHome,
+  onNavigateToMaterials
 }) => {
-  const { currentServerPrice, isEarlyBirdActive } = useNetVidyaStore();
+  const { currentServerPrice, isEarlyBirdActive, checkPackEnrolled } = useNetVidyaStore();
+  const isEnrolled = checkPackEnrolled ? checkPackEnrolled('ugc-net-english-bundle') : false;
   const [isDemoRunning, setIsDemoRunning] = useState(false);
   const [downloadToast, setDownloadToast] = useState<string | null>(null);
 
@@ -205,13 +208,17 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
         <div className="space-y-2 text-center sm:text-left">
           <div className="flex items-center justify-center sm:justify-start gap-2 text-xs font-mono text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Enrollment Open • Access through 31 Dec 2026</span>
+            <span>{isEnrolled ? '✓ National Pass Active • Full Access Granted' : 'Enrollment Open • Access through 31 Dec 2026'}</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-bold">
-            Ready to Unlock the Full Final Pack 2026?
+            {isEnrolled ? "You're Enrolled in the UGC NET Complete Bundle" : "Ready to Unlock the Full Final Pack 2026?"}
           </h3>
           <p className="text-xs sm:text-sm text-blue-200 max-w-xl">
-            Get all 5 Full Mocks + Unit-wise Tests + 5 Bonus Practice Mocks + Complete Reading Files for just <strong>₹{currentServerPrice}</strong> {isEarlyBirdActive ? '(Early-Bird Price until 10 Nov)' : ''}.
+            {isEnrolled ? (
+              <span>Your candidate account has full access to all 21 NTA mock tests and 3 complete reading dossiers through 31 Dec 2026.</span>
+            ) : (
+              <span>Get all 21 NTA Mocks + Unit-wise Tests + Complete Reading Files for just <strong>₹{currentServerPrice}</strong> {isEarlyBirdActive ? '(Early-Bird Price until 10 Nov)' : ''}.</span>
+            )}
           </p>
         </div>
 
@@ -222,13 +229,24 @@ export const NetVidyaFreeSample: React.FC<NetVidyaFreeSampleProps> = ({
           >
             Review Syllabus
           </button>
-          <button
-            onClick={onOpenCheckout}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02]"
-          >
-            <span>Buy Final Pack — ₹{currentServerPrice}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          {isEnrolled ? (
+            <button
+              onClick={onNavigateToMaterials || onNavigateHome}
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+              <span>Access My Materials &amp; Test Hall</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={onOpenCheckout}
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
+            >
+              <span>Buy Final Pack — ₹{currentServerPrice}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 

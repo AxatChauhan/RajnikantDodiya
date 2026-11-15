@@ -103,10 +103,17 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
     if (productId?.startsWith('gset-')) targetExam = 'gset';
     else if (productId?.startsWith('ugc-')) targetExam = 'ugc';
 
-    const targetProduct = CHECKOUT_PRODUCTS.find(p => p.id === productId) ||
-      (targetExam === 'gset' ? CHECKOUT_PRODUCTS[0] : CHECKOUT_PRODUCTS.find(p => p.id === 'ugc-net-english-bundle'));
+    let targetProduct = CHECKOUT_PRODUCTS.find(p => p.id === productId);
+    if (!targetProduct) {
+      targetProduct = CHECKOUT_PRODUCTS.find(p => p.exam === targetExam && !isPackEnrolled(p.id, buyerSession)) ||
+                      CHECKOUT_PRODUCTS.find(p => !isPackEnrolled(p.id, buyerSession));
+      if (targetProduct) {
+        targetExam = targetProduct.exam;
+        productId = targetProduct.id;
+      }
+    }
 
-    // If candidate already owns this pack, open their materials instead of charging them again
+    // If candidate already owns this pack (or owns all packs), open materials instead of prompting
     if (targetProduct && isPackEnrolled(targetProduct.id, buyerSession)) {
       setCurrentView('materials');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -542,6 +549,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           <NetVidyaFreeSample
             onOpenCheckout={() => handleOpenCheckout()}
             onNavigateHome={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onNavigateToMaterials={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           />
         )}
 
