@@ -114,7 +114,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
   return (
     <div className="space-y-12 sm:space-y-16 animate-fade-in pb-12">
       {/* 1. HERO SECTION */}
-      <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
+      <section className="relative pt-10 sm:pt-14 md:pt-16 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
         {/* Main Headline & Subtitle */}
         <div className="text-center space-y-3">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">

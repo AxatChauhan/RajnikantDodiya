@@ -53,7 +53,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
     <div className="animate-fade-in pb-12 space-y-12 sm:space-y-16">
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
+      <section className="relative pt-10 sm:pt-14 md:pt-16 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
         
         {/* Main Headline & Subtitle */}
         <div className="text-center space-y-3">
