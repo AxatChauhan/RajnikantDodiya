@@ -3,6 +3,7 @@ import {
   GraduationCap,
   BookOpen,
   KeyRound,
+  LogIn,
   ShieldCheck,
   Menu,
   X,
@@ -298,7 +299,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           {/* Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
-            {/* Universal My Materials / Account Button */}
+            {/* Universal Authentication & Materials Controls */}
             {buyerSession.isLoggedIn ? (
               <button
                 onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -309,15 +310,29 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span className="truncate max-w-[65px] sm:max-w-[80px] xl:max-w-[95px]">{buyerSession.name}</span>
               </button>
             ) : (
-              <button
-                onClick={handleOpenMyMaterials}
-                className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
-                title="Open My Materials (Student Login)"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span className="hidden sm:inline">My Materials</span>
-                <span className="sm:hidden">Materials</span>
-              </button>
+              <>
+                {/* Student Login Button */}
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-semibold text-blue-800 transition-colors flex items-center gap-1 sm:gap-1.5 shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+                  title="Student Login Portal"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                  <span className="hidden sm:inline">Student Login</span>
+                  <span className="sm:hidden">Login</span>
+                </button>
+
+                {/* Universal My Materials Button (Tablets & Desktop) */}
+                <button
+                  onClick={handleOpenMyMaterials}
+                  className="hidden sm:flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  title="Open My Materials (Student Login)"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span className="hidden md:inline">My Materials</span>
+                  <span className="md:hidden">Materials</span>
+                </button>
+              </>
             )}
 
             {/* Buy CTA Button */}
@@ -443,6 +458,21 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>Overview & Syllabus</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
+              {!buyerSession.isLoggedIn && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsLoginOpen(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
+                    <span>Student Login Portal</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-blue-500" />
+                </button>
+              )}
               <button
                 onClick={() => { setCurrentView('sample'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
@@ -455,6 +485,21 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
+              {!buyerSession.isLoggedIn && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsLoginOpen(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
+                    <span>Student Login Portal</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-blue-500" />
+                </button>
+              )}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -470,6 +515,21 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
+              {!buyerSession.isLoggedIn && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsLoginOpen(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
+                    <span>Student Login Portal</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-blue-500" />
+                </button>
+              )}
               <button
                 onClick={() => { handleOpenPolicies('contact'); setMobileMenuOpen(false); }}
                 className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-gray-600"
@@ -477,6 +537,21 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>Contact & Support Desk</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
+              {!buyerSession.isLoggedIn && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsLoginOpen(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
+                    <span>Student Login Portal</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-blue-500" />
+                </button>
+              )}
               <button
                 onClick={() => { handleGoToAcademicSite(); setMobileMenuOpen(false); }}
                 className="w-full text-left p-2.5 rounded-lg hover:bg-blue-50/80 flex items-center justify-between text-blue-900 font-semibold bg-blue-50/40 border border-blue-100"
