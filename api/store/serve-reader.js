@@ -8,7 +8,9 @@ import path from 'path';
 import {
   extractBearerToken,
   verifySessionToken,
-  isEmailBuyer
+  isEmailBuyer,
+  getUserEnrolledPacks,
+  AUTHOR_EMAILS
 } from '../../lib/auth-helper.js';
 import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
@@ -53,6 +55,16 @@ export default async function handler(req, res) {
     const isBuyer = payload.isBuyer || await isEmailBuyer(payload.email);
     if (!isBuyer) {
       return res.status(403).send('Access Denied: active student enrollment required.');
+    }
+
+    const isAuthor = AUTHOR_EMAILS.includes(payload.email.toLowerCase().trim());
+    if (!isAuthor) {
+      const enrolledPacks = payload.enrolledPacks && payload.enrolledPacks.length > 0
+        ? payload.enrolledPacks
+        : await getUserEnrolledPacks(payload.email);
+      if (!enrolledPacks.includes('ugc-net-english-bundle') && !enrolledPacks.includes('ugc-bundle')) {
+        return res.status(403).send('Access Denied: This reading dossier is exclusive to the UGC NET English Complete Bundle.');
+      }
     }
 
     // 3. Locate reader index.html

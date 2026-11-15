@@ -14,6 +14,7 @@ import {
   extractBearerToken,
   verifySessionToken,
   isEmailBuyer,
+  getUserEnrolledPacks,
   AUTHOR_EMAILS
 } from '../../lib/auth-helper.js';
 import { enforceRateLimit } from '../../lib/rate-limiter.js';
@@ -773,10 +774,53 @@ export default async function handler(req, res) {
       return res.status(404).json({ success: false, error: 'Test not found.' });
     }
 
-    // 4. Enforce Release Date Gate
+    const isAuthor = AUTHOR_EMAILS.includes(payload.email.toLowerCase().trim());
+
+    // 4. Granular Course Pack Access Gate
+    if (!isAuthor) {
+      const enrolledPacks = payload.enrolledPacks && payload.enrolledPacks.length > 0
+        ? payload.enrolledPacks
+        : await getUserEnrolledPacks(payload.email);
+
+      let isAllowed = false;
+      if (testItem.exam === 'ugc') {
+        isAllowed = enrolledPacks.includes('ugc-net-english-bundle') || enrolledPacks.includes('ugc-bundle');
+      } else if (testItem.category === 'GSET Paper 1') {
+        isAllowed = enrolledPacks.includes('gset-paper1');
+      } else if (testItem.category === 'GSET English') {
+        isAllowed = enrolledPacks.includes('gset-paper2-english') || enrolledPacks.includes('gset-paper2_eng');
+      } else if (testItem.category === 'GSET Education') {
+        isAllowed = enrolledPacks.includes('gset-paper2-education') || enrolledPacks.includes('gset-paper2_edu');
+      }
+
+      if (!isAllowed) {
+        return res.status(403).json({
+          success: false,
+          error: 'Access Denied: This test is not included in your active course pack enrollment.'
+        });
+      }
+    }
+
+    // 5. Unreleased / Not-Ready Module Gate
+    if (testItem.ready === false) {
+      const releaseTime = new Date(testItem.releaseDate);
+      const formattedDate = releaseTime.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+      return res.status(403).json({
+        success: false,
+        isLocked: true,
+        releaseDate: testItem.releaseDate,
+        formattedReleaseDate: formattedDate,
+        error: `Opens on ${formattedDate}`
+      });
+    }
+
+    // 6. Enforce Release Date Gate
     const now = new Date();
     const releaseTime = new Date(testItem.releaseDate);
-    const isAuthor = AUTHOR_EMAILS.includes(payload.email.toLowerCase().trim());
 
     if (now < releaseTime && !isAuthor) {
       const formattedDate = releaseTime.toLocaleDateString('en-IN', {
@@ -790,11 +834,11 @@ export default async function handler(req, res) {
         isLocked: true,
         releaseDate: testItem.releaseDate,
         formattedReleaseDate: formattedDate,
-        error: `Opens on ${releaseTime.toLocaleDateString('en-IN')}`
+        error: `Opens on ${formattedDate}`
       });
     }
 
-    // 5. Unlocked: Return Test Payload
+    // 7. Unlocked: Return Test Payload
     const runnerUrl = testItem.file
       ? (testItem.exam === 'gset'
           ? `/study-vault/gset/tests/${testItem.file}`
