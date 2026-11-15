@@ -61,7 +61,11 @@ export default async function handler(req, res) {
 
     // 4. Inject Dynamic Forensic Watermark
     const buyerEmail = payload.email.toLowerCase().trim();
-    htmlContent = htmlContent.replace(/\{\{BUYER_EMAIL\}\}/g, buyerEmail);
+    const buyerName = payload.name || buyerEmail.split('@')[0];
+    const orderId = payload.orderId || payload.id || 'NV-2026';
+    const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    const watermarkText = `${buyerName.toUpperCase()} • ${buyerEmail} • ORDER #${orderId} • ${dateStr} • NET Vidya English`;
+    htmlContent = htmlContent.replace(/\{\{BUYER_EMAIL\}\}/g, watermarkText);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');

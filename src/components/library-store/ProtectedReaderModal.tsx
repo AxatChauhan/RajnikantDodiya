@@ -36,6 +36,7 @@ interface ProtectedReaderModalProps {
   onClose: () => void;
   studentName: string;
   studentMobile: string;
+  studentEmail?: string;
   orderId: string;
   isUnlocked?: boolean;
   onUnlockRequest?: () => void;
@@ -313,6 +314,7 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
   onClose,
   studentName,
   studentMobile,
+  studentEmail,
   orderId,
   isUnlocked = false,
   onUnlockRequest,
@@ -387,8 +389,8 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
 
   const isPastPreview = !isUnlocked && currentPage > previewPagesLimit;
   const forensicWatermark = useMemo(
-    () => generateForensicWatermark(studentName, studentMobile, orderId),
-    [studentName, studentMobile, orderId]
+    () => generateForensicWatermark(studentName, studentMobile, orderId, studentEmail),
+    [studentName, studentMobile, orderId, studentEmail]
   );
 
   // Lock background scrolling when reading portal is open
@@ -1028,10 +1030,10 @@ export const ProtectedReaderModal: React.FC<ProtectedReaderModalProps> = ({
               className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden flex flex-col justify-around py-12"
               aria-hidden="true"
             >
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="whitespace-nowrap -rotate-[18deg] select-none text-center my-16">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="whitespace-nowrap -rotate-[22deg] select-none text-center my-14">
                   <span className={`font-mono text-xs tracking-[0.25em] uppercase font-bold select-none ${currentTheme.watermarkColor}`}>
-                    LICENSED SCHOLAR COPY • {studentName.toUpperCase() || 'REGISTERED SCHOLAR'} • +91 {studentMobile || '9876543210'} • ORDER #{orderId || 'HMP-2026'} • SPU MONOGRAPH
+                    {forensicWatermark}
                   </span>
                 </div>
               ))}

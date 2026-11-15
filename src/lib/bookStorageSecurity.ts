@@ -304,17 +304,27 @@ export function deleteBookmarkForBook(bookId: string, bookmarkId: string): Schol
 }
 
 /**
- * Generate Forensic Multi-Layer Watermark String
+ * Generate Forensic Multi-Layer Dynamic Watermark String
  */
 export function generateForensicWatermark(
   scholarName: string,
   scholarMobile: string,
-  orderId: string
+  orderId: string,
+  scholarEmail?: string
 ): string {
   const safeName = (scholarName || 'LICENSED SCHOLAR').toUpperCase().trim();
-  const safeMobile = (scholarMobile || 'SARDAR PATEL UNIVERSITY').trim();
-  const safeOrder = (orderId || 'PASS-VERIFIED').trim();
-  const dateStr = new Date().toISOString().split('T')[0];
+  const safeEmail = (scholarEmail || '').toLowerCase().trim();
+  const safeMobile = (scholarMobile || 'VERIFIED SCHOLAR').trim();
+  const safeOrder = (orderId || 'SPU-2026').trim();
+  const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-  return `${safeName} • +91 ${safeMobile} • ${safeOrder} • ${dateStr} • INSTITUTIONAL COPY`;
+  return [
+    'LICENSED SCHOLAR COPY',
+    safeName,
+    safeEmail ? safeEmail.toUpperCase() : null,
+    safeMobile ? `+91 ${safeMobile}` : null,
+    `ORDER #${safeOrder}`,
+    dateStr,
+    'UGC NET / GSET 2026'
+  ].filter(Boolean).join(' • ');
 }

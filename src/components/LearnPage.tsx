@@ -1225,6 +1225,7 @@ export const LearnPage: React.FC<LearnPageProps> = ({
             onClose={() => setIsReaderOpen(false)}
             studentName={studentSession.name || 'Scholar Candidate'}
             studentMobile={studentSession.mobile || 'Verified Pass'}
+            studentEmail={studentSession.email || ''}
             orderId={studentSession.orderId || 'DEMO-PASS'}
             isUnlocked={isBookOwned || isBundleOwned}
             onUnlockRequest={() => {

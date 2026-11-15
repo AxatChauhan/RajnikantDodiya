@@ -32,7 +32,11 @@ if (!isEnrolled) {
       const parsed = JSON.parse(s);
       if (parsed && (parsed.isBuyer || parsed.isLoggedIn)) {
         isEnrolled = true;
-        WM = (parsed.email || 'enrolled_scholar') + ' \u00b7 NET Vidya';
+        const name = (parsed.name || '').toUpperCase().trim();
+        const email = (parsed.email || 'scholar').toLowerCase().trim();
+        const orderId = parsed.orderId || 'NV-2026';
+        const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        WM = (name ? name + ' \u2022 ' : '') + email + ' \u2022 ORDER #' + orderId + ' \u2022 ' + dateStr + ' \u2022 NET Vidya English';
       }
     }
   } catch(e) {}
