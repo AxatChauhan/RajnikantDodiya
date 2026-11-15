@@ -504,57 +504,56 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
         ) : (
           <>
             {/* Navigation Tabs */}
-            <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => { setActiveTab('login'); setErrorMessage(null); setSuccessMessage(null); }}
-            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === 'login'
-                ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            <span>Sign In</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab('signup'); setErrorMessage(null); setSuccessMessage(null); }}
-            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === 'signup'
-                ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            <span className="hidden min-[380px]:inline">Create Account</span>
-            <span className="min-[380px]:hidden">Register</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setSuccessMessage(null); }}
-            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === 'forgot'
-                ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Forgot?</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab('activate'); setErrorMessage(null); setSuccessMessage(null); }}
-            className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === 'activate'
-                ? 'bg-emerald-600 text-white shadow-2xs font-bold'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Paid?</span>
-          </button>
-        </div>
+            <div className="flex rounded-xl bg-gray-100 p-1 text-[11px] sm:text-xs font-semibold gap-0.5 sm:gap-1 overflow-hidden select-none">
+              <button
+                type="button"
+                onClick={() => { setActiveTab('login'); setErrorMessage(null); setSuccessMessage(null); }}
+                className={`flex-1 py-1.5 sm:py-2 px-1 sm:px-1.5 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                  activeTab === 'login'
+                    ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <LogIn className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">Sign In</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('signup'); setErrorMessage(null); setSuccessMessage(null); }}
+                className={`flex-1 py-1.5 sm:py-2 px-1 sm:px-1.5 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                  activeTab === 'signup'
+                    ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <UserPlus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">Sign Up</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setSuccessMessage(null); }}
+                className={`flex-1 py-1.5 sm:py-2 px-1 sm:px-1.5 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                  activeTab === 'forgot'
+                    ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <HelpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">Forgot?</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('activate'); setErrorMessage(null); setSuccessMessage(null); }}
+                className={`flex-1 py-1.5 sm:py-2 px-1 sm:px-1.5 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                  activeTab === 'activate'
+                    ? 'bg-emerald-600 text-white shadow-2xs font-bold'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">Paid?</span>
+              </button>
+            </div>
 
         {/* Error / Success Feedback */}
         {errorMessage && (

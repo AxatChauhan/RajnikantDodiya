@@ -216,7 +216,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       
       {/* 1. TOP COMMERCIAL HEADER BAR */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs w-full">
-        <div className="max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-1.5 sm:gap-2.5">
+        <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 xl:px-6 h-14 flex items-center justify-between gap-1.5 sm:gap-2">
           
           {/* Brand Logo & Title */}
           <button
@@ -246,8 +246,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <span className="hidden xl:inline">UGC NET English</span>
-              <span className="xl:hidden">UGC NET</span>
+              <span className="hidden 2xl:inline">UGC NET English</span>
+              <span className="2xl:hidden">UGC NET</span>
             </button>
             <button
               onClick={() => { setActiveExamStore('gset'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -258,15 +258,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               }`}
             >
               <span>GSET</span>
-              <span className="hidden xl:inline"> 2026</span>
-              <span className="text-[9px] font-mono uppercase bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-bold hidden xl:inline">
+              <span className="hidden 2xl:inline"> 2026</span>
+              <span className="text-[9px] font-mono uppercase bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-bold hidden 2xl:inline">
                 NEW
               </span>
             </button>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-gray-700 shrink-0">
+          <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold text-gray-700 shrink-0">
             <button
               onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className={`px-2 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
@@ -290,14 +290,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               title="Return to main rajnikantdodiya.com site"
             >
               <Globe className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span className="hidden xl:inline">rajnikantdodiya.com</span>
-              <span className="xl:hidden">Academic Site</span>
+              <span className="hidden 2xl:inline">rajnikantdodiya.com</span>
+              <span className="2xl:hidden">Academic Site</span>
               <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
             </button>
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0">
             
             {/* Universal Authentication & Materials Controls */}
             {buyerSession.isLoggedIn ? (
@@ -318,8 +318,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   title="Student Login Portal"
                 >
                   <LogIn className="w-3.5 h-3.5 text-blue-700 shrink-0" />
-                  <span className="hidden sm:inline">Student Login</span>
-                  <span className="sm:hidden">Login</span>
+                  <span className="hidden xl:inline">Student Login</span>
+                  <span className="xl:hidden">Login</span>
                 </button>
 
                 {/* Universal My Materials Button (Tablets & Desktop) */}
@@ -329,8 +329,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   title="Open My Materials (Student Login)"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                  <span className="hidden md:inline">My Materials</span>
-                  <span className="md:hidden">Materials</span>
+                  <span className="hidden 2xl:inline">My Materials</span>
+                  <span className="2xl:hidden">Materials</span>
                 </button>
               </>
             )}
@@ -343,8 +343,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 title="Open My Materials"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden xl:inline">Access Materials</span>
-                <span className="xl:hidden">Materials</span>
+                <span className="hidden 2xl:inline">Access Materials</span>
+                <span className="2xl:hidden">Materials</span>
                 <ArrowRight className="hidden sm:inline w-3.5 h-3.5 shrink-0" />
               </button>
             ) : (
@@ -358,14 +358,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               >
                 {activeExamStore === 'gset' ? (
                   <>
-                    <span className="hidden xl:inline">Enroll GSET (from ₹149)</span>
-                    <span className="hidden sm:inline xl:hidden">Enroll GSET (₹149)</span>
+                    <span className="hidden 2xl:inline">Enroll GSET (from ₹149)</span>
+                    <span className="hidden sm:inline 2xl:hidden">Enroll GSET (₹149)</span>
                     <span className="sm:hidden">GSET ₹149</span>
                   </>
                 ) : (
                   <>
-                    <span className="hidden xl:inline">Buy Final Pack (₹{currentServerPrice})</span>
-                    <span className="hidden sm:inline xl:hidden">Enroll (₹{currentServerPrice})</span>
+                    <span className="hidden 2xl:inline">Buy Final Pack (₹{currentServerPrice})</span>
+                    <span className="hidden sm:inline 2xl:hidden">Enroll (₹{currentServerPrice})</span>
                     <span className="sm:hidden">Buy ₹{currentServerPrice}</span>
                   </>
                 )}
@@ -377,7 +377,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
               aria-label="Toggle Navigation Menu"
-              className="lg:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
+              className="xl:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -386,7 +386,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
         {/* Mobile & Tablet Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
+          <div className="xl:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
             {/* Student Account Card inside Mobile Drawer */}
             {buyerSession.isLoggedIn ? (
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
