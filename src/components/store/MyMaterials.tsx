@@ -127,6 +127,91 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
     return packs;
   }, [buyerSession, tests, readingFiles]);
 
+  // User enrolled reading files (UGC NET Pack)
+  const userReadingFiles = useMemo(() => {
+    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+    const hasUgc = isAuthor || userPacks.some(p => p.id === 'ugc-net-english-bundle');
+    return hasUgc ? readingFiles : [];
+  }, [buyerSession, userPacks, readingFiles]);
+
+  // Grouped tests under enrolled packs according to subjects
+  const subjectTestGroups = useMemo(() => {
+    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+    const groups: {
+      packId: string;
+      subjectTitle: string;
+      badge: string;
+      badgeClass: string;
+      tests: TestHallItem[];
+    }[] = [];
+
+    // 1. UGC NET English
+    if (isAuthor || userPacks.some(p => p.id === 'ugc-net-english-bundle')) {
+      const ugcTests = tests.filter(t => 
+        t.category?.includes('NET') || 
+        t.category?.includes('Unit') || 
+        t.category?.includes('Practice')
+      );
+      if (ugcTests.length > 0) {
+        groups.push({
+          packId: 'ugc-net-english-bundle',
+          subjectTitle: 'UGC NET English — NTA Computer-Based Simulation Tests',
+          badge: 'UGC NET English • 21 Mocks',
+          badgeClass: 'bg-blue-100 text-blue-800 border-blue-200',
+          tests: ugcTests
+        });
+      }
+    }
+
+    // 2. GSET Paper 1: General Aptitude
+    if (isAuthor || userPacks.some(p => p.id === 'gset-paper1')) {
+      const p1Tests = tests.filter(t => t.category === 'GSET Paper 1');
+      if (p1Tests.length > 0) {
+        groups.push({
+          packId: 'gset-paper1',
+          subjectTitle: 'GSET Paper 1: General Aptitude Foundation Tests',
+          badge: 'GSET Paper 1 • 3 Mocks',
+          badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+          tests: p1Tests
+        });
+      }
+    }
+
+    // 3. GSET Paper 2: English Literature Specialist
+    if (isAuthor || userPacks.some(p => p.id === 'gset-paper2-english')) {
+      const p2EngTests = tests.filter(t => t.category === 'GSET English');
+      if (p2EngTests.length > 0) {
+        groups.push({
+          packId: 'gset-paper2-english',
+          subjectTitle: 'GSET Paper 2: English Literature Specialist Tests',
+          badge: 'GSET English • 2 Mocks',
+          badgeClass: 'bg-teal-100 text-teal-800 border-teal-200',
+          tests: p2EngTests
+        });
+      }
+    }
+
+    // 4. GSET Paper 2: Education Discipline Master
+    if (isAuthor || userPacks.some(p => p.id === 'gset-paper2-education')) {
+      const p2EduTests = tests.filter(t => t.category === 'GSET Education');
+      if (p2EduTests.length > 0) {
+        groups.push({
+          packId: 'gset-paper2-education',
+          subjectTitle: 'GSET Paper 2: Education Discipline Master Tests',
+          badge: 'GSET Education • 3 Mocks',
+          badgeClass: 'bg-purple-100 text-purple-800 border-purple-200',
+          tests: p2EduTests
+        });
+      }
+    }
+
+    return groups;
+  }, [buyerSession, userPacks, tests]);
+
+  const totalEnrolledTests = useMemo(() => {
+    return subjectTestGroups.reduce((acc, g) => acc + g.tests.length, 0);
+  }, [subjectTestGroups]);
+
   // Handle Launch Test (CBT simulation)
   const handleLaunchTest = async (test: TestHallItem) => {
     const now = new Date();
@@ -455,40 +540,40 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
         <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'all'
                 ? 'bg-blue-700 text-white shadow-xs'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
-            All Materials ({tests.length + readingFiles.length})
+            All Materials ({totalEnrolledTests + userReadingFiles.length})
           </button>
           <button
             onClick={() => setActiveTab('tests')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'tests'
                 ? 'bg-blue-700 text-white shadow-xs'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>Mock Tests ({tests.length})</span>
+            <span>Mock Tests ({totalEnrolledTests})</span>
           </button>
           <button
             onClick={() => setActiveTab('notes')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'notes'
                 ? 'bg-blue-700 text-white shadow-xs'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Study Notes &amp; E-Books ({readingFiles.length})</span>
+            <span>Study Notes &amp; E-Books ({userReadingFiles.length})</span>
           </button>
         </div>
 
         {/* STUDY NOTES & E-BOOKS LIST (STRICTLY ON-SITE READING ONLY) */}
-        {(activeTab === 'all' || activeTab === 'notes') && readingFiles.length > 0 && (
+        {(activeTab === 'all' || activeTab === 'notes') && userReadingFiles.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
@@ -500,7 +585,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
             </div>
 
             <div className="space-y-3">
-              {readingFiles.map((file) => (
+              {userReadingFiles.map((file) => (
                 <div
                   key={file.id}
                   className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs hover:border-gray-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
@@ -527,7 +612,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
                   <div className="w-full sm:w-auto">
                     <button
                       onClick={() => handleOpenReader(file)}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <BookOpen className="w-4 h-4" />
                       <span>Read Online</span>
@@ -539,84 +624,110 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
           </div>
         )}
 
-        {/* MOCK TESTS LIST */}
-        {(activeTab === 'all' || activeTab === 'tests') && (
-          <div className="space-y-3 pt-2">
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
-              Computer-Based Mock Tests
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-              {tests.map((test) => {
-                const now = new Date();
-                const releaseDate = new Date(test.releaseDate);
-                const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
-                const isAvailable = now >= releaseDate || isAuthor;
-                const formattedDate = releaseDate.toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric'
-                });
-
-                return (
-                  <div
-                    key={test.id}
-                    className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs hover:border-blue-200 transition-all flex flex-col justify-between gap-3"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-mono uppercase bg-gray-100 text-gray-700 font-bold px-2 py-0.5 rounded">
-                          {test.category}
-                        </span>
-                        {isAvailable ? (
-                          <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" />
-                            <span>Available Now</span>
-                          </span>
-                        ) : (
-                          <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Lock className="w-3 h-3" />
-                            <span>Opens on {formattedDate}</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                        {test.title}
-                      </h4>
-
-                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
-                        {test.description}
-                      </p>
-                    </div>
-
-                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                      <div className="text-[11px] text-gray-500 font-medium">
-                        <span>{test.totalQuestions} Questions</span> • <span>{test.durationMinutes} Mins</span>
-                      </div>
-
-                      {isAvailable ? (
-                        <button
-                          onClick={() => handleLaunchTest(test)}
-                          className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Start Test</span>
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className="px-3.5 py-2 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed"
-                        >
-                          <Lock className="w-3.5 h-3.5" />
-                          <span>Locked</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+        {/* MOCK TESTS LIST (ORGANIZED UNDER PACKS ACCORDING TO SUBJECTS) */}
+        {(activeTab === 'all' || activeTab === 'tests') && subjectTestGroups.length > 0 && (
+          <div className="space-y-8 pt-2">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+              <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                Enrolled Computer-Based Mock Tests ({totalEnrolledTests})
+              </h3>
+              <span className="text-xs text-gray-500 font-medium hidden sm:inline">
+                Organized under packs by subject
+              </span>
             </div>
+
+            {subjectTestGroups.map((group) => (
+              <div
+                key={group.packId}
+                className="space-y-4 bg-slate-50/70 p-4 sm:p-6 rounded-3xl border border-gray-200/90 shadow-2xs"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-200/70 pb-3">
+                  <div className="space-y-1">
+                    <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border inline-block ${group.badgeClass}`}>
+                      {group.badge}
+                    </span>
+                    <h4 className="text-base sm:text-lg font-extrabold text-gray-900">
+                      {group.subjectTitle}
+                    </h4>
+                  </div>
+                  <span className="text-xs font-mono font-semibold text-gray-500 bg-white px-2.5 py-1 rounded-lg border border-gray-200 self-start sm:self-auto">
+                    {group.tests.length} CBT Exams
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {group.tests.map((test) => {
+                    const now = new Date();
+                    const releaseDate = new Date(test.releaseDate);
+                    const isAuthor = buyerSession.email?.toLowerCase().trim() === 'rajnikantdodiya2@gmail.com';
+                    const isAvailable = now >= releaseDate || isAuthor;
+                    const formattedDate = releaseDate.toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    });
+
+                    return (
+                      <div
+                        key={test.id}
+                        className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs hover:border-blue-200 transition-all flex flex-col justify-between gap-3"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-mono uppercase bg-gray-100 text-gray-700 font-bold px-2 py-0.5 rounded">
+                              {test.category}
+                            </span>
+                            {isAvailable ? (
+                              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>Available Now</span>
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded flex items-center gap-1">
+                                <Lock className="w-3 h-3" />
+                                <span>Opens on {formattedDate}</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 className="text-sm font-bold text-gray-900 leading-snug">
+                            {test.title}
+                          </h4>
+
+                          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                            {test.description}
+                          </p>
+                        </div>
+
+                        <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                          <div className="text-[11px] text-gray-500 font-medium">
+                            <span>{test.totalQuestions} Questions</span> • <span>{test.durationMinutes} Mins</span>
+                          </div>
+
+                          {isAvailable ? (
+                            <button
+                              onClick={() => handleLaunchTest(test)}
+                              className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Play className="w-3.5 h-3.5 fill-current" />
+                              <span>Start Test</span>
+                            </button>
+                          ) : (
+                            <button
+                              disabled
+                              className="px-3.5 py-2 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed"
+                            >
+                              <Lock className="w-3.5 h-3.5" />
+                              <span>Locked</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

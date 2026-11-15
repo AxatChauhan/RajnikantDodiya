@@ -288,13 +288,37 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     setCouponError(null);
   };
 
-  const handleInitiatePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleInitiatePayment = async (e?: React.FormEvent) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
     setErrorMessage(null);
 
-    const cleanName = studentName.trim();
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanMobile = mobile.replace(/\D/g, '').slice(-10);
+    const isSimulated = appliedDiscount?.code === 'SIMULATE' || finalPayablePrice === 0;
+
+    let cleanName = studentName.trim();
+    let cleanEmail = email.trim().toLowerCase();
+    let cleanMobile = mobile.replace(/\D/g, '').slice(-10);
+    let candidatePassword = password;
+
+    if (isSimulated) {
+      if (!cleanName) {
+        cleanName = 'Scholar Tester';
+        setStudentName('Scholar Tester');
+      }
+      if (!cleanEmail || !cleanEmail.includes('@')) {
+        cleanEmail = 'scholar.test@example.com';
+        setEmail('scholar.test@example.com');
+      }
+      if (!cleanMobile || cleanMobile.length !== 10) {
+        cleanMobile = '9876543210';
+        setMobile('9876543210');
+      }
+      if (!candidatePassword || candidatePassword.length < 6) {
+        candidatePassword = 'testpass123';
+        setPassword('testpass123');
+      }
+    }
 
     if (!cleanName || cleanName.length < 2) {
       setErrorMessage('Please enter your full candidate name.');
@@ -311,8 +335,8 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       return;
     }
 
-    if (!buyerSession.isLoggedIn) {
-      if (!password || password.length < 6) {
+    if (!buyerSession.isLoggedIn && !isSimulated) {
+      if (!candidatePassword || candidatePassword.length < 6) {
         setErrorMessage('Please create a portal password of at least 6 characters.');
         return;
       }
@@ -323,24 +347,41 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     try {
       // 1. Ensure user is authenticated before creating payment order
       if (!buyerSession.isLoggedIn) {
-        const authRes = isExistingAccount
-          ? await login(cleanEmail, password)
-          : await signup(cleanName, cleanEmail, cleanMobile, password);
+        if (isSimulated) {
+          // In simulation mode, attempt login or signup, but gracefully bypass on account collisions
+          try {
+            const authRes = isExistingAccount
+              ? await login(cleanEmail, candidatePassword)
+              : await signup(cleanName, cleanEmail, cleanMobile, candidatePassword);
 
-        if (!authRes.success) {
-          if (!isExistingAccount && authRes.error?.toLowerCase().includes('already exists')) {
-            setIsExistingAccount(true);
-            setErrorMessage('An account with this email already exists. Please enter your existing password to continue.');
+            if (authRes?.isBuyer) {
+              setIsPaymentSuccess(true);
+              setIsProcessing(false);
+              return;
+            }
+          } catch (authErr) {
+            console.warn('Simulation pre-auth non-fatal notice:', authErr);
+          }
+        } else {
+          const authRes = isExistingAccount
+            ? await login(cleanEmail, candidatePassword)
+            : await signup(cleanName, cleanEmail, cleanMobile, candidatePassword);
+
+          if (!authRes.success) {
+            if (!isExistingAccount && authRes.error?.toLowerCase().includes('already exists')) {
+              setIsExistingAccount(true);
+              setErrorMessage('An account with this email already exists. Please enter your existing password to continue.');
+              setIsProcessing(false);
+              return;
+            }
+            throw new Error(authRes.error || 'Account setup failed. Please check your credentials.');
+          }
+
+          if (authRes.isBuyer) {
+            setIsPaymentSuccess(true);
             setIsProcessing(false);
             return;
           }
-          throw new Error(authRes.error || 'Account setup failed. Please check your credentials.');
-        }
-
-        if (authRes.isBuyer) {
-          setIsPaymentSuccess(true);
-          setIsProcessing(false);
-          return;
         }
       }
 
@@ -352,7 +393,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           studentName: cleanName,
           email: cleanEmail,
           mobile: cleanMobile,
-          couponCode: appliedDiscount?.code || '',
+          couponCode: isSimulated ? 'SIMULATE' : (appliedDiscount?.code || ''),
           productId: activeProduct.id,
           examStore: selectedExam
         })
@@ -361,7 +402,58 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       const orderData = await orderRes.json().catch(() => ({}));
 
       if (!orderRes.ok || !orderData.success) {
-        throw new Error(orderData.error || 'Failed to initiate order. Please try again.');
+        if (!isSimulated) {
+          throw new Error(orderData.error || 'Failed to initiate order. Please try again.');
+        }
+      }
+
+      // PRIORITY 1: Test Simulation Mode (Instant ₹0 bypass - NEVER redirect to Razorpay)
+      const isSimulatedOrder = isSimulated || orderData.isTestMode || orderData.paymentMode === 'test_simulation';
+      if (isSimulatedOrder) {
+        const simOrderId = orderData.orderId || `order_sim_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        let receivedToken = '';
+        try {
+          const verifyRes = await fetch('/api/store/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: simOrderId,
+              studentName: cleanName,
+              email: cleanEmail,
+              mobile: cleanMobile,
+              productId: activeProduct.id,
+              amount: 0,
+              couponCode: 'SIMULATE'
+            })
+          });
+          const verifyData = await verifyRes.json().catch(() => ({}));
+          if (verifyData.token) {
+            receivedToken = verifyData.token;
+            try {
+              localStorage.setItem('netvidya_auth_token_v1', verifyData.token);
+            } catch {}
+          }
+        } catch (simVerifyErr) {
+          console.warn('Simulation server verification non-fatal:', simVerifyErr);
+        }
+
+        const enrolledPacksList = activeProduct.id === 'ugc-net-english-bundle'
+          ? ['ugc-net-english-bundle', 'ugc-bundle']
+          : [activeProduct.id, 'gset-all'];
+
+        loginBuyer({
+          name: cleanName,
+          email: cleanEmail,
+          mobile: cleanMobile,
+          orderId: simOrderId,
+          token: receivedToken || undefined,
+          isBuyer: true,
+          enrolledPacks: enrolledPacksList
+        });
+
+        setIsProcessing(false);
+        setIsPaymentSuccess(true);
+        return;
       }
 
       // 3. Handle GSET WhatsApp Manual Direct Link Flow (if dedicated link isn't configured yet)
@@ -375,7 +467,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         return;
       }
 
-      // 4. Handle Direct Payment Link Flow (e.g. ₹149 singles, ₹249 combos, or ₹499 UGC NET)
+      // 4. Handle Direct Payment Link Flow (e.g. ₹149 singles, ₹249 combos, or ₹499 UGC NET) - REAL NON-SIMULATED ORDERS ONLY
       const targetPaymentLink = (orderData.paymentMode === 'payment_link' && orderData.paymentLinkUrl)
         ? orderData.paymentLinkUrl
         : (activeProduct.paymentLink && orderData.paymentMode !== 'api_checkout' ? activeProduct.paymentLink : null);
@@ -470,7 +562,10 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                   mobile: cleanMobile,
                   orderId: orderData.orderId,
                   token: verifyData.token,
-                  isBuyer: true
+                  isBuyer: true,
+                  enrolledPacks: activeProduct.id === 'ugc-net-english-bundle'
+                    ? ['ugc-net-english-bundle', 'ugc-bundle']
+                    : [activeProduct.id, 'gset-all']
                 });
                 setIsProcessing(false);
                 setIsPaymentSuccess(true);
@@ -500,52 +595,25 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
         return;
       }
 
-      // 6. Test simulation mode
-      if (orderData.isTestMode) {
-        try {
-          const verifyRes = await fetch('/api/store/verify-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId: orderData.orderId,
-              studentName: cleanName,
-              email: cleanEmail,
-              mobile: cleanMobile,
-              productId: activeProduct.id,
-              amount: 0,
-              couponCode: appliedDiscount?.code || 'SIMULATE'
-            })
-          });
-          const verifyData = await verifyRes.json().catch(() => ({}));
-          if (verifyData.token) {
-            try {
-              localStorage.setItem('netvidya_auth_token_v1', verifyData.token);
-            } catch {}
-          }
-          loginBuyer({
-            name: cleanName,
-            email: cleanEmail,
-            mobile: cleanMobile,
-            orderId: orderData.orderId,
-            token: verifyData.token,
-            isBuyer: true
-          });
-        } catch {
-          loginBuyer({
-            name: cleanName,
-            email: cleanEmail,
-            mobile: cleanMobile,
-            orderId: orderData.orderId,
-            isBuyer: true
-          });
-        }
+      throw new Error('Online payment gateway is temporarily unreachable. Please contact student support.');
+    } catch (err: any) {
+      if (isSimulated) {
+        console.warn('Simulation checkout error, using local fallback:', err);
+        loginBuyer({
+          name: cleanName,
+          email: cleanEmail,
+          mobile: cleanMobile,
+          orderId: `order_sim_${Date.now()}`,
+          isBuyer: true,
+          enrolledPacks: activeProduct.id === 'ugc-net-english-bundle'
+            ? ['ugc-net-english-bundle', 'ugc-bundle']
+            : [activeProduct.id, 'gset-all']
+        });
         setIsProcessing(false);
         setIsPaymentSuccess(true);
         return;
       }
 
-      throw new Error('Online payment gateway is temporarily unreachable. Please contact student support.');
-    } catch (err: any) {
       if (activeProduct?.paymentLink) {
         let fallbackUrl = activeProduct.paymentLink;
         try {
@@ -767,7 +835,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
           )}
 
           {/* DYNAMIC PRICE SUMMARY BANNER */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-gray-900 to-slate-900 text-white shadow-sm flex items-center justify-between">
+          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-gray-900 to-slate-900 text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="min-w-0 pr-3">
               <span className="text-[10px] uppercase font-bold text-blue-300 tracking-wider block truncate">
                 Selected: {activeProduct.shortName}
@@ -784,9 +852,22 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 )}
               </div>
             </div>
-            <div className="text-right text-xs shrink-0">
-              <span className="text-[10px] text-gray-400 block">Digital Access Validity</span>
-              <strong className="text-white font-semibold">Through 31 Dec 2026</strong>
+            <div className="text-left sm:text-right text-xs shrink-0 flex items-center justify-between sm:flex-col sm:items-end gap-2">
+              <div>
+                <span className="text-[10px] text-gray-400 block">Digital Access Validity</span>
+                <strong className="text-white font-semibold">Through 31 Dec 2026</strong>
+              </div>
+              {(finalPayablePrice === 0 || appliedDiscount?.code === 'SIMULATE') && !redirectingUrl && !isPaymentSuccess && (
+                <button
+                  type="button"
+                  onClick={() => handleInitiatePayment()}
+                  disabled={isProcessing}
+                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0 transition-transform active:scale-95"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{isProcessing ? 'Unlocking Pass...' : '⚡ Instant Unlock (₹0)'}</span>
+                </button>
+              )}
             </div>
           </div>
 

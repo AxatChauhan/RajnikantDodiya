@@ -14,6 +14,7 @@ import {
   MessageCircle,
   FileText,
   Play,
+  Lock,
   ExternalLink
 } from 'lucide-react';
 import { STORE_MERCHANT } from '../../../config/storeConfig';
@@ -299,17 +300,17 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
         </div>
 
         {/* B. STANDALONE PACKS (MODULAR OPTIONS - ALL ₹149) */}
-        <div className="space-y-4 pt-4">
+        <div className="space-y-6 pt-4">
           <div className="text-center sm:text-left">
             <h3 className="text-base sm:text-lg font-bold text-gray-900">
               Need Only a Single Paper? Choose Standalone Packs (₹149 each)
             </h3>
             <p className="text-xs text-gray-500">
-              Modular single-paper options for candidates preparing targeted papers
+              Modular single-paper options for candidates preparing targeted papers. All included mock tests are unlocked upon enrollment.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
                 id: 'gset-paper1',
@@ -319,7 +320,30 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: 'All 10 general units: Teaching, Research, ICT, Logical Reasoning, and Higher Education.',
-                tests: '3 Full CBT Tests (50 Qs each)'
+                testsLabel: '3 Full CBT Tests (50 Qs each)',
+                tests: [
+                  {
+                    id: 'p1-m1',
+                    title: 'GSET Paper 1 — CBT Mock 01',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Teaching Aptitude, Research Ethics, Comprehension & ICT with Gujarati explanations.'
+                  },
+                  {
+                    id: 'p1-m2',
+                    title: 'GSET Paper 1 — CBT Mock 02',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Logical Reasoning, Data Interpretation, Higher Education Governance & NEP 2020.'
+                  },
+                  {
+                    id: 'p1-m3',
+                    title: 'GSET Paper 1 — CBT Mock 03',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'People, Development & Environment, Mathematical Reasoning & Speed Heuristics.'
+                  }
+                ]
               },
               {
                 id: 'gset-paper2-english',
@@ -329,7 +353,23 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: 'Paper 2 English Literature, Criticism, Literary Theory, Cultural Studies, and ELT in India.',
-                tests: '2 Full CBT Tests (100 Qs each)'
+                testsLabel: '2 Full CBT Tests (100 Qs each)',
+                tests: [
+                  {
+                    id: 'p2-eng-m1',
+                    title: 'GSET English Paper 2 — CBT Mock 01',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Chaucer to Modern English Poetry, Drama, Fiction, Post-Method Pedagogy & ELT in India.'
+                  },
+                  {
+                    id: 'p2-eng-m3',
+                    title: 'GSET English Paper 2 — CBT Mock 03',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Literary Criticism, Structuralism to Deconstruction, Cultural Studies & MLA 9th Research.'
+                  }
+                ]
               },
               {
                 id: 'gset-paper2-education',
@@ -339,14 +379,37 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: 'Paper 2 Education: Philosophy, Psychology, Learner Development, Pedagogy, and NEP 2020.',
-                tests: '3 Full CBT Tests (100 Qs each)'
+                testsLabel: '3 Full CBT Tests (100 Qs each)',
+                tests: [
+                  {
+                    id: 'p2-edu-m1',
+                    title: 'GSET Education Paper 2 — CBT Mock 01',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Philosophical & Sociological Foundations, Western & Indian thinkers, Curriculum Studies.'
+                  },
+                  {
+                    id: 'p2-edu-m2',
+                    title: 'GSET Education Paper 2 — CBT Mock 02',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Psychology of Learner, Teacher Education Reforms (NEP 2020) & Educational Research.'
+                  },
+                  {
+                    id: 'p2-edu-m3',
+                    title: 'GSET Education Paper 2 — CBT Mock 03',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Educational Technology, Special & Inclusive Education, Assessment & Evaluative Heuristics.'
+                  }
+                ]
               }
             ].map(pack => (
               <div
                 key={pack.id}
-                className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                className="bg-white rounded-2xl p-5 border border-gray-200 shadow-xs hover:border-emerald-300 transition-all flex flex-col justify-between space-y-4"
               >
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className={`text-[9px] font-mono uppercase font-bold px-2 py-0.5 rounded ${pack.badgeClass}`}>
                       {pack.badge}
@@ -357,239 +420,84 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                     </div>
                   </div>
 
-                  <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                    {pack.name}
-                  </h4>
-                  <p className="text-[11px] text-emerald-800 font-semibold">
-                    {pack.tests}
-                  </p>
-                  <p className="text-[11px] text-gray-500 leading-relaxed">
-                    {pack.description}
-                  </p>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-900 leading-snug">
+                      {pack.name}
+                    </h4>
+                    <p className="text-[11px] text-emerald-800 font-semibold mt-0.5">
+                      {pack.testsLabel}
+                    </p>
+                    <p className="text-[11px] text-gray-500 leading-relaxed mt-1">
+                      {pack.description}
+                    </p>
+                  </div>
+
+                  {/* Included Subject Tests List (Under the Pack) */}
+                  <div className="pt-3 border-t border-gray-100 space-y-2">
+                    <span className="text-[10px] font-mono uppercase font-bold text-gray-500 flex items-center justify-between">
+                      <span>Included Tests ({pack.tests.length})</span>
+                      <span className="text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold">
+                        <Lock className="w-2.5 h-2.5" />
+                        <span>Enrolled Access</span>
+                      </span>
+                    </span>
+
+                    <div className="space-y-1.5">
+                      {pack.tests.map(test => (
+                        <div
+                          key={test.id}
+                          className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1"
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-bold text-[11px] text-gray-900 truncate">{test.title}</span>
+                            <span className="text-[9px] font-mono text-gray-500 shrink-0 font-semibold">{test.qs} Qs • {test.mins}m</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 leading-tight line-clamp-2">{test.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => onOpenCheckout(pack.id)}
-                  className="w-full py-2 px-3 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>Enroll in Pack (₹{pack.price})</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="pt-2">
+                  <button
+                    onClick={() => onOpenCheckout(pack.id)}
+                    className="w-full py-2.5 px-3 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Enroll to Unlock Tests (₹{pack.price})</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 3. GSET 2026 LIVE CBT EXAMINATION HALL */}
-      <section className="max-w-5xl mx-auto px-4 space-y-8">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
-            <Clock className="w-3.5 h-3.5" />
-            <span>Interactive CBT Test Hall</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-            GSET 2026 Examination Simulators
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Authentic computer-based examination interface replicating the official MSU Baroda GSET pattern: real-time timer, bilingual question palette, and instant diagnostic rationales.
-          </p>
-        </div>
-
-        {/* Part A: Paper 1 General Aptitude (Common to both streams) */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
-            <div>
-              <span className="text-[10px] font-mono uppercase bg-emerald-50 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                Paper 1 • Common to All Candidates
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 mt-1">
-                Paper 1: General Aptitude & Teaching/Research Methodology
-              </h3>
-            </div>
-            <span className="text-xs text-gray-500 font-mono">3 Full CBT Mock Exams</span>
+      {/* 3. FREE PUBLIC DEMO STATION (TRY BEFORE YOU ENROLL) */}
+      <section className="max-w-4xl mx-auto px-4">
+        <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-white rounded-3xl p-6 sm:p-8 border border-emerald-300 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center sm:text-left">
+            <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-300 inline-block">
+              Zero Cost • Instant Trial
+            </span>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900">
+              Try the Official GSET CBT Exam Demo
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-600 max-w-lg leading-relaxed">
+              Experience the actual computer-based test interface with live timer, question palette, and bilingual layout before enrolling in the full packs.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                id: 'p1-m1',
-                title: 'GSET Paper 1 — CBT Mock 01',
-                file: 'GSET_Paper1_Mock01_CBT.html',
-                qs: 50,
-                mins: 60,
-                desc: 'Teaching Aptitude, Research Ethics, Comprehension & ICT with Gujarati explanations.'
-              },
-              {
-                id: 'p1-m2',
-                title: 'GSET Paper 1 — CBT Mock 02',
-                file: 'GSET_Paper1_Mock02_CBT.html',
-                qs: 50,
-                mins: 60,
-                desc: 'Logical Reasoning, Data Interpretation, Higher Education Governance & NEP 2020.'
-              },
-              {
-                id: 'p1-m3',
-                title: 'GSET Paper 1 — CBT Mock 03',
-                file: 'GSET_Paper1_Mock03_CBT.html',
-                qs: 50,
-                mins: 60,
-                desc: 'People, Development & Environment, Mathematical Reasoning & Speed Heuristics.'
-              }
-            ].map(test => (
-              <div
-                key={test.id}
-                className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all shadow-2xs"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded">
-                      50 Qs • 60 Min
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-500">Bilingual</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-900 leading-snug">{test.title}</h4>
-                  <p className="text-[11px] text-gray-600 leading-relaxed">{test.desc}</p>
-                </div>
-
-                <button
-                  onClick={() => window.open(`/study-vault/gset/tests/${test.file}`, '_blank')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Launch CBT Exam</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Part B: Paper 2 English Literature Specialist Tests */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
-            <div>
-              <span className="text-[10px] font-mono uppercase bg-emerald-50 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                Paper 2 • English Literature Specialist
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 mt-1">
-                Paper 2: English Literature, Criticism, Theory & ELT
-              </h3>
-            </div>
-            <span className="text-xs text-gray-500 font-mono">2 Full CBT Mocks</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              {
-                id: 'p2-eng-m1',
-                title: 'GSET English Paper 2 — CBT Mock 01',
-                file: 'GSET_English_Paper2_Mock01_CBT.html',
-                qs: 100,
-                mins: 120,
-                desc: 'Chaucer to Modern English Poetry, Drama, Fiction, Post-Method Pedagogy & ELT in India.'
-              },
-              {
-                id: 'p2-eng-m3',
-                title: 'GSET English Paper 2 — CBT Mock 03',
-                file: 'GSET_English_Paper2_Mock03_CBT.html',
-                qs: 100,
-                mins: 120,
-                desc: 'Literary Criticism, Structuralism to Deconstruction, Cultural Studies & MLA 9th Research.'
-              }
-            ].map(test => (
-              <div
-                key={test.id}
-                className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all shadow-2xs"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded">
-                      {test.qs} Qs • {test.mins} Min
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-500">100% CBT</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-900 leading-snug">{test.title}</h4>
-                  <p className="text-[11px] text-gray-600 leading-relaxed">{test.desc}</p>
-                </div>
-
-                <button
-                  onClick={() => window.open(`/study-vault/gset/tests/${test.file}`, '_blank')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Launch CBT Exam</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Part C: Paper 2 Education Discipline Specialist Tests */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
-            <div>
-              <span className="text-[10px] font-mono uppercase bg-purple-50 text-purple-800 font-bold px-2.5 py-0.5 rounded-full border border-purple-200">
-                Paper 2 • Education Discipline Specialist
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 mt-1">
-                Paper 2: Education, Teacher Training & Pedagogical Foundations
-              </h3>
-            </div>
-            <span className="text-xs text-gray-500 font-mono">3 Full CBT Mocks</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                id: 'p2-edu-m1',
-                title: 'GSET Education Paper 2 — CBT Mock 01',
-                file: 'GSET_Paper2_Education_Mock01_CBT.html',
-                qs: 100,
-                mins: 120,
-                desc: 'Philosophical & Sociological Foundations, Western & Indian thinkers, Curriculum Studies.'
-              },
-              {
-                id: 'p2-edu-m2',
-                title: 'GSET Education Paper 2 — CBT Mock 02',
-                file: 'GSET_Paper2_Education_Mock02_CBT.html',
-                qs: 100,
-                mins: 120,
-                desc: 'Psychology of Learner, Teacher Education Reforms (NEP 2020) & Educational Research.'
-              },
-              {
-                id: 'p2-edu-m3',
-                title: 'GSET Education Paper 2 — CBT Mock 03',
-                file: 'GSET_Paper2_Education_Mock03_CBT.html',
-                qs: 100,
-                mins: 120,
-                desc: 'Educational Technology, Special & Inclusive Education, Assessment & Evaluative Heuristics.'
-              }
-            ].map(test => (
-              <div
-                key={test.id}
-                className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between space-y-4 hover:border-purple-300 hover:bg-purple-50/30 transition-all shadow-2xs"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-purple-800 bg-purple-100/70 px-2 py-0.5 rounded">
-                      {test.qs} Qs • {test.mins} Min
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-500">100% CBT</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-900 leading-snug">{test.title}</h4>
-                  <p className="text-[11px] text-gray-600 leading-relaxed">{test.desc}</p>
-                </div>
-
-                <button
-                  onClick={() => window.open(`/study-vault/gset/tests/${test.file}`, '_blank')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Launch CBT Exam</span>
-                </button>
-              </div>
-            ))}
-          </div>
+          <button
+            onClick={onOpenDemoTest}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer shrink-0"
+          >
+            <Play className="w-4 h-4 fill-current" />
+            <span>Launch Free Demo Test</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </section>
 

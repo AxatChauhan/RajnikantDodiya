@@ -627,12 +627,11 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
                 </div>
 
                 <button
-                  onClick={() => window.open(`/study-vault/ugc/reading/${dossier.file}`, '_blank')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                  onClick={onOpenCheckout}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                 >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Open Online Reader</span>
-                  <ExternalLink className="w-3 h-3 opacity-80" />
+                  <Lock className="w-3.5 h-3.5 text-gray-400" />
+                  <span>Included in Bundle (Enroll to Read)</span>
                 </button>
               </div>
             ))}
@@ -725,11 +724,11 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
                 </div>
 
                 <button
-                  onClick={() => window.open(`/study-vault/ugc/tests/${test.file}`, '_blank')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  onClick={onOpenCheckout}
+                  className="w-full py-2.5 px-3 rounded-xl bg-gray-900 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                 >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Launch CBT Exam</span>
+                  <Lock className="w-3.5 h-3.5 text-gray-400" />
+                  <span>Included in Bundle (Enroll to Unlock)</span>
                 </button>
               </div>
             ))}
