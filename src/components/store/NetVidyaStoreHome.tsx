@@ -45,39 +45,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
   const { currentServerPrice, isEarlyBirdActive, paymentMode, settings, buyerSession, checkPackEnrolled } = useNetVidyaStore();
   const isEnrolled = checkPackEnrolled('ugc-net-english-bundle');
 
-  // Live Countdown state
-  const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
-
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-
-  useEffect(() => {
-    const updateCountdown = () => {
-      const now = new Date();
-      const cutoff = new Date(settings.earlyBirdCutoff);
-      const diff = cutoff.getTime() - now.getTime();
-
-      if (diff <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      setTimeLeft({ days, hours, minutes, seconds });
-    };
-
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-    return () => clearInterval(timer);
-  }, [settings.earlyBirdCutoff]);
 
   const faqs = getStoreFaqs(currentServerPrice);
 
@@ -85,30 +53,8 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
     <div className="animate-fade-in pb-12 space-y-12 sm:space-y-16">
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-4 sm:pt-6 max-w-5xl mx-auto px-4 space-y-5 sm:space-y-6">
+      <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
         
-        {/* Offer / Access Status Badge */}
-        <div className="text-center px-2">
-          {isEarlyBirdActive ? (
-            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-[11px] sm:text-xs font-semibold shadow-xs max-w-full">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Early-Bird Offer: ₹{currentServerPrice}</span>
-              </div>
-              <span className="text-emerald-700 font-mono font-bold">
-                (Ends in {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s)
-              </span>
-            </div>
-          ) : (
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                <span>Continuous access through <strong>31 December 2026</strong></span>
-              </span>
-            </div>
-          )}
-        </div>
-
         {/* Main Headline & Subtitle */}
         <div className="text-center space-y-3">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">

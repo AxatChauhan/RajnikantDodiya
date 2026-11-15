@@ -167,7 +167,7 @@ export const NetVidyaPolicies: React.FC<NetVidyaPoliciesProps> = ({
         }}
         className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-fade-in"
       >
-        <div className="relative w-full max-w-3xl my-auto bg-[#FAF9F5] rounded-3xl p-4 sm:p-7 shadow-2xl border border-gray-200 max-h-[calc(100dvh-2rem)] overflow-y-auto">
+        <div className="relative w-full max-w-3xl my-auto bg-white rounded-3xl p-4 sm:p-7 shadow-2xl border border-gray-200 max-h-[calc(100dvh-2rem)] overflow-y-auto">
           {innerContent}
         </div>
       </div>

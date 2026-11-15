@@ -194,7 +194,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white w-full overflow-x-clip">
+    <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white w-full overflow-x-clip">
       
       {/* 1. TOP COMMERCIAL HEADER BAR */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs w-full">

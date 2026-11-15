@@ -115,15 +115,6 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     <div className="space-y-12 sm:space-y-16 animate-fade-in pb-12">
       {/* 1. HERO SECTION */}
       <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
-        {/* State Eligibility Badge */}
-        <div className="text-center px-2">
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-bold">Gujarat State Eligibility Test (GSET 2026)</span>
-            <span className="text-emerald-700 font-mono hidden sm:inline">• MSU Baroda Syllabus Aligned</span>
-          </div>
-        </div>
-
         {/* Main Headline & Subtitle */}
         <div className="text-center space-y-3">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
