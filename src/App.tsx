@@ -114,15 +114,32 @@ function AppInner() {
     handleGoogleAuthRedirect();
 
     const checkInitialRoute = () => {
-      const isStoreHost = typeof window !== 'undefined' && window.location.hostname.startsWith('store.');
+      if (typeof window === 'undefined') return;
+
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      const hash = window.location.hash.replace(/^#+/, '').toLowerCase().split('?')[0];
+
+      // 1. Author Studio & Admin ERP route check (Path OR Hash takes priority on any hostname)
+      if (
+        hash === 'studio' ||
+        hash === 'admin' ||
+        hash === 'erp' ||
+        hash === 'store-studio' ||
+        hash === 'store-admin' ||
+        path === 'studio' ||
+        path === 'admin' ||
+        path === 'erp'
+      ) {
+        setActiveTab('studio');
+        return;
+      }
+
+      const isStoreHost = window.location.hostname.startsWith('store.');
       if (isStoreHost) {
         setActiveTab('store');
         return;
       }
-      if (typeof window === 'undefined') return;
 
-      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-      const hash = window.location.hash.replace(/^#+/, '').toLowerCase();
       const route = path || hash;
 
       if (POLICY_ROUTE_MAP[route]) {
