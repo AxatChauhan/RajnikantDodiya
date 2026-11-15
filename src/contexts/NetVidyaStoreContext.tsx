@@ -419,10 +419,70 @@ export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
 // Initial Content for Enrolled Candidate Registry
 export const INITIAL_BUYERS_REGISTRY: EnrolledBuyerRecord[] = [];
 
+/**
+ * Authoritative Pack Enrollment Resolver
+ * Handles bundle inheritance, combo mappings, and granular paper access.
+ */
+export function isPackEnrolled(packId: string, buyerSession?: NetVidyaBuyerSession | null): boolean {
+  if (!buyerSession || !buyerSession.isLoggedIn) return false;
+
+  // Official Author override
+  const cleanEmail = (buyerSession.email || '').toLowerCase().trim();
+  if (cleanEmail === 'rajnikantdodiya2@gmail.com') return true;
+
+  const enrolled = buyerSession.enrolledPacks || [];
+
+  // 1. UGC NET English Complete Bundle
+  if (packId === 'ugc-net-english-bundle' || packId === 'ugc' || packId === 'ugc-bundle') {
+    return buyerSession.isBuyer || enrolled.includes('ugc-net-english-bundle') || enrolled.includes('ugc-bundle');
+  }
+
+  // 2. GSET All-Access
+  if (enrolled.includes('gset-all')) return true;
+
+  // 3. GSET Duos
+  if (packId === 'gset-english-combo' || packId === 'gset-combo_eng') {
+    return enrolled.includes('gset-english-combo') || enrolled.includes('gset-combo_eng');
+  }
+  if (packId === 'gset-education-combo' || packId === 'gset-combo_edu') {
+    return enrolled.includes('gset-education-combo') || enrolled.includes('gset-combo_edu');
+  }
+
+  // 4. GSET Standalone Singles (also granted automatically if candidate owns the Duo combo!)
+  if (packId === 'gset-paper1') {
+    return (
+      enrolled.includes('gset-paper1') ||
+      enrolled.includes('gset-english-combo') ||
+      enrolled.includes('gset-education-combo') ||
+      enrolled.includes('gset-combo_eng') ||
+      enrolled.includes('gset-combo_edu')
+    );
+  }
+  if (packId === 'gset-paper2-english' || packId === 'gset-paper2_eng') {
+    return (
+      enrolled.includes('gset-paper2-english') ||
+      enrolled.includes('gset-paper2_eng') ||
+      enrolled.includes('gset-english-combo') ||
+      enrolled.includes('gset-combo_eng')
+    );
+  }
+  if (packId === 'gset-paper2-education' || packId === 'gset-paper2_edu') {
+    return (
+      enrolled.includes('gset-paper2-education') ||
+      enrolled.includes('gset-paper2_edu') ||
+      enrolled.includes('gset-education-combo') ||
+      enrolled.includes('gset-combo_edu')
+    );
+  }
+
+  return enrolled.includes(packId);
+}
+
 interface NetVidyaStoreContextType {
   settings: NetVidyaStoreSettings;
   updateSettings: (newSettings: Partial<NetVidyaStoreSettings>) => void;
   buyerSession: NetVidyaBuyerSession;
+  checkPackEnrolled: (packId: string) => boolean;
   loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean; enrolledPacks?: string[] }) => void;
   verifyPaymentAndActivate: (query: { paymentId?: string; email?: string; mobile?: string }) => Promise<{ success: boolean; message?: string; error?: string }>;
   logoutBuyer: () => void;
@@ -1211,6 +1271,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         settings,
         updateSettings,
         buyerSession,
+        checkPackEnrolled: (packId: string) => isPackEnrolled(packId, buyerSession),
         loginBuyer,
         verifyPaymentAndActivate,
         logoutBuyer,

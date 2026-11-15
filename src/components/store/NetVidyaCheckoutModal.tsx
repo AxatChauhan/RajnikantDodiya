@@ -13,7 +13,7 @@ import {
   MessageCircle,
   Check
 } from 'lucide-react';
-import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { useNetVidyaStore, isPackEnrolled } from '../../contexts/NetVidyaStoreContext';
 import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../config/storeConfig';
 import { StorePolicyLinks, PolicyTab } from '../common/StorePolicyLinks';
 import { useModalEscape } from '../../hooks/useModalEscape';
@@ -261,6 +261,11 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
     return CHECKOUT_PRODUCTS.filter(p => p.exam === 'gset');
   }, []);
 
+  // Check if candidate already owns the selected product
+  const isAlreadyOwned = useMemo(() => {
+    return isPackEnrolled(activeProduct.id, buyerSession);
+  }, [activeProduct.id, buyerSession]);
+
   // Base price and final payable calculation
   // Strict rule: GSET max combo is ₹249, singles are ₹149. UGC bundle is ₹499.
   const basePrice = activeProduct.price;
@@ -293,6 +298,12 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
       e.preventDefault();
     }
     setErrorMessage(null);
+
+    // If candidate already owns this pack, bypass checkout completely and open materials
+    if (isAlreadyOwned) {
+      handleCompleteSuccess();
+      return;
+    }
 
     const isSimulated = appliedDiscount?.code === 'SIMULATE' || finalPayablePrice === 0;
 
@@ -842,10 +853,14 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
               </span>
               <div className="flex items-baseline gap-2 mt-0.5">
                 <span className="text-2xl sm:text-3xl font-extrabold text-white font-serif">
-                  ₹{finalPayablePrice}
+                  ₹{isAlreadyOwned ? 0 : finalPayablePrice}
                 </span>
                 <span className="text-xs text-gray-300">INR (All Inclusive)</span>
-                {appliedDiscount && (
+                {isAlreadyOwned ? (
+                  <span className="text-xs text-emerald-400 font-bold">
+                    (Already Active Pass)
+                  </span>
+                ) : appliedDiscount && (
                   <span className="text-xs text-emerald-400 font-bold">
                     (₹{appliedDiscount.amount} Off)
                   </span>
@@ -857,7 +872,16 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 <span className="text-[10px] text-gray-400 block">Digital Access Validity</span>
                 <strong className="text-white font-semibold">Through 31 Dec 2026</strong>
               </div>
-              {(finalPayablePrice === 0 || appliedDiscount?.code === 'SIMULATE') && !redirectingUrl && !isPaymentSuccess && (
+              {isAlreadyOwned ? (
+                <button
+                  type="button"
+                  onClick={handleCompleteSuccess}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Open Materials</span>
+                </button>
+              ) : (finalPayablePrice === 0 || appliedDiscount?.code === 'SIMULATE') && !redirectingUrl && !isPaymentSuccess && (
                 <button
                   type="button"
                   onClick={() => handleInitiatePayment()}
@@ -1003,6 +1027,64 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                 <p className="text-[11px] text-gray-500">
                   A purchase confirmation email with your dashboard link has also been dispatched to your email.
                 </p>
+              </div>
+            </div>
+          ) : isAlreadyOwned ? (
+            /* ENROLLMENT ALREADY ACTIVE VIEW (REPAYMENT SHIELD) */
+            <div className="py-4 text-center space-y-4 animate-scale-up">
+              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle2 className="w-9 h-9" />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full inline-block">
+                  ALREADY ENROLLED &amp; ACTIVE
+                </span>
+                <h3 className="text-lg font-extrabold text-gray-900">
+                  You Already Own This Pack!
+                </h3>
+                <p className="text-xs text-gray-600 max-w-sm mx-auto leading-relaxed">
+                  You already have an active student pass for <strong>{activeProduct.name}</strong> unlocked through <strong>31 Dec 2026</strong>. You do not need to pay again.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-left space-y-1.5 text-xs">
+                <div className="flex justify-between text-gray-600">
+                  <span>Candidate:</span>
+                  <strong className="text-gray-900">{buyerSession.name || studentName || 'Scholar Candidate'}</strong>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Registered Email:</span>
+                  <strong className="text-gray-900 font-mono">{buyerSession.email || email}</strong>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Enrolled Pack:</span>
+                  <strong className="text-gray-900">{activeProduct.shortName}</strong>
+                </div>
+                <div className="flex justify-between text-gray-600 items-center">
+                  <span>Access Status:</span>
+                  <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px]">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> ACTIVE &amp; UNLOCKED
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleCompleteSuccess}
+                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Open Student Dashboard &amp; Test Hall</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full py-2 text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors cursor-pointer text-center block"
+                >
+                  ← Return to Store
+                </button>
               </div>
             </div>
           ) : (

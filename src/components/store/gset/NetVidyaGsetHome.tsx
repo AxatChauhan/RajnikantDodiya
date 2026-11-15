@@ -18,6 +18,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { STORE_MERCHANT } from '../../../config/storeConfig';
+import { useNetVidyaStore } from '../../../contexts/NetVidyaStoreContext';
 
 export interface GsetProductItem {
   id: string;
@@ -34,15 +35,20 @@ export interface GsetProductItem {
 interface NetVidyaGsetHomeProps {
   onOpenCheckout: (productId?: string) => void;
   onOpenDemoTest: () => void;
+  onNavigateToMaterials?: () => void;
   currentServerPrice: number;
 }
 
 export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
   onOpenCheckout,
   onOpenDemoTest,
+  onNavigateToMaterials,
   currentServerPrice
 }) => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const { buyerSession, checkPackEnrolled } = useNetVidyaStore();
+  const isEnglishComboEnrolled = checkPackEnrolled('gset-english-combo');
+  const isEducationComboEnrolled = checkPackEnrolled('gset-education-combo');
 
   const englishCombo: GsetProductItem = {
     id: 'gset-english-combo',
@@ -228,13 +234,24 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                   </span>
                 </div>
 
-                <button
-                  onClick={() => onOpenCheckout('gset-english-combo')}
-                  className="w-full py-3 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Enroll in English Duo (₹249)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {isEnglishComboEnrolled ? (
+                  <button
+                    onClick={onNavigateToMaterials || (() => onOpenCheckout('gset-english-combo'))}
+                    className="w-full py-3 px-5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-5 h-5 text-emerald-300" />
+                    <span>✓ Duo Active • Open Tests &amp; Materials</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onOpenCheckout('gset-english-combo')}
+                    className="w-full py-3 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Enroll in English Duo (₹249)</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
 
                 <p className="text-[10px] text-gray-400 font-mono">
                   3 Paper 1 Mocks + 2 English Paper 2 Mocks (5 Total Tests)
@@ -282,13 +299,24 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                   </span>
                 </div>
 
-                <button
-                  onClick={() => onOpenCheckout('gset-education-combo')}
-                  className="w-full py-3 px-5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Enroll in Education Duo (₹249)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {isEducationComboEnrolled ? (
+                  <button
+                    onClick={onNavigateToMaterials || (() => onOpenCheckout('gset-education-combo'))}
+                    className="w-full py-3 px-5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-5 h-5 text-purple-300" />
+                    <span>✓ Duo Active • Open Tests &amp; Materials</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onOpenCheckout('gset-education-combo')}
+                    className="w-full py-3 px-5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Enroll in Education Duo (₹249)</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
 
                 <p className="text-[10px] text-gray-400 font-mono">
                   3 Paper 1 Mocks + 3 Education Paper 2 Mocks (6 Total Tests)
@@ -436,10 +464,17 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                   <div className="pt-3 border-t border-gray-100 space-y-2">
                     <span className="text-[10px] font-mono uppercase font-bold text-gray-500 flex items-center justify-between">
                       <span>Included Tests ({pack.tests.length})</span>
-                      <span className="text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold">
-                        <Lock className="w-2.5 h-2.5" />
-                        <span>Enrolled Access</span>
-                      </span>
+                      {checkPackEnrolled(pack.id) ? (
+                        <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                          <span>Active &amp; Unlocked</span>
+                        </span>
+                      ) : (
+                        <span className="text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold">
+                          <Lock className="w-2.5 h-2.5" />
+                          <span>Enrolled Access</span>
+                        </span>
+                      )}
                     </span>
 
                     <div className="space-y-1.5">
@@ -460,14 +495,25 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 </div>
 
                 <div className="pt-2">
-                  <button
-                    onClick={() => onOpenCheckout(pack.id)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    <Lock className="w-3.5 h-3.5 text-gray-400" />
-                    <span>Enroll to Unlock Tests (₹{pack.price})</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  {checkPackEnrolled(pack.id) ? (
+                    <button
+                      onClick={onNavigateToMaterials || (() => onOpenCheckout(pack.id))}
+                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                      <span>✓ Unlocked • Open Mock Tests</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onOpenCheckout(pack.id)}
+                      className="w-full py-2.5 px-3 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-gray-400" />
+                      <span>Enroll to Unlock Tests (₹{pack.price})</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

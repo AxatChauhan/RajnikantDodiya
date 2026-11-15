@@ -12,9 +12,10 @@ import {
   Award,
   Layers,
   ChevronRight,
-  Shield
+  Shield,
+  CheckCircle2
 } from 'lucide-react';
-import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { useNetVidyaStore, isPackEnrolled } from '../../contexts/NetVidyaStoreContext';
 import { useSiteContent } from '../../contexts/SiteContentContext';
 import { NetVidyaStoreHome } from './NetVidyaStoreHome';
 import { NetVidyaFreeSample } from './NetVidyaFreeSample';
@@ -104,6 +105,13 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
     const targetProduct = CHECKOUT_PRODUCTS.find(p => p.id === productId) ||
       (targetExam === 'gset' ? CHECKOUT_PRODUCTS[0] : CHECKOUT_PRODUCTS.find(p => p.id === 'ugc-net-english-bundle'));
+
+    // If candidate already owns this pack, open their materials instead of charging them again
+    if (targetProduct && isPackEnrolled(targetProduct.id, buyerSession)) {
+      setCurrentView('materials');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
 
     // Compulsory candidate login required before proceeding to checkout / buying
     if (!buyerSession.isLoggedIn) {
@@ -308,28 +316,41 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               </button>
             )}
 
-            {/* Buy CTA Button */}
-            <button
-              onClick={() => handleOpenCheckout(undefined, activeExamStore)}
-              className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
-                activeExamStore === 'gset'
-                  ? 'bg-emerald-700 hover:bg-emerald-800'
-                  : 'bg-blue-700 hover:bg-blue-800'
-              }`}
-            >
-              {activeExamStore === 'gset' ? (
-                <>
-                  <span className="hidden min-[400px]:inline">Enroll GSET (from ₹149)</span>
-                  <span className="min-[400px]:hidden">GSET ₹149</span>
-                </>
-              ) : (
-                <>
-                  <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
-                  <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
-                </>
-              )}
-              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-            </button>
+            {/* Buy CTA or Active Access Button */}
+            {isPackEnrolled(activeExamStore === 'gset' ? 'gset-english-combo' : 'ugc-net-english-bundle', buyerSession) ? (
+              <button
+                onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer"
+                title="Open My Materials & Test Hall"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden min-[400px]:inline">Access Materials</span>
+                <span className="min-[400px]:hidden">My Pass</span>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+              </button>
+            ) : (
+              <button
+                onClick={() => handleOpenCheckout(undefined, activeExamStore)}
+                className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
+                  activeExamStore === 'gset'
+                    ? 'bg-emerald-700 hover:bg-emerald-800'
+                    : 'bg-blue-700 hover:bg-blue-800'
+                }`}
+              >
+                {activeExamStore === 'gset' ? (
+                  <>
+                    <span className="hidden min-[400px]:inline">Enroll GSET (from ₹149)</span>
+                    <span className="min-[400px]:hidden">GSET ₹149</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="hidden min-[400px]:inline">Buy Final Pack (₹{currentServerPrice})</span>
+                    <span className="min-[400px]:hidden">Buy ₹{currentServerPrice}</span>
+                  </>
+                )}
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+              </button>
+            )}
 
             {/* Mobile & Tablet Hamburger Menu */}
             <button
@@ -471,15 +492,26 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
             {/* Quick Action in Drawer */}
             <div className="pt-2 border-t border-gray-100">
-              <button
-                onClick={() => { handleOpenCheckout(undefined, activeExamStore); setMobileMenuOpen(false); }}
-                className={`w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs ${
-                  activeExamStore === 'gset' ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
-                }`}
-              >
-                <span>{activeExamStore === 'gset' ? 'Enroll GSET 2026 (from ₹149)' : 'Enroll UGC NET Bundle (₹499)'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              {isPackEnrolled(activeExamStore === 'gset' ? 'gset-english-combo' : 'ugc-net-english-bundle', buyerSession) ? (
+                <button
+                  onClick={() => { setCurrentView('materials'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Access My Materials &amp; Test Hall</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => { handleOpenCheckout(undefined, activeExamStore); setMobileMenuOpen(false); }}
+                  className={`w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs ${
+                    activeExamStore === 'gset' ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
+                  }`}
+                >
+                  <span>{activeExamStore === 'gset' ? 'Enroll GSET 2026 (from ₹149)' : 'Enroll UGC NET Bundle (₹499)'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -494,11 +526,13 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               onOpenLogin={() => setIsLoginOpen(true)}
               onOpenBookstore={onOpenBookstore}
+              onNavigateToMaterials={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             />
           ) : (
             <NetVidyaGsetHome
               onOpenCheckout={(packId) => handleOpenCheckout(packId, 'gset')}
               onOpenDemoTest={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onNavigateToMaterials={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               currentServerPrice={currentServerPrice}
             />
           )

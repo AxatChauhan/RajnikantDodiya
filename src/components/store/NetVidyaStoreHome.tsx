@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   Play,
   FileText,
-  Calendar,
   Lock,
   ChevronDown,
   HelpCircle,
@@ -20,264 +19,26 @@ import {
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import {
   getStoreFaqs,
-  STORE_MERCHANT,
-  STORE_TIMELINE_ITEMS
+  STORE_MERCHANT
 } from '../../config/storeConfig';
-
-const UGC_READING_DOSSIERS = [
-  {
-    id: 'ugc-read-ebook',
-    title: 'Complete E-book: UGC NET English Literature',
-    pages: 283,
-    badge: 'Comprehensive E-book • 283 Pages',
-    file: 'ebook/index.html',
-    desc: 'Chaucer to Contemporary World Literature, Literary Theory, Criticism, Post-Method Pedagogy & ELT in India with clean digital typography.'
-  },
-  {
-    id: 'ugc-read-pyq',
-    title: 'PYQ Trend Analysis & Elimination Master',
-    pages: 35,
-    badge: 'Strategy Dossier • 35 Pages',
-    file: 'pyq_analysis/index.html',
-    desc: '10-year question taxonomy, option elimination techniques, distractor patterns, and recurring high-frequency topics.'
-  },
-  {
-    id: 'ugc-read-revkit',
-    title: 'Last 30 Days Quick Revision Kit',
-    pages: 29,
-    badge: 'Revision Sprint • 29 Pages',
-    file: 'revision_kit/index.html',
-    desc: 'Chronological timeline summaries, major works, critical theory cheat sheets, and high-yield last-minute memory aids.'
-  }
-];
-
-const UGC_TESTS = [
-  {
-    id: 'ugc-net-mock-1',
-    title: 'NET Mock 1: Full-Length Paper II NTA Simulation',
-    category: 'grand',
-    categoryLabel: 'Grand Mock',
-    file: 'NET_Mock_01.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Comprehensive 100-question Paper II English Literature NTA simulation with countdown timer, question palette, and detailed explanations.'
-  },
-  {
-    id: 'ugc-unit-1',
-    title: 'Unit Test 1: Drama',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_01_Drama.html',
-    qs: 50,
-    mins: 60,
-    desc: 'British, American, and World Drama from classical Greek tragedy to post-war Absurd theatre.'
-  },
-  {
-    id: 'ugc-unit-2',
-    title: 'Unit Test 2: Poetry',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_02_Poetry.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Chaucer to Contemporary World Poetry, poetic forms, prosody, and metaphysical verse.'
-  },
-  {
-    id: 'ugc-unit-3',
-    title: 'Unit Test 3: Fiction & Short Story',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_03_Fiction.html',
-    qs: 50,
-    mins: 60,
-    desc: '18th-century rise of the novel, Victorian realism, modernist streams, and postcolonial fiction.'
-  },
-  {
-    id: 'ugc-unit-4',
-    title: 'Unit Test 4: Non-fictional Prose',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_04_Prose.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Essays, biographies, autobiographies, diaries, travelogues, and political essays.'
-  },
-  {
-    id: 'ugc-unit-5',
-    title: 'Unit Test 5: Language & Pedagogy',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_05_Language.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Linguistics, phonetics, syntax, English Language Teaching (ELT) methods & pedagogy in India.'
-  },
-  {
-    id: 'ugc-unit-6',
-    title: 'Unit Test 6: English in India',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_06_English_in_India.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Macaulay’s Minute, colonial language policies, Indian English authors, and multilingualism.'
-  },
-  {
-    id: 'ugc-unit-7',
-    title: 'Unit Test 7: Cultural Studies',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_07_Cultural_Studies.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Birmingham Centre, Raymond Williams, Stuart Hall, subcultures, and popular media analysis.'
-  },
-  {
-    id: 'ugc-unit-8',
-    title: 'Unit Test 8: Literary Criticism',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_08_Criticism.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Classical Aristotle & Plato, Sidney, Dryden, Dr. Johnson, Coleridge, and New Criticism.'
-  },
-  {
-    id: 'ugc-unit-9',
-    title: 'Unit Test 9: Literary Theory',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_09_Theory.html',
-    qs: 50,
-    mins: 60,
-    desc: 'Structuralism, Post-structuralism, Deconstruction, Psychoanalysis, Feminism, and Ecocriticism.'
-  },
-  {
-    id: 'ugc-unit-10',
-    title: 'Unit Test 10: Research Methods',
-    category: 'units',
-    categoryLabel: 'Unit Test',
-    file: 'Unit_Test_10_Research.html',
-    qs: 50,
-    mins: 60,
-    desc: 'MLA 9th Edition citations, research design, thesis formulation, and academic ethics.'
-  },
-  {
-    id: 'ugc-pm-a',
-    title: 'Practice Mock A: Full-Length Speed Simulation',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_A.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Full-length 100-question practice mock test for speed and accuracy building.'
-  },
-  {
-    id: 'ugc-pm-b',
-    title: 'Practice Mock B: Literature & Criticism',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_B.html',
-    qs: 100,
-    mins: 120,
-    desc: '100 questions covering core literary periods and critical movements.'
-  },
-  {
-    id: 'ugc-pm-c',
-    title: 'Practice Mock C: Theory & Cultural Studies',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_C.html',
-    qs: 100,
-    mins: 120,
-    desc: '100 questions focused on 20th-century critical theory and cultural perspectives.'
-  },
-  {
-    id: 'ugc-pm-d',
-    title: 'Practice Mock D: Comprehensive Speed Test',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_D.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Simulated examination testing time management across high-yield units.'
-  },
-  {
-    id: 'ugc-pm-e',
-    title: 'Practice Mock E: Advanced Question Bank',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_E.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Advanced-level analytical questions with distractor explanations.'
-  },
-  {
-    id: 'ugc-pm-f',
-    title: 'Practice Mock F: Full-Length Speed Booster',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_F.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Full-length 100-question Paper II mock for accuracy under exam pressure.'
-  },
-  {
-    id: 'ugc-pm-g',
-    title: 'Practice Mock G: Contemporary & World Literature',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_G.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Postcolonial, Dalit, Diaspora, and World Literature in translation.'
-  },
-  {
-    id: 'ugc-pm-h',
-    title: 'Practice Mock H: Critical Theory Sprint',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_H.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Targeted practice on high-frequency critical paradigms and key terms.'
-  },
-  {
-    id: 'ugc-pm-i',
-    title: 'Practice Mock I: NTA Pattern Simulation',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_I.html',
-    qs: 100,
-    mins: 120,
-    desc: 'Authentic assertion-reason, chronological matching, and passage comprehension.'
-  },
-  {
-    id: 'ugc-pm-j',
-    title: 'Practice Mock J: Final Pre-Exam Diagnostic',
-    category: 'practice',
-    categoryLabel: 'Practice Mock',
-    file: 'Practice_Mock_J.html',
-    qs: 100,
-    mins: 120,
-    desc: 'The ultimate 100-question diagnostic exam to finalize exam readiness.'
-  }
-];
 
 interface NetVidyaStoreHomeProps {
   onOpenCheckout: () => void;
   onOpenSample: () => void;
   onOpenLogin: () => void;
   onOpenBookstore?: () => void;
+  onNavigateToMaterials?: () => void;
 }
 
 export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
   onOpenCheckout,
   onOpenSample,
   onOpenLogin,
-  onOpenBookstore
+  onOpenBookstore,
+  onNavigateToMaterials
 }) => {
-  const { currentServerPrice, isEarlyBirdActive, paymentMode, settings } = useNetVidyaStore();
+  const { currentServerPrice, isEarlyBirdActive, paymentMode, settings, buyerSession, checkPackEnrolled } = useNetVidyaStore();
+  const isEnrolled = checkPackEnrolled('ugc-net-english-bundle');
 
   // Live Countdown state
   const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
@@ -288,7 +49,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
   });
 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [activeTestCategory, setActiveTestCategory] = useState<'all' | 'grand' | 'units' | 'practice'>('all');
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -315,7 +75,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
   }, [settings.earlyBirdCutoff]);
 
   const faqs = getStoreFaqs(currentServerPrice);
-  const nowTimestamp = Date.now();
 
   return (
     <div className="space-y-16 sm:space-y-24 animate-fade-in pb-12">
@@ -415,16 +174,27 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
 
           {/* Primary Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <button
-              onClick={onOpenCheckout}
-              className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02]"
-            >
-              <span>Enroll in Complete Bundle (₹{currentServerPrice})</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {isEnrolled ? (
+              <button
+                onClick={onNavigateToMaterials || onOpenCheckout}
+                className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
+              >
+                <CheckCircle2 className="w-5 h-5 text-emerald-300" />
+                <span>✓ National Pass Active • Open My Materials &amp; Test Hall</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={onOpenCheckout}
+                className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
+              >
+                <span>Enroll in Complete Bundle (₹{currentServerPrice})</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
             <button
               onClick={onOpenSample}
-              className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-sm transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <Play className="w-4 h-4 text-blue-700 fill-current" />
               <span>Try Free Demo (10 Qs + Sample)</span>
@@ -432,15 +202,17 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
           </div>
 
           {/* Already Enrolled Link */}
-          <div className="pt-2 text-center text-xs text-gray-500">
-            <span>Already enrolled? </span>
-            <button
-              onClick={onOpenLogin}
-              className="font-bold text-blue-700 hover:underline"
-            >
-              Student Login here →
-            </button>
-          </div>
+          {!isEnrolled && (
+            <div className="pt-2 text-center text-xs text-gray-500">
+              <span>Already enrolled? </span>
+              <button
+                onClick={onOpenLogin}
+                className="font-bold text-blue-700 hover:underline cursor-pointer"
+              >
+                Student Login here →
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Mini Trust Row */}
@@ -467,7 +239,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             All-In-One Study Bundle Breakdown
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            What You Get Inside the ₹499 Complete Bundle
+            What You Get Inside the ₹{currentServerPrice} Complete Bundle
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto">
             Everything you need for UGC NET English Paper II: authentic NTA computer-based CBT mock tests and complete high-yield online reading dossiers.
@@ -591,158 +363,15 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
         </div>
       </section>
 
-      {/* 2.5 UGC NET 2026 INTERACTIVE READING & CBT TEST HALL */}
-      <section className="max-w-6xl mx-auto px-4 space-y-12">
-        
-        {/* SECTION A: 3 HIGH-YIELD ONLINE READING DOSSIERS */}
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Online Reading Dossiers (347 Pages)</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              Interactive Digital Reading Library
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Carefully designed online readers with clean academic typography, structured page navigation, and zero heavy PDF loading delays. Read anywhere on desktop or mobile.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {UGC_READING_DOSSIERS.map(dossier => (
-              <div
-                key={dossier.id}
-                className="p-6 rounded-3xl bg-white border border-emerald-200 shadow-sm flex flex-col justify-between space-y-5 hover:border-emerald-300 hover:shadow-md transition-all"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                      {dossier.badge}
-                    </span>
-                    <span className="text-xs font-mono font-bold text-gray-500">{dossier.pages} Pages</span>
-                  </div>
-                  <h3 className="text-base font-bold text-gray-900 leading-snug">{dossier.title}</h3>
-                  <p className="text-xs text-gray-600 leading-relaxed">{dossier.desc}</p>
-                </div>
-
-                <button
-                  onClick={onOpenCheckout}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gray-900 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Lock className="w-3.5 h-3.5 text-gray-400" />
-                  <span>Included in Bundle (Enroll to Read)</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* SECTION B: 21 NTA COMPUTER-BASED CBT TESTS */}
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider">
-              <Clock className="w-3.5 h-3.5" />
-              <span>NTA CBT Test Hall (21 Exams)</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              UGC NET Computer-Based Test Simulators
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Exact NTA exam interface: real-time countdown timer, color-coded question palette (Answered, Not Answered, Marked for Review), and instant result diagnosis.
-            </p>
-          </div>
-
-          {/* Test Category Filter Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2 bg-gray-100/80 p-1.5 rounded-2xl max-w-xl mx-auto border border-gray-200 text-xs font-semibold">
-            <button
-              onClick={() => setActiveTestCategory('all')}
-              className={`py-2 px-3.5 rounded-xl transition-all cursor-pointer ${
-                activeTestCategory === 'all'
-                  ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              All Tests (21)
-            </button>
-            <button
-              onClick={() => setActiveTestCategory('grand')}
-              className={`py-2 px-3.5 rounded-xl transition-all cursor-pointer ${
-                activeTestCategory === 'grand'
-                  ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Grand Mock (1)
-            </button>
-            <button
-              onClick={() => setActiveTestCategory('units')}
-              className={`py-2 px-3.5 rounded-xl transition-all cursor-pointer ${
-                activeTestCategory === 'units'
-                  ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              10 Unit Tests (500 Qs)
-            </button>
-            <button
-              onClick={() => setActiveTestCategory('practice')}
-              className={`py-2 px-3.5 rounded-xl transition-all cursor-pointer ${
-                activeTestCategory === 'practice'
-                  ? 'bg-white text-blue-900 shadow-2xs font-bold'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              10 Practice Mocks (1,000 Qs)
-            </button>
-          </div>
-
-          {/* Test Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {UGC_TESTS.filter(t => activeTestCategory === 'all' || t.category === activeTestCategory).map(test => (
-              <div
-                key={test.id}
-                className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col justify-between space-y-4 hover:border-blue-300 hover:shadow-xs transition-all"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
-                      test.category === 'grand'
-                        ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                        : test.category === 'units'
-                        ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                        : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                    }`}>
-                      {test.categoryLabel}
-                    </span>
-                    <span className="text-[10px] font-mono text-gray-500 font-semibold">
-                      {test.qs} Qs • {test.mins} Min
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-900 leading-snug">{test.title}</h4>
-                  <p className="text-[11px] text-gray-600 leading-relaxed">{test.desc}</p>
-                </div>
-
-                <button
-                  onClick={onOpenCheckout}
-                  className="w-full py-2.5 px-3 rounded-xl bg-gray-900 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Lock className="w-3.5 h-3.5 text-gray-400" />
-                  <span>Included in Bundle (Enroll to Unlock)</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* SECTION C: FREE PUBLIC DEMO STATION */}
+      {/* 3. FREE PUBLIC DEMO STATION (TRY BEFORE YOU ENROLL) */}
+      <section className="max-w-4xl mx-auto px-4">
         <div className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-white rounded-3xl p-6 sm:p-8 border border-amber-200 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200/60 pb-4">
             <div>
               <span className="text-[10px] font-mono uppercase bg-amber-100 text-amber-900 font-bold px-2.5 py-0.5 rounded-full border border-amber-200">
                 Zero Cost • Instant Trial
               </span>
-              <h3 className="text-xl font-extrabold text-gray-900 mt-1">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 mt-1">
                 Free Public Demo Station (Try Before You Enroll)
               </h3>
             </div>
@@ -792,52 +421,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               </button>
             </div>
           </div>
-        </div>
-
-      </section>
-
-      {/* 3. RELEASE SCHEDULE TIMELINE */}
-      <section className="max-w-4xl mx-auto px-4 space-y-6">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-mono uppercase font-bold text-blue-700 tracking-wider">
-            Structured Release Schedule
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Systematic Phase-by-Phase Preparation
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-500">
-            Ready materials are unlocked immediately; upcoming modules unlock automatically on scheduled dates.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden text-xs sm:text-sm">
-          {STORE_TIMELINE_ITEMS.map((item, idx) => {
-            const isReleased =
-              !item.releaseDateIso || nowTimestamp >= new Date(item.releaseDateIso).getTime();
-            const statusLabel = isReleased ? 'Ready Now' : 'Upcoming';
-            return (
-              <div key={idx} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                <div className="flex items-start sm:items-center gap-3 min-w-0">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                    isReleased ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {idx + 1}
-                  </div>
-                  <div className="min-w-0">
-                    <strong className="text-gray-900 block font-semibold text-xs sm:text-sm">{item.title}</strong>
-                    <span className="text-[11px] sm:text-xs text-gray-500 font-mono">Scheduled: {item.date}</span>
-                  </div>
-                </div>
-                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold self-start sm:self-auto shrink-0 ${
-                  isReleased
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : 'bg-blue-50 text-blue-700'
-                }`}>
-                  {statusLabel}
-                </span>
-              </div>
-            );
-          })}
         </div>
       </section>
 
@@ -891,13 +474,24 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={onOpenCheckout}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02]"
-            >
-              <span>Enroll Now for ₹{currentServerPrice}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {isEnrolled ? (
+              <button
+                onClick={onNavigateToMaterials || onOpenCheckout}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
+              >
+                <CheckCircle2 className="w-5 h-5 text-emerald-200" />
+                <span>✓ National Pass Active • Open Student Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={onOpenCheckout}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
+              >
+                <span>Enroll Now for ₹{currentServerPrice}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
             <button
               onClick={onOpenSample}
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition-colors"

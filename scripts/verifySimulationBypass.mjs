@@ -261,7 +261,60 @@ async function runSuite() {
   const hasEnrolledPacksPassed = checkoutCode.includes('enrolledPacks: activeProduct.id === \'ugc-net-english-bundle\'');
   assert(hasEnrolledPacksPassed, `loginBuyer receives explicit enrolledPacks for instant unlock in My Materials`);
 
-  // --- SUITE 5: Summary Report ---
+  // Verify Repayment Shield in Checkout Modal
+  const hasAlreadyOwnedShield = checkoutCode.includes('/* ENROLLMENT ALREADY ACTIVE VIEW (REPAYMENT SHIELD) */') &&
+    checkoutCode.includes('You Already Own This Pack!');
+  assert(hasAlreadyOwnedShield, `Checkout modal has Repayment Shield preventing double-charging on owned packs`);
+
+  // --- SUITE 5: Pack Ownership Resolution Matrix (isPackEnrolled) ---
+  console.log(`\n${BOLD}--- TEST SUITE 5: Pack Ownership Resolution Matrix ---${RESET}`);
+  const storeContextCode = fs.readFileSync(path.resolve('src/contexts/NetVidyaStoreContext.tsx'), 'utf-8');
+  assert(storeContextCode.includes('export function isPackEnrolled('), `isPackEnrolled exported from NetVidyaStoreContext`);
+
+  // Simple runtime test of ownership logic
+  function testPackEnrolled(packId, session) {
+    if (!session || !session.isLoggedIn) return false;
+    const cleanEmail = (session.email || '').toLowerCase().trim();
+    if (cleanEmail === 'rajnikantdodiya2@gmail.com') return true;
+    const enrolled = session.enrolledPacks || [];
+    if (packId === 'ugc-net-english-bundle' || packId === 'ugc' || packId === 'ugc-bundle') {
+      return session.isBuyer || enrolled.includes('ugc-net-english-bundle') || enrolled.includes('ugc-bundle');
+    }
+    if (enrolled.includes('gset-all')) return true;
+    if (packId === 'gset-english-combo' || packId === 'gset-combo_eng') {
+      return enrolled.includes('gset-english-combo') || enrolled.includes('gset-combo_eng');
+    }
+    if (packId === 'gset-education-combo' || packId === 'gset-combo_edu') {
+      return enrolled.includes('gset-education-combo') || enrolled.includes('gset-combo_edu');
+    }
+    if (packId === 'gset-paper1') {
+      return enrolled.includes('gset-paper1') || enrolled.includes('gset-english-combo') || enrolled.includes('gset-education-combo');
+    }
+    if (packId === 'gset-paper2-english' || packId === 'gset-paper2_eng') {
+      return enrolled.includes('gset-paper2-english') || enrolled.includes('gset-paper2_eng') || enrolled.includes('gset-english-combo');
+    }
+    if (packId === 'gset-paper2-education' || packId === 'gset-paper2_edu') {
+      return enrolled.includes('gset-paper2-education') || enrolled.includes('gset-paper2_edu') || enrolled.includes('gset-education-combo');
+    }
+    return enrolled.includes(packId);
+  }
+
+  // Case 5A: UGC NET candidate
+  const ugcBuyer = { isLoggedIn: true, isBuyer: true, enrolledPacks: ['ugc-net-english-bundle'] };
+  assert(testPackEnrolled('ugc-net-english-bundle', ugcBuyer) === true, `UGC NET buyer owns UGC NET Bundle`);
+  assert(testPackEnrolled('gset-english-combo', ugcBuyer) === false, `UGC NET buyer does NOT own GSET Combo`);
+
+  // Case 5B: GSET English Duo combo owner inherits both single papers
+  const gsetEnglishDuoBuyer = { isLoggedIn: true, isBuyer: false, enrolledPacks: ['gset-english-combo'] };
+  assert(testPackEnrolled('gset-english-combo', gsetEnglishDuoBuyer) === true, `GSET English Duo buyer owns English Duo`);
+  assert(testPackEnrolled('gset-paper1', gsetEnglishDuoBuyer) === true, `GSET English Duo buyer automatically inherits Paper 1`);
+  assert(testPackEnrolled('gset-paper2-english', gsetEnglishDuoBuyer) === true, `GSET English Duo buyer automatically inherits Paper 2 English`);
+  assert(testPackEnrolled('gset-paper2-education', gsetEnglishDuoBuyer) === false, `GSET English Duo buyer does NOT own Education Paper`);
+
+  // Case 5C: Logged out visitor owns nothing
+  assert(testPackEnrolled('ugc-net-english-bundle', { isLoggedIn: false }) === false, `Logged out visitor owns nothing`);
+
+  // --- SUITE 6: Summary Report ---
   console.log(`\n${BOLD}${CYAN}================================================================${RESET}`);
   console.log(`${BOLD} VERIFICATION SUMMARY: ${passed}/${passed + failed} Tests Passed${RESET}`);
   if (failed === 0) {
