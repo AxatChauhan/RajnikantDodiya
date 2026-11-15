@@ -8,6 +8,7 @@ import {
   UGC_BUNDLE_PRODUCT
 } from './price.js';
 import { STORE_MERCHANT, STORE_PAYMENT_DEFAULTS } from '../../lib/store-config.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
 /**
  * Vercel Serverless Function: Create Razorpay Order
@@ -22,6 +23,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
+
+  if (!enforceRateLimit(req, res, 'store_create_order')) return;
 
   try {
     const { studentName, email, mobile, couponCode, productId, examStore } = req.body || {};

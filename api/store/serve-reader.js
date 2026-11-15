@@ -10,6 +10,7 @@ import {
   verifySessionToken,
   isEmailBuyer
 } from '../../lib/auth-helper.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
 const ALLOWED_DOCS = {
   ebook: {
@@ -44,6 +45,9 @@ export default async function handler(req, res) {
     if (!payload || !payload.email) {
       return res.status(401).send('Unauthorized: session expired.');
     }
+
+    // Rate-limit reading requests: 120 req/min per candidate
+    if (!enforceRateLimit(req, res, 'store_serve_reader', payload.email, { asText: true })) return;
 
     // 2. Authorize Buyer Entitlement
     const isBuyer = payload.isBuyer || await isEmailBuyer(payload.email);

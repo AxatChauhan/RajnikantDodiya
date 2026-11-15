@@ -15,6 +15,7 @@ import {
   GSET_PRODUCTS,
   UGC_BUNDLE_PRODUCT
 } from '../../lib/store-config.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
 export const DEFAULT_PAYMENT_LINK = STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
 export const DEFAULT_PAYMENT_LINK_PRICE = STORE_PAYMENT_DEFAULTS.defaultPaymentLinkPrice;
@@ -57,6 +58,8 @@ export async function fetchStoreSettings() {
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
+  if (!enforceRateLimit(req, res, 'store_price')) return;
 
   try {
     const simulatedNow = req.query?.now || req.headers?.['x-simulated-date'] || req.body?.simulatedNow;

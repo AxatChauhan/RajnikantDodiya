@@ -7,6 +7,7 @@ import {
   createSessionToken,
   DEFAULT_ACCESS_EXPIRY
 } from '../../lib/auth-helper.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
 async function verifyViaRazorpayApi(paymentId, keyId, keySecret) {
   if (!paymentId || !keyId || !keySecret) return null;
@@ -56,6 +57,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
+
+  if (!enforceRateLimit(req, res, 'store_verify_payment')) return;
 
   try {
     const {

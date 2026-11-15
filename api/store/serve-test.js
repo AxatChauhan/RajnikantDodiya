@@ -16,6 +16,7 @@ import {
   isEmailBuyer,
   AUTHOR_EMAILS
 } from '../../lib/auth-helper.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
 // Master schedule of tests and release dates
 export const TEST_HALL_SCHEDULE = [
@@ -385,6 +386,97 @@ export const TEST_HALL_SCHEDULE = [
     ready: true,
     description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
   },
+  {
+    id: 'gset-p1-m4',
+    file: 'GSET_Paper1_Mock04_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 04',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m5',
+    file: 'GSET_Paper1_Mock05_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 05',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m6',
+    file: 'GSET_Paper1_Mock06_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 06',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m7',
+    file: 'GSET_Paper1_Mock07_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 07',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m8',
+    file: 'GSET_Paper1_Mock08_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 08',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m9',
+    file: 'GSET_Paper1_Mock09_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 09',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m10',
+    file: 'GSET_Paper1_Mock10_CBT.html',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 10',
+    category: 'GSET Paper 1',
+    exam: 'gset',
+    stream: 'general',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
 
   // GSET Paper 2 Education Discipline Tests
   {
@@ -426,6 +518,97 @@ export const TEST_HALL_SCHEDULE = [
     ready: true,
     description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
   },
+  {
+    id: 'gset-p2-edu-m4',
+    file: 'GSET_Paper2_Education_Mock04_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 04',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m5',
+    file: 'GSET_Paper2_Education_Mock05_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 05',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m6',
+    file: 'GSET_Paper2_Education_Mock06_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 06',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m7',
+    file: 'GSET_Paper2_Education_Mock07_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 07',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m8',
+    file: 'GSET_Paper2_Education_Mock08_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 08',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m9',
+    file: 'GSET_Paper2_Education_Mock09_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 09',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m10',
+    file: 'GSET_Paper2_Education_Mock10_CBT.html',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 10',
+    category: 'GSET Education',
+    exam: 'gset',
+    stream: 'education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
 
   // GSET Paper 2 English Literature Tests
   {
@@ -453,6 +636,97 @@ export const TEST_HALL_SCHEDULE = [
     releaseDate: '2026-11-01T00:00:00+05:30',
     ready: true,
     description: 'English Subject: 100 Questions covering Literary Criticism, Cultural Studies, and Research Methodology.'
+  },
+  {
+    id: 'gset-p2-eng-m4',
+    file: 'GSET_English_Paper2_Mock04_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 04',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m5',
+    file: 'GSET_English_Paper2_Mock05_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 05',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m6',
+    file: 'GSET_English_Paper2_Mock06_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 06',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m7',
+    file: 'GSET_English_Paper2_Mock07_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 07',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m8',
+    file: 'GSET_English_Paper2_Mock08_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 08',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m9',
+    file: 'GSET_English_Paper2_Mock09_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 09',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m10',
+    file: 'GSET_English_Paper2_Mock10_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 10',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
   }
 ];
 
@@ -480,6 +754,9 @@ export default async function handler(req, res) {
         error: 'Unauthorized: invalid or expired session token.'
       });
     }
+
+    // Rate-limit CBT test retrieval: 60 req/min per candidate
+    if (!enforceRateLimit(req, res, 'store_serve_test', payload.email)) return;
 
     // 2. Authorize Buyer Entitlement
     const isBuyer = payload.isBuyer || await isEmailBuyer(payload.email);

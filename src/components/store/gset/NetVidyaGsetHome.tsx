@@ -339,7 +339,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: '10 general units: Teaching, Research, ICT, Logical Reasoning, and Higher Education.',
-                testsLabel: '3 Full CBT Tests (50 Qs each)',
+                testsLabel: '10 Full CBT Tests (50 Qs each)',
                 tests: [
                   {
                     id: 'p1-m1',
@@ -361,6 +361,55 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                     qs: 50,
                     mins: 60,
                     desc: 'People, Development & Environment, Mathematical Reasoning & Speed Heuristics.'
+                  },
+                  {
+                    id: 'p1-m4',
+                    title: 'GSET Paper 1 — CBT Mock 04',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Communication Barriers, Mass Media & Higher Education Policy Foundations.'
+                  },
+                  {
+                    id: 'p1-m5',
+                    title: 'GSET Paper 1 — CBT Mock 05',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Research Methodology, Variables, Hypotheses & Qualitative Analysis.'
+                  },
+                  {
+                    id: 'p1-m6',
+                    title: 'GSET Paper 1 — CBT Mock 06',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Information Technology, Digital Initiatives in Education & Cyber Ethics.'
+                  },
+                  {
+                    id: 'p1-m7',
+                    title: 'GSET Paper 1 — CBT Mock 07',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Syllogisms, Fallacies, Indian Logic (Pramanas) & Deductive Inferences.'
+                  },
+                  {
+                    id: 'p1-m8',
+                    title: 'GSET Paper 1 — CBT Mock 08',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Environmental Protocols, Sustainable Development Goals & Pollution Controls.'
+                  },
+                  {
+                    id: 'p1-m9',
+                    title: 'GSET Paper 1 — CBT Mock 09',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Data Interpretation Charts, Tables & Quantitative Problem Solving.'
+                  },
+                  {
+                    id: 'p1-m10',
+                    title: 'GSET Paper 1 — CBT Mock 10',
+                    qs: 50,
+                    mins: 60,
+                    desc: 'Full-Length Comprehensive Mock covering all 10 General Aptitude units.'
                   }
                 ]
               },
@@ -372,7 +421,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: 'Paper 2 English Literature, Criticism, Literary Theory, Cultural Studies, and ELT in India.',
-                testsLabel: '2 Full CBT Tests (100 Qs each)',
+                testsLabel: '9 Full CBT Tests (100 Qs each)',
                 tests: [
                   {
                     id: 'p2-eng-m1',
@@ -387,6 +436,55 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                     qs: 100,
                     mins: 120,
                     desc: 'Literary Criticism, Structuralism to Deconstruction, Cultural Studies & MLA 9th Research.'
+                  },
+                  {
+                    id: 'p2-eng-m4',
+                    title: 'GSET English Paper 2 — CBT Mock 04',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Renaissance Drama, Shakespeare, Jacobean Tragedy & Metaphysical Poets.'
+                  },
+                  {
+                    id: 'p2-eng-m5',
+                    title: 'GSET English Paper 2 — CBT Mock 05',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Augustan Satire, 18th Century Novel, Romantic & Victorian Poetry & Social Prose.'
+                  },
+                  {
+                    id: 'p2-eng-m6',
+                    title: 'GSET English Paper 2 — CBT Mock 06',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Modernist Fiction, Stream of Consciousness, Postmodern Drama & Absurd Theatre.'
+                  },
+                  {
+                    id: 'p2-eng-m7',
+                    title: 'GSET English Paper 2 — CBT Mock 07',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Postcolonial Theory, Subaltern Studies, African, Caribbean & Canadian Writing.'
+                  },
+                  {
+                    id: 'p2-eng-m8',
+                    title: 'GSET English Paper 2 — CBT Mock 08',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Indian Writing in English, Dalit Literature & Translation Studies in India.'
+                  },
+                  {
+                    id: 'p2-eng-m9',
+                    title: 'GSET English Paper 2 — CBT Mock 09',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Contemporary Literary Theory, Queer Theory, Ecocriticism & Digital Humanities.'
+                  },
+                  {
+                    id: 'p2-eng-m10',
+                    title: 'GSET English Paper 2 — CBT Mock 10',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Grand Full-Length Exam Mock Rehearsal across all Paper 2 English modules.'
                   }
                 ]
               },
@@ -398,7 +496,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: 'Paper 2 Education: Philosophy, Psychology, Learner Development, Pedagogy, and NEP 2020.',
-                testsLabel: '3 Full CBT Tests (100 Qs each)',
+                testsLabel: '10 Full CBT Tests (100 Qs each)',
                 tests: [
                   {
                     id: 'p2-edu-m1',
@@ -420,6 +518,55 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                     qs: 100,
                     mins: 120,
                     desc: 'Educational Technology, Special & Inclusive Education, Assessment & Evaluative Heuristics.'
+                  },
+                  {
+                    id: 'p2-edu-m4',
+                    title: 'GSET Education Paper 2 — CBT Mock 04',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Educational Studies, Western Philosophies (Idealism, Realism, Pragmatism) & Sociological Inquiry.'
+                  },
+                  {
+                    id: 'p2-edu-m5',
+                    title: 'GSET Education Paper 2 — CBT Mock 05',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Curriculum Development Models, Instructional Designs & Formative Assessment Systems.'
+                  },
+                  {
+                    id: 'p2-edu-m6',
+                    title: 'GSET Education Paper 2 — CBT Mock 06',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Cognitive Theories of Learning (Piaget, Vygotsky, Bruner) & Guidance / Counselling.'
+                  },
+                  {
+                    id: 'p2-edu-m7',
+                    title: 'GSET Education Paper 2 — CBT Mock 07',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Research in Education: Quantitative & Qualitative Designs, Sampling & Standard Error.'
+                  },
+                  {
+                    id: 'p2-edu-m8',
+                    title: 'GSET Education Paper 2 — CBT Mock 08',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'In-service / Pre-service Teacher Education, NCTE Guidelines & Quality Assurance Frameworks.'
+                  },
+                  {
+                    id: 'p2-edu-m9',
+                    title: 'GSET Education Paper 2 — CBT Mock 09',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Policy, Educational Leadership, Governance, Management & Comparative Education.'
+                  },
+                  {
+                    id: 'p2-edu-m10',
+                    title: 'GSET Education Paper 2 — CBT Mock 10',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Grand Discipline Mock: Complete 100-Question NTA-pattern Education Simulation.'
                   }
                 ]
               }

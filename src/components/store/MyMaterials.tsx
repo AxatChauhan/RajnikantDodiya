@@ -116,7 +116,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
         title: 'GSET Paper 1: General Aptitude Foundation Pack',
         shortTitle: 'GSET Paper 1',
         badge: 'GENERAL APTITUDE',
-        testsCount: tests.filter(t => t.category === 'GSET Paper 1').length || 3,
+        testsCount: tests.filter(t => t.category === 'GSET Paper 1').length || 10,
         notesCount: 0,
         validThrough: '31 Dec 2026'
       });
@@ -129,7 +129,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
         title: 'GSET Paper 2: English Literature Specialist Pack',
         shortTitle: 'GSET Paper 2 English',
         badge: 'ENGLISH SPECIALIST',
-        testsCount: tests.filter(t => t.category === 'GSET English').length || 2,
+        testsCount: tests.filter(t => t.category === 'GSET English').length || 9,
         notesCount: 0,
         validThrough: '31 Dec 2026'
       });
@@ -142,7 +142,7 @@ export const MyMaterials: React.FC<MyMaterialsProps> = ({
         title: 'GSET Paper 2: Education Discipline Master Pack',
         shortTitle: 'GSET Paper 2 Education',
         badge: 'EDUCATION SPECIALIST',
-        testsCount: tests.filter(t => t.category === 'GSET Education').length || 3,
+        testsCount: tests.filter(t => t.category === 'GSET Education').length || 10,
         notesCount: 0,
         validThrough: '31 Dec 2026'
       });

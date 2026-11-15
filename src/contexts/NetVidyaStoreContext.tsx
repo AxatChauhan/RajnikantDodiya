@@ -368,6 +368,69 @@ export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
     releaseDate: '2026-11-01T00:00:00+05:30',
     description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
   },
+  {
+    id: 'gset-p1-m4',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 04',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m5',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 05',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m6',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 06',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m7',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 07',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m8',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 08',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m9',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 09',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
+  {
+    id: 'gset-p1-m10',
+    title: 'GSET Paper 1: General Aptitude CBT Mock 10',
+    category: 'GSET Paper 1',
+    totalQuestions: 50,
+    durationMinutes: 60,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'MSU Baroda GSET Pattern — 50 Questions General Aptitude with complete Gujarati explanations.'
+  },
 
   // GSET Paper 2 Education Discipline Tests
   {
@@ -397,6 +460,69 @@ export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
     releaseDate: '2026-11-01T00:00:00+05:30',
     description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
   },
+  {
+    id: 'gset-p2-edu-m4',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 04',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m5',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 05',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m6',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 06',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m7',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 07',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m8',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 08',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m9',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 09',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
+  {
+    id: 'gset-p2-edu-m10',
+    title: 'GSET Education Paper 2: Discipline CBT Mock 10',
+    category: 'GSET Education',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'Education Subject: 100 Questions comprehensive GSET simulation.'
+  },
 
   // GSET Paper 2 English Literature Tests
   {
@@ -416,6 +542,69 @@ export const INITIAL_TEST_HALL_ITEMS: TestHallItem[] = [
     durationMinutes: 120,
     releaseDate: '2026-11-01T00:00:00+05:30',
     description: 'English Subject: 100 Questions covering Literary Criticism, Cultural Studies, and Research Methodology.'
+  },
+  {
+    id: 'gset-p2-eng-m4',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 04',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m5',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 05',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m6',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 06',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m7',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 07',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m8',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 08',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m9',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 09',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
+  },
+  {
+    id: 'gset-p2-eng-m10',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 10',
+    category: 'GSET English',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
   }
 ];
 

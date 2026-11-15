@@ -17,6 +17,7 @@ import {
   verifySessionToken,
   extractBearerToken
 } from '../../lib/auth-helper.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 import { sendPurchaseConfirmationEmail } from './email.js';
 import { DEFAULT_STORE_SETTINGS } from './price.js';
 
@@ -90,6 +91,8 @@ export default async function handler(req, res) {
       if (req.method && req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
       }
+
+      if (!enforceRateLimit(req, res, 'store_admin_login')) return;
 
       const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'ip_unknown';
       if (!globalThis.__NETVIDYA_ADMIN_LOGIN_FAILS__) {

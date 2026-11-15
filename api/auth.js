@@ -28,6 +28,7 @@ import {
   markUserEmailVerified
 } from '../lib/auth-helper.js';
 import { sendOtpEmail, sendPasswordResetEmail } from './store/email.js';
+import { enforceRateLimit } from '../lib/rate-limiter.js';
 
 export async function signupHandler(req, res) {
   if (!req.query) req.query = {};
@@ -100,6 +101,7 @@ export default async function handler(req, res) {
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
+        if (!enforceRateLimit(req, res, 'auth_signup')) return;
         const { name, email, mobile, password } = req.body || {};
         if (!name || !email || !password || typeof password !== 'string' || password.length === 0) {
           return res.status(400).json({ success: false, error: 'Name, email, and password are required.' });
@@ -163,6 +165,7 @@ export default async function handler(req, res) {
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
+        if (!enforceRateLimit(req, res, 'auth_login')) return;
         const { email, password } = req.body || {};
         if (!email || !password || typeof password !== 'string' || password.length === 0) {
           return res.status(400).json({ success: false, error: 'Email and password required.' });
@@ -279,6 +282,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'Email and verification code are required.' });
         }
         const cleanEmail = email.trim().toLowerCase();
+        if (!enforceRateLimit(req, res, 'auth_verify_otp', cleanEmail)) return;
         const cleanOtp = otp.toString().trim();
 
         const verifyResult = await verifyEmailOtp(cleanEmail, cleanOtp, purpose);
@@ -329,6 +333,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'Email is required.' });
         }
         const cleanEmail = email.trim().toLowerCase();
+        if (!enforceRateLimit(req, res, 'auth_resend_otp', cleanEmail)) return;
         const user = await findUserByEmail(cleanEmail);
         if (!user) {
           return res.status(404).json({ success: false, error: 'User account not found.' });
@@ -401,6 +406,7 @@ export default async function handler(req, res) {
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
+        if (!enforceRateLimit(req, res, 'auth_forgot_password')) return;
         const { email } = req.body || {};
         if (!email || typeof email !== 'string' || !email.trim()) {
           return res.status(400).json({ success: false, error: 'Email is required.' });
@@ -436,6 +442,7 @@ export default async function handler(req, res) {
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
+        if (!enforceRateLimit(req, res, 'auth_reset_password')) return;
         const { token, otp, email, newPassword } = req.body || {};
         if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length === 0) {
           return res.status(400).json({ success: false, error: 'New password is required.' });

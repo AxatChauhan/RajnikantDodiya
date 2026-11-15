@@ -15,6 +15,7 @@ import {
   isEmailBuyer,
   DEFAULT_ACCESS_EXPIRY
 } from '../../lib/auth-helper.js';
+import { enforceRateLimit } from '../../lib/rate-limiter.js';
 
 export default async function handler(req, res) {
   try {
@@ -40,6 +41,9 @@ export default async function handler(req, res) {
         error: 'Unauthorized: invalid or expired session token.'
       });
     }
+
+    // Rate-limit file downloads: 20 req/min per candidate
+    if (!enforceRateLimit(req, res, 'store_download_file', payload.email)) return;
 
     // 2. Authorize Buyer Entitlement
     const isBuyer = payload.isBuyer || await isEmailBuyer(payload.email);

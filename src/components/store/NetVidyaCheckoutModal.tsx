@@ -53,7 +53,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'RECOMMENDED • BEST VALUE',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     isCombo: true,
-    testCountDesc: '5 Full CBT Tests (3 Paper 1 + 2 English Paper 2)',
+    testCountDesc: '19 Full CBT Tests (10 Paper 1 + 9 English Paper 2)',
     description: 'Complete dual-paper preparation: Paper 1 General Aptitude combined with English Literature & ELT.'
   },
   {
@@ -68,7 +68,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'RECOMMENDED • BEST VALUE',
     badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
     isCombo: true,
-    testCountDesc: '6 Full CBT Tests (3 Paper 1 + 3 Education Paper 2)',
+    testCountDesc: '20 Full CBT Tests (10 Paper 1 + 10 Education Paper 2)',
     description: 'Complete dual-paper preparation: Paper 1 General Aptitude combined with Teacher Education & Pedagogy.'
   },
 
@@ -85,7 +85,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'GENERAL APTITUDE (COMMON)',
     badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
     isCombo: false,
-    testCountDesc: '3 Full CBT Tests (50 Questions each)',
+    testCountDesc: '10 Full CBT Tests (50 Questions each)',
     description: '10 general units: Teaching Aptitude, Research, ICT, Logical Reasoning, and Higher Education.'
   },
   {
@@ -100,7 +100,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'ENGLISH STREAM SPECIALIST',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     isCombo: false,
-    testCountDesc: '2 Specialist CBT Tests (100 Questions each)',
+    testCountDesc: '9 Specialist CBT Tests (100 Questions each)',
     description: 'British, American & Indian Literature, Literary Theory, Cultural Studies, and ELT in India.'
   },
   {
@@ -115,7 +115,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'EDUCATION STREAM SPECIALIST',
     badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
     isCombo: false,
-    testCountDesc: '3 Specialist CBT Tests (100 Questions each)',
+    testCountDesc: '10 Specialist CBT Tests (100 Questions each)',
     description: 'Philosophical & Sociological Foundations, Teacher Education, Curriculum Studies, and Pedagogy.'
   },
 
