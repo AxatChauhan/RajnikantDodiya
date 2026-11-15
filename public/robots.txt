@@ -3,7 +3,6 @@ Allow: /
 Allow: /store
 Allow: /publications
 Allow: /learn
-Allow: /bookstore
 Allow: /terms
 Allow: /privacy-policy
 Allow: /refund-policy

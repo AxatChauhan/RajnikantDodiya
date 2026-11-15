@@ -241,14 +241,6 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
 
               <div className="pt-2 border-t border-deckle/60 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                 <span className="text-ink-faint text-[11px] shrink-0">ISBN: {book.isbn}</span>
-                {onNavigate && (
-                  <button
-                    onClick={() => onNavigate('bookstore')}
-                    className="text-claret font-sans font-medium hover:underline flex items-center gap-1 shrink-0"
-                  >
-                    View in Bookstore <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
               </div>
             </div>
           ))}
@@ -297,14 +289,6 @@ export const PublicationsPage: React.FC<PublicationsPageProps> = ({ subSection, 
 
               <div className="pt-2 border-t border-deckle/60 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                 <span className="text-ink-faint text-[11px] shrink-0">ISBN: {book.isbn}</span>
-                {onNavigate && (
-                  <button
-                    onClick={() => onNavigate('bookstore')}
-                    className="text-claret font-sans font-medium hover:underline flex items-center gap-1 shrink-0"
-                  >
-                    View in Bookstore <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
               </div>
             </div>
           ))}

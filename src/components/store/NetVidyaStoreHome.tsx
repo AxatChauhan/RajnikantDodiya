@@ -31,7 +31,6 @@ interface NetVidyaStoreHomeProps {
   onOpenCheckout: (productId?: string) => void;
   onOpenSample: () => void;
   onOpenLogin: () => void;
-  onOpenBookstore?: () => void;
   onNavigateToMaterials?: () => void;
 }
 
@@ -39,7 +38,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
   onOpenCheckout,
   onOpenSample,
   onOpenLogin,
-  onOpenBookstore,
   onNavigateToMaterials
 }) => {
   const { currentServerPrice, isEarlyBirdActive, paymentMode, settings, buyerSession, checkPackEnrolled } = useNetVidyaStore();
@@ -742,14 +740,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             <p className="text-[11px] text-blue-300">
               Instant electronic activation • 21 Mocks &amp; 3 Reading Files included • Access till {STORE_MERCHANT.accessExpiryLabel}
             </p>
-            {onOpenBookstore && (
-              <button
-                onClick={onOpenBookstore}
-                className="text-xs text-blue-200 hover:text-white underline font-medium"
-              >
-                Looking for Digital Monographs & Printed Research Books? Visit Bookstore →
-              </button>
-            )}
           </div>
         </div>
       </section>

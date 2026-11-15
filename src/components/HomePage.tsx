@@ -370,17 +370,17 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenCompendium
 
                 <div className="flex items-center gap-2.5">
                   <button
-                    onClick={() => onNavigate('bookstore')}
+                    onClick={() => onNavigate('publications')}
                     className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-claret text-claret hover:bg-claret-soft text-xs font-semibold transition-colors"
                   >
-                    Read Free Excerpt
+                    View Monograph Details
                   </button>
                   <button
-                    onClick={() => onNavigate('bookstore')}
+                    onClick={() => onNavigate('publications')}
                     className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-claret hover:bg-claret-light text-white text-xs font-semibold shadow-md flex items-center justify-center gap-1.5"
                   >
-                    <Zap className="w-3.5 h-3.5 text-brass" />
-                    <span>Get Instant Access</span>
+                    <BookOpen className="w-3.5 h-3.5 text-brass" />
+                    <span>View in Publications</span>
                   </button>
                 </div>
               </div>

@@ -307,20 +307,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </a>
             </div>
 
-            {/* BUTTON 0: [Academic Bookstore] - Desktop only to declutter mobile/tablet header */}
-            <button
-              onClick={() => handleNavClick('bookstore')}
-              className={`hidden lg:flex px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-sans font-medium transition-all items-center gap-1.5 shadow-2xs shrink-0 min-h-[38px] ${
-                activeTab === 'bookstore'
-                  ? 'bg-claret text-white border border-claret-dark shadow-xs'
-                  : 'bg-white hover:bg-parchment-warm border border-deckle hover:border-claret text-ink hover:text-claret'
-              }`}
-              title="Official Academic Bookstore & Study Passes"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-claret" />
-              <span className="font-serif">Bookstore</span>
-            </button>
-
             {/* BUTTON 2: [Student Login / My Materials] */}
             {buyerSession?.isLoggedIn ? (
               <button
@@ -478,29 +464,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
-            {/* Featured Academic Bookstore Card in Mobile Drawer */}
-            <button
-              onClick={() => handleNavClick('bookstore')}
-              className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition-all ${
-                activeTab === 'bookstore'
-                  ? 'bg-claret text-white border-claret-dark shadow-xs'
-                  : 'bg-parchment-warm/70 border-deckle hover:border-claret text-ink shadow-2xs'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <div className={`p-2 rounded-xl ${activeTab === 'bookstore' ? 'bg-white/20 text-white' : 'bg-claret-soft text-claret'}`}>
-                  <BookOpen className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="font-serif text-sm font-semibold block leading-tight">Academic Bookstore</span>
-                  <span className={`text-[10px] font-mono ${activeTab === 'bookstore' ? 'text-brass' : 'text-ink-muted'}`}>
-                    Study Passes • CBT Simulator • Books
-                  </span>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 opacity-70" />
-            </button>
-
             {/* Main Tabs Accordion List */}
             <nav className="space-y-1">
               {MAIN_NAV_ITEMS.map((item) => {
@@ -631,17 +594,23 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
 
         <button
-          onClick={() => handleNavClick('bookstore')}
+          onClick={() => {
+            if (onOpenStore) {
+              onOpenStore();
+            } else {
+              handleNavClick('store');
+            }
+          }}
           className="flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all"
-          aria-label="Navigate to Official Academic Bookstore"
+          aria-label="Navigate to NET Vidya Store"
         >
           <span className={`p-1 rounded-xl transition-all flex items-center justify-center ${
-            activeTab === 'bookstore' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
+            activeTab === 'store' ? 'bg-claret/10 text-claret' : 'text-ink-muted'
           }`}>
-            <BookOpen className="w-5 h-5" />
+            <GraduationCap className="w-5 h-5" />
           </span>
           <span className={`text-[10px] font-sans transition-colors ${
-            activeTab === 'bookstore' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
+            activeTab === 'store' ? 'text-claret font-bold' : 'text-ink-muted font-normal'
           }`}>
             Store
           </span>

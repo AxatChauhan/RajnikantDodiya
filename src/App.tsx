@@ -95,7 +95,11 @@ function AppInner() {
   const { buyerSession } = useNetVidyaStore();
 
   const handleNavigate = (tab: MainTab, subSection?: string) => {
-    setActiveTab(tab);
+    if ((tab as string) === 'bookstore') {
+      setActiveTab('publications');
+    } else {
+      setActiveTab(tab);
+    }
     setActiveSubSection(subSection);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -152,7 +156,12 @@ function AppInner() {
         return;
       }
 
-      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'bookstore', 'contact', 'store', 'policies'];
+      if (route === 'bookstore') {
+        setActiveTab('publications');
+        return;
+      }
+
+      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'contact', 'store', 'policies'];
       if (validTabs.includes(route as MainTab)) {
         setActiveTab(route as MainTab);
       }
@@ -232,7 +241,6 @@ function AppInner() {
         <NetVidyaStoreLayout
           initialExamStore={isGset ? 'gset' : 'ugc'}
           onBackToAcademicSite={() => handleNavigate('home')}
-          onOpenBookstore={() => handleNavigate('bookstore')}
         />
         {/* Global Author Studio & Store Admin Modal */}
         <AuthorStudioModal />
@@ -313,10 +321,9 @@ function AppInner() {
               />
             )}
             {activeTab === 'bookstore' && (
-              <AcademicStorePage
-                onOpenAuthModal={() => setIsStudentLoginOpen(true)}
+              <PublicationsPage
+                subSection={activeSubSection}
                 onNavigate={handleNavigate}
-                onOpenPolicy={handleOpenPolicyModal}
               />
             )}
             {activeTab === 'contact' && (

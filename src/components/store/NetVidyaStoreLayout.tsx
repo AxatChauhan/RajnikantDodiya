@@ -36,7 +36,6 @@ export type StoreView = 'home' | 'sample' | 'dashboard' | 'materials' | 'policie
 
 interface NetVidyaStoreLayoutProps {
   onBackToAcademicSite?: () => void;
-  onOpenBookstore?: () => void;
   initialView?: StoreView;
   initialPolicyTab?: PolicyTab;
   initialExamStore?: 'ugc' | 'gset';
@@ -44,7 +43,6 @@ interface NetVidyaStoreLayoutProps {
 
 export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   onBackToAcademicSite,
-  onOpenBookstore,
   initialView = 'home',
   initialPolicyTab = 'terms',
   initialExamStore = 'ugc'
@@ -286,31 +284,13 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <span>Free Demo</span>
             </button>
             <button
-              onClick={handleOpenMyMaterials}
-              className={`px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
-                currentView === 'materials' ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-gray-100'
-              }`}
-              title="Open My Materials (Tests & Study Notes)"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>My Materials</span>
-            </button>
-            {onOpenBookstore && (
-              <button
-                onClick={onOpenBookstore}
-                className="hidden 2xl:inline-block px-2 py-1.5 rounded-lg text-gray-600 hover:text-blue-800 hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0"
-                title="Browse Monographs & Print Editions"
-              >
-                Bookstore
-              </button>
-            )}
-            <button
               onClick={handleGoToAcademicSite}
-              className="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-900 hover:bg-blue-50/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 border border-transparent hover:border-blue-200"
+              className="px-2 lg:px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-900 hover:bg-blue-50/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 border border-transparent hover:border-blue-200"
               title="Return to main rajnikantdodiya.com site"
             >
               <Globe className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span>rajnikantdodiya.com</span>
+              <span className="hidden xl:inline">rajnikantdodiya.com</span>
+              <span className="xl:hidden">Academic Site</span>
               <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
             </button>
           </nav>
@@ -326,7 +306,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 title="Open My Materials"
               >
                 <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span className="truncate max-w-[65px] sm:max-w-[85px] xl:max-w-[95px]">{buyerSession.name}</span>
+                <span className="truncate max-w-[65px] sm:max-w-[80px] xl:max-w-[95px]">{buyerSession.name}</span>
               </button>
             ) : (
               <button
@@ -348,8 +328,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 title="Open My Materials"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden sm:inline">Access Materials</span>
-                <span className="sm:hidden">Materials</span>
+                <span className="hidden xl:inline">Access Materials</span>
+                <span className="xl:hidden">Materials</span>
                 <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             ) : (
@@ -363,12 +343,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               >
                 {activeExamStore === 'gset' ? (
                   <>
-                    <span className="hidden sm:inline">Enroll GSET (from ₹149)</span>
+                    <span className="hidden xl:inline">Enroll GSET (from ₹149)</span>
+                    <span className="hidden sm:inline xl:hidden">Enroll GSET (₹149)</span>
                     <span className="sm:hidden">GSET ₹149</span>
                   </>
                 ) : (
                   <>
-                    <span className="hidden sm:inline">Buy Final Pack (₹{currentServerPrice})</span>
+                    <span className="hidden xl:inline">Buy Final Pack (₹{currentServerPrice})</span>
+                    <span className="hidden sm:inline xl:hidden">Enroll (₹{currentServerPrice})</span>
                     <span className="sm:hidden">Buy ₹{currentServerPrice}</span>
                   </>
                 )}
@@ -495,15 +477,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>Contact & Support Desk</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
-              {onOpenBookstore && (
-                <button
-                  onClick={() => { onOpenBookstore(); setMobileMenuOpen(false); }}
-                  className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-gray-700"
-                >
-                  <span>Bookstore &amp; Printed Editions</span>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
-                </button>
-              )}
               <button
                 onClick={() => { handleGoToAcademicSite(); setMobileMenuOpen(false); }}
                 className="w-full text-left p-2.5 rounded-lg hover:bg-blue-50/80 flex items-center justify-between text-blue-900 font-semibold bg-blue-50/40 border border-blue-100"
@@ -551,7 +524,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               onOpenCheckout={(prodId) => handleOpenCheckout(prodId || 'ugc-net-english-bundle', prodId?.startsWith('gset-') ? 'gset' : 'ugc')}
               onOpenSample={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               onOpenLogin={() => setIsLoginOpen(true)}
-              onOpenBookstore={onOpenBookstore}
               onNavigateToMaterials={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             />
           ) : (
@@ -609,14 +581,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              {onOpenBookstore && (
-                <button
-                  onClick={onOpenBookstore}
-                  className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
-                >
-                  <span>Academic Bookstore (Monographs &amp; Print Books)</span>
-                </button>
-              )}
               <button
                 onClick={handleGoToAcademicSite}
                 className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1.5"
