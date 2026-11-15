@@ -458,21 +458,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>Overview & Syllabus</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
-              {!buyerSession.isLoggedIn && (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsLoginOpen(true);
-                  }}
-                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
-                    <span>Student Login Portal</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-blue-500" />
-                </button>
-              )}
               <button
                 onClick={() => { setCurrentView('sample'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
@@ -485,21 +470,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
-              {!buyerSession.isLoggedIn && (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsLoginOpen(true);
-                  }}
-                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
-                    <span>Student Login Portal</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-blue-500" />
-                </button>
-              )}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -537,21 +507,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 <span>Contact & Support Desk</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
-              {!buyerSession.isLoggedIn && (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsLoginOpen(true);
-                  }}
-                  className="w-full text-left p-2.5 rounded-lg flex items-center justify-between text-blue-800 bg-blue-50/70 hover:bg-blue-100 font-bold transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <LogIn className="w-4 h-4 text-blue-700 shrink-0" />
-                    <span>Student Login Portal</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-blue-500" />
-                </button>
-              )}
               <button
                 onClick={() => { handleGoToAcademicSite(); setMobileMenuOpen(false); }}
                 className="w-full text-left p-2.5 rounded-lg hover:bg-blue-50/80 flex items-center justify-between text-blue-900 font-semibold bg-blue-50/40 border border-blue-100"
