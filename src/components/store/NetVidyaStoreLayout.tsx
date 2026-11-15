@@ -230,7 +230,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <span className="font-bold text-sm sm:text-base text-gray-900 group-hover:text-blue-700 transition-colors leading-none whitespace-nowrap">
                 NET Vidya
               </span>
-              <span className="text-[9px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0 leading-none">
+              <span className="hidden min-[400px]:inline text-[9px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0 leading-none">
                 Store
               </span>
             </div>
@@ -339,18 +339,18 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             {isPackEnrolled(activeExamStore === 'gset' ? 'gset-english-combo' : 'ugc-net-english-bundle', buyerSession) ? (
               <button
                 onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer"
+                className="px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap cursor-pointer"
                 title="Open My Materials"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden xl:inline">Access Materials</span>
                 <span className="xl:hidden">Materials</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                <ArrowRight className="hidden sm:inline w-3.5 h-3.5 shrink-0" />
               </button>
             ) : (
               <button
                 onClick={() => handleOpenCheckout(undefined, activeExamStore)}
-                className={`px-2 sm:px-3 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
+                className={`px-2 sm:px-3 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
                   activeExamStore === 'gset'
                     ? 'bg-emerald-700 hover:bg-emerald-800'
                     : 'bg-blue-700 hover:bg-blue-800'
@@ -369,7 +369,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                     <span className="sm:hidden">Buy ₹{currentServerPrice}</span>
                   </>
                 )}
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                <ArrowRight className="hidden sm:inline w-3.5 h-3.5 shrink-0" />
               </button>
             )}
 
