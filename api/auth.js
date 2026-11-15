@@ -1,7 +1,8 @@
 /**
  * Unified Student Authentication API Route
  * Handles: /api/auth/signup, /api/auth/login, /api/auth/me,
- *          /api/auth/forgot-password, /api/auth/reset-password
+ *          /api/auth/forgot-password, /api/auth/reset-password,
+ *          /api/auth/verify-otp, /api/auth/resend-otp
  */
 
 import crypto from 'crypto';
@@ -19,8 +20,14 @@ import {
   findResetToken,
   invalidateResetToken,
   updateUserPassword,
-  DEFAULT_ACCESS_EXPIRY
+  DEFAULT_ACCESS_EXPIRY,
+  generateNumericOtp,
+  storeEmailOtp,
+  verifyEmailOtp,
+  canResendOtp,
+  markUserEmailVerified
 } from '../lib/auth-helper.js';
+import { sendOtpEmail, sendPasswordResetEmail } from './store/email.js';
 
 export async function signupHandler(req, res) {
   if (!req.query) req.query = {};
@@ -49,6 +56,18 @@ export async function forgotPasswordHandler(req, res) {
 export async function resetPasswordHandler(req, res) {
   if (!req.query) req.query = {};
   req.query.action = 'reset-password';
+  return handler(req, res);
+}
+
+export async function verifyOtpHandler(req, res) {
+  if (!req.query) req.query = {};
+  req.query.action = 'verify-otp';
+  return handler(req, res);
+}
+
+export async function resendOtpHandler(req, res) {
+  if (!req.query) req.query = {};
+  req.query.action = 'resend-otp';
   return handler(req, res);
 }
 
@@ -104,6 +123,8 @@ export default async function handler(req, res) {
           password_hash: hash,
           password_salt: salt,
           is_buyer: isBuyer,
+          email_verified: false,
+          email_verified_at: null,
           is_active: true,
           enrolled_at: isBuyer ? new Date().toISOString() : null,
           expires_at: DEFAULT_ACCESS_EXPIRY,
@@ -111,28 +132,27 @@ export default async function handler(req, res) {
           updated_at: new Date().toISOString()
         };
         await saveUser(newUser);
-        const enrolledPacks = await getUserEnrolledPacks(newUser.email);
-        const token = createSessionToken({
-          id: newUser.id,
-          name: newUser.name,
-          email: newUser.email,
-          mobile: newUser.mobile,
-          isBuyer: newUser.is_buyer,
-          enrolledPacks,
-          expiresAt: newUser.expires_at
-        });
+
+        // Generate and dispatch 6-digit verification OTP to ensure email is genuine
+        const otp = generateNumericOtp();
+        await storeEmailOtp(cleanEmail, otp, 'signup');
+        try {
+          await sendOtpEmail({
+            to: cleanEmail,
+            otp,
+            studentName: newUser.name,
+            purpose: 'signup'
+          });
+        } catch (emailErr) {
+          console.warn('[AUTH] Notice: OTP signup dispatch error:', emailErr);
+        }
+
         return res.status(200).json({
           success: true,
-          token,
-          user: {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            mobile: newUser.mobile,
-            isBuyer: newUser.is_buyer,
-            enrolledPacks,
-            expiresAt: newUser.expires_at
-          }
+          requiresOtp: true,
+          email: cleanEmail,
+          purpose: 'signup',
+          message: 'Account created! Please enter the 6-digit verification code sent to your email to verify your email address.'
         });
       }
 
@@ -159,6 +179,8 @@ export default async function handler(req, res) {
             password_hash: hash,
             password_salt: salt,
             is_buyer: true,
+            email_verified: true,
+            email_verified_at: new Date().toISOString(),
             is_active: true,
             enrolled_at: new Date().toISOString(),
             expires_at: DEFAULT_ACCESS_EXPIRY,
@@ -174,6 +196,8 @@ export default async function handler(req, res) {
           user.password_hash = hash;
           user.password_salt = salt;
           user.is_buyer = true;
+          user.email_verified = true;
+          user.email_verified_at = new Date().toISOString();
           await saveUser(user);
         } else {
           const isPasswordValid = verifyPassword(password, user.password_salt, user.password_hash);
@@ -181,11 +205,40 @@ export default async function handler(req, res) {
             return res.status(401).json({ success: false, error: 'Invalid email or password.' });
           }
         }
+
         const isBuyer = user.is_buyer || await isEmailBuyer(cleanEmail);
         if (isBuyer !== user.is_buyer) {
           user.is_buyer = isBuyer;
           await saveUser(user);
         }
+
+        // Email verification gate:
+        // Check if user has verified their email address.
+        // If not verified (first login or pending verification), require OTP to verify email is genuine!
+        if (!user.email_verified && !user.is_buyer) {
+          const otp = generateNumericOtp();
+          await storeEmailOtp(cleanEmail, otp, 'first_login');
+          try {
+            await sendOtpEmail({
+              to: cleanEmail,
+              otp,
+              studentName: user.name,
+              purpose: 'first_login'
+            });
+          } catch (emailErr) {
+            console.warn('[AUTH] Notice: OTP login dispatch error:', emailErr);
+          }
+
+          return res.status(200).json({
+            success: true,
+            requiresOtp: true,
+            email: cleanEmail,
+            purpose: 'first_login',
+            message: 'Please enter the 6-digit verification code sent to your email to complete first-time login.'
+          });
+        }
+
+        // Verified student: DIRECT INSTANT LOGIN!
         const enrolledPacks = await getUserEnrolledPacks(cleanEmail);
         const token = createSessionToken({
           id: user.id,
@@ -208,6 +261,97 @@ export default async function handler(req, res) {
             enrolledPacks,
             expiresAt: user.expires_at
           }
+        });
+      }
+
+      case 'verify-otp': {
+        if (req.method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { email, otp, purpose } = req.body || {};
+        if (!email || !otp) {
+          return res.status(400).json({ success: false, error: 'Email and verification code are required.' });
+        }
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanOtp = otp.toString().trim();
+
+        const verifyResult = await verifyEmailOtp(cleanEmail, cleanOtp, purpose);
+        if (!verifyResult.valid) {
+          return res.status(400).json({ success: false, error: verifyResult.error || 'Invalid verification code.' });
+        }
+
+        // Mark user email as verified
+        await markUserEmailVerified(cleanEmail);
+        const user = await findUserByEmail(cleanEmail);
+        if (!user) {
+          return res.status(404).json({ success: false, error: 'User account not found.' });
+        }
+
+        const enrolledPacks = await getUserEnrolledPacks(cleanEmail);
+        const token = createSessionToken({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile,
+          isBuyer: user.is_buyer,
+          enrolledPacks,
+          expiresAt: user.expires_at
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: 'Email successfully verified!',
+          token,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            mobile: user.mobile,
+            isBuyer: user.is_buyer,
+            enrolledPacks,
+            expiresAt: user.expires_at
+          }
+        });
+      }
+
+      case 'resend-otp': {
+        if (req.method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { email, purpose } = req.body || {};
+        if (!email) {
+          return res.status(400).json({ success: false, error: 'Email is required.' });
+        }
+        const cleanEmail = email.trim().toLowerCase();
+        const user = await findUserByEmail(cleanEmail);
+        if (!user) {
+          return res.status(404).json({ success: false, error: 'User account not found.' });
+        }
+
+        const rateCheck = canResendOtp(cleanEmail);
+        if (!rateCheck.allowed) {
+          return res.status(429).json({
+            success: false,
+            error: `Please wait ${rateCheck.waitSeconds} seconds before requesting a new code.`
+          });
+        }
+
+        const otp = generateNumericOtp();
+        await storeEmailOtp(cleanEmail, otp, purpose || 'signup');
+        try {
+          await sendOtpEmail({
+            to: cleanEmail,
+            otp,
+            studentName: user.name,
+            purpose: purpose || 'signup'
+          });
+        } catch (emailErr) {
+          console.warn('[AUTH] Notice: Resend OTP dispatch error:', emailErr);
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'A fresh 6-digit verification code has been dispatched to your email.'
         });
       }
 
@@ -261,12 +405,16 @@ export default async function handler(req, res) {
         const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
         await saveResetToken(cleanEmail, rawToken, tokenHash, expiresAt);
 
-        // Dispatch password reset email securely without exposing token in response
+        // Also generate and store a 6-digit OTP code for password reset
+        const resetOtp = generateNumericOtp();
+        await storeEmailOtp(cleanEmail, resetOtp, 'reset_password');
+
+        // Dispatch password reset email with secure link and 6-digit reset code
         try {
-          const { sendPasswordResetEmail } = await import('./store/email.js');
           await sendPasswordResetEmail({
             to: cleanEmail,
-            resetToken: rawToken
+            resetToken: rawToken,
+            otpCode: resetOtp
           });
         } catch (emailErr) {
           console.warn('[AUTH] Password reset email notice:', emailErr);
@@ -274,7 +422,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
           success: true,
-          message: 'If an account exists with this email, a password reset link has been dispatched to your inbox.'
+          message: 'If an account exists with this email, a 6-digit reset code and link have been dispatched to your inbox.'
         });
       }
 
@@ -282,23 +430,44 @@ export default async function handler(req, res) {
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
-        const { token, newPassword } = req.body || {};
-        if (!token || !newPassword || typeof newPassword !== 'string' || newPassword.trim().length === 0) {
-          return res.status(400).json({ success: false, error: 'Token and new password required.' });
+        const { token, otp, email, newPassword } = req.body || {};
+        if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length === 0) {
+          return res.status(400).json({ success: false, error: 'New password is required.' });
         }
-        const tokenRecord = await findResetToken(token);
-        if (!tokenRecord) {
-          return res.status(400).json({ success: false, error: 'Invalid or expired reset token.' });
-        }
-        const expiresAt = new Date(tokenRecord.expiresAt).getTime();
-        if (Date.now() > expiresAt) {
+
+        let targetEmail = '';
+
+        if (token) {
+          // Token-based reset
+          const tokenRecord = await findResetToken(token);
+          if (!tokenRecord) {
+            return res.status(400).json({ success: false, error: 'Invalid or expired reset token.' });
+          }
+          const expiresAt = new Date(tokenRecord.expiresAt).getTime();
+          if (Date.now() > expiresAt) {
+            await invalidateResetToken(token);
+            return res.status(400).json({ success: false, error: 'Invalid or expired reset token.' });
+          }
+          targetEmail = tokenRecord.email;
           await invalidateResetToken(token);
-          return res.status(400).json({ success: false, error: 'Invalid or expired reset token.' });
+        } else if (otp && email) {
+          // OTP-based reset
+          const cleanEmail = email.trim().toLowerCase();
+          const verifyResult = await verifyEmailOtp(cleanEmail, otp.toString().trim(), 'reset_password');
+          if (!verifyResult.valid) {
+            return res.status(400).json({ success: false, error: verifyResult.error || 'Invalid or expired reset code.' });
+          }
+          targetEmail = cleanEmail;
+        } else {
+          return res.status(400).json({ success: false, error: 'Reset token or 6-digit verification code with email is required.' });
         }
+
         const { salt, hash } = hashPassword(newPassword);
-        await updateUserPassword(tokenRecord.email, hash, salt);
-        await invalidateResetToken(token);
-        return res.status(200).json({ success: true, message: 'Password reset successful.' });
+        await updateUserPassword(targetEmail, hash, salt);
+        // Resetting password proves email ownership: verify user email as genuine
+        await markUserEmailVerified(targetEmail);
+
+        return res.status(200).json({ success: true, message: 'Password reset successful! You may now sign in.' });
       }
 
       default:

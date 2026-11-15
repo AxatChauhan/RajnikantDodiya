@@ -12,7 +12,8 @@ import {
   AlertCircle,
   CheckCircle2,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
 import { useModalEscape } from '../../hooks/useModalEscape';
@@ -36,7 +37,16 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   requiredForEnrollment = false,
   pendingProductName
 }) => {
-  const { login, signup, forgotPassword, resetPassword, currentServerPrice, verifyPaymentAndActivate } = useNetVidyaStore();
+  const {
+    login,
+    signup,
+    verifyOtp,
+    resendOtp,
+    forgotPassword,
+    resetPassword,
+    currentServerPrice,
+    verifyPaymentAndActivate
+  } = useNetVidyaStore();
 
   const [activeTab, setActiveTab] = useState<TabType>('login');
   
@@ -59,10 +69,26 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   const [newPassword, setNewPassword] = useState('');
   const [isResetStep, setIsResetStep] = useState(false);
 
+  // Email Verification OTP state (Required once for 1st-time login or registration)
+  const [isOtpStep, setIsOtpStep] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpEmail, setOtpEmail] = useState('');
+  const [otpPurpose, setOtpPurpose] = useState<'signup' | 'first_login' | 'reset_password'>('signup');
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   // Status and messages
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   // Background body and root scroll lock
   useEffect(() => {
@@ -131,6 +157,15 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     setIsSubmitting(false);
 
     if (result.success) {
+      if (result.requiresOtp) {
+        setIsOtpStep(true);
+        setOtpEmail(result.email || cleanEmail);
+        setOtpPurpose((result.purpose as any) || 'first_login');
+        setOtpCode('');
+        setResendCooldown(30);
+        setSuccessMessage(result.message || 'Please enter the 6-digit verification code sent to your email.');
+        return;
+      }
       onLoginSuccess();
       onClose();
     } else {
@@ -172,10 +207,64 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     setIsSubmitting(false);
 
     if (result.success) {
+      if (result.requiresOtp) {
+        setIsOtpStep(true);
+        setOtpEmail(result.email || cleanEmail);
+        setOtpPurpose('signup');
+        setOtpCode('');
+        setResendCooldown(30);
+        setSuccessMessage(result.message || 'Account created! Please enter the 6-digit verification code sent to your email.');
+        return;
+      }
       onLoginSuccess();
       onClose();
     } else {
       setErrorMessage(result.error || 'Registration could not be completed.');
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const cleanCode = otpCode.trim();
+    if (!cleanCode || cleanCode.length < 6) {
+      setErrorMessage('Please enter the 6-digit verification code.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await verifyOtp(otpEmail, cleanCode, otpPurpose);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      setSuccessMessage(result.message || 'Email verified successfully! Entering your dashboard...');
+      setTimeout(() => {
+        setIsOtpStep(false);
+        setOtpCode('');
+        onLoginSuccess();
+        onClose();
+      }, 700);
+    } else {
+      setErrorMessage(result.error || 'Invalid verification code. Please check your email and try again.');
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || isSubmitting) return;
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    setIsSubmitting(true);
+    const result = await resendOtp(otpEmail, otpPurpose);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      setSuccessMessage(result.message || 'A fresh verification code has been dispatched to your email.');
+      setResendCooldown(30);
+    } else {
+      setErrorMessage(result.error || 'Failed to resend code. Please wait a moment and try again.');
     }
   };
 
@@ -199,7 +288,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       if (result.token) {
         setResetToken(result.token);
       }
-      setSuccessMessage(result.message || 'Password reset token has been issued.');
+      setSuccessMessage(result.message || 'Password reset code and link have been dispatched.');
     } else {
       setErrorMessage(result.error || 'Failed to process password reset request.');
     }
@@ -210,8 +299,9 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (!resetToken.trim()) {
-      setErrorMessage('Please provide the reset token.');
+    const cleanTokenOrCode = resetToken.trim();
+    if (!cleanTokenOrCode) {
+      setErrorMessage('Please provide the 6-digit reset code or token.');
       return;
     }
 
@@ -221,7 +311,12 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     }
 
     setIsSubmitting(true);
-    const result = await resetPassword(resetToken.trim(), newPassword);
+    const isNumericOtp = /^\d{6}$/.test(cleanTokenOrCode);
+    const payload = isNumericOtp
+      ? { otp: cleanTokenOrCode, email: forgotEmail.trim().toLowerCase(), newPassword }
+      : { token: cleanTokenOrCode, newPassword };
+
+    const result = await resetPassword(payload);
     setIsSubmitting(false);
 
     if (result.success) {
@@ -230,8 +325,10 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       setActiveTab('login');
       setLoginEmail(forgotEmail);
       setLoginPassword('');
+      setResetToken('');
+      setNewPassword('');
     } else {
-      setErrorMessage(result.error || 'Invalid or expired reset token.');
+      setErrorMessage(result.error || 'Invalid or expired reset code or token.');
     }
   };
 
@@ -316,8 +413,99 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
           </div>
         )}
 
-        {/* Navigation Tabs */}
-        <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold">
+        {/* Error / Success Feedback */}
+        {errorMessage && (
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+            <p className="leading-relaxed">{errorMessage}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
+            <p className="leading-relaxed">{successMessage}</p>
+          </div>
+        )}
+
+        {/* OTP EMAIL VERIFICATION SCREEN */}
+        {isOtpStep ? (
+          <form onSubmit={handleVerifyOtp} className="space-y-4 animate-scale-up">
+            <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-blue-900 text-xs space-y-1.5 text-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto mb-1">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-sm text-blue-950">Verify Your Email Address</h3>
+              <p className="text-blue-800 leading-relaxed text-[12px]">
+                We sent a 6-digit verification code to <strong className="text-blue-950">{otpEmail}</strong> to verify that your email is genuine.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1 text-center">
+                Enter 6-Digit Verification Code *
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                autoFocus
+                required
+                value={otpCode}
+                onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="••••••"
+                className="w-full py-3 px-4 text-center tracking-[0.5em] font-mono text-2xl font-bold rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none bg-gray-50/50"
+              />
+              <p className="text-[11px] text-gray-500 mt-1 text-center">
+                Valid for 10 minutes. Required only once to verify genuine candidate email.
+              </p>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              <button
+                type="submit"
+                disabled={isSubmitting || otpCode.length < 6}
+                className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <span>Verifying Code...</span>
+                ) : (
+                  <>
+                    <span>Verify Code &amp; Continue</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center justify-between text-xs pt-1 px-1">
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resendCooldown > 0 || isSubmitting}
+                  className="text-blue-700 hover:text-blue-900 font-semibold disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend Code'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOtpStep(false);
+                    setOtpCode('');
+                    setErrorMessage(null);
+                    setSuccessMessage(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-800 cursor-pointer font-medium"
+                >
+                  ← Change Email / Back
+                </button>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <>
+            {/* Navigation Tabs */}
+            <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold">
           <button
             type="button"
             onClick={() => { setActiveTab('login'); setErrorMessage(null); setSuccessMessage(null); }}
@@ -591,17 +779,33 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  32-Byte Reset Token *
+                  6-Digit Reset Code or Link Token *
                 </label>
                 <input
                   type="text"
                   required
                   value={resetToken}
                   onChange={e => setResetToken(e.target.value)}
-                  placeholder="Paste 64-character token"
+                  placeholder="Enter 6-digit code (e.g. 123456) or paste link token"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-300 font-mono text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                 />
               </div>
+
+              {!forgotEmail && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Your Registered Email *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={e => setForgotEmail(e.target.value)}
+                    placeholder="e.g. scholar@gmail.com"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -614,7 +818,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     required
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
+                    placeholder="Enter new password (min. 6 characters)"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                   />
                 </div>
@@ -640,7 +844,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                   onClick={() => setIsResetStep(false)}
                   className="text-xs text-gray-500 hover:text-gray-700 text-center py-1"
                 >
-                  ← Back to request reset token
+                  ← Back to request reset code
                 </button>
               </div>
             </form>
@@ -709,6 +913,8 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               )}
             </button>
           </form>
+        )}
+          </>
         )}
 
         {/* Not Enrolled Yet Section */}

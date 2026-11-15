@@ -489,10 +489,12 @@ interface NetVidyaStoreContextType {
   loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean; enrolledPacks?: string[] }) => void;
   verifyPaymentAndActivate: (query: { paymentId?: string; email?: string; mobile?: string }) => Promise<{ success: boolean; message?: string; error?: string }>;
   logoutBuyer: () => void;
-  login: (email: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; error?: string }>;
-  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; requiresOtp?: boolean; email?: string; purpose?: string; message?: string; error?: string }>;
+  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; requiresOtp?: boolean; email?: string; purpose?: string; message?: string; error?: string }>;
+  verifyOtp: (email: string, otp: string, purpose?: string) => Promise<{ success: boolean; isBuyer?: boolean; message?: string; error?: string }>;
+  resendOtp: (email: string, purpose?: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string; token?: string }>;
-  resetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  resetPassword: (tokenOrPayload: string | { token?: string; otp?: string; email?: string; newPassword: string }, newPasswordParam?: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   refreshSession: () => Promise<{ isBuyer: boolean; isLoggedIn: boolean; error?: string }>;
   logout: () => void;
   readingFiles: ReadingFileItem[];
@@ -750,6 +752,18 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || 'Invalid credentials' };
       }
+
+      // Check if candidate needs email verification OTP
+      if (data.requiresOtp) {
+        return {
+          success: true,
+          requiresOtp: true,
+          email: data.email || email,
+          purpose: data.purpose || 'first_login',
+          message: data.message
+        };
+      }
+
       const session: NetVidyaBuyerSession = {
         isLoggedIn: true,
         isBuyer: Boolean(data.user?.isBuyer),
@@ -783,6 +797,18 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || 'Registration failed' };
       }
+
+      // Check if registration requires OTP email verification
+      if (data.requiresOtp) {
+        return {
+          success: true,
+          requiresOtp: true,
+          email: data.email || email,
+          purpose: data.purpose || 'signup',
+          message: data.message
+        };
+      }
+
       const session: NetVidyaBuyerSession = {
         isLoggedIn: true,
         isBuyer: Boolean(data.user?.isBuyer),
@@ -805,6 +831,56 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  const verifyOtp = useCallback(async (email: string, otp: string, purpose?: string) => {
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, purpose })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Verification code failed' };
+      }
+      const session: NetVidyaBuyerSession = {
+        isLoggedIn: true,
+        isBuyer: Boolean(data.user?.isBuyer),
+        name: data.user?.name || email.split('@')[0],
+        email: data.user?.email || email.toLowerCase().trim(),
+        mobile: data.user?.mobile || '',
+        token: data.token,
+        role: 'student',
+        expiresAt: data.user?.expiresAt,
+        enrolledPacks: data.user?.enrolledPacks || (data.user?.isBuyer ? ['ugc-net-english-bundle'] : [])
+      };
+      setBuyerSession(session);
+      try {
+        localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+        if (data.token) localStorage.setItem('netvidya_auth_token_v1', data.token);
+      } catch {}
+      return { success: true, isBuyer: Boolean(data.user?.isBuyer), message: data.message };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error during verification' };
+    }
+  }, []);
+
+  const resendOtp = useCallback(async (email: string, purpose?: string) => {
+    try {
+      const res = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, purpose })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Could not resend verification code' };
+      }
+      return { success: true, message: data.message };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error resending code' };
+    }
+  }, []);
+
   const forgotPassword = useCallback(async (email: string) => {
     try {
       const res = await fetch('/api/auth/forgot-password', {
@@ -822,12 +898,18 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const resetPassword = useCallback(async (token: string, newPassword: string) => {
+  const resetPassword = useCallback(async (tokenOrPayload: string | { token?: string; otp?: string; email?: string; newPassword: string }, newPasswordParam?: string) => {
     try {
+      let body: any = {};
+      if (typeof tokenOrPayload === 'string') {
+        body = { token: tokenOrPayload, newPassword: newPasswordParam };
+      } else {
+        body = tokenOrPayload;
+      }
       const res = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword })
+        body: JSON.stringify(body)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
@@ -1331,6 +1413,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         logoutBuyer,
         login,
         signup,
+        verifyOtp,
+        resendOtp,
         forgotPassword,
         resetPassword,
         refreshSession,
