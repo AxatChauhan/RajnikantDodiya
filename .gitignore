@@ -28,3 +28,5 @@ test-asset.webp
 
 .vercel
 .env*
+
+scratch/
