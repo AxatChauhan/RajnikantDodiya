@@ -33,7 +33,8 @@ export type MainTab =
   | 'contact'
   | 'bookstore'
   | 'store'
-  | 'policies';
+  | 'policies'
+  | 'studio';
 
 export interface NavItemConfig {
   id: MainTab;

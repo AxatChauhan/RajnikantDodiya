@@ -65,6 +65,8 @@ export interface EnrolledBuyerRecord {
   paymentMethod: string;
   enrolledAt: string;
   isActive: boolean;
+  packName?: string;
+  enrolledPacks?: string[];
 }
 
 // Initial Content: Populated with official UGC NET and GSET 2026 materials
@@ -500,7 +502,15 @@ interface NetVidyaStoreContextType {
   addTest: (test: Omit<TestHallItem, 'id'>) => void;
   deleteTest: (id: string) => void;
   buyersRegistry: EnrolledBuyerRecord[];
-  addManualBuyer: (buyer: { name: string; email: string; mobile: string; amountPaid?: number }) => void;
+  addManualBuyer: (buyer: {
+    name: string;
+    email: string;
+    mobile: string;
+    amountPaid?: number;
+    packName?: string;
+    enrolledPacks?: string[];
+    paymentMethod?: string;
+  }) => void;
   toggleBuyerAccess: (buyerId: string) => void;
   clearBuyersRegistry: () => void;
   exportBuyersToExcel: () => void;
@@ -891,17 +901,50 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success && (data.isEnrolled || data.verified)) {
+        const bName = data.buyer?.name || data.user?.name || buyerSession.name || 'Candidate';
+        const bEmail = data.buyer?.email || data.user?.email || cleanEmail;
+        const bMobile = data.buyer?.mobile || data.user?.mobile || cleanMobile;
+        const bOrder = data.buyer?.orderId || cleanPayId || `NV_${Date.now()}`;
+        const bPacks = data.buyer?.enrolledPacks || data.user?.enrolledPacks || ['ugc-net-english-bundle'];
+        const bAmount = data.buyer?.amountPaid || data.order?.amount || currentServerPrice;
+
         loginBuyer({
-          name: data.buyer?.name || data.user?.name || buyerSession.name || 'Candidate',
-          email: data.buyer?.email || data.user?.email || cleanEmail,
-          mobile: data.buyer?.mobile || data.user?.mobile || cleanMobile,
-          orderId: data.buyer?.orderId || cleanPayId || `NV_${Date.now()}`,
+          name: bName,
+          email: bEmail,
+          mobile: bMobile,
+          orderId: bOrder,
           token: data.token,
-          isBuyer: true
+          isBuyer: true,
+          enrolledPacks: bPacks
         });
+
+        setBuyersRegistry(prev => {
+          if (prev.some(b => b.orderId === bOrder || (b.email && b.email.toLowerCase() === bEmail.toLowerCase()))) {
+            return prev;
+          }
+          const rec: EnrolledBuyerRecord = {
+            id: `buyer-${Date.now()}`,
+            name: bName,
+            email: bEmail,
+            mobile: bMobile,
+            orderId: bOrder,
+            amountPaid: bAmount,
+            paymentMethod: cleanPayId.startsWith('pay_sim') ? 'simulation' : 'razorpay',
+            enrolledAt: new Date().toISOString(),
+            isActive: true,
+            enrolledPacks: bPacks,
+            packName: bPacks.includes('ugc-net-english-bundle') ? 'UGC NET English Bundle' : bPacks.join(', ')
+          };
+          const updated = [rec, ...prev];
+          try {
+            localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(updated));
+          } catch {}
+          return updated;
+        });
+
         return {
           success: true,
-          message: `Verified! Welcome ${data.buyer?.name || data.user?.name || 'Scholar'}. All 21 NTA CBT Tests and 3 High-Yield Revision Dossiers are unlocked!`
+          message: `Verified! Welcome ${bName}. All enrolled CBT Tests and Revision Dossiers are unlocked!`
         };
       }
       return { success: false, error: data.error || 'No captured payment record found for this reference. Please check your Payment ID or email.' };
@@ -1143,17 +1186,27 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [adminToken]);
 
   // Add Manual Buyer (Admin for UPI)
-  const addManualBuyer = useCallback((buyer: { name: string; email: string; mobile: string; amountPaid?: number }) => {
+  const addManualBuyer = useCallback((buyer: {
+    name: string;
+    email: string;
+    mobile: string;
+    amountPaid?: number;
+    packName?: string;
+    enrolledPacks?: string[];
+    paymentMethod?: string;
+  }) => {
     const newRecord: EnrolledBuyerRecord = {
       id: `buyer-${Date.now()}`,
       name: buyer.name.trim(),
       email: buyer.email.toLowerCase().trim(),
       mobile: buyer.mobile.trim(),
       orderId: `NV_MANUAL_${Date.now().toString().slice(-6)}`,
-      amountPaid: buyer.amountPaid || currentServerPrice,
-      paymentMethod: 'manual_upi',
+      amountPaid: buyer.amountPaid ?? currentServerPrice,
+      paymentMethod: buyer.paymentMethod || 'manual_upi',
       enrolledAt: new Date().toISOString(),
-      isActive: true
+      isActive: true,
+      packName: buyer.packName || 'UGC NET English Complete Bundle',
+      enrolledPacks: buyer.enrolledPacks || ['ugc-net-english-bundle']
     };
     setBuyersRegistry(prev => {
       const updated = [newRecord, ...prev];

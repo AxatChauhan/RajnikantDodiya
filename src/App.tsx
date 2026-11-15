@@ -29,6 +29,7 @@ const DeviceTransferredModal = lazy(() => import('./components/library-store/Dev
 const ProtectedReaderModal = lazy(() => import('./components/library-store/ProtectedReaderModal').then(m => ({ default: m.ProtectedReaderModal })));
 const ExamPortal = lazy(() => import('./components/library-store/ExamPortal').then(m => ({ default: m.ExamPortal })));
 const AuthorStudioModal = lazy(() => import('./components/studio/AuthorStudioModal').then(m => ({ default: m.AuthorStudioModal })));
+const AuthorStudioPage = lazy(() => import('./components/studio/AuthorStudioPage').then(m => ({ default: m.AuthorStudioPage })));
 const NetVidyaStoreLayout = lazy(() => import('./components/store/NetVidyaStoreLayout').then(m => ({ default: m.NetVidyaStoreLayout })));
 const NetVidyaPolicies = lazy(() => import('./components/store/NetVidyaPolicies').then(m => ({ default: m.NetVidyaPolicies })));
 const NetVidyaStudentLoginModal = lazy(() => import('./components/store/NetVidyaStudentLoginModal').then(m => ({ default: m.NetVidyaStudentLoginModal })));
@@ -135,14 +136,8 @@ function AppInner() {
         return;
       }
 
-      if (route === 'admin' || route === 'store-admin' || route === 'store-studio') {
-        setActiveTab('store');
-        openStudio('store');
-        return;
-      }
-
-      if (route === 'studio') {
-        openStudio('theme');
+      if (route === 'admin' || route === 'store-admin' || route === 'store-studio' || route === 'studio' || route === 'erp') {
+        setActiveTab('studio');
         return;
       }
 
@@ -161,7 +156,7 @@ function AppInner() {
         return;
       }
 
-      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'contact', 'store', 'policies'];
+      const validTabs: MainTab[] = ['home', 'about', 'research', 'publications', 'talks', 'communities', 'learn', 'contact', 'store', 'policies', 'studio'];
       if (validTabs.includes(route as MainTab)) {
         setActiveTab(route as MainTab);
       }
@@ -187,7 +182,8 @@ function AppInner() {
       bookstore: `Academic Bookstore & Study Materials | Dr. Rajnikant Dodiya`,
       contact: `Contact & Collaboration | Dr. Rajnikant Dodiya`,
       store: 'UGC NET English & GSET 2026 Preparation Suite | NET Vidya by Dr. Rajnikant Dodiya',
-      policies: 'Store Policies, Terms, Privacy & Refunds | NET Vidya English'
+      policies: 'Store Policies, Terms, Privacy & Refunds | NET Vidya English',
+      studio: 'Author Studio ERP & Operations Portal | NET Vidya by Dr. Rajnikant Dodiya'
     };
 
     const tabDescriptions: Record<MainTab, string> = {
@@ -201,7 +197,8 @@ function AppInner() {
       bookstore: 'Browse published educational texts, monograph chapters, and research volumes authored by Dr. Rajnikant Dodiya.',
       contact: 'Get in touch with Dr. Rajnikant Dodiya for academic collaboration, lecture invitations, and NET Vidya student inquiries.',
       store: 'Enroll in the UGC NET English Final Pack 2026 or GSET 2026 Preparation Suite. Authentic NTA computer-based mocks, pedagogical explanations, and revision dossiers curated by Dr. Rajnikant Dodiya.',
-      policies: 'Official Terms & Conditions, Privacy Policy, Cancellation & Refund Policy, Digital Delivery Policy, and Merchant Contact for NET Vidya English.'
+      policies: 'Official Terms & Conditions, Privacy Policy, Cancellation & Refund Policy, Digital Delivery Policy, and Merchant Contact for NET Vidya English.',
+      studio: 'Enterprise management dashboard for student enrollments, candidate sales ledger, live revenue analytics, and system pricing.'
     };
 
     document.title = tabTitles[activeTab] || `${profile.name || PROFESSOR_INFO.name} | Assistant Professor & NET Vidya English`;
@@ -233,6 +230,16 @@ function AppInner() {
       }, 100);
     }
   }, [activeTab, activeSubSection]);
+
+  if (activeTab === 'studio') {
+    return (
+      <Suspense fallback={<AcademicLoadingFallback />}>
+        <AuthorStudioPage
+          onExit={() => handleNavigate('home')}
+        />
+      </Suspense>
+    );
+  }
 
   if (activeTab === 'store') {
     const isGset = typeof window !== 'undefined' && (window.location.hash.includes('gset') || window.location.pathname.includes('gset'));
