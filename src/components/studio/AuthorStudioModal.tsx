@@ -636,7 +636,7 @@ export const AuthorStudioModal: React.FC = () => {
     setIsAuthenticating(true);
 
     try {
-      const result = await authenticateAuthorStudio(emailInput, passwordInput);
+      const result = await authenticateAuthorStudio(emailInput || PROFESSOR_INFO.email, passwordInput);
       if (result.success && result.session) {
         setSession(result.session);
         setPasswordInput('');

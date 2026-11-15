@@ -128,8 +128,7 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
     setIsAuthenticating(true);
     setAuthError(null);
 
-    const email = 'netvidya.dodiya@gmail.com';
-    const result = await authenticateAuthorStudio(email, passwordInput);
+    const result = await authenticateAuthorStudio(passwordInput.trim());
     setIsAuthenticating(false);
 
     if (result.success && result.session) {
@@ -379,7 +378,7 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
       return;
     }
 
-    const email = 'netvidya.dodiya@gmail.com';
+    const email = PROFESSOR_INFO.email;
     const res = await changeAuthorMasterPassword(email, currentPwInput, newPwInput);
     if (res.success) {
       setPwChangeFeedback('Master Studio password updated successfully.');

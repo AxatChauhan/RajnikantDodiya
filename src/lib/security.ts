@@ -174,7 +174,9 @@ export const AUTHOR_EMAILS = [
   'rajnikant.dodiya@spuvvn.edu',
   'admin@rajnikantdodiya.com',
   'rajnikantdodiya@gmail.com',
-  'dr.rajnikantdodiya@gmail.com'
+  'dr.rajnikantdodiya@gmail.com',
+  'netvidya.dodiya@gmail.com',
+  'netvidyaenglish@gmail.com'
 ];
 
 export function isAuthorEmail(email: string): boolean {
