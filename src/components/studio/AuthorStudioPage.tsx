@@ -734,6 +734,46 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
             </span>
           </button>
 
+          {/* Module 3: Study Vault Reading Files */}
+          <button
+            onClick={() => setActiveModule('files')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeModule === 'files'
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <FileText className="w-4 h-4 text-cyan-400" />
+              <span>Study Vault (Files)</span>
+            </span>
+            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+              activeModule === 'files' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+            }`}>
+              {readingFiles.length}
+            </span>
+          </button>
+
+          {/* Module 4: Test Hall CBT Simulators */}
+          <button
+            onClick={() => setActiveModule('tests')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeModule === 'tests'
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <Layers className="w-4 h-4 text-indigo-400" />
+              <span>Test Hall &amp; CBT</span>
+            </span>
+            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+              activeModule === 'tests' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+            }`}>
+              {tests.length}
+            </span>
+          </button>
+
           <button
             onClick={() => setActiveModule('revenue')}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -768,6 +808,22 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">
               ₹{currentServerPrice}
             </span>
+          </button>
+
+          {/* Module 7: Supabase Cloud Database & Sync */}
+          <button
+            onClick={() => setActiveModule('database')}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              activeModule === 'database'
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <Database className="w-4 h-4 text-emerald-400" />
+              <span>Supabase Cloud DB</span>
+            </span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           </button>
 
           <button
@@ -833,9 +889,12 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
             <h1 className="text-sm sm:text-base font-bold text-white uppercase tracking-wider font-mono">
               {activeModule === 'overview' && 'Executive Overview & KPIs'}
               {activeModule === 'buyers' && 'Candidate Sales Ledger & Buyers'}
+              {activeModule === 'files' && 'Study Vault & Reading Dossiers'}
+              {activeModule === 'tests' && 'Test Hall & CBT Examination Suite'}
               {activeModule === 'revenue' && 'Revenue & Financial Analytics'}
               {activeModule === 'pricing' && 'Course Pricing & Early-Bird Engine'}
-              {activeModule === 'security' && 'Security & System Backups'}
+              {activeModule === 'database' && 'Supabase Cloud Database & Realtime Sync'}
+              {activeModule === 'security' && 'Security & Master Passwords'}
             </h1>
           </div>
 
@@ -858,6 +917,15 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
               <span className="hidden sm:inline">Export Excel</span>
             </button>
 
+            {/* Supabase Database Live Status */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-950/50 border border-blue-500/30 text-blue-400 text-xs font-mono font-semibold shadow-xs">
+              <Database className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span className="hidden sm:inline">
+                {supabaseRealtimeConnected ? 'Supabase Realtime Live' : 'Supabase Connected'}
+              </span>
+              <span className="sm:hidden">Supabase</span>
+            </div>
+
             {/* Real-time Continuous Live Auto-Sync Status */}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold shadow-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
@@ -865,18 +933,21 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
               <span className="sm:hidden">Live Sync</span>
             </div>
 
+            {/* 1-Click Sync Everything to Supabase & Production */}
             <button
-              onClick={() => {
-                fetchAdminUsersRegistry();
-                saveAllToProduction();
-                triggerToast('ERP state synced to production.');
+              onClick={async () => {
+                setIsSyncingAll(true);
+                const res = await syncAllWithSupabase();
+                await saveAllToProduction();
+                setIsSyncingAll(false);
+                triggerToast(res.message || 'All 7 Supabase tables synchronized.');
               }}
-              disabled={isSyncing}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              title="Manual refresh"
+              disabled={isSyncingAll || isSyncing}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-xs text-white font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Synchronize all Supabase database tables and state"
             >
-              <Save className="w-3.5 h-3.5 text-blue-400" />
-              <span>{isSyncing ? 'Syncing...' : 'Refresh'}</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingAll ? 'animate-spin' : ''}`} />
+              <span>{isSyncingAll ? 'Syncing...' : 'Sync Everything'}</span>
             </button>
           </div>
         </header>
