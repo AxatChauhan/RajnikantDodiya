@@ -112,9 +112,9 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
   ];
 
   return (
-    <div className="space-y-16 sm:space-y-24 animate-fade-in pb-12">
+    <div className="space-y-12 sm:space-y-16 animate-fade-in pb-12">
       {/* 1. HERO SECTION */}
-      <section className="relative pt-6 sm:pt-10 max-w-5xl mx-auto px-4 space-y-8">
+      <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
         {/* State Eligibility Badge */}
         <div className="text-center px-2">
           <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-2xl sm:rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold shadow-xs">

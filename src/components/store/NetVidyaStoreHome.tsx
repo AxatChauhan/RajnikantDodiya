@@ -83,28 +83,10 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
   const faqs = getStoreFaqs(currentServerPrice);
 
   return (
-    <div className="space-y-16 sm:space-y-24 animate-fade-in pb-12">
-
-      {/* Top E-Commerce Trust Announcement Ticker */}
-      <div className="bg-slate-900 text-white py-2 px-3 text-[11px] sm:text-xs -mt-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 sm:gap-8 flex-wrap text-center">
-          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-            <Zap className="w-3.5 h-3.5" /> Instant Digital Access
-          </span>
-          <span className="hidden sm:flex items-center gap-1.5 text-blue-300 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" /> SSL Secured Razorpay
-          </span>
-          <span className="flex items-center gap-1.5 text-amber-300 font-medium">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 4.9 Rating (850+)
-          </span>
-          <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-            <Calendar className="w-3.5 h-3.5" /> Valid 31 Dec 2026
-          </span>
-        </div>
-      </div>
+    <div className="animate-fade-in pb-12 space-y-12 sm:space-y-16">
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-4 sm:pt-6 max-w-5xl mx-auto px-4 space-y-8">
+      <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
         
         {/* Offer / Access Status Badge */}
         <div className="text-center px-2">
