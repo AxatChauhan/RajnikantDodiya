@@ -3,7 +3,8 @@ import LIVE_STUDIO_SNAPSHOT from '../data/live_studio_state.json';
 import { downloadBuyersAsXlsx } from '../utils/excelExport';
 import {
   DEFAULT_STORE_SETTINGS,
-  STORE_PAYMENT_DEFAULTS
+  STORE_PAYMENT_DEFAULTS,
+  isAuthorEmail
 } from '../config/storeConfig';
 
 export interface NetVidyaStoreSettings {
@@ -428,7 +429,7 @@ export function isPackEnrolled(packId: string, buyerSession?: NetVidyaBuyerSessi
 
   // Official Author override
   const cleanEmail = (buyerSession.email || '').toLowerCase().trim();
-  if (cleanEmail === 'rajnikantdodiya2@gmail.com') return true;
+  if (isAuthorEmail(cleanEmail)) return true;
 
   const enrolled = buyerSession.enrolledPacks || [];
 
@@ -541,7 +542,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       const cachedStr = localStorage.getItem(STORAGE_KEY_SESSION);
       if (cachedStr) {
         const cached = JSON.parse(cachedStr);
-        if (cached && cached.email?.toLowerCase() === 'rajnikantdodiya2@gmail.com') {
+        if (cached && isAuthorEmail(cached.email)) {
           cached.isBuyer = true;
           cached.isLoggedIn = true;
           cached.enrolledPacks = [
