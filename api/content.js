@@ -54,6 +54,33 @@ export default async function handler(req, res) {
       updatedAt: new Date().toISOString()
     };
 
+    // Ensure store.registeredUsers contains every user (bought or not bought)
+    if (!liveState.store) liveState.store = {};
+    if (!Array.isArray(liveState.store.registeredUsers)) liveState.store.registeredUsers = [];
+
+    if (globalThis.__NETVIDYA_USERS_DB__) {
+      const userMap = new Map(liveState.store.registeredUsers.map(u => [u.email?.toLowerCase(), u]));
+      for (const [email, u] of globalThis.__NETVIDYA_USERS_DB__.entries()) {
+        const cleanEmail = email.toLowerCase().trim();
+        if (!userMap.has(cleanEmail)) {
+          userMap.set(cleanEmail, {
+            id: u.id || `usr_${cleanEmail}`,
+            name: u.name || cleanEmail.split('@')[0],
+            email: cleanEmail,
+            mobile: u.mobile || '',
+            isBuyer: Boolean(u.is_buyer),
+            isActive: u.is_active !== false,
+            enrolledAt: u.enrolled_at || (u.is_buyer ? new Date().toISOString() : null),
+            lastLoginAt: u.last_login_at || new Date().toISOString(),
+            createdAt: u.created_at || new Date().toISOString(),
+            amountPaid: Number(u.amount_paid) || (u.is_buyer ? 499 : 0),
+            orderId: u.order_id
+          });
+        }
+      }
+      liveState.store.registeredUsers = Array.from(userMap.values());
+    }
+
     res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=60');
     return res.status(200).json({
       success: true,

@@ -69,6 +69,21 @@ export interface EnrolledBuyerRecord {
   enrolledPacks?: string[];
 }
 
+export interface RegisteredUserRecord {
+  id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  isBuyer: boolean;
+  isActive: boolean;
+  enrolledAt?: string | null;
+  lastLoginAt?: string | null;
+  createdAt: string;
+  enrolledPacks?: string[];
+  orderId?: string;
+  amountPaid?: number;
+}
+
 // Initial Content: Populated with official UGC NET and GSET 2026 materials
 export const INITIAL_READING_FILES: ReadingFileItem[] = [
   {
@@ -693,6 +708,11 @@ interface NetVidyaStoreContextType {
   addTest: (test: Omit<TestHallItem, 'id'>) => void;
   deleteTest: (id: string) => void;
   buyersRegistry: EnrolledBuyerRecord[];
+  registeredUsers: RegisteredUserRecord[];
+  fetchAdminUsersRegistry: () => Promise<void>;
+  totalUsersCount: number;
+  totalBuyersCount: number;
+  totalNonBuyersCount: number;
   addManualBuyer: (buyer: {
     name: string;
     email: string;
@@ -722,6 +742,7 @@ const STORAGE_KEY_SETTINGS = 'netvidya_store_settings_v1';
 const STORAGE_KEY_FILES = 'netvidya_reading_files_v3';
 const STORAGE_KEY_TESTS = 'netvidya_tests_v3';
 const STORAGE_KEY_BUYERS = 'netvidya_buyers_registry_v1';
+const STORAGE_KEY_REGISTERED_USERS = 'netvidya_registered_users_v2';
 
 const NetVidyaStoreContext = createContext<NetVidyaStoreContextType | undefined>(undefined);
 
@@ -816,6 +837,43 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     return INITIAL_BUYERS_REGISTRY;
   });
 
+  // 5.1 Registered Scholars & Users (All users who logged in or signed up: Bought + Not Bought)
+  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUserRecord[]>(() => {
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY_REGISTERED_USERS);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    const snapshotUsers = (LIVE_STUDIO_SNAPSHOT as any)?.store?.registeredUsers;
+    if (Array.isArray(snapshotUsers) && snapshotUsers.length > 0) return snapshotUsers;
+    return [
+      {
+        id: 'usr_init_student',
+        name: 'Test Student',
+        email: 'student@example.com',
+        mobile: '9898989898',
+        isBuyer: true,
+        isActive: true,
+        enrolledAt: '2026-11-10T10:00:00.000Z',
+        lastLoginAt: '2026-11-15T18:00:00.000Z',
+        createdAt: '2026-11-10T10:00:00.000Z',
+        amountPaid: 499,
+        orderId: 'NV_INIT_001'
+      },
+      {
+        id: 'usr_rzp_candidate',
+        name: 'Candidate Scholar',
+        email: 'candidate.scholar@example.com',
+        mobile: '9876543210',
+        isBuyer: false,
+        isActive: true,
+        enrolledAt: null,
+        lastLoginAt: '2026-11-15T20:30:00.000Z',
+        createdAt: '2026-11-12T14:20:00.000Z',
+        amountPaid: 0
+      }
+    ];
+  });
+
   // Real-time server price & checkout mode sync
   const defaultLink =
     import.meta.env.VITE_RAZORPAY_PAYMENT_LINK || STORE_PAYMENT_DEFAULTS.defaultPaymentLink;
@@ -869,6 +927,34 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
           if (storeState.tests && Array.isArray(storeState.tests) && storeState.tests.length > 0 && !storeState.tests[0]?.id?.includes('test-net-mock-1')) {
             setTests(storeState.tests);
             try { localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(storeState.tests)); } catch {}
+          }
+          if (storeState.registeredUsers && Array.isArray(storeState.registeredUsers)) {
+            setRegisteredUsers(prev => {
+              const map = new Map(prev.map(u => [u.email.toLowerCase(), u]));
+              for (const u of storeState.registeredUsers) {
+                if (u?.email) {
+                  const key = u.email.toLowerCase();
+                  map.set(key, { ...(map.get(key) || {}), ...u });
+                }
+              }
+              const merged = Array.from(map.values());
+              try { localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(merged)); } catch {}
+              return merged;
+            });
+          }
+          if (storeState.buyers && Array.isArray(storeState.buyers) && storeState.buyers.length > 0) {
+            setBuyersRegistry(prev => {
+              const map = new Map(prev.map(b => [b.email.toLowerCase(), b]));
+              for (const b of storeState.buyers) {
+                if (b?.email) {
+                  const key = b.email.toLowerCase();
+                  map.set(key, { ...(map.get(key) || {}), ...b });
+                }
+              }
+              const merged = Array.from(map.values());
+              try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(merged)); } catch {}
+              return merged;
+            });
           }
         }
       })
@@ -929,6 +1015,82 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [adminToken]);
 
+  // Helper to keep registered scholars synchronized across all user sessions
+  const syncUserToRegisteredUsers = useCallback((userObj: {
+    name?: string;
+    email: string;
+    mobile?: string;
+    isBuyer?: boolean;
+    amountPaid?: number;
+    orderId?: string;
+    enrolledPacks?: string[];
+  }) => {
+    if (!userObj?.email) return;
+    const cleanEmail = userObj.email.toLowerCase().trim();
+    setRegisteredUsers(prev => {
+      const map = new Map(prev.map(u => [u.email.toLowerCase(), u]));
+      const existing = map.get(cleanEmail);
+      const isBuyer = Boolean(userObj.isBuyer ?? existing?.isBuyer ?? false);
+      const updatedUser: RegisteredUserRecord = {
+        id: existing?.id || `usr_${cleanEmail}`,
+        name: userObj.name || existing?.name || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        mobile: userObj.mobile || existing?.mobile || '',
+        isBuyer,
+        isActive: existing?.isActive !== false,
+        enrolledAt: isBuyer ? (existing?.enrolledAt || new Date().toISOString()) : null,
+        lastLoginAt: new Date().toISOString(),
+        createdAt: existing?.createdAt || new Date().toISOString(),
+        enrolledPacks: userObj.enrolledPacks || existing?.enrolledPacks,
+        amountPaid: isBuyer ? (userObj.amountPaid ?? existing?.amountPaid ?? 499) : 0,
+        orderId: isBuyer ? (userObj.orderId ?? existing?.orderId ?? 'NV_ONLINE') : undefined
+      };
+      map.set(cleanEmail, updatedUser);
+      const list = Array.from(map.values());
+      try {
+        localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(list));
+      } catch {}
+      return list;
+    });
+  }, []);
+
+  // Fetch verified admin user & buyer registry from server API
+  const fetchAdminUsersRegistry = useCallback(async () => {
+    try {
+      const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/store/admin/buyers', { headers });
+      const data = await res.json().catch(() => ({}));
+      if (data?.success) {
+        if (Array.isArray(data.buyers)) {
+          setBuyersRegistry(data.buyers);
+          try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(data.buyers)); } catch {}
+        }
+        const userList = data.users || data.allUsers;
+        if (Array.isArray(userList)) {
+          setRegisteredUsers(prev => {
+            const map = new Map(prev.map(u => [u.email.toLowerCase(), u]));
+            for (const u of userList) {
+              if (u?.email) {
+                const key = u.email.toLowerCase();
+                map.set(key, { ...(map.get(key) || {}), ...u });
+              }
+            }
+            const merged = Array.from(map.values());
+            try { localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(merged)); } catch {}
+            return merged;
+          });
+        }
+      }
+    } catch {}
+  }, [adminToken]);
+
+  useEffect(() => {
+    fetchAdminUsersRegistry();
+  }, [fetchAdminUsersRegistry, isAdminAuthenticated]);
+
   // Genuine Authentication Methods
   const login = useCallback(async (email: string, password: string) => {
     try {
@@ -965,6 +1127,13 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         enrolledPacks: data.user?.enrolledPacks || (data.user?.isBuyer ? ['ugc-net-english-bundle'] : [])
       };
       setBuyerSession(session);
+      syncUserToRegisteredUsers({
+        name: session.name,
+        email: session.email,
+        mobile: session.mobile,
+        isBuyer: session.isBuyer,
+        enrolledPacks: session.enrolledPacks
+      });
       try {
         localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
         if (data.token) localStorage.setItem('netvidya_auth_token_v1', data.token);
@@ -1010,6 +1179,13 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         enrolledPacks: data.user?.enrolledPacks || []
       };
       setBuyerSession(session);
+      syncUserToRegisteredUsers({
+        name: session.name,
+        email: session.email,
+        mobile: session.mobile,
+        isBuyer: session.isBuyer,
+        enrolledPacks: session.enrolledPacks
+      });
       try {
         localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
         if (data.token) localStorage.setItem('netvidya_auth_token_v1', data.token);
@@ -1043,6 +1219,13 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         enrolledPacks: data.user?.enrolledPacks || (data.user?.isBuyer ? ['ugc-net-english-bundle'] : [])
       };
       setBuyerSession(session);
+      syncUserToRegisteredUsers({
+        name: session.name,
+        email: session.email,
+        mobile: session.mobile,
+        isBuyer: session.isBuyer,
+        enrolledPacks: session.enrolledPacks
+      });
       try {
         localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
         if (data.token) localStorage.setItem('netvidya_auth_token_v1', data.token);
@@ -1141,6 +1324,15 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       enrolledPacks: data.enrolledPacks || (data.isBuyer !== false ? ['ugc-net-english-bundle'] : [])
     };
     setBuyerSession(session);
+    syncUserToRegisteredUsers({
+      name: session.name,
+      email: session.email,
+      mobile: session.mobile,
+      isBuyer: true,
+      orderId: session.orderId,
+      enrolledPacks: session.enrolledPacks,
+      amountPaid: 499
+    });
     try {
       localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
       if (sessionToken) {
@@ -1479,6 +1671,15 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       packName: buyer.packName || 'UGC NET English Complete Bundle',
       enrolledPacks: buyer.enrolledPacks || ['ugc-net-english-bundle']
     };
+    syncUserToRegisteredUsers({
+      name: newRecord.name,
+      email: newRecord.email,
+      mobile: newRecord.mobile,
+      isBuyer: true,
+      amountPaid: newRecord.amountPaid,
+      orderId: newRecord.orderId,
+      enrolledPacks: newRecord.enrolledPacks
+    });
     setBuyersRegistry(prev => {
       const updated = [newRecord, ...prev];
       try {
@@ -1486,7 +1687,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch {}
       return updated;
     });
-  }, [currentServerPrice]);
+  }, [currentServerPrice, syncUserToRegisteredUsers]);
 
   // Toggle Buyer Access
   const toggleBuyerAccess = useCallback((buyerId: string) => {
@@ -1520,15 +1721,16 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [adminToken]);
 
-  // Export Buyers to Genuine Excel (.xlsx)
+  // Export Scholars & Buyers to Genuine Excel (.xlsx)
   const exportBuyersToExcel = useCallback(() => {
-    if (buyersRegistry.length === 0) {
-      alert('No buyers registered yet to export.');
+    const listToExport = registeredUsers.length > 0 ? registeredUsers : buyersRegistry;
+    if (listToExport.length === 0) {
+      alert('No scholar or buyer records registered yet to export.');
       return;
     }
     // Genuine OpenXML binary .xlsx file generation
-    downloadBuyersAsXlsx(buyersRegistry);
-  }, [buyersRegistry]);
+    downloadBuyersAsXlsx(listToExport);
+  }, [buyersRegistry, registeredUsers]);
 
   // Clear All Buyers from Local Storage / Registry
   const clearBuyersRegistry = useCallback(() => {
@@ -1615,6 +1817,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         addTest,
         deleteTest,
         buyersRegistry,
+        registeredUsers,
+        fetchAdminUsersRegistry,
+        totalUsersCount: registeredUsers.length,
+        totalBuyersCount: buyersRegistry.length,
+        totalNonBuyersCount: Math.max(0, registeredUsers.length - buyersRegistry.length),
         addManualBuyer,
         toggleBuyerAccess,
         clearBuyersRegistry,

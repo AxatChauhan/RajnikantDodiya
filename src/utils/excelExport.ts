@@ -1,4 +1,4 @@
-import { EnrolledBuyerRecord } from '../contexts/NetVidyaStoreContext';
+import type { EnrolledBuyerRecord, RegisteredUserRecord } from '../contexts/NetVidyaStoreContext';
 
 function crc32(bytes: Uint8Array): number {
   let table = new Int32Array(256);
@@ -16,7 +16,7 @@ function crc32(bytes: Uint8Array): number {
   return (crc ^ (-1)) >>> 0;
 }
 
-export function generateXlsxBlob(buyers: EnrolledBuyerRecord[]): Blob {
+export function generateXlsxBlob(buyers: (EnrolledBuyerRecord | RegisteredUserRecord)[]): Blob {
   const fileEntries: {
     localHeader: Uint8Array;
     data: Uint8Array;
@@ -74,7 +74,7 @@ export function generateXlsxBlob(buyers: EnrolledBuyerRecord[]): Blob {
   const wb = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <sheets>
-    <sheet name="Enrolled Buyers" sheetId="1" r:id="rId1"/>
+    <sheet name="Scholars & Users" sheetId="1" r:id="rId1"/>
   </sheets>
 </workbook>`;
 
@@ -85,7 +85,7 @@ export function generateXlsxBlob(buyers: EnrolledBuyerRecord[]): Blob {
     .replace(/"/g, '&quot;');
 
   const colNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const headers = ['Order ID', 'Candidate Name', 'Email Address', 'Mobile Number', 'Amount Paid (INR)', 'Payment Mode', 'Enrollment Date', 'Status'];
+  const headers = ['Order / User ID', 'Candidate Name', 'Email Address', 'Mobile Number', 'Amount Paid (INR)', 'Payment Mode', 'Registered / Enrolled Date', 'Account Status'];
 
   let rowsXml = `<row r="1">`;
   headers.forEach((h, i) => {
@@ -93,17 +93,25 @@ export function generateXlsxBlob(buyers: EnrolledBuyerRecord[]): Blob {
   });
   rowsXml += `</row>`;
 
-  buyers.forEach((b, rowIdx) => {
+  buyers.forEach((b: any, rowIdx) => {
     const rNum = rowIdx + 2;
+    const isB = ('isBuyer' in b) ? Boolean(b.isBuyer) : true;
+    const statusText = isB ? (b.isActive ? 'Active (Paid Pass)' : 'Revoked') : 'Registered Candidate (Not Bought)';
+    const amountVal = isB ? (b.amountPaid ?? 499) : 0;
+    const paymentMode = b.paymentMethod || (isB ? 'Razorpay' : 'Free Registration');
+    const enrollDate = b.enrolledAt
+      ? new Date(b.enrolledAt).toLocaleDateString('en-IN')
+      : (b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN') : '');
+
     const values = [
-      b.orderId || '',
+      b.orderId || (isB ? 'NV_ORD' : '—'),
       b.name || '',
       b.email || '',
       b.mobile || '',
-      b.amountPaid ?? 799,
-      b.paymentMethod || 'Razorpay',
-      b.enrolledAt ? new Date(b.enrolledAt).toLocaleDateString('en-IN') : '',
-      b.isActive ? 'Active' : 'Revoked'
+      amountVal,
+      paymentMode,
+      enrollDate,
+      statusText
     ];
     rowsXml += `<row r="${rNum}">`;
     values.forEach((v, colIdx) => {
@@ -195,7 +203,7 @@ export function generateXlsxBlob(buyers: EnrolledBuyerRecord[]): Blob {
   });
 }
 
-export function downloadBuyersAsXlsx(buyers: EnrolledBuyerRecord[], filenamePrefix = 'NetVidya_Final_Pack_Buyers') {
+export function downloadBuyersAsXlsx(buyers: (EnrolledBuyerRecord | RegisteredUserRecord)[], filenamePrefix = 'NetVidya_Scholars_Registry') {
   const blob = generateXlsxBlob(buyers);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

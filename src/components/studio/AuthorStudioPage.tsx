@@ -66,6 +66,7 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
     settings: storeSettings,
     updateSettings: updateStoreSettings,
     buyersRegistry,
+    registeredUsers,
     addManualBuyer,
     toggleBuyerAccess,
     exportBuyersToExcel,
@@ -153,43 +154,104 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
 
   // 2. CANDIDATE REGISTRY FILTERS & SEARCH
   const [buyerSearchQuery, setBuyerSearchQuery] = useState('');
+  const [selectedUserTypeFilter, setSelectedUserTypeFilter] = useState<'all' | 'buyers' | 'non_buyers'>('all');
   const [selectedPackFilter, setSelectedPackFilter] = useState<string>('all');
   const [selectedPaymentFilter, setSelectedPaymentFilter] = useState<string>('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'active' | 'revoked'>('all');
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
 
-  // Filtered Buyers List
+  // Unified Site Scholars List (Combines Registered Users + Buyers Registry)
+  const allScholars = useMemo(() => {
+    const map = new Map<string, any>();
+
+    // 1. Registered Users (both bought and not bought)
+    registeredUsers.forEach(u => {
+      const emailKey = u.email.toLowerCase().trim();
+      map.set(emailKey, {
+        id: u.id,
+        name: u.name || emailKey.split('@')[0],
+        email: u.email,
+        mobile: u.mobile || '',
+        orderId: u.orderId || (u.isBuyer ? 'NV_STUDENT' : '—'),
+        amountPaid: u.amountPaid || (u.isBuyer ? 499 : 0),
+        paymentMethod: u.isBuyer ? 'Online / Paid Pass' : 'Free Registration',
+        enrolledAt: u.enrolledAt,
+        createdAt: u.createdAt,
+        lastLoginAt: u.lastLoginAt,
+        isActive: u.isActive !== false,
+        isBuyer: Boolean(u.isBuyer),
+        enrolledPacks: u.enrolledPacks || (u.isBuyer ? ['ugc-net-english-bundle'] : []),
+        packName: u.isBuyer ? 'UGC NET English Bundle' : 'Free Candidate (Not Bought)'
+      });
+    });
+
+    // 2. Verified Buyers Registry
+    buyersRegistry.forEach(b => {
+      const emailKey = b.email.toLowerCase().trim();
+      const existing = map.get(emailKey);
+      map.set(emailKey, {
+        id: b.id || existing?.id,
+        name: b.name || existing?.name,
+        email: b.email,
+        mobile: b.mobile || existing?.mobile || '',
+        orderId: b.orderId || existing?.orderId || 'NV_ORD',
+        amountPaid: b.amountPaid ?? existing?.amountPaid ?? 499,
+        paymentMethod: b.paymentMethod || existing?.paymentMethod || 'Razorpay',
+        enrolledAt: b.enrolledAt || existing?.enrolledAt || new Date().toISOString(),
+        createdAt: existing?.createdAt || b.enrolledAt || new Date().toISOString(),
+        lastLoginAt: existing?.lastLoginAt || new Date().toISOString(),
+        isActive: b.isActive !== false,
+        isBuyer: true,
+        enrolledPacks: b.enrolledPacks || existing?.enrolledPacks || ['ugc-net-english-bundle'],
+        packName: b.packName || existing?.packName || 'UGC NET English Bundle'
+      });
+    });
+
+    return Array.from(map.values());
+  }, [registeredUsers, buyersRegistry]);
+
+  const totalUsersCount = allScholars.length;
+  const buyersCount = allScholars.filter(s => s.isBuyer).length;
+  const nonBuyersCount = allScholars.filter(s => !s.isBuyer).length;
+
+  // Filtered Scholars List
   const filteredBuyers = useMemo(() => {
-    return buyersRegistry.filter(buyer => {
-      // Search
+    return allScholars.filter(scholar => {
+      // User Type Filter
+      if (selectedUserTypeFilter === 'buyers' && !scholar.isBuyer) return false;
+      if (selectedUserTypeFilter === 'non_buyers' && scholar.isBuyer) return false;
+
+      // Search Query
       const q = buyerSearchQuery.trim().toLowerCase();
       const matchesSearch = !q ||
-        (buyer.name && buyer.name.toLowerCase().includes(q)) ||
-        (buyer.email && buyer.email.toLowerCase().includes(q)) ||
-        (buyer.mobile && buyer.mobile.includes(q)) ||
-        (buyer.orderId && buyer.orderId.toLowerCase().includes(q));
+        (scholar.name && scholar.name.toLowerCase().includes(q)) ||
+        (scholar.email && scholar.email.toLowerCase().includes(q)) ||
+        (scholar.mobile && scholar.mobile.includes(q)) ||
+        (scholar.orderId && scholar.orderId.toLowerCase().includes(q));
 
       // Pack Filter
       let matchesPack = true;
       if (selectedPackFilter !== 'all') {
-        if (selectedPackFilter === 'ugc') {
-          matchesPack = !buyer.enrolledPacks || buyer.enrolledPacks.includes('ugc-net-english-bundle') || buyer.packName?.includes('UGC');
+        if (!scholar.isBuyer) {
+          matchesPack = false;
+        } else if (selectedPackFilter === 'ugc') {
+          matchesPack = !scholar.enrolledPacks || scholar.enrolledPacks.includes('ugc-net-english-bundle') || scholar.packName?.includes('UGC');
         } else if (selectedPackFilter === 'gset-combo') {
-          matchesPack = Boolean(buyer.enrolledPacks?.includes('gset-english-combo') || buyer.packName?.includes('Combo') || buyer.packName?.includes('Duo'));
+          matchesPack = Boolean(scholar.enrolledPacks?.includes('gset-english-combo') || scholar.packName?.includes('Combo') || scholar.packName?.includes('Duo'));
         } else if (selectedPackFilter === 'gset-p1') {
-          matchesPack = Boolean(buyer.enrolledPacks?.includes('gset-paper1') || buyer.packName?.includes('Paper 1'));
+          matchesPack = Boolean(scholar.enrolledPacks?.includes('gset-paper1') || scholar.packName?.includes('Paper 1'));
         } else if (selectedPackFilter === 'gset-p2-eng') {
-          matchesPack = Boolean(buyer.enrolledPacks?.includes('gset-paper2-english') || buyer.packName?.includes('Paper 2 English'));
+          matchesPack = Boolean(scholar.enrolledPacks?.includes('gset-paper2-english') || scholar.packName?.includes('Paper 2 English'));
         } else if (selectedPackFilter === 'gset-p2-edu') {
-          matchesPack = Boolean(buyer.enrolledPacks?.includes('gset-paper2-education') || buyer.packName?.includes('Education'));
+          matchesPack = Boolean(scholar.enrolledPacks?.includes('gset-paper2-education') || scholar.packName?.includes('Education'));
         }
       }
 
       // Payment Filter
       let matchesPayment = true;
       if (selectedPaymentFilter !== 'all') {
-        const mode = (buyer.paymentMethod || '').toLowerCase();
+        const mode = (scholar.paymentMethod || '').toLowerCase();
         if (selectedPaymentFilter === 'razorpay') {
           matchesPayment = mode.includes('razorpay') || mode.includes('online');
         } else if (selectedPaymentFilter === 'upi') {
@@ -201,12 +263,12 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
 
       // Status Filter
       let matchesStatus = true;
-      if (selectedStatusFilter === 'active') matchesStatus = buyer.isActive;
-      if (selectedStatusFilter === 'revoked') matchesStatus = !buyer.isActive;
+      if (selectedStatusFilter === 'active') matchesStatus = scholar.isActive;
+      if (selectedStatusFilter === 'revoked') matchesStatus = !scholar.isActive;
 
       return matchesSearch && matchesPack && matchesPayment && matchesStatus;
     });
-  }, [buyersRegistry, buyerSearchQuery, selectedPackFilter, selectedPaymentFilter, selectedStatusFilter]);
+  }, [allScholars, selectedUserTypeFilter, buyerSearchQuery, selectedPackFilter, selectedPaymentFilter, selectedStatusFilter]);
 
   // 3. FINANCIAL CALCULATIONS
   const financialSummary = useMemo(() => {
@@ -593,12 +655,12 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
           >
             <span className="flex items-center gap-2.5">
               <Users className="w-4 h-4 text-emerald-400" />
-              <span>Users That Bought</span>
+              <span>All Scholars &amp; Users</span>
             </span>
             <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
               activeModule === 'buyers' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
             }`}>
-              {buyersRegistry.length}
+              {totalUsersCount}
             </span>
           </button>
 
@@ -769,14 +831,14 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
                 {/* Metric 2: Total Scholars */}
                 <div className="bg-[#0E1528] rounded-2xl p-5 border border-slate-800 shadow-xs space-y-2">
                   <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
-                    <span>TOTAL SCHOLARS</span>
+                    <span>TOTAL LOGGED-IN USERS</span>
                     <Users className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">
-                    {financialSummary.totalCount}
+                    {totalUsersCount}
                   </div>
-                  <p className="text-[11px] text-slate-500 font-mono">
-                    Active Passes: <span className="text-emerald-400 font-bold">{financialSummary.activeCount}</span> • Revoked: {financialSummary.revokedCount}
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    <span className="text-emerald-400 font-bold">{buyersCount} Enrolled (Paid)</span> • <span className="text-blue-300 font-bold">{nonBuyersCount} Free (Not Bought)</span>
                   </p>
                 </div>
 
@@ -1015,7 +1077,7 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
           )}
 
           {/* ============================================================= */}
-          {/* MODULE 2: USERS THAT BOUGHT (SALES LEDGER & CANDIDATE REGISTRY) */}
+          {/* MODULE 2: ALL SCHOLARS & REGISTERED USERS (SALES & LOGGED-IN USERS) */}
           {/* ============================================================= */}
           {activeModule === 'buyers' && (
             <div className="space-y-6 animate-fade-in">
@@ -1027,13 +1089,13 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
                   <div>
                     <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                       <Users className="w-5 h-5 text-blue-400" />
-                      <span>Enrolled Candidate Registry &amp; Sales Ledger</span>
+                      <span>All Scholars &amp; Candidate Registry</span>
                       <span className="text-xs font-mono font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/30">
-                        {buyersRegistry.length} Records
+                        {totalUsersCount} Total ({buyersCount} Paid • {nonBuyersCount} Free)
                       </span>
                     </h2>
                     <p className="text-xs text-slate-400 mt-1">
-                      Complete list of students who enrolled or bought. Search, revoke/restore pass access, resend receipts, or export to Excel.
+                      Complete list of students who have logged in or signed up on the site, both verified buyers and registered candidates.
                     </p>
                   </div>
 
@@ -1054,6 +1116,43 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
                       <span>Export (.xlsx)</span>
                     </button>
                   </div>
+                </div>
+
+                {/* Candidate Classification Tabs */}
+                <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-800/80">
+                  <button
+                    onClick={() => setSelectedUserTypeFilter('all')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                      selectedUserTypeFilter === 'all'
+                        ? 'bg-blue-600 text-white shadow-xs font-bold'
+                        : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-700'
+                    }`}
+                  >
+                    <span>All Logged-in Scholars</span>
+                    <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded font-mono">{totalUsersCount}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedUserTypeFilter('buyers')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                      selectedUserTypeFilter === 'buyers'
+                        ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                        : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-700'
+                    }`}
+                  >
+                    <span>Enrolled Buyers (Paid)</span>
+                    <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded font-mono">{buyersCount}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedUserTypeFilter('non_buyers')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                      selectedUserTypeFilter === 'non_buyers'
+                        ? 'bg-purple-600 text-white shadow-xs font-bold'
+                        : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-700'
+                    }`}
+                  >
+                    <span>Registered Candidates (Not Bought)</span>
+                    <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded font-mono">{nonBuyersCount}</span>
+                  </button>
                 </div>
 
                 {/* Filters Row */}
@@ -1165,14 +1264,23 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
                       </thead>
                       <tbody className="divide-y divide-slate-800/80 font-medium">
                         {filteredBuyers.map((b) => (
-                          <tr key={b.id} className="hover:bg-slate-800/30 transition-colors">
+                          <tr key={b.id || b.email} className="hover:bg-slate-800/30 transition-colors">
                             {/* Candidate Name */}
                             <td className="p-3.5 font-bold text-white whitespace-nowrap">
                               <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-300 font-mono font-bold flex items-center justify-center text-[11px] shrink-0">
+                                <div className={`w-7 h-7 rounded-lg font-mono font-bold flex items-center justify-center text-[11px] shrink-0 ${
+                                  b.isBuyer ? 'bg-blue-600/20 text-blue-300' : 'bg-purple-600/20 text-purple-300'
+                                }`}>
                                   {b.name ? b.name.charAt(0).toUpperCase() : 'C'}
                                 </div>
-                                <span>{b.name}</span>
+                                <div>
+                                  <div>{b.name}</div>
+                                  {!b.isBuyer && (
+                                    <span className="text-[9px] uppercase tracking-wider font-mono text-purple-300 bg-purple-950/60 border border-purple-800/50 px-1.5 py-0.2 rounded">
+                                      Free Account
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </td>
 
@@ -1184,93 +1292,132 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
 
                             {/* Enrolled Pack */}
                             <td className="p-3.5 whitespace-nowrap">
-                              <span className="font-medium text-slate-200">
-                                {b.packName || 'UGC NET English Bundle'}
+                              <span className={`font-medium ${b.isBuyer ? 'text-slate-200' : 'text-slate-400 italic'}`}>
+                                {b.isBuyer ? (b.packName || 'UGC NET English Bundle') : '— (Free Candidate)'}
                               </span>
                             </td>
 
                             {/* Amount Paid */}
-                            <td className="p-3.5 font-mono text-emerald-400 font-bold whitespace-nowrap">
-                              ₹{b.amountPaid || currentServerPrice}
+                            <td className="p-3.5 font-mono whitespace-nowrap">
+                              {b.isBuyer ? (
+                                <span className="text-emerald-400 font-bold">₹{b.amountPaid || currentServerPrice}</span>
+                              ) : (
+                                <span className="text-slate-500 font-bold">₹0</span>
+                              )}
                             </td>
 
                             {/* Payment Mode */}
                             <td className="p-3.5 whitespace-nowrap">
                               <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
-                                (b.paymentMethod || '').includes('upi') || (b.paymentMethod || '').includes('manual')
+                                !b.isBuyer
+                                  ? 'bg-slate-800 text-slate-400 border border-slate-700'
+                                  : (b.paymentMethod || '').includes('upi') || (b.paymentMethod || '').includes('manual')
                                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                                   : (b.paymentMethod || '').includes('sim')
                                   ? 'bg-slate-700 text-slate-300 border border-slate-600'
                                   : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                               }`}>
-                                {(b.paymentMethod || 'razorpay').replace('_', ' ')}
+                                {b.isBuyer ? (b.paymentMethod || 'razorpay').replace('_', ' ') : 'Free Candidate'}
                               </span>
                             </td>
 
                             {/* Order ID */}
                             <td className="p-3.5 font-mono text-[11px] whitespace-nowrap text-slate-400">
-                              <button
-                                onClick={() => handleCopyOrderId(b.orderId)}
-                                className="hover:text-white flex items-center gap-1 group cursor-pointer"
-                                title="Click to copy Order ID"
-                              >
-                                <span>{b.orderId}</span>
-                                {copiedOrderId === b.orderId ? (
-                                  <Check className="w-3 h-3 text-emerald-400" />
-                                ) : (
-                                  <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                )}
-                              </button>
+                              {b.isBuyer && b.orderId && b.orderId !== '—' ? (
+                                <button
+                                  onClick={() => handleCopyOrderId(b.orderId)}
+                                  className="hover:text-white flex items-center gap-1 group cursor-pointer"
+                                  title="Click to copy Order ID"
+                                >
+                                  <span>{b.orderId}</span>
+                                  {copiedOrderId === b.orderId ? (
+                                    <Check className="w-3 h-3 text-emerald-400" />
+                                  ) : (
+                                    <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  )}
+                                </button>
+                              ) : (
+                                <span className="text-slate-500">—</span>
+                              )}
                             </td>
 
                             {/* Enrolled Timestamp */}
                             <td className="p-3.5 font-mono text-[11px] whitespace-nowrap text-slate-400">
-                              {new Date(b.enrolledAt).toLocaleDateString('en-IN', {
+                              {b.enrolledAt ? new Date(b.enrolledAt).toLocaleDateString('en-IN', {
                                 day: 'numeric',
                                 month: 'short',
                                 year: 'numeric'
-                              })}
+                              }) : (b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              }) : '—')}
                             </td>
 
                             {/* Status */}
                             <td className="p-3.5 whitespace-nowrap">
                               <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                                b.isActive
+                                !b.isBuyer
+                                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                  : b.isActive
                                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                                   : 'bg-red-500/20 text-red-300 border border-red-500/30'
                               }`}>
-                                {b.isActive ? 'Active Pass' : 'Revoked'}
+                                {!b.isBuyer ? 'Logged In • Free' : (b.isActive ? 'Active Pass' : 'Revoked')}
                               </span>
                             </td>
 
                             {/* Actions Menu */}
                             <td className="p-3.5 text-right whitespace-nowrap">
                               <div className="flex items-center justify-end gap-1.5">
-                                <button
-                                  onClick={() => {
-                                    toggleBuyerAccess(b.id);
-                                    triggerToast(`Candidate access ${b.isActive ? 'revoked' : 'restored'}.`);
-                                  }}
-                                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border ${
-                                    b.isActive
-                                      ? 'border-amber-700/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40'
-                                      : 'border-emerald-700/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40'
-                                  }`}
-                                  title={b.isActive ? 'Revoke Pass Access' : 'Restore Pass Access'}
-                                >
-                                  {b.isActive ? 'Revoke' : 'Restore'}
-                                </button>
+                                {b.isBuyer ? (
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        toggleBuyerAccess(b.id);
+                                        triggerToast(`Candidate access ${b.isActive ? 'revoked' : 'restored'}.`);
+                                      }}
+                                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border ${
+                                        b.isActive
+                                          ? 'border-amber-700/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40'
+                                          : 'border-emerald-700/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40'
+                                      }`}
+                                      title={b.isActive ? 'Revoke Pass Access' : 'Restore Pass Access'}
+                                    >
+                                      {b.isActive ? 'Revoke' : 'Restore'}
+                                    </button>
 
-                                <button
-                                  onClick={() => {
-                                    resendConfirmationEmail(b.id);
-                                    triggerToast(`Receipt resent to ${b.email}`);
-                                  }}
-                                  className="p-1 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                                  title="Resend Confirmation Receipt Email"
-                                >
-                                  <Mail className="w-3.5 h-3.5" />
-                                </button>
+                                    <button
+                                      onClick={() => {
+                                        resendConfirmationEmail(b.id);
+                                        triggerToast(`Receipt resent to ${b.email}`);
+                                      }}
+                                      className="p-1 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                                      title="Resend Confirmation Receipt Email"
+                                    >
+                                      <Mail className="w-3.5 h-3.5" />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    onClick={() => {
+                                      setManualForm({
+                                        name: b.name || '',
+                                        email: b.email,
+                                        mobile: b.mobile || '',
+                                        amountPaid: currentServerPrice,
+                                        packType: 'ugc-net-english-bundle',
+                                        paymentMethod: 'manual_upi'
+                                      });
+                                      setIsManualModalOpen(true);
+                                    }}
+                                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border border-emerald-700/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 flex items-center gap-1"
+                                    title="Grant manual access pass to this registered candidate"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                    <span>Grant Pass</span>
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -1283,11 +1430,12 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
                 {/* Table Footer Summary */}
                 <div className="p-4 bg-[#121B33] border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 font-mono">
                   <div>
-                    Showing <strong className="text-white">{filteredBuyers.length}</strong> of {buyersRegistry.length} total enrolled scholars
+                    Showing <strong className="text-white">{filteredBuyers.length}</strong> of {totalUsersCount} total registered scholars ({buyersCount} Enrolled Buyers • {nonBuyersCount} Free Candidates)
                   </div>
                   <div className="flex items-center gap-4">
-                    <span>Active: <strong className="text-emerald-400">{filteredBuyers.filter(b => b.isActive).length}</strong></span>
-                    <span>Revoked: <strong className="text-red-400">{filteredBuyers.filter(b => !b.isActive).length}</strong></span>
+                    <span>Enrolled: <strong className="text-emerald-400">{buyersCount}</strong></span>
+                    <span>Free: <strong className="text-purple-400">{nonBuyersCount}</strong></span>
+                    <span>Filtered Active: <strong className="text-emerald-400">{filteredBuyers.filter(b => b.isActive).length}</strong></span>
                   </div>
                 </div>
               </div>

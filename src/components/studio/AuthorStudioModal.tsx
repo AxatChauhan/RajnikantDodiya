@@ -133,6 +133,10 @@ export const AuthorStudioModal: React.FC = () => {
     addTest: addStoreTest,
     deleteTest: deleteStoreTest,
     buyersRegistry: storeBuyersRegistry,
+    registeredUsers: storeRegisteredUsers,
+    totalUsersCount: storeTotalUsersCount,
+    totalBuyersCount: storeTotalBuyersCount,
+    totalNonBuyersCount: storeTotalNonBuyersCount,
     addManualBuyer: addStoreManualBuyer,
     toggleBuyerAccess: toggleStoreBuyerAccess,
     clearBuyersRegistry: clearStoreBuyersRegistry,
@@ -269,7 +273,57 @@ export const AuthorStudioModal: React.FC = () => {
     triggerStoreToast('New Test Hall module scheduled. It will automatically unlock on the set release date.');
   };
 
-  const filteredStoreBuyers = storeBuyersRegistry.filter(b => {
+  // Unified list of all logged-in users & buyers for AuthorStudioModal
+  const [modalUserFilter, setModalUserFilter] = useState<'all' | 'buyers' | 'non_buyers'>('all');
+  const allModalScholars = React.useMemo(() => {
+    const map = new Map<string, any>();
+    storeRegisteredUsers.forEach(u => {
+      const emailKey = u.email.toLowerCase().trim();
+      map.set(emailKey, {
+        id: u.id,
+        name: u.name || emailKey.split('@')[0],
+        email: u.email,
+        mobile: u.mobile || '',
+        orderId: u.orderId || (u.isBuyer ? 'NV_STUDENT' : '—'),
+        amountPaid: u.amountPaid || (u.isBuyer ? storeCurrentPrice : 0),
+        paymentMethod: u.isBuyer ? 'Online / Paid Pass' : 'Free Registration',
+        enrolledAt: u.enrolledAt,
+        createdAt: u.createdAt,
+        lastLoginAt: u.lastLoginAt,
+        isActive: u.isActive !== false,
+        isBuyer: Boolean(u.isBuyer),
+        enrolledPacks: u.enrolledPacks || (u.isBuyer ? ['ugc-net-english-bundle'] : []),
+        packName: u.isBuyer ? 'UGC NET English Bundle' : 'Free Candidate (Not Bought)'
+      });
+    });
+
+    storeBuyersRegistry.forEach(b => {
+      const emailKey = b.email.toLowerCase().trim();
+      const existing = map.get(emailKey);
+      map.set(emailKey, {
+        id: b.id || existing?.id,
+        name: b.name || existing?.name,
+        email: b.email,
+        mobile: b.mobile || existing?.mobile || '',
+        orderId: b.orderId || existing?.orderId || 'NV_ORD',
+        amountPaid: b.amountPaid ?? existing?.amountPaid ?? storeCurrentPrice,
+        paymentMethod: b.paymentMethod || existing?.paymentMethod || 'Razorpay',
+        enrolledAt: b.enrolledAt || existing?.enrolledAt || new Date().toISOString(),
+        createdAt: existing?.createdAt || b.enrolledAt || new Date().toISOString(),
+        lastLoginAt: existing?.lastLoginAt || new Date().toISOString(),
+        isActive: b.isActive !== false,
+        isBuyer: true,
+        enrolledPacks: b.enrolledPacks || existing?.enrolledPacks || ['ugc-net-english-bundle'],
+        packName: b.packName || existing?.packName || 'UGC NET English Bundle'
+      });
+    });
+
+    return Array.from(map.values());
+  }, [storeRegisteredUsers, storeBuyersRegistry, storeCurrentPrice]);
+
+  const filteredStoreBuyers = allModalScholars.filter(b => {
+    if (modalUserFilter === 'buyers' && !b.isBuyer) return false;
+    if (modalUserFilter === 'non_buyers' && b.isBuyer) return false;
     if (!storeBuyerSearch.trim()) return true;
     const q = storeBuyerSearch.toLowerCase().trim();
     return (
@@ -2399,21 +2453,33 @@ export const AuthorStudioModal: React.FC = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-deckle/60">
                       <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
                         <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Total Scholars</span>
-                        <span className="text-xl font-bold text-ink font-serif">{storeBuyersRegistry.length}</span>
+                        <span className="text-xl font-bold text-ink font-serif">{storeTotalUsersCount}</span>
+                        <span className="text-[10px] text-ink-muted block mt-0.5">
+                          <strong className="text-emerald-700">{storeTotalBuyersCount} Paid</strong> • <strong className="text-indigo-600">{storeTotalNonBuyersCount} Free</strong>
+                        </span>
                       </div>
                       <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
                         <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Active Passes</span>
                         <span className="text-xl font-bold text-emerald-700 font-serif">
                           {storeBuyersRegistry.filter(b => b.isActive).length}
                         </span>
+                        <span className="text-[10px] text-ink-muted block mt-0.5">
+                          Enrolled Scholar Passes
+                        </span>
                       </div>
                       <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
                         <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Study Dossiers</span>
                         <span className="text-xl font-bold text-ink font-serif">{storeReadingFiles.length} PDFs</span>
+                        <span className="text-[10px] text-ink-muted block mt-0.5">
+                          Active Reading Dossiers
+                        </span>
                       </div>
                       <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
                         <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">CBT Mock Tests</span>
                         <span className="text-xl font-bold text-ink font-serif">{storeTests.length} Modules</span>
+                        <span className="text-[10px] text-ink-muted block mt-0.5">
+                          Scheduled CBT Tests
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2421,7 +2487,7 @@ export const AuthorStudioModal: React.FC = () => {
                   {/* Sub-Navigation Tabs */}
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs border-b border-deckle">
                     {[
-                      { id: 'buyers', label: `Enrolled Registry (${storeBuyersRegistry.length})`, icon: Users },
+                      { id: 'buyers', label: `All Scholars & Logged-in Users (${storeTotalUsersCount})`, icon: Users },
                       { id: 'manual_access', label: 'Grant Manual Pass (Direct UPI)', icon: Plus },
                       { id: 'pricing', label: 'Pricing & Cutoff Countdown', icon: DollarSign },
                       { id: 'content', label: 'Study Dossiers & Mock Tests', icon: FileText }
@@ -2452,10 +2518,13 @@ export const AuthorStudioModal: React.FC = () => {
                         <div>
                           <h4 className="font-serif text-lg font-bold text-ink flex items-center gap-2">
                             <Users className="w-4 h-4 text-claret" />
-                            <span>Enrolled Candidate Registry</span>
+                            <span>All Scholars &amp; Candidate Registry</span>
+                            <span className="text-xs font-mono font-bold bg-claret/10 text-claret px-2 py-0.5 rounded-full border border-claret/20">
+                              {storeTotalUsersCount} Total
+                            </span>
                           </h4>
                           <p className="text-xs text-ink-muted mt-0.5">
-                            Live records of all candidate passes. Revoke or restore access, or resend confirmation emails.
+                            Live records of all registered and logged-in candidates on the portal ({storeTotalBuyersCount} Paid Passes • {storeTotalNonBuyersCount} Free Candidates).
                           </p>
                         </div>
 
@@ -2483,6 +2552,43 @@ export const AuthorStudioModal: React.FC = () => {
                             <span>Download .xlsx File</span>
                           </button>
                         </div>
+                      </div>
+
+                      {/* Segmented Filter Pills */}
+                      <div className="flex items-center gap-2 flex-wrap pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setModalUserFilter('all')}
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold font-mono transition-all cursor-pointer ${
+                            modalUserFilter === 'all'
+                              ? 'bg-claret text-white font-bold shadow-xs'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          All Logged-in Scholars ({storeTotalUsersCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setModalUserFilter('buyers')}
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold font-mono transition-all cursor-pointer ${
+                            modalUserFilter === 'buyers'
+                              ? 'bg-emerald-700 text-white font-bold shadow-xs'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Enrolled Buyers ({storeTotalBuyersCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setModalUserFilter('non_buyers')}
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold font-mono transition-all cursor-pointer ${
+                            modalUserFilter === 'non_buyers'
+                              ? 'bg-indigo-700 text-white font-bold shadow-xs'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Free / Not Bought ({storeTotalNonBuyersCount})
+                        </button>
                       </div>
 
                       {/* Search */}
@@ -2520,45 +2626,78 @@ export const AuthorStudioModal: React.FC = () => {
                                 </tr>
                               ) : (
                                 filteredStoreBuyers.map(b => (
-                                  <tr key={b.id} className="hover:bg-[#FAF9F5]/70 transition-colors">
-                                    <td className="p-3 font-medium text-ink">{b.name}</td>
+                                  <tr key={b.id || b.email} className="hover:bg-[#FAF9F5]/70 transition-colors">
+                                    <td className="p-3 font-medium text-ink">
+                                      <div>{b.name}</div>
+                                      {!b.isBuyer && (
+                                        <span className="text-[9px] uppercase tracking-wider font-mono text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded inline-block mt-0.5">
+                                          Free Account
+                                        </span>
+                                      )}
+                                    </td>
                                     <td className="p-3 font-mono text-[11px] text-ink-muted">
                                       <div>{b.email}</div>
                                       <div>{b.mobile || '—'}</div>
                                     </td>
-                                    <td className="p-3 font-mono text-[11px] text-ink-muted">{b.orderId}</td>
-                                    <td className="p-3 font-bold text-ink">₹{b.amountPaid}</td>
+                                    <td className="p-3 font-mono text-[11px] text-ink-muted">{b.orderId || '—'}</td>
+                                    <td className="p-3 font-bold text-ink">
+                                      {b.isBuyer ? `₹${b.amountPaid}` : <span className="text-ink-muted font-normal">₹0 (Free)</span>}
+                                    </td>
                                     <td className="p-3">
                                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                        b.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                                        !b.isBuyer
+                                          ? 'bg-indigo-100 text-indigo-800'
+                                          : b.isActive
+                                          ? 'bg-emerald-100 text-emerald-800'
+                                          : 'bg-rose-100 text-rose-800'
                                       }`}>
-                                        {b.isActive ? 'Active Pass' : 'Revoked'}
+                                        {!b.isBuyer ? 'Logged In • Free' : (b.isActive ? 'Active Pass' : 'Revoked')}
                                       </span>
                                     </td>
                                     <td className="p-3 text-right">
                                       <div className="flex items-center justify-end gap-3">
-                                        <button
-                                          onClick={async () => {
-                                            const res = await resendStoreConfirmationEmail(b.email);
-                                            triggerStoreToast(res.message || `Confirmation email resent to ${b.email}`);
-                                          }}
-                                          className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 hover:underline cursor-pointer"
-                                          title="Resend Purchase Confirmation Email with Student Dashboard URL"
-                                        >
-                                          <Mail className="w-3.5 h-3.5" />
-                                          <span>Resend Email</span>
-                                        </button>
-                                        <button
-                                          onClick={() => {
-                                            toggleStoreBuyerAccess(b.id);
-                                            triggerStoreToast(`Access ${b.isActive ? 'revoked' : 'restored'} for ${b.name}`);
-                                          }}
-                                          className={`text-[11px] font-semibold underline cursor-pointer ${
-                                            b.isActive ? 'text-rose-700 hover:text-rose-900' : 'text-blue-700 hover:text-blue-900'
-                                          }`}
-                                        >
-                                          {b.isActive ? 'Revoke Access' : 'Grant Access'}
-                                        </button>
+                                        {b.isBuyer ? (
+                                          <>
+                                            <button
+                                              onClick={async () => {
+                                                const res = await resendStoreConfirmationEmail(b.email);
+                                                triggerStoreToast(res.message || `Confirmation email resent to ${b.email}`);
+                                              }}
+                                              className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 hover:underline cursor-pointer"
+                                              title="Resend Purchase Confirmation Email with Student Dashboard URL"
+                                            >
+                                              <Mail className="w-3.5 h-3.5" />
+                                              <span>Resend Email</span>
+                                            </button>
+                                            <button
+                                              onClick={() => {
+                                                toggleStoreBuyerAccess(b.id);
+                                                triggerStoreToast(`Access ${b.isActive ? 'revoked' : 'restored'} for ${b.name}`);
+                                              }}
+                                              className={`text-[11px] font-semibold underline cursor-pointer ${
+                                                b.isActive ? 'text-rose-700 hover:text-rose-900' : 'text-blue-700 hover:text-blue-900'
+                                              }`}
+                                            >
+                                              {b.isActive ? 'Revoke Access' : 'Grant Access'}
+                                            </button>
+                                          </>
+                                        ) : (
+                                          <button
+                                            onClick={() => {
+                                              setStoreManualName(b.name || '');
+                                              setStoreManualEmail(b.email);
+                                              setStoreManualMobile(b.mobile || '');
+                                              setStoreManualAmount(storeCurrentPrice);
+                                              setStoreSubTab('manual_access');
+                                              triggerStoreToast(`Prefilled manual pass form for ${b.name || b.email}`);
+                                            }}
+                                            className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg flex items-center gap-1 cursor-pointer"
+                                            title="Grant manual access pass to this registered user"
+                                          >
+                                            <Plus className="w-3 h-3" />
+                                            <span>Grant Pass</span>
+                                          </button>
+                                        )}
                                       </div>
                                     </td>
                                   </tr>

@@ -248,6 +248,9 @@ export default async function handler(req, res) {
         }
 
         // Verified student: DIRECT INSTANT LOGIN!
+        user.last_login_at = new Date().toISOString();
+        await saveUser(user);
+
         const enrolledPacks = await getUserEnrolledPacks(cleanEmail);
         const token = createSessionToken({
           id: user.id,
@@ -296,6 +299,10 @@ export default async function handler(req, res) {
         if (!user) {
           return res.status(404).json({ success: false, error: 'User account not found.' });
         }
+        user.last_login_at = new Date().toISOString();
+        user.email_verified = true;
+        user.email_verified_at = new Date().toISOString();
+        await saveUser(user);
 
         const enrolledPacks = await getUserEnrolledPacks(cleanEmail);
         const token = createSessionToken({

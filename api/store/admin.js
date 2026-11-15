@@ -166,13 +166,14 @@ export default async function handler(req, res) {
     }
 
     // -------------------------------------------------------------------------
-    // 3. GET /api/store/admin/buyers
+    // 3. GET /api/store/admin/buyers or /api/store/admin/users
     // -------------------------------------------------------------------------
-    if (action === 'buyers') {
+    if (action === 'buyers' || action === 'users') {
       const buyersMap = new Map();
+      const allUsersMap = new Map();
 
-      // Seed baseline candidate
-      buyersMap.set('student@example.com', {
+      // Seed baseline candidate (Paid Buyer)
+      const initStudent = {
         id: 'usr_init_student',
         name: 'Test Student',
         student_name: 'Test Student',
@@ -180,19 +181,25 @@ export default async function handler(req, res) {
         mobile: '9898989898',
         orderId: 'NV_INIT_001',
         order_id: 'NV_INIT_001',
-        amount: 799,
-        amount_paid: 799,
-        amountPaid: 799,
+        amount: 499,
+        amount_paid: 499,
+        amountPaid: 499,
         paymentMethod: 'razorpay',
         payment_method: 'razorpay',
         is_active: true,
         isActive: true,
+        is_buyer: true,
+        isBuyer: true,
         enrolled_at: new Date().toISOString(),
-        enrolledAt: new Date().toISOString()
-      });
+        enrolledAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString()
+      };
+      buyersMap.set('student@example.com', initStudent);
+      allUsersMap.set('student@example.com', initStudent);
 
-      // Seed official Razorpay verification account
-      buyersMap.set('razorpay.test@rajnikantdodiya.com', {
+      // Seed official Razorpay verification account (Paid Buyer)
+      const rzpVerifier = {
         id: 'usr_rzp_verifier',
         name: 'Razorpay Verification Officer',
         student_name: 'Razorpay Verification Officer',
@@ -200,23 +207,54 @@ export default async function handler(req, res) {
         mobile: '9876543210',
         orderId: 'NV_RZP_VERIFY_2026',
         order_id: 'NV_RZP_VERIFY_2026',
-        amount: 799,
-        amount_paid: 799,
-        amountPaid: 799,
+        amount: 499,
+        amount_paid: 499,
+        amountPaid: 499,
         paymentMethod: 'razorpay_verification',
         payment_method: 'razorpay_verification',
         is_active: true,
         isActive: true,
+        is_buyer: true,
+        isBuyer: true,
         enrolled_at: new Date().toISOString(),
-        enrolledAt: new Date().toISOString()
-      });
+        enrolledAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString()
+      };
+      buyersMap.set('razorpay.test@rajnikantdodiya.com', rzpVerifier);
+      allUsersMap.set('razorpay.test@rajnikantdodiya.com', rzpVerifier);
+
+      // Seed logged-in candidate account (Registered - Not Bought)
+      const rzpCandidate = {
+        id: 'usr_rzp_candidate',
+        name: 'Candidate Scholar',
+        student_name: 'Candidate Scholar',
+        email: 'candidate.scholar@example.com',
+        mobile: '9876543210',
+        orderId: '',
+        order_id: '',
+        amount: 0,
+        amount_paid: 0,
+        amountPaid: 0,
+        paymentMethod: 'none',
+        payment_method: 'none',
+        is_active: true,
+        isActive: true,
+        is_buyer: false,
+        isBuyer: false,
+        enrolled_at: null,
+        enrolledAt: null,
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        lastLoginAt: new Date().toISOString()
+      };
+      allUsersMap.set('candidate.scholar@example.com', rzpCandidate);
 
       // Fetch from test simulation DB
       const simDb = await getSimulatedDb();
       if (simDb?.buyers) {
         for (const [email, b] of simDb.buyers.entries()) {
           const cleanEmail = email.toLowerCase().trim();
-          buyersMap.set(cleanEmail, {
+          const buyerObj = {
             id: b.id || `usr_${cleanEmail}`,
             name: b.name || b.student_name || 'Scholar',
             student_name: b.student_name || b.name || 'Scholar',
@@ -224,43 +262,121 @@ export default async function handler(req, res) {
             mobile: b.mobile || '',
             orderId: b.orderId || b.order_id || 'NV_ORD',
             order_id: b.order_id || b.orderId || 'NV_ORD',
-            amount: b.amountPaid ?? b.amount_paid ?? b.amount ?? 799,
-            amount_paid: b.amount_paid ?? b.amountPaid ?? b.amount ?? 799,
-            amountPaid: b.amountPaid ?? b.amount_paid ?? b.amount ?? 799,
+            amount: b.amountPaid ?? b.amount_paid ?? b.amount ?? 499,
+            amount_paid: b.amount_paid ?? b.amountPaid ?? b.amount ?? 499,
+            amountPaid: b.amountPaid ?? b.amount_paid ?? b.amount ?? 499,
             is_active: b.is_active !== false && b.isActive !== false,
             isActive: b.is_active !== false && b.isActive !== false,
+            is_buyer: true,
+            isBuyer: true,
             enrolled_at: b.enrolled_at || b.enrolledAt || new Date().toISOString(),
-            enrolledAt: b.enrolledAt || b.enrolled_at || new Date().toISOString()
-          });
+            enrolledAt: b.enrolledAt || b.enrolled_at || new Date().toISOString(),
+            createdAt: b.createdAt || b.created_at || new Date().toISOString(),
+            lastLoginAt: b.lastLoginAt || b.last_login_at || new Date().toISOString()
+          };
+          buyersMap.set(cleanEmail, buyerObj);
+          allUsersMap.set(cleanEmail, buyerObj);
         }
       }
 
-      // Fetch from global memory users
+      if (simDb?.users) {
+        for (const [email, u] of simDb.users.entries()) {
+          const cleanEmail = email.toLowerCase().trim();
+          const isB = Boolean(u.isBuyer ?? u.is_buyer);
+          const userObj = {
+            id: u.id || `usr_${cleanEmail}`,
+            name: u.name || 'Scholar',
+            student_name: u.name || 'Scholar',
+            email: cleanEmail,
+            mobile: u.mobile || '',
+            orderId: u.orderId || u.order_id || (isB ? 'NV_ORD' : ''),
+            order_id: u.order_id || u.orderId || (isB ? 'NV_ORD' : ''),
+            amount: u.amountPaid || u.amount_paid || (isB ? 499 : 0),
+            amount_paid: u.amount_paid || u.amountPaid || (isB ? 499 : 0),
+            amountPaid: u.amountPaid || u.amount_paid || (isB ? 499 : 0),
+            is_active: u.is_active !== false && u.isActive !== false,
+            isActive: u.is_active !== false && u.isActive !== false,
+            is_buyer: isB,
+            isBuyer: isB,
+            enrolled_at: isB ? (u.enrolled_at || u.enrolledAt || new Date().toISOString()) : null,
+            enrolledAt: isB ? (u.enrolledAt || u.enrolled_at || new Date().toISOString()) : null,
+            createdAt: u.createdAt || u.created_at || new Date().toISOString(),
+            lastLoginAt: u.lastLoginAt || u.last_login_at || new Date().toISOString()
+          };
+          allUsersMap.set(cleanEmail, userObj);
+          if (isB) buyersMap.set(cleanEmail, userObj);
+        }
+      }
+
+      // Fetch from global memory users (ALL users, whether bought or not bought)
       if (globalThis.__NETVIDYA_USERS_DB__) {
         for (const [email, u] of globalThis.__NETVIDYA_USERS_DB__.entries()) {
-          if (u.is_buyer) {
-            const cleanEmail = email.toLowerCase().trim();
-            if (!buyersMap.has(cleanEmail)) {
-              buyersMap.set(cleanEmail, {
-                id: u.id || `usr_${cleanEmail}`,
-                name: u.name || 'Scholar',
-                student_name: u.name || 'Scholar',
-                email: cleanEmail,
-                mobile: u.mobile || '',
-                orderId: u.order_id || 'NV_ORD',
-                order_id: u.order_id || 'NV_ORD',
-                amount: u.amount_paid || 799,
-                amount_paid: u.amount_paid || 799,
-                amountPaid: u.amount_paid || 799,
-                is_active: u.is_active !== false,
-                isActive: u.is_active !== false,
-                enrolled_at: u.enrolled_at || new Date().toISOString(),
-                enrolledAt: u.enrolled_at || new Date().toISOString()
-              });
-            }
+          const cleanEmail = email.toLowerCase().trim();
+          const isB = Boolean(u.is_buyer);
+          const userObj = {
+            id: u.id || `usr_${cleanEmail}`,
+            name: u.name || 'Scholar',
+            student_name: u.name || 'Scholar',
+            email: cleanEmail,
+            mobile: u.mobile || '',
+            orderId: u.order_id || (isB ? 'NV_ORD' : ''),
+            order_id: u.order_id || (isB ? 'NV_ORD' : ''),
+            amount: u.amount_paid || (isB ? 499 : 0),
+            amount_paid: u.amount_paid || (isB ? 499 : 0),
+            amountPaid: u.amount_paid || (isB ? 499 : 0),
+            is_active: u.is_active !== false,
+            isActive: u.is_active !== false,
+            is_buyer: isB,
+            isBuyer: isB,
+            enrolled_at: isB ? (u.enrolled_at || new Date().toISOString()) : null,
+            enrolledAt: isB ? (u.enrolled_at || new Date().toISOString()) : null,
+            createdAt: u.created_at || new Date().toISOString(),
+            lastLoginAt: u.last_login_at || new Date().toISOString()
+          };
+          allUsersMap.set(cleanEmail, userObj);
+          if (isB && !buyersMap.has(cleanEmail)) {
+            buyersMap.set(cleanEmail, userObj);
           }
         }
       }
+
+      // Fetch from persistent snapshot state (live_studio_state.json)
+      try {
+        const liveState = globalThis.__AUTHOR_STUDIO_LIVE_STATE__;
+        const regUsers = liveState?.store?.registeredUsers;
+        if (Array.isArray(regUsers)) {
+          for (const u of regUsers) {
+            if (u?.email) {
+              const cleanEmail = u.email.toLowerCase().trim();
+              const isB = Boolean(u.isBuyer ?? u.is_buyer);
+              const userObj = {
+                id: u.id || `usr_${cleanEmail}`,
+                name: u.name || cleanEmail.split('@')[0],
+                student_name: u.name || cleanEmail.split('@')[0],
+                email: cleanEmail,
+                mobile: u.mobile || '',
+                orderId: u.orderId || (isB ? 'NV_ORD' : ''),
+                order_id: u.orderId || (isB ? 'NV_ORD' : ''),
+                amount: u.amountPaid || (isB ? 499 : 0),
+                amount_paid: u.amountPaid || (isB ? 499 : 0),
+                amountPaid: u.amountPaid || (isB ? 499 : 0),
+                is_active: u.isActive !== false,
+                isActive: u.isActive !== false,
+                is_buyer: isB,
+                isBuyer: isB,
+                enrolled_at: isB ? (u.enrolledAt || new Date().toISOString()) : null,
+                enrolledAt: isB ? (u.enrolledAt || new Date().toISOString()) : null,
+                createdAt: u.createdAt || new Date().toISOString(),
+                lastLoginAt: u.lastLoginAt || new Date().toISOString()
+              };
+              allUsersMap.set(cleanEmail, userObj);
+              if (isB && !buyersMap.has(cleanEmail)) {
+                buyersMap.set(cleanEmail, userObj);
+              }
+            }
+          }
+        }
+      } catch {}
 
       // Fetch from Supabase if configured
       const supabase = await getSupabaseClient();
@@ -270,7 +386,7 @@ export default async function handler(req, res) {
           if (dbBuyers) {
             for (const b of dbBuyers) {
               const cleanEmail = b.email.toLowerCase().trim();
-              buyersMap.set(cleanEmail, {
+              const bObj = {
                 id: b.id,
                 name: b.student_name || b.name || 'Scholar',
                 student_name: b.student_name || b.name || 'Scholar',
@@ -278,21 +394,69 @@ export default async function handler(req, res) {
                 mobile: b.mobile || '',
                 orderId: b.order_id || b.orderId,
                 order_id: b.order_id || b.orderId,
-                amount: Number(b.amount_paid) || 799,
-                amount_paid: Number(b.amount_paid) || 799,
-                amountPaid: Number(b.amount_paid) || 799,
+                amount: Number(b.amount_paid) || 499,
+                amount_paid: Number(b.amount_paid) || 499,
+                amountPaid: Number(b.amount_paid) || 499,
                 is_active: b.is_active !== false,
                 isActive: b.is_active !== false,
+                is_buyer: true,
+                isBuyer: true,
                 enrolled_at: b.enrolled_at || new Date().toISOString(),
-                enrolledAt: b.enrolled_at || new Date().toISOString()
-              });
+                enrolledAt: b.enrolled_at || new Date().toISOString(),
+                createdAt: b.enrolled_at || new Date().toISOString(),
+                lastLoginAt: b.enrolled_at || new Date().toISOString()
+              };
+              buyersMap.set(cleanEmail, bObj);
+              allUsersMap.set(cleanEmail, bObj);
+            }
+          }
+        } catch {}
+
+        try {
+          const { data: dbUsers } = await supabase.from('netvidya_users').select('*');
+          if (dbUsers) {
+            for (const u of dbUsers) {
+              const cleanEmail = u.email.toLowerCase().trim();
+              const isB = Boolean(u.is_buyer);
+              const uObj = {
+                id: u.id,
+                name: u.name || 'Scholar',
+                student_name: u.name || 'Scholar',
+                email: cleanEmail,
+                mobile: u.mobile || '',
+                orderId: u.order_id || (isB ? 'NV_ORD' : ''),
+                order_id: u.order_id || (isB ? 'NV_ORD' : ''),
+                amount: Number(u.amount_paid) || (isB ? 499 : 0),
+                amount_paid: Number(u.amount_paid) || (isB ? 499 : 0),
+                amountPaid: Number(u.amount_paid) || (isB ? 499 : 0),
+                is_active: u.is_active !== false,
+                isActive: u.is_active !== false,
+                is_buyer: isB,
+                isBuyer: isB,
+                enrolled_at: isB ? (u.enrolled_at || new Date().toISOString()) : null,
+                enrolledAt: isB ? (u.enrolled_at || new Date().toISOString()) : null,
+                createdAt: u.created_at || new Date().toISOString(),
+                lastLoginAt: u.last_login_at || new Date().toISOString()
+              };
+              allUsersMap.set(cleanEmail, uObj);
+              if (isB && !buyersMap.has(cleanEmail)) {
+                buyersMap.set(cleanEmail, uObj);
+              }
             }
           }
         } catch {}
       }
 
       const buyers = Array.from(buyersMap.values());
-      return res.status(200).json({ success: true, buyers });
+      const allUsers = Array.from(allUsersMap.values());
+      return res.status(200).json({
+        success: true,
+        buyers,
+        users: allUsers,
+        allUsers,
+        totalBuyers: buyers.length,
+        totalUsers: allUsers.length
+      });
     }
 
     // -------------------------------------------------------------------------

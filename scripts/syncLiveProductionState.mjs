@@ -70,13 +70,24 @@ async function syncLiveState() {
       }
     }
 
+    const existingUsers = Array.isArray(existing?.store?.registeredUsers) ? existing.store.registeredUsers : [];
+    const liveUsers = Array.isArray(liveState?.store?.registeredUsers) ? liveState.store.registeredUsers : [];
+    const usersMap = new Map();
+    for (const u of [...existingUsers, ...liveUsers]) {
+      if (u && (u.email || u.id)) {
+        const key = (u.email || u.id).toLowerCase();
+        usersMap.set(key, u);
+      }
+    }
+
     const merged = {
       ...existing,
       ...liveState,
       store: {
         ...(existing.store || {}),
         ...(liveState.store || {}),
-        buyers: Array.from(buyersMap.values())
+        buyers: Array.from(buyersMap.values()),
+        registeredUsers: Array.from(usersMap.values())
       },
       syncedAt: new Date().toISOString()
     };
