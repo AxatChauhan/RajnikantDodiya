@@ -1,6 +1,24 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import LIVE_STUDIO_SNAPSHOT from '../data/live_studio_state.json';
 import { downloadBuyersAsXlsx } from '../utils/excelExport';
+import { supabase } from '../lib/supabase';
+import {
+  fetchSupabaseUsers,
+  fetchSupabaseBuyers,
+  fetchSupabaseReadingFiles,
+  fetchSupabaseTests,
+  fetchSupabaseStoreSettings,
+  saveSupabaseStoreSettings,
+  saveUserToSupabase,
+  toggleSupabaseAccess,
+  saveReadingFileToSupabase,
+  deleteReadingFileFromSupabase,
+  saveTestToSupabase,
+  deleteTestFromSupabase,
+  revokeDeviceSessionInSupabase,
+  checkSupabaseDatabaseHealth,
+  SupabaseDatabaseHealth
+} from '../lib/supabaseSync';
 import {
   DEFAULT_STORE_SETTINGS,
   STORE_PAYMENT_DEFAULTS,
@@ -82,6 +100,19 @@ export interface RegisteredUserRecord {
   enrolledPacks?: string[];
   orderId?: string;
   amountPaid?: number;
+  emailVerified?: boolean;
+  emailVerifiedAt?: string | null;
+  role?: string;
+  paymentMethod?: string;
+  razorpayPaymentId?: string | null;
+  expiresAt?: string | null;
+  deviceSlots?: {
+    hasPhone: boolean;
+    hasLaptop: boolean;
+    phoneInfo?: string;
+    laptopInfo?: string;
+    lastActiveAt?: string;
+  };
 }
 
 // Initial Content: Populated with official UGC NET and GSET 2026 materials
@@ -735,6 +766,11 @@ interface NetVidyaStoreContextType {
   msUntilCutoff: number;
   paymentMode: 'api_checkout' | 'payment_link';
   paymentLinkUrl: string;
+  syncAllWithSupabase: () => Promise<{ success: boolean; message: string }>;
+  revokeCandidateDevice: (identifier: string) => Promise<boolean>;
+  supabaseRealtimeConnected: boolean;
+  supabaseHealth: SupabaseDatabaseHealth | null;
+  checkHealth: () => Promise<SupabaseDatabaseHealth>;
 }
 
 const STORAGE_KEY_SESSION = 'netvidya_buyer_session_v1';
@@ -992,6 +1028,16 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         })
       }).catch(() => {});
 
+      // Sync directly to Supabase netvidya_store_settings
+      saveSupabaseStoreSettings({
+        earlyBirdPrice: updated.earlyBirdPrice,
+        standardPrice: updated.standardPrice,
+        earlyBirdCutoffDate: updated.earlyBirdCutoff,
+        accessExpiryDate: updated.accessExpiryDate,
+        supportEmail: updated.supportEmail,
+        supportPhone: updated.supportPhone
+      }).catch(() => {});
+
       return updated;
     });
 
@@ -1061,41 +1107,91 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
-  // Fetch verified admin user & buyer registry from server API
+  // Supabase Database Realtime State & Health Monitoring
+  const [supabaseRealtimeConnected, setSupabaseRealtimeConnected] = useState(false);
+  const [supabaseHealth, setSupabaseHealth] = useState<SupabaseDatabaseHealth | null>(null);
+
+  const checkHealth = useCallback(async () => {
+    const health = await checkSupabaseDatabaseHealth();
+    setSupabaseHealth(health);
+    return health;
+  }, []);
+
+  // Fetch verified admin user & buyer registry from BOTH server API and Supabase
   const fetchAdminUsersRegistry = useCallback(async () => {
     try {
       const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/store/admin/buyers', { headers });
-      const data = await res.json().catch(() => ({}));
-      if (data?.success) {
-        if (Array.isArray(data.buyers)) {
-          const cleanBuyers = data.buyers.filter((b: any) => !isDummyAccount(b.email, b.name));
-          setBuyersRegistry(cleanBuyers);
-          try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(cleanBuyers)); } catch {}
-        }
-        const userList = data.users || data.allUsers;
-        if (Array.isArray(userList)) {
-          setRegisteredUsers(prev => {
-            const map = new Map(prev.filter(u => !isDummyAccount(u.email, u.name)).map(u => [u.email.toLowerCase(), u]));
-            for (const u of userList) {
-              if (u?.email && !isDummyAccount(u.email, u.name)) {
-                const key = u.email.toLowerCase();
-                map.set(key, { ...(map.get(key) || {}), ...u });
-              }
-            }
-            const merged = Array.from(map.values());
-            try { localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(merged)); } catch {}
-            return merged;
-          });
+      // Parallel fetch: Server Admin API + Direct Supabase Tables
+      const [res, sbUsers, sbBuyers, sbSettings] = await Promise.all([
+        fetch('/api/store/admin/buyers', { headers }).catch(() => null),
+        fetchSupabaseUsers().catch(() => []),
+        fetchSupabaseBuyers().catch(() => []),
+        fetchSupabaseStoreSettings().catch(() => null)
+      ]);
+
+      const data = res ? await res.json().catch(() => ({})) : {};
+
+      // 1. Merge Enrolled Buyers
+      const buyersMap = new Map<string, EnrolledBuyerRecord>();
+      if (Array.isArray(data?.buyers)) {
+        for (const b of data.buyers) {
+          if (!isDummyAccount(b.email, b.name)) buyersMap.set(b.email.toLowerCase(), b);
         }
       }
-    } catch {}
+      for (const b of sbBuyers) {
+        if (!isDummyAccount(b.email, b.name)) buyersMap.set(b.email.toLowerCase(), b);
+      }
+      const finalBuyers = Array.from(buyersMap.values());
+      setBuyersRegistry(finalBuyers);
+      try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(finalBuyers)); } catch {}
+
+      // 2. Merge Registered Users (Both bought and not bought)
+      const userList = data.users || data.allUsers || [];
+      setRegisteredUsers(prev => {
+        const usersMap = new Map<string, RegisteredUserRecord>();
+        for (const u of prev) {
+          if (!isDummyAccount(u.email, u.name)) usersMap.set(u.email.toLowerCase(), u);
+        }
+        if (Array.isArray(userList)) {
+          for (const u of userList) {
+            if (u?.email && !isDummyAccount(u.email, u.name)) {
+              const k = u.email.toLowerCase();
+              usersMap.set(k, { ...(usersMap.get(k) || {}), ...u });
+            }
+          }
+        }
+        for (const u of sbUsers) {
+          if (!isDummyAccount(u.email, u.name)) {
+            const k = u.email.toLowerCase();
+            usersMap.set(k, { ...(usersMap.get(k) || {}), ...u });
+          }
+        }
+        const finalUsers = Array.from(usersMap.values());
+        try { localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(finalUsers)); } catch {}
+        return finalUsers;
+      });
+
+      // 3. Sync Settings if returned from Supabase
+      if (sbSettings) {
+        setSettings(prev => ({
+          ...prev,
+          earlyBirdPrice: sbSettings.earlyBirdPrice ?? prev.earlyBirdPrice,
+          standardPrice: sbSettings.standardPrice ?? prev.standardPrice,
+          earlyBirdCutoff: sbSettings.earlyBirdCutoff ?? (sbSettings as any).earlyBirdCutoffDate ?? prev.earlyBirdCutoff,
+          accessExpiryDate: sbSettings.accessExpiryDate ?? prev.accessExpiryDate,
+          supportEmail: sbSettings.supportEmail ?? prev.supportEmail,
+          supportPhone: sbSettings.supportPhone ?? prev.supportPhone
+        }));
+      }
+    } catch (err) {
+      console.warn('[StoreContext] fetchAdminUsersRegistry sync notice:', err);
+    }
   }, [adminToken]);
 
-  // Real-time multi-tab & continuous background auto-sync
+  // Real-time multi-tab, Supabase Postgres Changes, & background auto-sync
   useEffect(() => {
     // 1. Initial cleanup of any cached dummy data in localStorage
     try {
@@ -1119,8 +1215,9 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch {}
 
-    // Initial fetch
+    // Initial fetch & health check
     fetchAdminUsersRegistry();
+    checkHealth();
 
     // 2. Storage event listener for cross-tab sync
     const handleStorageEvent = (e: StorageEvent) => {
@@ -1166,14 +1263,51 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch {}
 
-    // 4. Background auto-polling (every 3 seconds) for live server updates
+    // 4. Supabase Realtime Channel Subscription for true instant database sync
+    let sbChannel: any = null;
+    try {
+      sbChannel = supabase
+        .channel('netvidya-studio-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'netvidya_users' }, () => {
+          fetchAdminUsersRegistry();
+          checkHealth();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'netvidya_buyers' }, () => {
+          fetchAdminUsersRegistry();
+          checkHealth();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'netvidya_store_settings' }, () => {
+          fetchAdminUsersRegistry();
+          checkHealth();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'netvidya_reading_files' }, () => {
+          fetchSupabaseReadingFiles().then(files => {
+            if (files.length > 0) setReadingFiles(files);
+          });
+          checkHealth();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'netvidya_tests' }, () => {
+          fetchSupabaseTests().then(tests => {
+            if (tests.length > 0) setTests(tests);
+          });
+          checkHealth();
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            setSupabaseRealtimeConnected(true);
+          }
+        });
+    } catch {}
+
+    // 5. Background auto-polling (every 3 seconds) for live server & db updates
     const pollTimer = setInterval(() => {
       fetchAdminUsersRegistry();
     }, 3000);
 
-    // 5. Window focus listener (instant check when switching tabs)
+    // 6. Window focus listener (instant check when switching tabs)
     const handleFocus = () => {
       fetchAdminUsersRegistry();
+      checkHealth();
     };
     window.addEventListener('focus', handleFocus);
 
@@ -1182,8 +1316,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       window.removeEventListener('focus', handleFocus);
       clearInterval(pollTimer);
       if (channel) channel.close();
+      if (sbChannel) {
+        supabase.removeChannel(sbChannel);
+      }
     };
-  }, [fetchAdminUsersRegistry, isAdminAuthenticated]);
+  }, [fetchAdminUsersRegistry, checkHealth, isAdminAuthenticated]);
 
   // Genuine Authentication Methods
   const login = useCallback(async (email: string, password: string) => {
@@ -1640,7 +1777,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Add Reading File (Admin)
+  // Add Reading File (Admin & Supabase Sync)
   const addReadingFile = useCallback((file: Omit<ReadingFileItem, 'id' | 'downloadCount' | 'dateAdded'>) => {
     const newItem: ReadingFileItem = {
       ...file,
@@ -1654,6 +1791,10 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(updated));
       } catch {}
 
+      // 1. Sync to Supabase netvidya_reading_files
+      saveReadingFileToSupabase(newItem).catch(() => {});
+
+      // 2. Sync to /api/content
       const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
       fetch('/api/content', {
         method: 'POST',
@@ -1671,7 +1812,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, [adminToken]);
 
-  // Delete Reading File (Admin)
+  // Delete Reading File (Admin & Supabase Sync)
   const deleteReadingFile = useCallback((id: string) => {
     setReadingFiles(prev => {
       const updated = prev.filter(f => f.id !== id);
@@ -1679,6 +1820,10 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(updated));
       } catch {}
 
+      // 1. Delete from Supabase
+      deleteReadingFileFromSupabase(id).catch(() => {});
+
+      // 2. Sync to /api/content
       const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
       fetch('/api/content', {
         method: 'POST',
@@ -1696,7 +1841,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, [adminToken]);
 
-  // Add Test (Admin)
+  // Add Test (Admin & Supabase Sync)
   const addTest = useCallback((test: Omit<TestHallItem, 'id'>) => {
     const newTest: TestHallItem = {
       ...test,
@@ -1708,6 +1853,10 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(updated));
       } catch {}
 
+      // 1. Sync to Supabase netvidya_tests
+      saveTestToSupabase(newTest).catch(() => {});
+
+      // 2. Sync to /api/content
       const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
       fetch('/api/content', {
         method: 'POST',
@@ -1725,7 +1874,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, [adminToken]);
 
-  // Delete Test (Admin)
+  // Delete Test (Admin & Supabase Sync)
   const deleteTest = useCallback((id: string) => {
     setTests(prev => {
       const updated = prev.filter(t => t.id !== id);
@@ -1733,6 +1882,10 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(updated));
       } catch {}
 
+      // 1. Delete from Supabase
+      deleteTestFromSupabase(id).catch(() => {});
+
+      // 2. Sync to /api/content
       const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
       fetch('/api/content', {
         method: 'POST',
@@ -1750,7 +1903,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, [adminToken]);
 
-  // Add Manual Buyer (Admin for UPI)
+  // Add Manual Buyer (Admin for UPI & Direct Supabase Persistence)
   const addManualBuyer = useCallback((buyer: {
     name: string;
     email: string;
@@ -1789,9 +1942,22 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch {}
       return updated;
     });
+
+    // Authoritative direct write to Supabase netvidya_users and netvidya_buyers
+    saveUserToSupabase({
+      name: newRecord.name,
+      email: newRecord.email,
+      mobile: newRecord.mobile,
+      isBuyer: true,
+      isActive: true,
+      amountPaid: newRecord.amountPaid,
+      orderId: newRecord.orderId,
+      enrolledPacks: newRecord.enrolledPacks,
+      paymentMethod: newRecord.paymentMethod
+    }).catch(() => {});
   }, [currentServerPrice, syncUserToRegisteredUsers]);
 
-  // Toggle Buyer Access
+  // Toggle Buyer Access (Admin & Supabase Sync)
   const toggleBuyerAccess = useCallback((buyerId: string) => {
     let targetEmail = '';
     let targetStatus = true;
@@ -1810,6 +1976,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       return updated;
     });
 
+    // Update in Supabase
+    if (targetEmail) {
+      toggleSupabaseAccess(targetEmail, targetStatus).catch(() => {});
+    }
+
     const token = adminToken || (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('netvidya_admin_token') : null);
     if (token && targetEmail) {
       fetch('/api/store/admin/toggle-access', {
@@ -1822,6 +1993,85 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       }).catch(() => {});
     }
   }, [adminToken]);
+
+  // 1-Click Full Supabase 2-Way Sync Engine
+  const syncAllWithSupabase = useCallback(async (): Promise<{ success: boolean; message: string }> => {
+    try {
+      const [sbUsers, sbBuyers, sbFiles, sbTests, sbSettings, health] = await Promise.all([
+        fetchSupabaseUsers(),
+        fetchSupabaseBuyers(),
+        fetchSupabaseReadingFiles(),
+        fetchSupabaseTests(),
+        fetchSupabaseStoreSettings(),
+        checkSupabaseDatabaseHealth()
+      ]);
+
+      setSupabaseHealth(health);
+
+      // 1. Sync Buyers
+      if (sbBuyers.length > 0) {
+        const cleanBuyers = sbBuyers.filter(b => !isDummyAccount(b.email, b.name));
+        setBuyersRegistry(cleanBuyers);
+        try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(cleanBuyers)); } catch {}
+      }
+
+      // 2. Sync Registered Users
+      if (sbUsers.length > 0) {
+        const cleanUsers = sbUsers.filter(u => !isDummyAccount(u.email, u.name));
+        setRegisteredUsers(cleanUsers);
+        try { localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(cleanUsers)); } catch {}
+      }
+
+      // 3. Sync Reading Files
+      if (sbFiles.length > 0) {
+        setReadingFiles(sbFiles);
+        try { localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(sbFiles)); } catch {}
+      } else if (readingFiles.length > 0) {
+        for (const f of readingFiles) {
+          await saveReadingFileToSupabase(f);
+        }
+      }
+
+      // 4. Sync CBT Tests
+      if (sbTests.length > 0) {
+        setTests(sbTests);
+        try { localStorage.setItem(STORAGE_KEY_TESTS, JSON.stringify(sbTests)); } catch {}
+      } else if (tests.length > 0) {
+        for (const t of tests) {
+          await saveTestToSupabase(t);
+        }
+      }
+
+      // 5. Sync Store Settings
+      if (sbSettings) {
+        setSettings(prev => ({
+          ...prev,
+          earlyBirdPrice: sbSettings.earlyBirdPrice ?? prev.earlyBirdPrice,
+          standardPrice: sbSettings.standardPrice ?? prev.standardPrice,
+          earlyBirdCutoff: sbSettings.earlyBirdCutoff ?? (sbSettings as any).earlyBirdCutoffDate ?? prev.earlyBirdCutoff,
+          accessExpiryDate: sbSettings.accessExpiryDate ?? prev.accessExpiryDate,
+          supportEmail: sbSettings.supportEmail ?? prev.supportEmail,
+          supportPhone: sbSettings.supportPhone ?? prev.supportPhone
+        }));
+      }
+
+      return {
+        success: true,
+        message: `Successfully synchronized ${sbUsers.length} scholars, ${sbBuyers.length} buyers, and full catalog with Supabase.`
+      };
+    } catch (err: any) {
+      return { success: false, message: err?.message || 'Sync failed.' };
+    }
+  }, [readingFiles, tests]);
+
+  // Reset Candidate Dual-Device Session
+  const revokeCandidateDevice = useCallback(async (identifier: string): Promise<boolean> => {
+    const success = await revokeDeviceSessionInSupabase(identifier);
+    if (success) {
+      await fetchAdminUsersRegistry();
+    }
+    return success;
+  }, [fetchAdminUsersRegistry]);
 
   // Export Scholars & Buyers to Genuine Excel (.xlsx)
   const exportBuyersToExcel = useCallback(() => {
@@ -1937,7 +2187,12 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         isEarlyBirdActive,
         msUntilCutoff,
         paymentMode: serverPriceState.paymentMode,
-        paymentLinkUrl: serverPriceState.paymentLinkUrl
+        paymentLinkUrl: serverPriceState.paymentLinkUrl,
+        syncAllWithSupabase,
+        revokeCandidateDevice,
+        supabaseRealtimeConnected,
+        supabaseHealth,
+        checkHealth
       }}
     >
       {children}

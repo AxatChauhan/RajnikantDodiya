@@ -63,6 +63,61 @@ export default async function handler(req, res) {
             liveState = data.content;
             globalThis.__AUTHOR_STUDIO_LIVE_STATE__ = data.content;
           }
+
+          // Query live netvidya_users from Supabase
+          const { data: dbUsers } = await client.from('netvidya_users').select('*');
+          if (Array.isArray(dbUsers)) {
+            if (!liveState) liveState = loadBaselineSnapshot() || { version: 1, updatedAt: new Date().toISOString() };
+            if (!liveState.store) liveState.store = {};
+            if (!Array.isArray(liveState.store.registeredUsers)) liveState.store.registeredUsers = [];
+            const userMap = new Map(liveState.store.registeredUsers.map(u => [u.email?.toLowerCase(), u]));
+            for (const u of dbUsers) {
+              const cleanEmail = u.email?.toLowerCase().trim();
+              if (!cleanEmail) continue;
+              userMap.set(cleanEmail, {
+                id: u.id,
+                name: u.name || cleanEmail.split('@')[0],
+                email: cleanEmail,
+                mobile: u.mobile || '',
+                isBuyer: Boolean(u.is_buyer),
+                isActive: u.is_active !== false,
+                enrolledAt: u.enrolled_at || (u.is_buyer ? u.created_at : null),
+                lastLoginAt: u.last_login_at || u.created_at,
+                createdAt: u.created_at || new Date().toISOString(),
+                amountPaid: Number(u.amount_paid) || (u.is_buyer ? 499 : 0),
+                orderId: u.order_id || null,
+                enrolledPacks: u.enrolled_packs || [],
+                emailVerified: Boolean(u.email_verified)
+              });
+            }
+            liveState.store.registeredUsers = Array.from(userMap.values());
+          }
+
+          // Query live netvidya_buyers from Supabase
+          const { data: dbBuyers } = await client.from('netvidya_buyers').select('*');
+          if (Array.isArray(dbBuyers)) {
+            if (!liveState) liveState = loadBaselineSnapshot() || { version: 1, updatedAt: new Date().toISOString() };
+            if (!liveState.store) liveState.store = {};
+            if (!Array.isArray(liveState.store.buyers)) liveState.store.buyers = [];
+            const buyerMap = new Map(liveState.store.buyers.map(b => [b.email?.toLowerCase(), b]));
+            for (const b of dbBuyers) {
+              const cleanEmail = b.email?.toLowerCase().trim();
+              if (!cleanEmail) continue;
+              buyerMap.set(cleanEmail, {
+                id: b.id,
+                name: b.student_name || 'Scholar',
+                email: cleanEmail,
+                mobile: b.mobile || '',
+                orderId: b.order_id,
+                amountPaid: Number(b.amount_paid) || 499,
+                paymentMethod: b.payment_method || 'razorpay',
+                enrolledAt: b.enrolled_at || new Date().toISOString(),
+                isActive: b.is_active !== false,
+                packName: b.product_id || 'UGC NET English Complete Bundle'
+              });
+            }
+            liveState.store.buyers = Array.from(buyerMap.values());
+          }
         } catch {}
       }
     }

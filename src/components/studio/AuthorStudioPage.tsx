@@ -35,9 +35,26 @@ import {
   ChevronRight,
   TrendingUp,
   Receipt,
-  GraduationCap
+  GraduationCap,
+  Database,
+  RefreshCw,
+  FileText,
+  Smartphone,
+  Laptop,
+  Cloud,
+  ExternalLink,
+  HardDrive,
+  Radio,
+  Zap
 } from 'lucide-react';
-import { useNetVidyaStore, EnrolledBuyerRecord, isDummyAccount } from '../../contexts/NetVidyaStoreContext';
+import {
+  useNetVidyaStore,
+  EnrolledBuyerRecord,
+  RegisteredUserRecord,
+  ReadingFileItem,
+  TestHallItem,
+  isDummyAccount
+} from '../../contexts/NetVidyaStoreContext';
 import { useSiteContent } from '../../contexts/SiteContentContext';
 import {
   authenticateAuthorStudio,
@@ -51,7 +68,15 @@ import {
 import { PROFESSOR_INFO } from '../../data/professorData';
 import { ProfessorCrestIcon } from '../common/ProfessorCrestIcon';
 
-export type ErpModule = 'overview' | 'buyers' | 'revenue' | 'pricing' | 'security';
+export type ErpModule =
+  | 'overview'
+  | 'buyers'
+  | 'files'
+  | 'tests'
+  | 'revenue'
+  | 'pricing'
+  | 'database'
+  | 'security';
 
 interface AuthorStudioPageProps {
   onExit?: () => void;
@@ -73,10 +98,39 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
     exportBuyersToExcel,
     resendConfirmationEmail,
     currentServerPrice,
-    isEarlyBirdActive
+    isEarlyBirdActive,
+    readingFiles,
+    addReadingFile,
+    deleteReadingFile,
+    tests,
+    addTest,
+    deleteTest,
+    syncAllWithSupabase,
+    revokeCandidateDevice,
+    supabaseRealtimeConnected,
+    supabaseHealth,
+    checkHealth
   } = useNetVidyaStore();
 
   const { saveAllToProduction, isSyncing, lastSavedAt } = useSiteContent();
+
+  const [isSyncingAll, setIsSyncingAll] = useState(false);
+  const [isAddFileModalOpen, setIsAddFileModalOpen] = useState(false);
+  const [newFileForm, setNewFileForm] = useState({
+    title: '',
+    category: 'Paper II: English Core',
+    description: '',
+    fileSizeMb: 5.0
+  });
+
+  const [isAddTestModalOpen, setIsAddTestModalOpen] = useState(false);
+  const [newTestForm, setNewTestForm] = useState({
+    title: '',
+    category: 'Full Mock Test',
+    durationMinutes: 180,
+    totalQuestions: 100,
+    releaseDate: '2026-11-20'
+  });
 
   const handleDownloadBackup = () => {
     const backupData = {
@@ -84,7 +138,11 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
       curator: PROFESSOR_INFO.name,
       storeSettings,
       buyersRegistry,
-      version: '2.4.0-erp'
+      registeredUsers,
+      readingFiles,
+      tests,
+      supabaseHealth,
+      version: '2.5.0-supabase-sync'
     };
     const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);

@@ -17,7 +17,7 @@ import {
   TestHallItem,
   EnrolledBuyerRecord,
   RegisteredUserRecord,
-  StoreSettings
+  NetVidyaStoreSettings
 } from '../contexts/NetVidyaStoreContext';
 
 export interface SupabaseDatabaseHealth {
@@ -246,7 +246,7 @@ export async function fetchSupabaseTests(): Promise<TestHallItem[]> {
 /**
  * 5. Fetch Store Settings from Supabase `netvidya_store_settings`
  */
-export async function fetchSupabaseStoreSettings(): Promise<Partial<StoreSettings> | null> {
+export async function fetchSupabaseStoreSettings(): Promise<Partial<NetVidyaStoreSettings> | null> {
   try {
     const { data, error } = await supabase
       .from('netvidya_store_settings')
@@ -259,7 +259,7 @@ export async function fetchSupabaseStoreSettings(): Promise<Partial<StoreSetting
     return {
       earlyBirdPrice: Number(data.early_bird_price),
       standardPrice: Number(data.standard_price),
-      earlyBirdCutoffDate: data.early_bird_cutoff,
+      earlyBirdCutoff: data.early_bird_cutoff,
       accessExpiryDate: data.access_expiry_date,
       supportEmail: data.support_email,
       supportPhone: data.support_phone
@@ -272,7 +272,7 @@ export async function fetchSupabaseStoreSettings(): Promise<Partial<StoreSetting
 /**
  * 6. Save Store Settings to Supabase `netvidya_store_settings`
  */
-export async function saveSupabaseStoreSettings(settings: StoreSettings): Promise<boolean> {
+export async function saveSupabaseStoreSettings(settings: Partial<NetVidyaStoreSettings> & Record<string, any>): Promise<boolean> {
   try {
     const { error } = await supabase
       .from('netvidya_store_settings')
@@ -282,7 +282,7 @@ export async function saveSupabaseStoreSettings(settings: StoreSettings): Promis
         product_name: 'GSET + UGC NET English Final Pack 2026',
         early_bird_price: settings.earlyBirdPrice,
         standard_price: settings.standardPrice,
-        early_bird_cutoff: settings.earlyBirdCutoffDate,
+        early_bird_cutoff: settings.earlyBirdCutoff || settings.earlyBirdCutoffDate,
         access_expiry_date: settings.accessExpiryDate,
         is_store_active: true,
         support_email: settings.supportEmail || 'netvidyaenglish@gmail.com',
@@ -397,10 +397,10 @@ export async function saveReadingFileToSupabase(file: ReadingFileItem): Promise<
         title: file.title,
         category: file.category,
         description: file.description,
-        file_path: file.filePath || `/study-vault/reading/${file.id}`,
+        file_path: (file as any).filePath || file.sampleUrl || `/study-vault/reading/${file.id}`,
         file_size_mb: file.fileSizeMb,
         download_count: file.downloadCount,
-        is_active: file.isActive !== false,
+        is_active: (file as any).isActive !== false,
         created_at: file.dateAdded || new Date().toISOString()
       }, { onConflict: 'id' });
 
@@ -437,10 +437,10 @@ export async function saveTestToSupabase(test: TestHallItem): Promise<boolean> {
         title: test.title,
         category: test.category,
         release_date: test.releaseDate,
-        file_path: test.filePath || `/study-vault/tests/${test.id}.html`,
+        file_path: (test as any).filePath || `/study-vault/tests/${test.id}.html`,
         duration_minutes: test.durationMinutes,
         total_questions: test.totalQuestions,
-        is_active: test.isActive !== false,
+        is_active: (test as any).isActive !== false,
         created_at: new Date().toISOString()
       }, { onConflict: 'id' });
 
