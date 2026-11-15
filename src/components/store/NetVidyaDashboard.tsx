@@ -157,30 +157,32 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
                 {isActivating ? 'Verifying...' : 'Unlock Materials'}
               </button>
             </div>
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={async () => {
-                  setActivationInput('pay_simulated_test');
-                  setIsActivating(true);
-                  setActivationMsg(null);
-                  const res = await verifyPaymentAndActivate({
-                    paymentId: 'pay_simulated_test',
-                    email: 'scholar.test@example.com'
-                  });
-                  setIsActivating(false);
-                  if (res.success) {
-                    setActivationMsg({ type: 'success', text: res.message || 'Simulation test pass activated! All materials unlocked.' });
-                  } else {
-                    setActivationMsg({ type: 'error', text: res.error || 'Simulation activation failed.' });
-                  }
-                }}
-                className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline inline-flex items-center gap-1"
-              >
-                <span>🧪 Or simulate ₹0 test payment &amp; unlock demo portal</span>
-                <span>→</span>
-              </button>
-            </div>
+            {typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setActivationInput('pay_simulated_test');
+                    setIsActivating(true);
+                    setActivationMsg(null);
+                    const res = await verifyPaymentAndActivate({
+                      paymentId: 'pay_simulated_test',
+                      email: 'scholar.test@example.com'
+                    });
+                    setIsActivating(false);
+                    if (res.success) {
+                      setActivationMsg({ type: 'success', text: res.message || 'Simulation test pass activated! All materials unlocked.' });
+                    } else {
+                      setActivationMsg({ type: 'error', text: res.error || 'Simulation activation failed.' });
+                    }
+                  }}
+                  className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline inline-flex items-center gap-1"
+                >
+                  <span>🧪 Localhost Demo: Simulate ₹0 test payment</span>
+                  <span>→</span>
+                </button>
+              </div>
+            )}
             {activationMsg && (
               <div className={`p-2 rounded-xl text-xs flex items-center gap-2 ${
                 activationMsg.type === 'success' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'
@@ -358,30 +360,32 @@ export const NetVidyaDashboard: React.FC<NetVidyaDashboardProps> = ({
                     {isActivating ? 'Verifying...' : 'Activate Access'}
                   </button>
                 </div>
-                <div className="pt-1">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setActivationInput('pay_simulated_test');
-                      setIsActivating(true);
-                      setActivationMsg(null);
-                      const res = await verifyPaymentAndActivate({
-                        paymentId: 'pay_simulated_test',
-                        email: buyerSession.email || 'scholar.test@example.com'
-                      });
-                      setIsActivating(false);
-                      if (res.success) {
-                        setActivationMsg({ type: 'success', text: res.message || 'Simulation test pass activated! All materials unlocked.' });
-                      } else {
-                        setActivationMsg({ type: 'error', text: res.error || 'Simulation activation failed.' });
-                      }
-                    }}
-                    className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline inline-flex items-center gap-1"
-                  >
-                    <span>🧪 Or simulate ₹0 test payment &amp; unlock demo portal</span>
-                    <span>→</span>
-                  </button>
-                </div>
+                {typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setActivationInput('pay_simulated_test');
+                        setIsActivating(true);
+                        setActivationMsg(null);
+                        const res = await verifyPaymentAndActivate({
+                          paymentId: 'pay_simulated_test',
+                          email: buyerSession.email || 'scholar.test@example.com'
+                        });
+                        setIsActivating(false);
+                        if (res.success) {
+                          setActivationMsg({ type: 'success', text: res.message || 'Simulation test pass activated! All materials unlocked.' });
+                        } else {
+                          setActivationMsg({ type: 'error', text: res.error || 'Simulation activation failed.' });
+                        }
+                      }}
+                      className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline inline-flex items-center gap-1"
+                    >
+                      <span>🧪 Localhost Demo: Simulate ₹0 test payment</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {activationMsg && (

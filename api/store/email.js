@@ -4,11 +4,30 @@
  * Provides fallback simulation logger when external delivery credentials are not set.
  */
 
+import nodemailer from 'nodemailer';
 import { STORE_MERCHANT, DEFAULT_STORE_SETTINGS } from '../../lib/store-config.js';
+
+let cachedGmailTransporter = null;
+function getGmailTransporter() {
+  const user = (process.env.GMAIL_USER || '').trim();
+  const rawPass = (process.env.GMAIL_APP_PASSWORD || '').trim();
+  if (!user || !rawPass) return null;
+  const pass = rawPass.replace(/\s+/g, '');
+  if (!cachedGmailTransporter) {
+    cachedGmailTransporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user,
+        pass
+      }
+    });
+  }
+  return { transporter: cachedGmailTransporter, user };
+}
 
 export const SENDER_INFO = {
   name: `${STORE_MERCHANT.storeTitle} (${STORE_MERCHANT.proprietor})`,
-  email: STORE_MERCHANT.supportEmail,
+  email: process.env.GMAIL_USER || STORE_MERCHANT.supportEmail,
   replyTo: STORE_MERCHANT.supportEmail
 };
 
@@ -132,7 +151,26 @@ NET Vidya English Team
  */
 export async function sendEmail({ to, subject, html, text }) {
   try {
-    // 1. Try Resend if RESEND_API_KEY is configured
+    // 1. Try Gmail SMTP if GMAIL_USER & GMAIL_APP_PASSWORD are configured
+    const gmailAuth = getGmailTransporter();
+    if (gmailAuth) {
+      try {
+        const info = await gmailAuth.transporter.sendMail({
+          from: `"${STORE_MERCHANT.storeTitle}" <${gmailAuth.user}>`,
+          to,
+          replyTo: STORE_MERCHANT.supportEmail || gmailAuth.user,
+          subject,
+          text,
+          html
+        });
+        console.log(`[EMAIL] Successfully dispatched via Gmail SMTP to ${to} (Message ID: ${info.messageId})`);
+        return { success: true, messageId: info.messageId, provider: 'gmail' };
+      } catch (err) {
+        console.warn('[EMAIL] Gmail SMTP dispatch failed, trying next provider:', err?.message || err);
+      }
+    }
+
+    // 2. Try Resend if RESEND_API_KEY is configured
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
       try {
@@ -159,7 +197,7 @@ export async function sendEmail({ to, subject, html, text }) {
       }
     }
 
-    // 2. Fallback Simulation Logger
+    // 3. Fallback Simulation Logger
     const simMessageId = `sim_msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     console.log(`[NET VIDYA EMAIL SIMULATOR] Dispatching Email:
   ID: ${simMessageId}
@@ -184,8 +222,63 @@ export async function sendEmail({ to, subject, html, text }) {
   }
 }
 
+/**
+ * Send password reset email containing secure reset link.
+ */
+export async function sendPasswordResetEmail({
+  to,
+  resetToken,
+  websiteUrl = STORE_MERCHANT.websiteUrl
+}) {
+  const cleanEmail = (to || '').trim().toLowerCase();
+  if (!cleanEmail || !cleanEmail.includes('@')) {
+    return { success: false, error: 'Invalid recipient email' };
+  }
+  const resetLink = `${websiteUrl}/#reset-password?token=${encodeURIComponent(resetToken)}`;
+  const subject = `Password Reset Request - ${STORE_MERCHANT.storeTitle}`;
+  const textContent = `
+Dear Student,
+
+We received a request to reset your password for your ${STORE_MERCHANT.storeTitle} student account.
+
+Click the link below or copy it into your browser to reset your password:
+${resetLink}
+
+This password reset link is valid for 1 hour. If you did not request this, you can safely ignore this email.
+
+Best regards,
+${STORE_MERCHANT.storeTitle} Team
+`.trim();
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; padding: 24px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">
+    <h2 style="color: #1e3a8a; margin-top: 0;">Password Reset Request</h2>
+    <p>Dear Student,</p>
+    <p>We received a request to reset your password for your <strong>${STORE_MERCHANT.storeTitle}</strong> account.</p>
+    <div style="margin: 24px 0; text-align: center;">
+      <a href="${resetLink}" style="background-color: #1e3a8a; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">Reset My Password</a>
+    </div>
+    <p style="font-size: 13px; color: #64748b;">Or copy this link into your browser:<br><a href="${resetLink}" style="color: #2563eb; word-break: break-all;">${resetLink}</a></p>
+    <p style="font-size: 12px; color: #94a3b8; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 12px;">This link expires in 60 minutes. If you did not request a password reset, no action is needed.</p>
+  </div>
+</body>
+</html>
+`.trim();
+
+  return sendEmail({
+    to: cleanEmail,
+    subject,
+    text: textContent,
+    html: htmlContent
+  });
+}
+
 export default {
   sendPurchaseConfirmationEmail,
+  sendPasswordResetEmail,
   sendEmail,
   SENDER_INFO
 };

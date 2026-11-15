@@ -91,25 +91,46 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
       }
 
+      const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'ip_unknown';
+      if (!globalThis.__NETVIDYA_ADMIN_LOGIN_FAILS__) {
+        globalThis.__NETVIDYA_ADMIN_LOGIN_FAILS__ = new Map();
+      }
+      const failRecord = globalThis.__NETVIDYA_ADMIN_LOGIN_FAILS__.get(clientIp) || { count: 0, lockedUntil: 0 };
+      const now = Date.now();
+
+      if (failRecord.lockedUntil && failRecord.lockedUntil > now) {
+        const remainingSeconds = Math.ceil((failRecord.lockedUntil - now) / 1000);
+        return res.status(429).json({
+          success: false,
+          error: `Too many failed admin attempts. Security lockout active for ${remainingSeconds}s.`
+        });
+      }
+
       const { password } = req.body || {};
       if (!password || typeof password !== 'string') {
         return res.status(401).json({ success: false, error: 'Admin password is required.' });
       }
 
       const cleanPassword = password.trim();
-      const validPins = [
-        process.env.ADMIN_PASSWORD,
-        process.env.ADMIN_PIN,
-        'dr_rajnikant_admin_2026',
-        'admin123',
-        '2026',
-        'rajnikant2026'
-      ].filter(Boolean);
+      const configuredAdminPassword = process.env.ADMIN_PASSWORD || process.env.ADMIN_PIN;
 
-      const isValid = validPins.includes(cleanPassword);
+      if (!configuredAdminPassword) {
+        console.error('[SECURITY CRITICAL] ADMIN_PASSWORD environment variable is not configured!');
+        return res.status(500).json({ success: false, error: 'Server configuration error: ADMIN_PASSWORD not set.' });
+      }
+
+      const isValid = cleanPassword === configuredAdminPassword.trim();
       if (!isValid) {
+        failRecord.count += 1;
+        if (failRecord.count >= 5) {
+          failRecord.lockedUntil = now + (15 * 60 * 1000); // 15 min lock
+        }
+        globalThis.__NETVIDYA_ADMIN_LOGIN_FAILS__.set(clientIp, failRecord);
         return res.status(401).json({ success: false, error: 'Invalid admin credentials.' });
       }
+
+      // Reset fail counter on successful login
+      globalThis.__NETVIDYA_ADMIN_LOGIN_FAILS__.delete(clientIp);
 
       const adminToken = createSessionToken({
         role: 'admin',

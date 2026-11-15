@@ -177,7 +177,7 @@ export default async function handler(req, res) {
           await saveUser(user);
         } else {
           const isPasswordValid = verifyPassword(password, user.password_salt, user.password_hash);
-          if (!isPasswordValid && !isBuyerKnown) {
+          if (!isPasswordValid) {
             return res.status(401).json({ success: false, error: 'Invalid email or password.' });
           }
         }
@@ -260,10 +260,21 @@ export default async function handler(req, res) {
         const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
         const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
         await saveResetToken(cleanEmail, rawToken, tokenHash, expiresAt);
+
+        // Dispatch password reset email securely without exposing token in response
+        try {
+          const { sendPasswordResetEmail } = await import('./store/email.js');
+          await sendPasswordResetEmail({
+            to: cleanEmail,
+            resetToken: rawToken
+          });
+        } catch (emailErr) {
+          console.warn('[AUTH] Password reset email notice:', emailErr);
+        }
+
         return res.status(200).json({
           success: true,
-          message: 'Password reset link sent to your email.',
-          token: rawToken
+          message: 'If an account exists with this email, a password reset link has been dispatched to your inbox.'
         });
       }
 

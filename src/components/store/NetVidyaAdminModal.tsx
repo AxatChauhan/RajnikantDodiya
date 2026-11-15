@@ -257,7 +257,7 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                 autoFocus
                 value={pinInput}
                 onChange={e => setPinInput(e.target.value)}
-                placeholder="Enter PIN (e.g. 2026)"
+                placeholder="Enter Admin Password"
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 text-center text-sm font-mono tracking-widest focus:ring-2 focus:ring-blue-600 outline-none"
               />
             </div>

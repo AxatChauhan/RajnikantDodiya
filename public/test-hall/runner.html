@@ -707,19 +707,37 @@
       document.getElementById('testTitleDisplay').textContent = testTitles[testId];
     }
 
-    // Try reading student name from local session
+    // Verify candidate session authenticity & authorization
+    let isAuthorized = false;
     try {
-      const rawSession = localStorage.getItem('netvidya_buyer_session_v1');
+      const rawSession = localStorage.getItem('netvidya_student_session') || localStorage.getItem('netvidya_buyer_session_v1');
       if (rawSession) {
         const sess = JSON.parse(rawSession);
-        if (sess && sess.name) {
-          document.getElementById('candidateName').textContent = sess.name;
+        if (sess && (sess.isBuyer || sess.isLoggedIn)) {
+          isAuthorized = true;
+          if (sess.name) {
+            document.getElementById('candidateName').textContent = sess.name;
+          }
           if (sess.email) {
             document.getElementById('rollNumber').textContent = 'NV-2026-' + Math.abs(sess.email.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)).toString().slice(0, 6);
           }
         }
       }
     } catch (e) {}
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isAuthorized && !isLocalhost) {
+      document.body.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;font-family:sans-serif;color:#0f172a;background:#f8fafc;padding:24px;text-align:center;">
+          <div style="background:#fff;padding:32px;border-radius:12px;border:1px solid #cbd5e1;max-width:440px;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+            <div style="width:48px;height:48px;background:#fee2e2;color:#dc2626;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;">🔒</div>
+            <h2 style="font-size:18px;font-weight:700;margin-bottom:8px;">Student Authentication Required</h2>
+            <p style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:20px;">This Computer-Based Test (CBT) is restricted to enrolled candidates. Please sign in to your student dashboard to launch the exam.</p>
+            <a href="/#materials" style="display:inline-block;padding:10px 20px;background:#1e3a8a;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;">Return to Dashboard</a>
+          </div>
+        </div>`;
+      throw new Error('Unauthorized test hall access');
+    }
 
     // Initialize Timer
     function startTimer() {

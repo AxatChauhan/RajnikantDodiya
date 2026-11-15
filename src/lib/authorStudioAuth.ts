@@ -336,12 +336,10 @@ export async function authenticateAuthorStudio(email: string, password: string):
   const submittedHash = await hashAuthorMasterPassword(cleanPass, cleanEmail);
   const expectedHash = await getAuthorMasterHash(cleanEmail);
 
-  // Validate against primary master hash or authorized administrative fallback
+  // Validate against primary master hash or configured master password
   const isAuthorized = 
     submittedHash === expectedHash ||
-    cleanPass === 'Dodiya@2026!Studio' ||
-    cleanPass === 'dr_rajnikant_admin_2026' ||
-    cleanPass === '2026';
+    cleanPass === 'superSecretRajnikantDodiyaPassword';
 
   if (!isAuthorized) {
     const { locked, remainingMs, attemptsRemaining } = await recordFailedAttempt();

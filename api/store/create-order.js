@@ -66,15 +66,44 @@ export default async function handler(req, res) {
 
     const settings = await fetchStoreSettings();
 
+    // Check environment: Local dev vs Production
+    const isLocalDev = Boolean(
+      !process.env.VERCEL &&
+      (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV || process.env.ALLOW_DEV_SIMULATION === 'true')
+    );
+
     // Server-enforced coupon code validation from centralized store-config
     const cleanCoupon = (couponCode || '').toString().trim().toUpperCase();
     const couponEntry = STORE_PAYMENT_DEFAULTS.validCoupons[cleanCoupon];
-    const discount = couponEntry?.amount || 0;
+    let discount = 0;
+
+    if (couponEntry) {
+      if (couponEntry.isLocalOnly && !isLocalDev) {
+        return res.status(400).json({
+          success: false,
+          error: 'Test simulation vouchers are disabled in production.'
+        });
+      }
+      if (couponEntry.minOrderValue && basePrice < couponEntry.minOrderValue) {
+        return res.status(400).json({
+          success: false,
+          error: `Coupon ${cleanCoupon} requires a minimum pack price of ₹${couponEntry.minOrderValue}.`
+        });
+      }
+      discount = couponEntry.amount || 0;
+    }
+
     const finalPrice = Math.max(0, basePrice - discount);
     const amountInPaisa = finalPrice * 100; // Razorpay expects amount in paise
 
-    // Instant Developer & Author Test Payment Simulation Voucher (₹0 checkout)
+    // Instant Developer & Author Test Payment Simulation Voucher (₹0 checkout) - LOCAL DEV ONLY
     if (cleanCoupon === 'SIMULATE' || cleanCoupon === 'TESTPAY' || cleanCoupon === 'TESTPASS') {
+      if (!isLocalDev) {
+        return res.status(403).json({
+          success: false,
+          error: 'Test simulation is strictly prohibited in production environments.'
+        });
+      }
       const testOrderId = `order_sim_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
       return res.status(200).json({
         success: true,

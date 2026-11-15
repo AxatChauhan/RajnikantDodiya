@@ -111,31 +111,51 @@ export default async function handler(req, res) {
     if (!isCryptographicallyVerified && finalPaymentId && keyId && keySecret) {
       rzpPaymentEntity = await verifyViaRazorpayApi(finalPaymentId, keyId, keySecret);
       if (rzpPaymentEntity) {
+        // Enforce that payment entity email matches the requesting student email
+        const rzpEmail = (rzpPaymentEntity.email || rzpPaymentEntity.notes?.email || '').toLowerCase().trim();
+        if (rzpEmail && cleanEmail && rzpEmail !== cleanEmail) {
+          return res.status(403).json({
+            success: false,
+            verified: false,
+            error: 'Security Alert: This payment transaction is registered to a different email address.'
+          });
+        }
         isCryptographicallyVerified = true;
       }
     }
 
-    // Method 3: Direct search by registered email against Razorpay payments API
-    if (!isCryptographicallyVerified && cleanEmail && keyId && keySecret) {
+    // Method 3: Direct search by registered email against Razorpay payments API (requires verified paymentId)
+    if (!isCryptographicallyVerified && cleanEmail && finalPaymentId && keyId && keySecret) {
       rzpPaymentEntity = await findCapturedPaymentByEmail(cleanEmail, keyId, keySecret);
-      if (rzpPaymentEntity) {
+      if (rzpPaymentEntity && rzpPaymentEntity.id === finalPaymentId) {
         isCryptographicallyVerified = true;
-        finalPaymentId = rzpPaymentEntity.id;
       }
     }
 
-    // Method 4: Verified simulation vouchers or pre-seeded transactions
+    // Method 4: Verified simulation vouchers (STRICTLY LOCAL DEV ONLY)
+    const isLocalDev = Boolean(
+      !process.env.VERCEL &&
+      (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV || process.env.ALLOW_DEV_SIMULATION === 'true')
+    );
+
     const cleanCoupon = (req.body?.couponCode || '').toString().trim().toUpperCase();
-    if (
-      !isCryptographicallyVerified &&
-      (cleanCoupon === 'SIMULATE' ||
-       cleanCoupon === 'TESTPAY' ||
-       cleanCoupon === 'TESTPASS' ||
-       finalPaymentId === 'pay_simulated_test' ||
-       (finalPaymentId && finalPaymentId.startsWith('pay_sim_')) ||
-       (orderId && orderId.startsWith('order_sim_')) ||
-       finalPaymentId === 'pay_U01dCsc7irC6LP')
-    ) {
+    const isSimulationRequest = Boolean(
+      cleanCoupon === 'SIMULATE' ||
+      cleanCoupon === 'TESTPAY' ||
+      cleanCoupon === 'TESTPASS' ||
+      finalPaymentId === 'pay_simulated_test' ||
+      (finalPaymentId && finalPaymentId.startsWith('pay_sim_')) ||
+      (orderId && orderId.startsWith('order_sim_'))
+    );
+
+    if (isSimulationRequest) {
+      if (!isLocalDev) {
+        return res.status(403).json({
+          success: false,
+          verified: false,
+          error: 'Payment simulation is strictly prohibited in production environments.'
+        });
+      }
       isCryptographicallyVerified = true;
       finalPaymentId = finalPaymentId || `pay_sim_${Date.now()}`;
     }
@@ -178,10 +198,23 @@ export default async function handler(req, res) {
     } else if (productId === 'gset-education-combo' || productId === 'gset-combo_edu') {
       resolvedProductName = 'GSET Education Scholar Duo (Paper 1 + Education)';
       amountPaid = 249;
-    } else if (amount) {
-      amountPaid = Number(amount);
     } else if (rzpPaymentEntity?.amount) {
       amountPaid = rzpPaymentEntity.amount / 100;
+    } else if (amount) {
+      amountPaid = Number(amount);
+    }
+
+    // Authoritative tier resolution preventing tier spoofing
+    let effectiveProductId = productId;
+    if (rzpPaymentEntity?.amount && !isSimulationRequest) {
+      if (amountPaid < 400 && effectiveProductId === 'ugc-net-english-bundle') {
+        effectiveProductId = amountPaid <= 149 ? 'gset-paper1' : 'gset-english-combo';
+      } else if (amountPaid < 200 && effectiveProductId && effectiveProductId.includes('combo')) {
+        effectiveProductId = 'gset-paper1';
+      }
+    }
+    if (!effectiveProductId) {
+      effectiveProductId = amountPaid <= 149 ? 'gset-paper1' : (amountPaid <= 249 ? 'gset-english-combo' : 'ugc-net-english-bundle');
     }
 
     const finalOrderId = razorpay_order_id || rzpPaymentEntity?.order_id || orderId || `NV_${Date.now()}`;
@@ -228,7 +261,7 @@ export default async function handler(req, res) {
       razorpayPaymentId: finalPaymentId,
       razorpayOrderId: razorpay_order_id || rzpPaymentEntity?.order_id || null,
       amountPaid,
-      productId: productId || (amountPaid <= 149 ? 'gset-paper1' : (amountPaid <= 249 ? 'gset-english-combo' : 'ugc-net-english-bundle')),
+      productId: effectiveProductId,
       paymentMethod: rzpPaymentEntity?.method || 'razorpay',
       expiresAt: accessExpiresAt
     })) || { dbRecorded: false };

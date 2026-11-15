@@ -21,7 +21,30 @@ color:#1f3a5f;opacity:.10;font-size:clamp(14px,3vw,28px);font-weight:700;transfo
 <form onsubmit="go();return false">Page <input id="j" type="number" min="1" max="29" value="1"> / 29 <button>Go</button></form></header>
 <main id="m"></main>
 <script>
-const P=["p-01.jpg", "p-02.jpg", "p-03.jpg", "p-04.jpg", "p-05.jpg", "p-06.jpg", "p-07.jpg", "p-08.jpg", "p-09.jpg", "p-10.jpg", "p-11.jpg", "p-12.jpg", "p-13.jpg", "p-14.jpg", "p-15.jpg", "p-16.jpg", "p-17.jpg", "p-18.jpg", "p-19.jpg", "p-20.jpg", "p-21.jpg", "p-22.jpg", "p-23.jpg", "p-24.jpg", "p-25.jpg", "p-26.jpg", "p-27.jpg", "p-28.jpg", "p-29.jpg"], WM="{{BUYER_EMAIL}} \u00b7 NET Vidya";
+const P=["p-01.jpg", "p-02.jpg", "p-03.jpg", "p-04.jpg", "p-05.jpg", "p-06.jpg", "p-07.jpg", "p-08.jpg", "p-09.jpg", "p-10.jpg", "p-11.jpg", "p-12.jpg", "p-13.jpg", "p-14.jpg", "p-15.jpg", "p-16.jpg", "p-17.jpg", "p-18.jpg", "p-19.jpg", "p-20.jpg", "p-21.jpg", "p-22.jpg", "p-23.jpg", "p-24.jpg", "p-25.jpg", "p-26.jpg", "p-27.jpg", "p-28.jpg", "p-29.jpg"];
+let WM="{{BUYER_EMAIL}} \u00b7 NET Vidya";
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+let isEnrolled = !WM.includes('{{BUYER_EMAIL}}');
+if (!isEnrolled) {
+  try {
+    const s = localStorage.getItem('netvidya_student_session') || localStorage.getItem('netvidya_buyer_session_v1');
+    if (s) {
+      const parsed = JSON.parse(s);
+      if (parsed && (parsed.isBuyer || parsed.isLoggedIn)) {
+        isEnrolled = true;
+        WM = (parsed.email || 'enrolled_scholar') + ' \u00b7 NET Vidya';
+      }
+    }
+  } catch(e) {}
+}
+if (!isEnrolled && !isLocal) {
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;font-family:sans-serif;color:#0f172a;background:#f8fafc;padding:24px;text-align:center;">' +
+    '<h2 style="font-size:20px;font-weight:bold;margin-bottom:8px;">Access Restricted</h2>' +
+    '<p style="font-size:14px;color:#64748b;max-width:400px;margin-bottom:16px;">This reading dossier is protected digital property. Please access it from your official NET Vidya Student Materials dashboard.</p>' +
+    '<a href="/#materials" style="display:inline-block;padding:10px 20px;background:#1e3a8a;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">Open My Materials</a>' +
+    '</div>';
+  throw new Error('Unauthorized direct access blocked');
+}
 const m=document.getElementById('m');
 P.forEach((f,i)=>{const d=document.createElement('div');d.className='pg';d.id='p'+(i+1);
 d.innerHTML='<img loading="lazy" alt="Page '+(i+1)+'" src="pages/'+f+'"><div class="wm">'+('<span>'+WM+'</span>').repeat(4)+'</div><span class="no">'+(i+1)+'</span>';m.appendChild(d)});

@@ -28,7 +28,18 @@ function loadBaselineSnapshot() {
 
 export default async function handler(req, res) {
   // CORS & Security headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers?.origin || '';
+  const allowedOrigins = [
+    'https://rajnikantdodiya.com',
+    'https://www.rajnikantdodiya.com',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ];
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://rajnikantdodiya.com');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Author-Password');
 
@@ -65,24 +76,13 @@ export default async function handler(req, res) {
       }
     }
 
-    // Check password if present
+    // Check password if present strictly against configured ADMIN_PASSWORD
     if (!isAuthenticated && authorPassword && typeof authorPassword === 'string') {
       const cleanPass = authorPassword.trim();
-      const validPins = [
-        process.env.ADMIN_PASSWORD,
-        process.env.ADMIN_PIN,
-        'dr_rajnikant_admin_2026',
-        '2026'
-      ].filter(Boolean);
-
-      if (validPins.includes(cleanPass) || cleanPass.length >= 10) {
+      const configuredPass = process.env.ADMIN_PASSWORD || process.env.ADMIN_PIN;
+      if (configuredPass && cleanPass === configuredPass.trim()) {
         isAuthenticated = true;
       }
-    }
-
-    // Fallback: allow author email match from body if in non-strict local dev
-    if (!isAuthenticated && req.body?.authorEmail && AUTHOR_EMAILS.includes(String(req.body.authorEmail).toLowerCase().trim())) {
-      isAuthenticated = true;
     }
 
     if (!isAuthenticated) {

@@ -1284,7 +1284,7 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                             handleApplyCoupon();
                           }
                         }}
-                        placeholder="e.g. SIMULATE, GSET50, or NET100"
+                        placeholder="e.g. GSET50 or NET100"
                         className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono uppercase focus:ring-2 focus:ring-blue-600 outline-none"
                       />
                       <button
@@ -1296,34 +1296,36 @@ export const NetVidyaCheckoutModal: React.FC<NetVidyaCheckoutModalProps> = ({
                       </button>
                     </div>
 
-                    {/* Method A: Dedicated 1-Click Payment Simulation Button */}
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-xs">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                        <div>
-                          <strong className="text-amber-950 font-bold block text-[11px]">Testing / Demo Mode:</strong>
-                          <span className="text-[10px] text-amber-800 leading-tight block">Simulate paying ₹0 without real bank charge</span>
+                    {/* Method A: Dedicated 1-Click Payment Simulation Button (STRICTLY LOCALHOST ONLY) */}
+                    {typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-xs">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                          <div>
+                            <strong className="text-amber-950 font-bold block text-[11px]">Local Dev Testing:</strong>
+                            <span className="text-[10px] text-amber-800 leading-tight block">Simulate paying ₹0 on localhost</span>
+                          </div>
                         </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!studentName.trim()) setStudentName('Scholar Tester');
+                            if (!email.trim()) setEmail('scholar.test@example.com');
+                            if (!mobile.trim()) setMobile('9876543210');
+                            if (!password) setPassword('testpass123');
+                            setCouponCode('SIMULATE');
+                            setCouponError(null);
+                            const sim = STORE_PAYMENT_DEFAULTS.validCoupons['SIMULATE'];
+                            if (sim) {
+                              setAppliedDiscount({ code: 'SIMULATE', ...sim });
+                            }
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-all shadow-2xs shrink-0 cursor-pointer"
+                        >
+                          ⚡ 1-Click Simulate (₹0)
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!studentName.trim()) setStudentName('Scholar Tester');
-                          if (!email.trim()) setEmail('scholar.test@example.com');
-                          if (!mobile.trim()) setMobile('9876543210');
-                          if (!password) setPassword('testpass123');
-                          setCouponCode('SIMULATE');
-                          setCouponError(null);
-                          const sim = STORE_PAYMENT_DEFAULTS.validCoupons['SIMULATE'];
-                          if (sim) {
-                            setAppliedDiscount({ code: 'SIMULATE', ...sim });
-                          }
-                        }}
-                        className="px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-all shadow-2xs shrink-0 cursor-pointer"
-                      >
-                        ⚡ 1-Click Simulate (₹0)
-                      </button>
-                    </div>
+                    )}
                   </>
                 )}
                 {couponError && (

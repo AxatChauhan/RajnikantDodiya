@@ -552,7 +552,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       const cachedStr = localStorage.getItem(STORAGE_KEY_SESSION);
       if (cachedStr) {
         const cached = JSON.parse(cachedStr);
-        if (cached && isAuthorEmail(cached.email)) {
+        if (cached && cached.token && isAuthorEmail(cached.email)) {
           cached.isBuyer = true;
           cached.isLoggedIn = true;
           cached.enrolledPacks = [
