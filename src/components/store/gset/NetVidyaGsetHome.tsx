@@ -59,9 +59,9 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     badge: 'MOST POPULAR • COMPLETE ENGLISH PASS',
     description: 'The definitive complete preparation package for GSET English aspirants: comprehensive Paper 1 General Aptitude combined with specialized Paper 2 English Literature & ELT.',
     features: [
-      'Full Paper 1: 3 Computer-Based CBT Tests (General Aptitude)',
-      'Full Paper 2: 2 Computer-Based CBT Tests (English Literature, Theory & ELT)',
-      '5 Complete GSET Simulation Mock Exams with instant scoring',
+      'Full Paper 1: 10 Computer-Based CBT Tests (General Aptitude)',
+      'Full Paper 2: 9 Computer-Based CBT Tests (English Literature, Theory & ELT)',
+      '19 Complete GSET Simulation Mock Exams with instant scoring',
       '100% MSU Baroda GSET Syllabus Aligned & Verified Rationales',
       'Watermarked Digital Access valid till 31 Dec 2026',
       'Priority WhatsApp Academic Guidance with Mentor'
@@ -78,9 +78,9 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     badge: 'MOST POPULAR • COMPLETE EDUCATION PASS',
     description: 'The definitive dual-paper preparation package for GSET Education candidates: complete Paper 1 General Aptitude combined with specialized Teacher Education & Pedagogy.',
     features: [
-      'Full Paper 1: 3 Computer-Based CBT Tests (General Aptitude)',
-      'Full Paper 2: 3 Computer-Based CBT Tests (Teacher Education & Pedagogy)',
-      '6 Complete GSET Simulation Mock Exams with instant scoring',
+      'Full Paper 1: 10 Computer-Based CBT Tests (General Aptitude)',
+      'Full Paper 2: 10 Computer-Based CBT Tests (Teacher Education & Pedagogy)',
+      '20 Complete GSET Simulation Mock Exams with instant scoring',
       'Philosophical, Sociological & Psychological Foundations + Pedagogy',
       'Watermarked Digital Access valid till 31 Dec 2026',
       'Priority WhatsApp Academic Guidance with Mentor'
@@ -245,7 +245,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 )}
 
                 <p className="text-[10px] text-gray-400 font-mono">
-                  3 Paper 1 Mocks + 2 English Paper 2 Mocks (5 Total Tests)
+                  10 Paper 1 Mocks + 9 English Paper 2 Mocks (19 Total Tests)
                 </p>
               </div>
             </div>
@@ -310,7 +310,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 )}
 
                 <p className="text-[10px] text-gray-400 font-mono">
-                  3 Paper 1 Mocks + 3 Education Paper 2 Mocks (6 Total Tests)
+                  10 Paper 1 Mocks + 10 Education Paper 2 Mocks (20 Total Tests)
                 </p>
               </div>
             </div>
