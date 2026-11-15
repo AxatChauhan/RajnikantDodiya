@@ -44,7 +44,6 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     resendOtp,
     forgotPassword,
     resetPassword,
-    currentServerPrice,
     verifyPaymentAndActivate
   } = useNetVidyaStore();
 
@@ -891,7 +890,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     }}
                     className="text-[11px] text-emerald-700 hover:text-emerald-900 font-semibold underline inline-flex items-center gap-1"
                   >
-                    <span>🧪 Localhost Demo: Use Simulation ID (₹0 Pass)</span>
+                    <span>🧪 Localhost Demo: Use Simulation ID</span>
                     <span>→</span>
                   </button>
                 </div>
@@ -917,31 +916,15 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
           </>
         )}
 
-        {/* Not Enrolled Yet Section */}
-        <div className="pt-4 border-t border-gray-200 text-center space-y-2">
-          <p className="text-xs text-gray-500">
-            Don’t have an active pass for the Final Pack 2026?
-          </p>
+        {/* Modal Footer: Cancel / Return */}
+        <div className="pt-4 border-t border-gray-100 text-center">
           <button
             type="button"
-            onClick={() => {
-              onClose();
-              onOpenCheckout();
-            }}
-            className="text-xs font-bold text-blue-700 hover:text-blue-900 underline inline-flex items-center gap-1 cursor-pointer"
+            onClick={onClose}
+            className="text-xs text-gray-500 hover:text-gray-800 transition-colors py-1.5 px-4 rounded-lg hover:bg-gray-100 font-medium inline-block cursor-pointer"
           >
-            <span>Enroll Now (₹{currentServerPrice})</span>
-            <span>→</span>
+            ← Cancel and Return to Store
           </button>
-          <div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-xs text-gray-500 hover:text-gray-800 transition-colors py-1.5 px-3 rounded-lg hover:bg-gray-100 font-medium inline-block cursor-pointer mt-1"
-            >
-              ← Cancel and Return to Store
-            </button>
-          </div>
         </div>
 
       </div>
