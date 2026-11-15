@@ -15,7 +15,6 @@ import {
   Layers,
   GraduationCap,
   ExternalLink,
-  Star,
   Calendar,
   Zap,
   Check,
@@ -86,7 +85,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
     <div className="animate-fade-in pb-12 space-y-12 sm:space-y-16">
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-6 sm:pt-8 max-w-5xl mx-auto px-4 space-y-6 sm:space-y-8">
+      <section className="relative pt-4 sm:pt-6 max-w-5xl mx-auto px-4 space-y-5 sm:space-y-6">
         
         {/* Offer / Access Status Badge */}
         <div className="text-center px-2">
@@ -202,15 +201,12 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
             /* Prospective Candidate E-Commerce Pricing Card */
             <div className="space-y-4 text-center">
               <div className="flex items-center justify-center gap-2">
-                <span className="flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
-                  <Star className="w-3 h-3 fill-amber-500 text-amber-500" /> 4.9 (850+)
-                </span>
                 {isEarlyBirdActive ? (
-                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    Early-Bird Price
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
+                    Early-Bird Offer
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded-full border border-blue-200">
+                  <span className="text-xs font-bold text-blue-800 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">
                     Standard Price
                   </span>
                 )}
@@ -308,9 +304,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
                 <span className="text-[10px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded border border-blue-200">
                   NATIONAL PASS
                 </span>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
-                </span>
               </div>
               <h3 className="text-sm font-bold text-gray-900 leading-snug">
                 UGC NET English Complete Bundle
@@ -366,9 +359,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-300">
                   FLAGSHIP DUO
-                </span>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
                 </span>
               </div>
               <h3 className="text-sm font-bold text-gray-900 leading-snug">
@@ -426,9 +416,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
                 <span className="text-[10px] font-mono uppercase bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded border border-purple-300">
                   FLAGSHIP DUO
                 </span>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.9
-                </span>
               </div>
               <h3 className="text-sm font-bold text-gray-900 leading-snug">
                 GSET Education Scholar Duo
@@ -484,9 +471,6 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-800 font-bold px-2 py-0.5 rounded border border-slate-200">
                   SINGLE PAPER
-                </span>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> 4.8
                 </span>
               </div>
               <h3 className="text-sm font-bold text-gray-900 leading-snug">

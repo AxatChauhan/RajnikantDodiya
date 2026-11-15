@@ -13,10 +13,7 @@ import {
   Layers,
   ChevronRight,
   Shield,
-  CheckCircle2,
-  Zap,
-  Star,
-  Calendar
+  CheckCircle2
 } from 'lucide-react';
 import { useNetVidyaStore, isPackEnrolled } from '../../contexts/NetVidyaStoreContext';
 import { useSiteContent } from '../../contexts/SiteContentContext';
@@ -197,10 +194,10 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white">
+    <div className="min-h-screen bg-[#FAF9F5] text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white w-full overflow-x-clip">
       
       {/* 1. TOP COMMERCIAL HEADER BAR */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs w-full">
         <div className="max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-1.5 sm:gap-2.5">
           
           {/* Brand Logo & Title */}
@@ -515,24 +512,6 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           </div>
         )}
       </header>
-
-      {/* Top E-Commerce Trust Announcement Ticker (Directly Below Sticky Navbar) */}
-      <div className="bg-slate-900 text-white py-2 px-3 text-[11px] sm:text-xs border-b border-slate-800 shrink-0 shadow-2xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 sm:gap-8 flex-wrap text-center">
-          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-            <Zap className="w-3.5 h-3.5" /> Instant Digital Access
-          </span>
-          <span className="hidden sm:flex items-center gap-1.5 text-blue-300 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" /> SSL Secured Razorpay
-          </span>
-          <span className="flex items-center gap-1.5 text-amber-300 font-medium">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 4.9 Rating (850+)
-          </span>
-          <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-            <Calendar className="w-3.5 h-3.5" /> Valid 31 Dec 2026
-          </span>
-        </div>
-      </div>
 
       {/* 2. MAIN STORE VIEW CONTAINER */}
       <main className="flex-1">
