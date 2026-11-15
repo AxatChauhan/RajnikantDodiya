@@ -355,30 +355,30 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden select-none"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-hidden select-none"
     >
-      <div className="relative w-full max-w-[420px] my-auto bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-gray-200 space-y-3 sm:space-y-3.5 animate-scale-up overflow-hidden select-text">
+      <div className="relative w-full max-w-[400px] my-auto bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-2xl border border-gray-200 space-y-2.5 sm:space-y-3 animate-scale-up overflow-hidden select-text">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-1.5 sm:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors z-10 cursor-pointer"
+          className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors z-10 cursor-pointer"
           title="Close Modal (Esc)"
           aria-label="Close Modal"
         >
-          <X className="w-4 h-4 sm:w-5 sm:h-5" />
+          <X className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 pr-8">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-            <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="flex items-center gap-2.5 pr-8">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+            <KeyRound className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight truncate">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight truncate">
               NET Vidya Student Portal
             </h2>
-            <p className="text-[11px] sm:text-xs text-gray-500 truncate">
+            <p className="text-[11px] text-gray-500 truncate">
               Access your GSET &amp; UGC NET English Materials
             </p>
           </div>
@@ -386,14 +386,14 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
 
         {/* Error Feedback */}
         {errorMessage && (
-          <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+          <div className="p-2 sm:p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
-              <p className="leading-snug flex-1">{errorMessage}</p>
+              <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-600 mt-0.5" />
+              <p className="leading-snug flex-1 text-[11px]">{errorMessage}</p>
             </div>
             {loginErrorType === 'ACCOUNT_NOT_FOUND' && (
-              <div className="mt-2.5 pt-2 border-t border-rose-200 flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[11px] text-rose-900 font-medium">New candidate? Create your account:</span>
+              <div className="mt-2 pt-1.5 border-t border-rose-200 flex flex-wrap items-center justify-between gap-1.5">
+                <span className="text-[10px] text-rose-900 font-medium">New candidate?</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -402,15 +402,15 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     setErrorMessage(null);
                     setLoginErrorType(null);
                   }}
-                  className="px-2.5 py-1 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-2xs"
+                  className="px-2 py-0.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-semibold text-[10px] transition-all cursor-pointer shadow-2xs"
                 >
-                  Create Account with this Email →
+                  Create Account →
                 </button>
               </div>
             )}
             {loginErrorType === 'INCORRECT_PASSWORD' && (
-              <div className="mt-2.5 pt-2 border-t border-rose-200 flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[11px] text-rose-900 font-medium">Forgot your password?</span>
+              <div className="mt-2 pt-1.5 border-t border-rose-200 flex flex-wrap items-center justify-between gap-1.5">
+                <span className="text-[10px] text-rose-900 font-medium">Forgot password?</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -419,7 +419,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     setErrorMessage(null);
                     setLoginErrorType(null);
                   }}
-                  className="px-2.5 py-1 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-2xs"
+                  className="px-2 py-0.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-semibold text-[10px] transition-all cursor-pointer shadow-2xs"
                 >
                   Reset Password →
                 </button>
@@ -430,23 +430,23 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
 
         {/* Success Feedback (Hidden during OTP step to prevent double alert banners) */}
         {!isOtpStep && successMessage && (
-          <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
-            <p className="leading-snug">{successMessage}</p>
+          <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600 mt-0.5" />
+            <p className="leading-snug text-[11px]">{successMessage}</p>
           </div>
         )}
 
         {/* OTP EMAIL VERIFICATION SCREEN */}
         {isOtpStep ? (
-          <form onSubmit={handleVerifyOtp} className="space-y-3 animate-scale-up">
-            <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-4 h-4" />
+          <form onSubmit={handleVerifyOtp} className="space-y-2.5 animate-scale-up">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-blue-950 text-xs leading-tight">Verify Your Email Address</p>
-                <p className="text-blue-800 text-[11px] truncate">
-                  6-digit code sent to <strong className="text-blue-950 font-semibold">{otpEmail}</strong>
+                <p className="text-blue-800 text-[10px] sm:text-[11px] truncate">
+                  Code sent to <strong className="text-blue-950 font-semibold">{otpEmail}</strong>
                 </p>
               </div>
             </div>
@@ -465,18 +465,18 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                 value={otpCode}
                 onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="••••••"
-                className="w-full py-2 sm:py-2.5 px-3 text-center tracking-[0.4em] font-mono text-xl sm:text-2xl font-bold rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none bg-gray-50/50"
+                className="w-full py-2 px-3 text-center tracking-[0.35em] font-mono text-xl sm:text-2xl font-bold rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none bg-gray-50/50"
               />
-              <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 text-center">
+              <p className="text-[10px] text-gray-400 mt-1 text-center">
                 Valid for 10 minutes. Check spam folder if not received.
               </p>
             </div>
 
-            <div className="space-y-2 pt-0.5">
+            <div className="space-y-1.5 pt-0.5">
               <button
                 type="submit"
                 disabled={isSubmitting || otpCode.length < 6}
-                className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="w-full py-2 sm:py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span>Verifying Code...</span>
@@ -495,7 +495,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                   disabled={resendCooldown > 0 || isSubmitting}
                   className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend Code'}
+                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
                 </button>
                 <button
                   type="button"
@@ -514,97 +514,97 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
           </form>
         ) : (
           <>
-            {/* Navigation Tabs (Strictly 3 tabs: Sign In | Sign Up | Forgot?) */}
-            <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold gap-1 select-none">
+            {/* Navigation Tabs (Strictly 3 tabs: Sign In | Create Account | Forgot?) */}
+            <div className="flex rounded-xl bg-gray-100 p-0.5 sm:p-1 text-xs font-semibold gap-1 select-none">
               <button
                 type="button"
                 onClick={() => { setActiveTab('login'); setErrorMessage(null); setLoginErrorType(null); setSuccessMessage(null); }}
-                className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                className={`flex-1 py-1 sm:py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation text-[11px] sm:text-xs ${
                   activeTab === 'login'
                     ? 'bg-white text-blue-900 shadow-2xs font-bold'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <LogIn className="w-3.5 h-3.5 shrink-0" />
+                <LogIn className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span>Sign In</span>
               </button>
               <button
                 type="button"
                 onClick={() => { setActiveTab('signup'); setErrorMessage(null); setLoginErrorType(null); setSuccessMessage(null); }}
-                className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                className={`flex-1 py-1 sm:py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation text-[11px] sm:text-xs ${
                   activeTab === 'signup'
                     ? 'bg-white text-blue-900 shadow-2xs font-bold'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <UserPlus className="w-3.5 h-3.5 shrink-0" />
-                <span>Sign Up</span>
+                <UserPlus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span>Create Account</span>
               </button>
               <button
                 type="button"
                 onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setLoginErrorType(null); setSuccessMessage(null); }}
-                className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
+                className={`flex-1 py-1 sm:py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation text-[11px] sm:text-xs ${
                   activeTab === 'forgot'
                     ? 'bg-white text-blue-900 shadow-2xs font-bold'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <HelpCircle className="w-3.5 h-3.5 shrink-0" />
+                <HelpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span>Forgot?</span>
               </button>
             </div>
 
             {/* 1. SIGN IN TAB */}
             {activeTab === 'login' && (
-              <form onSubmit={handleSignIn} className="space-y-3">
+              <form onSubmit={handleSignIn} className="space-y-2.5">
                 <div>
-                  <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-gray-700 mb-0.5">
                     Registered Email *
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                    <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
                     <input
                       type="email"
                       required
                       value={loginEmail}
                       onChange={e => setLoginEmail(e.target.value)}
                       placeholder="e.g. scholar@gmail.com"
-                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                      className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-0.5">
                     <label className="block text-[11px] font-semibold text-gray-700">
                       Password *
                     </label>
                     <button
                       type="button"
                       onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setLoginErrorType(null); }}
-                      className="text-[11px] text-blue-700 hover:text-blue-900 font-medium cursor-pointer"
+                      className="text-[10px] sm:text-[11px] text-blue-700 hover:text-blue-900 font-medium cursor-pointer"
                     >
                       Forgot password?
                     </button>
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                    <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
                     <input
                       type="password"
                       required
                       value={loginPassword}
                       onChange={e => setLoginPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                      className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="pt-1">
+                <div className="pt-0.5">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                    className="w-full py-2 sm:py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <span>Signing In...</span>
@@ -619,22 +619,22 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               </form>
             )}
 
-            {/* 2. SIGN UP TAB */}
+            {/* 2. CREATE ACCOUNT TAB */}
             {activeTab === 'signup' && (
-              <form onSubmit={handleSignUp} className="space-y-2.5">
+              <form onSubmit={handleSignUp} className="space-y-2">
                 <div>
                   <label className="block text-[11px] font-semibold text-gray-700 mb-0.5">
                     Full Name *
                   </label>
                   <div className="relative">
-                    <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
+                    <User className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
                     <input
                       type="text"
                       required
                       value={signupName}
                       onChange={e => setSignupName(e.target.value)}
                       placeholder="e.g. Priya Sharma"
-                      className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                      className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                     />
                   </div>
                 </div>
@@ -644,14 +644,14 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     Email Address *
                   </label>
                   <div className="relative">
-                    <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
+                    <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
                     <input
                       type="email"
                       required
                       value={signupEmail}
                       onChange={e => setSignupEmail(e.target.value)}
                       placeholder="e.g. priya.sharma@gmail.com"
-                      className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                      className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                     />
                   </div>
                 </div>
@@ -662,14 +662,14 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                       Mobile Number *
                     </label>
                     <div className="relative">
-                      <Phone className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
+                      <Phone className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
                       <input
                         type="tel"
                         required
                         value={signupMobile}
                         onChange={e => setSignupMobile(e.target.value)}
                         placeholder="9876543210"
-                        className="w-full pl-7 pr-2 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                        className="w-full pl-7 pr-2 py-1.5 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                       />
                     </div>
                   </div>
@@ -679,24 +679,24 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                       Password *
                     </label>
                     <div className="relative">
-                      <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
+                      <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
                       <input
                         type="password"
                         required
                         value={signupPassword}
                         onChange={e => setSignupPassword(e.target.value)}
                         placeholder="Min 6 chars"
-                        className="w-full pl-7 pr-2 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                        className="w-full pl-7 pr-2 py-1.5 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-1">
+                <div className="pt-0.5">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                    className="w-full py-2 sm:py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <span>Registering Account...</span>
@@ -714,32 +714,32 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             {/* 3. FORGOT / RESET PASSWORD TAB */}
             {activeTab === 'forgot' && (
               !isResetStep ? (
-                <form onSubmit={handleForgotPassword} className="space-y-3">
+                <form onSubmit={handleForgotPassword} className="space-y-2.5">
                   <div>
-                    <label className="block text-[11px] font-semibold text-gray-700 mb-1">
+                    <label className="block text-[11px] font-semibold text-gray-700 mb-0.5">
                       Registered Email Address *
                     </label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                      <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
                       <input
                         type="email"
                         required
                         value={forgotEmail}
                         onChange={e => setForgotEmail(e.target.value)}
                         placeholder="e.g. scholar@gmail.com"
-                        className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                        className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                       />
                     </div>
-                    <p className="text-[10px] sm:text-[11px] text-gray-500 mt-1">
+                    <p className="text-[10px] text-gray-500 mt-1">
                       We will issue a secure 1-hour reset token to update your password.
                     </p>
                   </div>
 
-                  <div className="pt-1 flex flex-col gap-1.5">
+                  <div className="pt-0.5 flex flex-col gap-1.5">
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                      className="w-full py-2 sm:py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <span>Issuing Token...</span>
@@ -753,14 +753,14 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     <button
                       type="button"
                       onClick={() => setIsResetStep(true)}
-                      className="text-xs text-blue-700 hover:text-blue-900 text-center py-0.5 font-medium cursor-pointer"
+                      className="text-[11px] text-blue-700 hover:text-blue-900 text-center py-0.5 font-medium cursor-pointer"
                     >
                       Already have a reset token? Enter here →
                     </button>
                   </div>
                 </form>
               ) : (
-                <form onSubmit={handleResetPassword} className="space-y-2.5">
+                <form onSubmit={handleResetPassword} className="space-y-2">
                   <div>
                     <label className="block text-[11px] font-semibold text-gray-700 mb-0.5">
                       6-Digit Reset Code or Link Token *
@@ -771,7 +771,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                       value={resetToken}
                       onChange={e => setResetToken(e.target.value)}
                       placeholder="e.g. 123456 or paste token"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 font-mono text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                      className="w-full px-3 py-1.5 rounded-xl border border-gray-300 font-mono text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                     />
                   </div>
 
@@ -786,7 +786,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                         value={forgotEmail}
                         onChange={e => setForgotEmail(e.target.value)}
                         placeholder="e.g. scholar@gmail.com"
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                        className="w-full px-3 py-1.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                       />
                     </div>
                   )}
@@ -796,23 +796,23 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                       New Password *
                     </label>
                     <div className="relative">
-                      <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
+                      <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
                       <input
                         type="password"
                         required
                         value={newPassword}
                         onChange={e => setNewPassword(e.target.value)}
                         placeholder="Min 6 characters"
-                        className="w-full pl-8 pr-3 py-2 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                        className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                       />
                     </div>
                   </div>
 
-                  <div className="pt-1 flex flex-col gap-1.5">
+                  <div className="pt-0.5 flex flex-col gap-1">
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                      className="w-full py-2 sm:py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <span>Updating Password...</span>
@@ -826,7 +826,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     <button
                       type="button"
                       onClick={() => setIsResetStep(false)}
-                      className="text-xs text-gray-500 hover:text-gray-700 text-center py-0.5 cursor-pointer"
+                      className="text-[11px] text-gray-500 hover:text-gray-700 text-center py-0.5 cursor-pointer"
                     >
                       ← Back to request reset code
                     </button>

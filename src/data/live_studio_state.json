@@ -259,7 +259,38 @@
       }
     ],
     "buyers": [],
-    "registeredUsers": []
+    "registeredUsers": [
+      {
+        "id": "20985ca2-5431-4712-9d55-58820223ffdf",
+        "name": "Persisted Candidate Dr. Sharma",
+        "email": "persisted_candidate_1794770034372@netvidya.ac.in",
+        "mobile": "9876543210",
+        "isBuyer": false,
+        "isActive": true,
+        "enrolledAt": null,
+        "lastLoginAt": "2026-11-15T19:13:57.549+00:00",
+        "createdAt": "2026-11-15T19:13:57.549+00:00",
+        "amountPaid": 0,
+        "orderId": null,
+        "enrolledPacks": [],
+        "emailVerified": false
+      },
+      {
+        "id": "5453bdc7-7e8b-4774-836c-9d2fdfc21080",
+        "name": "Aarav Dodiya Scholar",
+        "email": "aarav_live_scholar@netvidya.ac.in",
+        "mobile": "NA",
+        "isBuyer": false,
+        "isActive": true,
+        "enrolledAt": null,
+        "lastLoginAt": "2026-11-15T19:40:05.187+00:00",
+        "createdAt": "2026-11-15T19:40:05.187+00:00",
+        "amountPaid": 0,
+        "orderId": null,
+        "enrolledPacks": [],
+        "emailVerified": false
+      }
+    ]
   },
-  "syncedAt": "2026-11-15T19:35:00.618Z"
+  "syncedAt": "2026-11-15T19:47:21.008Z"
 }

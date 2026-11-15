@@ -215,8 +215,8 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
     <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white w-full overflow-x-clip">
       
       {/* 1. TOP COMMERCIAL HEADER BAR */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs w-full">
-        <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 xl:px-6 h-14 flex items-center justify-between gap-1.5 sm:gap-2">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xs w-full overflow-x-clip">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-1.5 sm:gap-2">
           
           {/* Brand Logo & Title */}
           <button
@@ -230,14 +230,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <span className="font-bold text-sm sm:text-base text-gray-900 group-hover:text-blue-700 transition-colors leading-none whitespace-nowrap">
                 NET Vidya
               </span>
-              <span className="hidden min-[400px]:inline text-[9px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0 leading-none">
+              <span className="hidden min-[480px]:inline text-[9px] font-mono uppercase bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded shrink-0 leading-none">
                 Store
               </span>
             </div>
           </button>
 
-          {/* Dual Storefront Switcher */}
-          <div className="hidden sm:flex items-center bg-gray-100/90 p-0.5 rounded-xl border border-gray-200 text-xs font-semibold shrink-0">
+          {/* Dual Storefront Switcher (Visible on Tablets & Desktops >= 768px) */}
+          <div className="hidden md:flex items-center bg-gray-100/90 p-0.5 rounded-xl border border-gray-200 text-xs font-semibold shrink-0">
             <button
               onClick={() => { setActiveExamStore('ugc'); setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className={`px-2 lg:px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
@@ -265,11 +265,11 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </button>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold text-gray-700 shrink-0">
+          {/* Desktop Navigation Links (Visible on Wide Displays >= 1536px to prevent navbar overcrowding) */}
+          <nav className="hidden 2xl:flex items-center gap-1 text-xs font-semibold text-gray-700 shrink-0">
             <button
               onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-2 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                 currentView === 'home' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
               }`}
             >
@@ -277,7 +277,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </button>
             <button
               onClick={() => { setCurrentView('sample'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentView === 'sample' ? 'bg-blue-50 text-blue-800 font-bold' : 'hover:bg-gray-100'
               }`}
             >
@@ -286,18 +286,17 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             </button>
             <button
               onClick={handleGoToAcademicSite}
-              className="px-2 lg:px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-900 hover:bg-blue-50/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 border border-transparent hover:border-blue-200"
+              className="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-900 hover:bg-blue-50/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 border border-transparent hover:border-blue-200"
               title="Return to main rajnikantdodiya.com site"
             >
               <Globe className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span className="hidden 2xl:inline">rajnikantdodiya.com</span>
-              <span className="2xl:hidden">Academic Site</span>
+              <span>Academic Site</span>
               <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
             </button>
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Universal Authentication & Materials Controls */}
             {buyerSession.isLoggedIn ? (
@@ -307,7 +306,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 title="Open My Materials"
               >
                 <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                <span className="truncate max-w-[65px] sm:max-w-[80px] xl:max-w-[95px]">{buyerSession.name}</span>
+                <span className="truncate max-w-[65px] sm:max-w-[85px] xl:max-w-[100px]">{buyerSession.name}</span>
               </button>
             ) : (
               <>
@@ -318,19 +317,18 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   title="Student Login Portal"
                 >
                   <LogIn className="w-3.5 h-3.5 text-blue-700 shrink-0" />
-                  <span className="hidden xl:inline">Student Login</span>
-                  <span className="xl:hidden">Login</span>
+                  <span className="hidden sm:inline">Student Login</span>
+                  <span className="sm:hidden">Login</span>
                 </button>
 
-                {/* Universal My Materials Button (Tablets & Desktop) */}
+                {/* Universal My Materials Button (Desktops >= 1024px) */}
                 <button
                   onClick={handleOpenMyMaterials}
-                  className="hidden sm:flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   title="Open My Materials (Student Login)"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                  <span className="hidden 2xl:inline">My Materials</span>
-                  <span className="2xl:hidden">Materials</span>
+                  <span>My Materials</span>
                 </button>
               </>
             )}
@@ -343,14 +341,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 title="Open My Materials"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden 2xl:inline">Access Materials</span>
-                <span className="2xl:hidden">Materials</span>
+                <span className="hidden sm:inline">Access Materials</span>
+                <span className="sm:hidden">Materials</span>
                 <ArrowRight className="hidden sm:inline w-3.5 h-3.5 shrink-0" />
               </button>
             ) : (
               <button
                 onClick={() => handleOpenCheckout(undefined, activeExamStore)}
-                className={`px-2 sm:px-3 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
                   activeExamStore === 'gset'
                     ? 'bg-emerald-700 hover:bg-emerald-800'
                     : 'bg-blue-700 hover:bg-blue-800'
@@ -365,7 +363,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 ) : (
                   <>
                     <span className="hidden 2xl:inline">Buy Final Pack (₹{currentServerPrice})</span>
-                    <span className="hidden sm:inline 2xl:hidden">Enroll (₹{currentServerPrice})</span>
+                    <span className="hidden sm:inline 2xl:hidden">Buy Pack (₹{currentServerPrice})</span>
                     <span className="sm:hidden">Buy ₹{currentServerPrice}</span>
                   </>
                 )}
@@ -373,20 +371,20 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               </button>
             )}
 
-            {/* Mobile & Tablet Hamburger Menu */}
+            {/* Mobile, Tablet & Laptop Hamburger Menu (< 1536px) */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
               aria-label="Toggle Navigation Menu"
-              className="xl:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
+              className="2xl:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile & Tablet Navigation Drawer */}
+        {/* Navigation Drawer (Visible on < 1536px when toggled) */}
         {mobileMenuOpen && (
-          <div className="xl:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
+          <div className="2xl:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
             {/* Student Account Card inside Mobile Drawer */}
             {buyerSession.isLoggedIn ? (
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
