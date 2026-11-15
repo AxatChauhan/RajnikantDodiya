@@ -203,6 +203,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
     }
   };
 
+  const handleOpenMyMaterials = () => {
+    if (buyerSession.isLoggedIn) {
+      setCurrentView('materials');
+    } else {
+      setIsLoginOpen(true);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white w-full overflow-x-clip">
       
@@ -276,6 +285,16 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Free Demo</span>
             </button>
+            <button
+              onClick={handleOpenMyMaterials}
+              className={`px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                currentView === 'materials' ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-gray-100'
+              }`}
+              title="Open My Materials (Tests & Study Notes)"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>My Materials</span>
+            </button>
             {onOpenBookstore && (
               <button
                 onClick={onOpenBookstore}
@@ -299,25 +318,25 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           {/* Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
-            {/* Student Login / Dashboard Button */}
+            {/* Universal My Materials / Account Button */}
             {buyerSession.isLoggedIn ? (
               <button
                 onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0"
+                className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-xs font-mono font-bold text-emerald-800 hover:bg-emerald-100 transition-all flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
                 title="Open My Materials"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                 <span className="truncate max-w-[65px] sm:max-w-[85px] xl:max-w-[95px]">{buyerSession.name}</span>
               </button>
             ) : (
               <button
-                onClick={() => setIsLoginOpen(true)}
-                className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                title="Student Login"
+                onClick={handleOpenMyMaterials}
+                className="px-2 sm:px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-semibold text-gray-800 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                title="Open My Materials (Student Login)"
               >
-                <KeyRound className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden sm:inline">Student Login</span>
-                <span className="sm:hidden">Login</span>
+                <BookOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                <span className="hidden sm:inline">My Materials</span>
+                <span className="sm:hidden">Materials</span>
               </button>
             )}
 
@@ -454,20 +473,21 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 </span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>
-              {buyerSession.isLoggedIn && (
-                <button
-                  onClick={() => { setCurrentView('materials'); setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
-                    currentView === 'materials' ? 'bg-emerald-50 text-emerald-900 font-bold' : 'hover:bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>My Materials (Tests &amp; Study Notes)</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleOpenMyMaterials();
+                }}
+                className={`w-full text-left p-2.5 rounded-lg flex items-center justify-between transition-colors ${
+                  currentView === 'materials' ? 'bg-emerald-50 text-emerald-900 font-bold' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>My Materials (Tests &amp; Study Notes)</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
               <button
                 onClick={() => { handleOpenPolicies('contact'); setMobileMenuOpen(false); }}
                 className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-gray-600"

@@ -344,11 +344,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }
                 }}
                 className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-sans font-medium transition-all flex items-center gap-1.5 shadow-xs shrink-0 h-9 sm:h-10 min-h-[36px]"
-                title="Open Student Login Portal"
+                title="Open My Materials (Student Login)"
               >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Student Login</span>
-                <span className="sm:hidden">Login</span>
+                <BookOpen className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">My Materials</span>
+                <span className="sm:hidden">Materials</span>
               </button>
             )}
 
@@ -472,8 +472,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                   className="w-full py-2.5 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-sans font-medium flex items-center justify-center gap-1.5 shadow-xs min-h-[42px]"
                 >
-                  <KeyRound className="w-3.5 h-3.5" />
-                  <span>Student Login Portal</span>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>My Materials &amp; Student Login</span>
                 </button>
               )}
             </div>
