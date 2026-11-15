@@ -61,11 +61,27 @@ async function syncLiveState() {
     // Seed verified buyers
     const verifiedSeed = [];
 
+    const isDummyEmail = (email) => {
+      if (!email) return false;
+      const e = String(email).toLowerCase().trim();
+      return (
+        e.includes('example.com') ||
+        e.includes('example.in') ||
+        e.includes('priya.gset') ||
+        e.includes('aarav.ugc') ||
+        e.includes('test.student') ||
+        e.includes('candidate.scholar') ||
+        e.includes('razorpay.test') ||
+        e.includes('razorpay.candidate') ||
+        e.includes('razorpay@netvidya')
+      );
+    };
+
     const buyersMap = new Map();
     for (const b of [...verifiedSeed, ...existingBuyers, ...liveBuyers]) {
       if (b && (b.email || b.id)) {
         const key = (b.email || b.id).toLowerCase();
-        if (key.includes('nilam')) continue;
+        if (key.includes('nilam') || isDummyEmail(key)) continue;
         buyersMap.set(key, b);
       }
     }
@@ -76,6 +92,7 @@ async function syncLiveState() {
     for (const u of [...existingUsers, ...liveUsers]) {
       if (u && (u.email || u.id)) {
         const key = (u.email || u.id).toLowerCase();
+        if (isDummyEmail(key)) continue;
         usersMap.set(key, u);
       }
     }

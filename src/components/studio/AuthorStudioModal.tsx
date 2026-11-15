@@ -40,7 +40,7 @@ import {
   Search,
   Clock
 } from 'lucide-react';
-import { useNetVidyaStore } from '../../contexts/NetVidyaStoreContext';
+import { useNetVidyaStore, isDummyAccount } from '../../contexts/NetVidyaStoreContext';
 import {
   useSiteContent,
   FONT_PRESETS,
@@ -278,6 +278,7 @@ export const AuthorStudioModal: React.FC = () => {
   const allModalScholars = React.useMemo(() => {
     const map = new Map<string, any>();
     storeRegisteredUsers.forEach(u => {
+      if (isDummyAccount(u.email, u.name)) return;
       const emailKey = u.email.toLowerCase().trim();
       map.set(emailKey, {
         id: u.id,
@@ -298,6 +299,7 @@ export const AuthorStudioModal: React.FC = () => {
     });
 
     storeBuyersRegistry.forEach(b => {
+      if (isDummyAccount(b.email, b.name)) return;
       const emailKey = b.email.toLowerCase().trim();
       const existing = map.get(emailKey);
       map.set(emailKey, {
@@ -2453,15 +2455,15 @@ export const AuthorStudioModal: React.FC = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-deckle/60">
                       <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
                         <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Total Scholars</span>
-                        <span className="text-xl font-bold text-ink font-serif">{storeTotalUsersCount}</span>
+                        <span className="text-xl font-bold text-ink font-serif">{allModalScholars.length}</span>
                         <span className="text-[10px] text-ink-muted block mt-0.5">
-                          <strong className="text-emerald-700">{storeTotalBuyersCount} Paid</strong> • <strong className="text-indigo-600">{storeTotalNonBuyersCount} Free</strong>
+                          <strong className="text-emerald-700">{allModalScholars.filter(b => b.isBuyer).length} Paid</strong> • <strong className="text-indigo-600">{allModalScholars.filter(b => !b.isBuyer).length} Free</strong>
                         </span>
                       </div>
                       <div className="p-3 bg-[#FAF9F5] rounded-xl border border-deckle">
                         <span className="text-[10px] font-mono uppercase text-ink-muted block font-semibold">Active Passes</span>
                         <span className="text-xl font-bold text-emerald-700 font-serif">
-                          {storeBuyersRegistry.filter(b => b.isActive).length}
+                          {allModalScholars.filter(b => b.isBuyer && b.isActive).length}
                         </span>
                         <span className="text-[10px] text-ink-muted block mt-0.5">
                           Enrolled Scholar Passes
@@ -2487,7 +2489,7 @@ export const AuthorStudioModal: React.FC = () => {
                   {/* Sub-Navigation Tabs */}
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs border-b border-deckle">
                     {[
-                      { id: 'buyers', label: `All Scholars & Logged-in Users (${storeTotalUsersCount})`, icon: Users },
+                      { id: 'buyers', label: `All Scholars & Logged-in Users (${allModalScholars.length})`, icon: Users },
                       { id: 'manual_access', label: 'Grant Manual Pass (Direct UPI)', icon: Plus },
                       { id: 'pricing', label: 'Pricing & Cutoff Countdown', icon: DollarSign },
                       { id: 'content', label: 'Study Dossiers & Mock Tests', icon: FileText }

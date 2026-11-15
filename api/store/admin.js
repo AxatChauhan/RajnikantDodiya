@@ -172,88 +172,28 @@ export default async function handler(req, res) {
       const buyersMap = new Map();
       const allUsersMap = new Map();
 
-      // Seed baseline candidate (Paid Buyer)
-      const initStudent = {
-        id: 'usr_init_student',
-        name: 'Test Student',
-        student_name: 'Test Student',
-        email: 'student@example.com',
-        mobile: '9898989898',
-        orderId: 'NV_INIT_001',
-        order_id: 'NV_INIT_001',
-        amount: 499,
-        amount_paid: 499,
-        amountPaid: 499,
-        paymentMethod: 'razorpay',
-        payment_method: 'razorpay',
-        is_active: true,
-        isActive: true,
-        is_buyer: true,
-        isBuyer: true,
-        enrolled_at: new Date().toISOString(),
-        enrolledAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString()
-      };
-      buyersMap.set('student@example.com', initStudent);
-      allUsersMap.set('student@example.com', initStudent);
-
-      // Seed official Razorpay verification account (Paid Buyer)
-      const rzpVerifier = {
-        id: 'usr_rzp_verifier',
-        name: 'Razorpay Verification Officer',
-        student_name: 'Razorpay Verification Officer',
-        email: 'razorpay.test@rajnikantdodiya.com',
-        mobile: '9876543210',
-        orderId: 'NV_RZP_VERIFY_2026',
-        order_id: 'NV_RZP_VERIFY_2026',
-        amount: 499,
-        amount_paid: 499,
-        amountPaid: 499,
-        paymentMethod: 'razorpay_verification',
-        payment_method: 'razorpay_verification',
-        is_active: true,
-        isActive: true,
-        is_buyer: true,
-        isBuyer: true,
-        enrolled_at: new Date().toISOString(),
-        enrolledAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString()
-      };
-      buyersMap.set('razorpay.test@rajnikantdodiya.com', rzpVerifier);
-      allUsersMap.set('razorpay.test@rajnikantdodiya.com', rzpVerifier);
-
-      // Seed logged-in candidate account (Registered - Not Bought)
-      const rzpCandidate = {
-        id: 'usr_rzp_candidate',
-        name: 'Candidate Scholar',
-        student_name: 'Candidate Scholar',
-        email: 'candidate.scholar@example.com',
-        mobile: '9876543210',
-        orderId: '',
-        order_id: '',
-        amount: 0,
-        amount_paid: 0,
-        amountPaid: 0,
-        paymentMethod: 'none',
-        payment_method: 'none',
-        is_active: true,
-        isActive: true,
-        is_buyer: false,
-        isBuyer: false,
-        enrolled_at: null,
-        enrolledAt: null,
-        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        lastLoginAt: new Date().toISOString()
-      };
-      allUsersMap.set('candidate.scholar@example.com', rzpCandidate);
+      function isDummyEmail(email) {
+        if (!email) return false;
+        const e = String(email).toLowerCase().trim();
+        return (
+          e.includes('example.com') ||
+          e.includes('example.in') ||
+          e.includes('priya.gset') ||
+          e.includes('aarav.ugc') ||
+          e.includes('test.student') ||
+          e.includes('candidate.scholar') ||
+          e.includes('razorpay.test') ||
+          e.includes('razorpay.candidate') ||
+          e.includes('razorpay@netvidya')
+        );
+      }
 
       // Fetch from test simulation DB
       const simDb = await getSimulatedDb();
       if (simDb?.buyers) {
         for (const [email, b] of simDb.buyers.entries()) {
           const cleanEmail = email.toLowerCase().trim();
+          if (isDummyEmail(cleanEmail)) continue;
           const buyerObj = {
             id: b.id || `usr_${cleanEmail}`,
             name: b.name || b.student_name || 'Scholar',
@@ -282,6 +222,7 @@ export default async function handler(req, res) {
       if (simDb?.users) {
         for (const [email, u] of simDb.users.entries()) {
           const cleanEmail = email.toLowerCase().trim();
+          if (isDummyEmail(cleanEmail)) continue;
           const isB = Boolean(u.isBuyer ?? u.is_buyer);
           const userObj = {
             id: u.id || `usr_${cleanEmail}`,
@@ -312,6 +253,7 @@ export default async function handler(req, res) {
       if (globalThis.__NETVIDYA_USERS_DB__) {
         for (const [email, u] of globalThis.__NETVIDYA_USERS_DB__.entries()) {
           const cleanEmail = email.toLowerCase().trim();
+          if (isDummyEmail(cleanEmail)) continue;
           const isB = Boolean(u.is_buyer);
           const userObj = {
             id: u.id || `usr_${cleanEmail}`,
@@ -348,6 +290,7 @@ export default async function handler(req, res) {
           for (const u of regUsers) {
             if (u?.email) {
               const cleanEmail = u.email.toLowerCase().trim();
+              if (isDummyEmail(cleanEmail)) continue;
               const isB = Boolean(u.isBuyer ?? u.is_buyer);
               const userObj = {
                 id: u.id || `usr_${cleanEmail}`,

@@ -58,10 +58,32 @@ export default async function handler(req, res) {
     if (!liveState.store) liveState.store = {};
     if (!Array.isArray(liveState.store.registeredUsers)) liveState.store.registeredUsers = [];
 
+    const isDummyEmail = (email) => {
+      if (!email) return false;
+      const e = String(email).toLowerCase().trim();
+      return (
+        e.includes('example.com') ||
+        e.includes('example.in') ||
+        e.includes('priya.gset') ||
+        e.includes('aarav.ugc') ||
+        e.includes('test.student') ||
+        e.includes('candidate.scholar') ||
+        e.includes('razorpay.test') ||
+        e.includes('razorpay.candidate') ||
+        e.includes('razorpay@netvidya')
+      );
+    };
+
+    liveState.store.registeredUsers = liveState.store.registeredUsers.filter(u => !isDummyEmail(u?.email));
+    if (Array.isArray(liveState.store.buyers)) {
+      liveState.store.buyers = liveState.store.buyers.filter(b => !isDummyEmail(b?.email));
+    }
+
     if (globalThis.__NETVIDYA_USERS_DB__) {
       const userMap = new Map(liveState.store.registeredUsers.map(u => [u.email?.toLowerCase(), u]));
       for (const [email, u] of globalThis.__NETVIDYA_USERS_DB__.entries()) {
         const cleanEmail = email.toLowerCase().trim();
+        if (isDummyEmail(cleanEmail)) continue;
         if (!userMap.has(cleanEmail)) {
           userMap.set(cleanEmail, {
             id: u.id || `usr_${cleanEmail}`,

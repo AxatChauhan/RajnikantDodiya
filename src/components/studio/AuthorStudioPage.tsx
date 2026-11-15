@@ -37,7 +37,7 @@ import {
   Receipt,
   GraduationCap
 } from 'lucide-react';
-import { useNetVidyaStore, EnrolledBuyerRecord } from '../../contexts/NetVidyaStoreContext';
+import { useNetVidyaStore, EnrolledBuyerRecord, isDummyAccount } from '../../contexts/NetVidyaStoreContext';
 import { useSiteContent } from '../../contexts/SiteContentContext';
 import {
   authenticateAuthorStudio,
@@ -67,6 +67,7 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
     updateSettings: updateStoreSettings,
     buyersRegistry,
     registeredUsers,
+    fetchAdminUsersRegistry,
     addManualBuyer,
     toggleBuyerAccess,
     exportBuyersToExcel,
@@ -161,12 +162,22 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
 
-  // Unified Site Scholars List (Combines Registered Users + Buyers Registry)
+  // Continuous Live Auto-Sync: Automatically polls server registry so candidate logins reflect instantly
+  useEffect(() => {
+    fetchAdminUsersRegistry();
+    const timer = setInterval(() => {
+      fetchAdminUsersRegistry();
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [fetchAdminUsersRegistry]);
+
+  // Unified Site Scholars List (Combines Registered Users + Buyers Registry, with 0 dummy data)
   const allScholars = useMemo(() => {
     const map = new Map<string, any>();
 
     // 1. Registered Users (both bought and not bought)
     registeredUsers.forEach(u => {
+      if (isDummyAccount(u.email, u.name)) return;
       const emailKey = u.email.toLowerCase().trim();
       map.set(emailKey, {
         id: u.id,
@@ -188,6 +199,7 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
 
     // 2. Verified Buyers Registry
     buyersRegistry.forEach(b => {
+      if (isDummyAccount(b.email, b.name)) return;
       const emailKey = b.email.toLowerCase().trim();
       const existing = map.get(emailKey);
       map.set(emailKey, {
@@ -788,16 +800,25 @@ export const AuthorStudioPage: React.FC<AuthorStudioPageProps> = ({
               <span className="hidden sm:inline">Export Excel</span>
             </button>
 
+            {/* Real-time Continuous Live Auto-Sync Status */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="hidden sm:inline">Live Auto-Sync Active</span>
+              <span className="sm:hidden">Live Sync</span>
+            </div>
+
             <button
               onClick={() => {
+                fetchAdminUsersRegistry();
                 saveAllToProduction();
                 triggerToast('ERP state synced to production.');
               }}
               disabled={isSyncing}
               className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Manual refresh"
             >
               <Save className="w-3.5 h-3.5 text-blue-400" />
-              <span>{isSyncing ? 'Syncing...' : 'Sync Live'}</span>
+              <span>{isSyncing ? 'Syncing...' : 'Refresh'}</span>
             </button>
           </div>
         </header>

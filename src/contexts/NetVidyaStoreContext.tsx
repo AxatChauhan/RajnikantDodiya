@@ -744,6 +744,31 @@ const STORAGE_KEY_TESTS = 'netvidya_tests_v3';
 const STORAGE_KEY_BUYERS = 'netvidya_buyers_registry_v1';
 const STORAGE_KEY_REGISTERED_USERS = 'netvidya_registered_users_v2';
 
+// Helper to guarantee dummy seed accounts are completely purged from store & studio
+export const isDummyAccount = (email?: string, name?: string): boolean => {
+  if (!email && !name) return false;
+  const e = (email || '').toLowerCase().trim();
+  const n = (name || '').toLowerCase().trim();
+  return (
+    e.includes('example.com') ||
+    e.includes('example.in') ||
+    e.includes('priya.gset') ||
+    e.includes('aarav.ugc') ||
+    e.includes('test.student') ||
+    e.includes('candidate.scholar') ||
+    e.includes('razorpay.test') ||
+    e.includes('razorpay.candidate') ||
+    e.includes('razorpay@netvidya') ||
+    n === 'test student' ||
+    n === 'candidate scholar' ||
+    n === 'priya sharma' ||
+    n === 'aarav patel' ||
+    n === 'razorpay verification officer' ||
+    n === 'razorpay reviewer' ||
+    n === 'razorpay test candidate'
+  );
+};
+
 const NetVidyaStoreContext = createContext<NetVidyaStoreContextType | undefined>(undefined);
 
 export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -812,66 +837,38 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       const cached = localStorage.getItem(STORAGE_KEY_BUYERS);
       if (cached) {
         const parsed: EnrolledBuyerRecord[] = JSON.parse(cached);
-        // Clean out legacy mock test candidates
-        const clean = parsed.filter(b => 
-          b.id !== 'buy-1' && 
-          b.id !== 'buy-2' && 
-          b.id !== 'buy-3' && 
-          !b.email?.includes('aarav.patel') &&
-          !b.email?.includes('priya.sharma') &&
-          !b.email?.includes('hardik.vaghela') &&
-          !b.email?.includes('student@example.com')
-        );
-        const existingEmails = new Set(clean.map(b => b.email?.toLowerCase()));
-        for (const initial of INITIAL_BUYERS_REGISTRY) {
-          if (!existingEmails.has(initial.email.toLowerCase())) {
-            clean.unshift(initial);
-          }
-        }
+        const clean = parsed.filter(b => !isDummyAccount(b.email, b.name));
         try {
           localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(clean));
         } catch {}
         return clean;
       }
     } catch {}
-    return INITIAL_BUYERS_REGISTRY;
+    const snapshotBuyers = (LIVE_STUDIO_SNAPSHOT as any)?.store?.buyers;
+    if (Array.isArray(snapshotBuyers)) {
+      return snapshotBuyers.filter((b: any) => !isDummyAccount(b.email, b.name));
+    }
+    return [];
   });
 
   // 5.1 Registered Scholars & Users (All users who logged in or signed up: Bought + Not Bought)
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUserRecord[]>(() => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY_REGISTERED_USERS);
-      if (cached) return JSON.parse(cached);
+      if (cached) {
+        const parsed: RegisteredUserRecord[] = JSON.parse(cached);
+        const clean = parsed.filter(u => !isDummyAccount(u.email, u.name));
+        try {
+          localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(clean));
+        } catch {}
+        return clean;
+      }
     } catch {}
     const snapshotUsers = (LIVE_STUDIO_SNAPSHOT as any)?.store?.registeredUsers;
-    if (Array.isArray(snapshotUsers) && snapshotUsers.length > 0) return snapshotUsers;
-    return [
-      {
-        id: 'usr_init_student',
-        name: 'Test Student',
-        email: 'student@example.com',
-        mobile: '9898989898',
-        isBuyer: true,
-        isActive: true,
-        enrolledAt: '2026-11-10T10:00:00.000Z',
-        lastLoginAt: '2026-11-15T18:00:00.000Z',
-        createdAt: '2026-11-10T10:00:00.000Z',
-        amountPaid: 499,
-        orderId: 'NV_INIT_001'
-      },
-      {
-        id: 'usr_rzp_candidate',
-        name: 'Candidate Scholar',
-        email: 'candidate.scholar@example.com',
-        mobile: '9876543210',
-        isBuyer: false,
-        isActive: true,
-        enrolledAt: null,
-        lastLoginAt: '2026-11-15T20:30:00.000Z',
-        createdAt: '2026-11-12T14:20:00.000Z',
-        amountPaid: 0
-      }
-    ];
+    if (Array.isArray(snapshotUsers)) {
+      return snapshotUsers.filter((u: any) => !isDummyAccount(u.email, u.name));
+    }
+    return [];
   });
 
   // Real-time server price & checkout mode sync
@@ -1046,10 +1043,20 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         orderId: isBuyer ? (userObj.orderId ?? existing?.orderId ?? 'NV_ONLINE') : undefined
       };
       map.set(cleanEmail, updatedUser);
-      const list = Array.from(map.values());
+      const list = Array.from(map.values()).filter(u => !isDummyAccount(u.email, u.name));
       try {
         localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(list));
       } catch {}
+
+      // Cross-tab zero-latency broadcast
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const ch = new BroadcastChannel('netvidya_live_sync_v1');
+          ch.postMessage({ type: 'USER_LOGIN', user: updatedUser });
+          ch.close();
+        }
+      } catch {}
+
       return list;
     });
   }, []);
@@ -1065,15 +1072,16 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       const data = await res.json().catch(() => ({}));
       if (data?.success) {
         if (Array.isArray(data.buyers)) {
-          setBuyersRegistry(data.buyers);
-          try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(data.buyers)); } catch {}
+          const cleanBuyers = data.buyers.filter((b: any) => !isDummyAccount(b.email, b.name));
+          setBuyersRegistry(cleanBuyers);
+          try { localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(cleanBuyers)); } catch {}
         }
         const userList = data.users || data.allUsers;
         if (Array.isArray(userList)) {
           setRegisteredUsers(prev => {
-            const map = new Map(prev.map(u => [u.email.toLowerCase(), u]));
+            const map = new Map(prev.filter(u => !isDummyAccount(u.email, u.name)).map(u => [u.email.toLowerCase(), u]));
             for (const u of userList) {
-              if (u?.email) {
+              if (u?.email && !isDummyAccount(u.email, u.name)) {
                 const key = u.email.toLowerCase();
                 map.set(key, { ...(map.get(key) || {}), ...u });
               }
@@ -1087,8 +1095,94 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch {}
   }, [adminToken]);
 
+  // Real-time multi-tab & continuous background auto-sync
   useEffect(() => {
+    // 1. Initial cleanup of any cached dummy data in localStorage
+    try {
+      const cachedBuyers = localStorage.getItem(STORAGE_KEY_BUYERS);
+      if (cachedBuyers) {
+        const parsed = JSON.parse(cachedBuyers);
+        if (Array.isArray(parsed)) {
+          const clean = parsed.filter((b: any) => !isDummyAccount(b.email, b.name));
+          localStorage.setItem(STORAGE_KEY_BUYERS, JSON.stringify(clean));
+          setBuyersRegistry(clean);
+        }
+      }
+      const cachedUsers = localStorage.getItem(STORAGE_KEY_REGISTERED_USERS);
+      if (cachedUsers) {
+        const parsed = JSON.parse(cachedUsers);
+        if (Array.isArray(parsed)) {
+          const clean = parsed.filter((u: any) => !isDummyAccount(u.email, u.name));
+          localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(clean));
+          setRegisteredUsers(clean);
+        }
+      }
+    } catch {}
+
+    // Initial fetch
     fetchAdminUsersRegistry();
+
+    // 2. Storage event listener for cross-tab sync
+    const handleStorageEvent = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY_REGISTERED_USERS && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) {
+            setRegisteredUsers(parsed.filter((u: any) => !isDummyAccount(u.email, u.name)));
+          }
+        } catch {}
+      }
+      if (e.key === STORAGE_KEY_BUYERS && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) {
+            setBuyersRegistry(parsed.filter((b: any) => !isDummyAccount(b.email, b.name)));
+          }
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorageEvent);
+
+    // 3. BroadcastChannel listener for zero-latency inter-tab updates
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        channel = new BroadcastChannel('netvidya_live_sync_v1');
+        channel.onmessage = (event) => {
+          if (event.data?.type === 'USER_LOGIN' && event.data?.user) {
+            const u = event.data.user;
+            if (!isDummyAccount(u.email, u.name)) {
+              setRegisteredUsers(prev => {
+                const map = new Map(prev.filter(item => !isDummyAccount(item.email, item.name)).map(item => [item.email.toLowerCase(), item]));
+                map.set(u.email.toLowerCase(), u);
+                const list = Array.from(map.values());
+                try { localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(list)); } catch {}
+                return list;
+              });
+            }
+          }
+          fetchAdminUsersRegistry();
+        };
+      }
+    } catch {}
+
+    // 4. Background auto-polling (every 3 seconds) for live server updates
+    const pollTimer = setInterval(() => {
+      fetchAdminUsersRegistry();
+    }, 3000);
+
+    // 5. Window focus listener (instant check when switching tabs)
+    const handleFocus = () => {
+      fetchAdminUsersRegistry();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageEvent);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(pollTimer);
+      if (channel) channel.close();
+    };
   }, [fetchAdminUsersRegistry, isAdminAuthenticated]);
 
   // Genuine Authentication Methods

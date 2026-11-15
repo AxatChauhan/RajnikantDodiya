@@ -259,59 +259,7 @@
       }
     ],
     "buyers": [],
-    "registeredUsers": [
-      {
-        "id": "usr_1794763457163_m4169",
-        "name": "Priya Sharma",
-        "email": "priya.gset@example.in",
-        "mobile": "9876543210",
-        "isBuyer": true,
-        "isActive": true,
-        "enrolledAt": "2026-11-15T17:24:17.163Z",
-        "lastLoginAt": "2026-11-15T17:24:17.163Z",
-        "createdAt": "2026-11-15T17:24:17.163Z",
-        "amountPaid": 499,
-        "orderId": "NV_STUDENT"
-      },
-      {
-        "id": "usr_1794763457029_ibics",
-        "name": "Aarav Patel",
-        "email": "aarav.ugc@example.in",
-        "mobile": "9825123456",
-        "isBuyer": true,
-        "isActive": true,
-        "enrolledAt": "2026-11-15T17:24:17.029Z",
-        "lastLoginAt": "2026-11-15T17:24:17.029Z",
-        "createdAt": "2026-11-15T17:24:17.029Z",
-        "amountPaid": 499,
-        "orderId": "NV_STUDENT"
-      },
-      {
-        "id": "usr_init_student",
-        "name": "Test Student",
-        "email": "student@example.com",
-        "mobile": "9898989898",
-        "isBuyer": true,
-        "isActive": true,
-        "enrolledAt": "2026-11-10T10:00:00.000Z",
-        "lastLoginAt": "2026-11-15T18:00:00.000Z",
-        "createdAt": "2026-11-10T10:00:00.000Z",
-        "amountPaid": 499,
-        "orderId": "NV_INIT_001"
-      },
-      {
-        "id": "usr_rzp_candidate",
-        "name": "Candidate Scholar",
-        "email": "candidate.scholar@example.com",
-        "mobile": "9876543210",
-        "isBuyer": false,
-        "isActive": true,
-        "enrolledAt": null,
-        "lastLoginAt": "2026-11-15T20:30:00.000Z",
-        "createdAt": "2026-11-12T14:20:00.000Z",
-        "amountPaid": 0
-      }
-    ]
+    "registeredUsers": []
   },
-  "syncedAt": "2026-11-15T17:24:35.099Z"
+  "syncedAt": "2026-11-15T17:43:00.778Z"
 }

@@ -149,6 +149,67 @@ function apiDevMiddleware() {
           });
           return;
         }
+        if (url.startsWith('/api/content')) {
+          let bodyStr = '';
+          req.on('data', (chunk: any) => { bodyStr += chunk; });
+          req.on('end', async () => {
+            try {
+              let body = {};
+              try { body = JSON.parse(bodyStr); } catch {}
+              const { default: handler } = await import('./api/content.js');
+              const mockRes = {
+                statusCode: 200,
+                setHeader(k: string, v: string) { res.setHeader(k, v); },
+                status(c: number) { this.statusCode = c; return this; },
+                json(data: any) {
+                  res.statusCode = this.statusCode;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify(data));
+                },
+                end(data?: any) {
+                  res.end(data);
+                }
+              };
+              return handler({ method: req.method, url, body, query: {}, headers: req.headers }, mockRes);
+            } catch (err: any) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: err?.message || 'Server error' }));
+            }
+          });
+          return;
+        }
+        if (url.startsWith('/api/store/admin')) {
+          let bodyStr = '';
+          req.on('data', (chunk: any) => { bodyStr += chunk; });
+          req.on('end', async () => {
+            try {
+              let body = {};
+              try { body = JSON.parse(bodyStr); } catch {}
+              const action = url.replace('/api/store/admin', '').replace(/^\//, '').split('?')[0] || '';
+              const { default: handler } = await import('./api/store/admin.js');
+              const mockRes = {
+                statusCode: 200,
+                setHeader(k: string, v: string) { res.setHeader(k, v); },
+                status(c: number) { this.statusCode = c; return this; },
+                json(data: any) {
+                  res.statusCode = this.statusCode;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify(data));
+                },
+                end(data?: any) {
+                  res.end(data);
+                }
+              };
+              return handler({ method: req.method, url, body, query: { action }, headers: req.headers }, mockRes);
+            } catch (err: any) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: err?.message || 'Server error' }));
+            }
+          });
+          return;
+        }
         next();
       });
     }
