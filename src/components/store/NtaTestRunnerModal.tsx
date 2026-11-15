@@ -262,22 +262,24 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
       localStorage.setItem(`netvidya_test_score_${testTitle.replace(/\s+/g, '_')}`, JSON.stringify(scoreRecord));
 
       // Asynchronously record test attempt to Supabase for candidate analytics
-      try {
-        const storedSession = localStorage.getItem('netvidya_buyer_session_v1');
-        const sessionData = storedSession ? JSON.parse(storedSession) : null;
-        const candidateEmail = sessionData?.email || `${(candidateName || 'scholar').toLowerCase().replace(/\s+/g, '_')}@candidate.netvidya`;
-        
-        supabase.from('netvidya_test_submissions').insert({
-          student_email: candidateEmail,
-          student_name: candidateName,
-          test_title: testTitle,
-          total_questions: questions.length,
-          correct_count: correct,
-          score_percentage: scorePercentage,
-          submitted_answers: selectedAnswers,
-          completed_at: new Date().toISOString()
-        }).then(() => {}).catch(() => {});
-      } catch {}
+      (async () => {
+        try {
+          const storedSession = localStorage.getItem('netvidya_buyer_session_v1');
+          const sessionData = storedSession ? JSON.parse(storedSession) : null;
+          const candidateEmail = sessionData?.email || `${(candidateName || 'scholar').toLowerCase().replace(/\s+/g, '_')}@candidate.netvidya`;
+          
+          await supabase.from('netvidya_test_submissions').insert({
+            student_email: candidateEmail,
+            student_name: candidateName,
+            test_title: testTitle,
+            total_questions: questions.length,
+            correct_count: correct,
+            score_percentage: scorePercentage,
+            submitted_answers: selectedAnswers,
+            completed_at: new Date().toISOString()
+          });
+        } catch {}
+      })();
     } catch {}
   };
 
