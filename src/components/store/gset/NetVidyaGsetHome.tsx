@@ -149,7 +149,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
               Dr. Rajnikant Dodiya
             </h2>
             <p className="text-xs sm:text-sm font-semibold text-emerald-900">
-              Ph.D. in English • 2× UGC NET & GSET Qualified Scholar
+              Ph.D. • 2× UGC NET & GSET Qualified Scholar
             </p>
             <p className="text-xs text-gray-600 leading-relaxed max-w-xl">
               Assistant Professor of English & Doctoral Researcher in Language Education. Personally qualified GSET and UGC-NET, curating authoritative subject materials for Gujarat candidates.

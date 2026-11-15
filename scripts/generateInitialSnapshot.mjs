@@ -29,10 +29,10 @@ const snapshot = {
     email: 'rajnikantdodiya2@gmail.com',
     officialEmail: 'rajnikant@hmpietr.edu.in',
     photoUrl: '/dr-rajnikant-dodiya.jpg',
-    shortBio: 'Assistant Professor of English at HMPIETR, Sardar Patel University. Ph.D. in English (2018), 2× UGC-NET & GSET qualified scholar specializing in Post-Method Pedagogy, ELT, and Teacher Education.',
+    shortBio: 'Assistant Professor of English at HMPIETR, Sardar Patel University. Ph.D. (2018), 2× UGC-NET & GSET qualified scholar specializing in Post-Method Pedagogy, ELT, and Teacher Education.',
     longBio: [
       'Dr. Rajnikant S. Dodiya is an Assistant Professor of English at the renowned H.M. Patel Institute of English Training and Research (HMPIETR), a premier teacher-education institute affiliated with Sardar Patel University, Vallabh Vidyanagar, Gujarat.',
-      'He holds a Ph.D. in English (2018) and has qualified the prestigious UGC-NET twice alongside the Gujarat State Eligibility Test (GSET). His doctoral and post-doctoral scholarship centers on Post-Method Pedagogy, Second Language Acquisition in ESL contexts, and the philosophical synthesis of ethical teacher education.',
+      'He holds a Ph.D. (2018) and has qualified the prestigious UGC-NET twice alongside the Gujarat State Eligibility Test (GSET). His doctoral and post-doctoral scholarship centers on Post-Method Pedagogy, Second Language Acquisition in ESL contexts, and the philosophical synthesis of ethical teacher education.',
       'A passionate academic mentor, Dr. Dodiya has authored high-impact research monographs and scholarly anthologies published across national and international university presses, while actively guiding NET and GSET aspirants in English Literature and Pedagogy.'
     ]
   },

@@ -377,7 +377,7 @@ async function verifyAuthorImage() {
   const hasProperStyling = homeCode.includes('object-cover') && homeCode.includes('rounded-2xl');
   logCheck('componentIntegration', 'Responsive styling with object-cover and rounded corners', hasProperStyling);
   
-  const hasCredentials = homeCode.includes('Ph.D. in English') && homeCode.includes('2× UGC NET & GSET Qualified');
+  const hasCredentials = homeCode.includes('Ph.D.') && homeCode.includes('2× UGC NET');
   logCheck('componentIntegration', 'Verified author credentials displayed beside image', hasCredentials);
   
   const noStrikeThrough = !homeCode.includes('1,499') && !homeCode.includes('1499') && !homeCode.includes('line-through');

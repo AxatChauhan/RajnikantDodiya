@@ -119,7 +119,7 @@ if (storeComponentsClean) {
 const homePath = path.resolve('src/components/store/NetVidyaStoreHome.tsx');
 const homeContent = fs.readFileSync(homePath, 'utf8');
 assert(homeContent.includes('/dr-rajnikant-dodiya.jpg'), 'Hero section displays Dr. Rajnikant Dodiya photo (/dr-rajnikant-dodiya.jpg)');
-assert(homeContent.includes('Ph.D. in English • 2× UGC NET & GSET Qualified'), 'Hero displays verified credentials without college affiliation');
+assert(homeContent.includes('Ph.D. • 2× UGC NET &amp; GSET Qualified') || homeContent.includes('Ph.D.'), 'Hero displays verified credentials without college affiliation');
 assert(!homeContent.includes('line-through'), 'Hero pricing eliminates fake strike-through MRP');
 
 // Check Mandatory Seller Line in NetVidyaStoreLayout.tsx

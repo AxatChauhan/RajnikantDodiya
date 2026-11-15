@@ -90,6 +90,18 @@ async function syncLiveState() {
       merged.store.settings.sellerLine = 'Sold by NET Vidya. Content curated by Dr. Rajnikant Dodiya.';
     }
 
+    // Sanitize credentials: only Ph.D., not Ph.D. in English
+    if (merged.profile) {
+      if (typeof merged.profile.shortBio === 'string') {
+        merged.profile.shortBio = merged.profile.shortBio.replace(/Ph\.?D\.?\s*in\s*English/gi, 'Ph.D.');
+      }
+      if (Array.isArray(merged.profile.longBio)) {
+        merged.profile.longBio = merged.profile.longBio.map(bio =>
+          typeof bio === 'string' ? bio.replace(/Ph\.?D\.?\s*in\s*English/gi, 'Ph.D.') : bio
+        );
+      }
+    }
+
     fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(merged, null, 2) + '\n', 'utf8');
     console.log(`[Sync] Successfully updated local snapshot at src/data/live_studio_state.json`);
     console.log(`[Sync] Version: ${merged.version || 1}, Last Modified: ${merged.updatedAt || merged.syncedAt}`);

@@ -87,7 +87,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               Dr. Rajnikant Dodiya
             </h2>
             <p className="text-xs sm:text-sm font-semibold text-blue-900">
-              Ph.D. in English • 2× UGC NET &amp; GSET Qualified
+              Ph.D. • 2× UGC NET &amp; GSET Qualified
             </p>
             <p className="text-xs text-gray-600 leading-relaxed max-w-xl">
               Personally curated and validated 100% of the mock questions, analytical model rationales, and high-yield reading files to help candidates excel in the upcoming examinations.
