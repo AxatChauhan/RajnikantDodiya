@@ -570,7 +570,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
       </main>
 
       {/* 3. STORE FOOTER (Mandatory Legal & Brand Isolation) */}
-      <footer className="bg-white border-t border-gray-200 mt-16 py-8 sm:py-10 text-xs text-gray-500">
+      <footer className="bg-white border-t border-gray-200 mt-16 pt-8 pb-24 sm:py-10 text-xs text-gray-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">

@@ -131,7 +131,16 @@ function AppInner() {
         return;
       }
 
-      if (route === 'login' || route === 'signin' || route === 'student-login') {
+      if (
+        route === 'login' ||
+        route === 'signin' ||
+        route === 'student-login' ||
+        route.startsWith('reset-password') ||
+        route.startsWith('forgot-password') ||
+        route === 'reset' ||
+        window.location.search.includes('token=') ||
+        window.location.hash.includes('token=')
+      ) {
         setIsStudentLoginOpen(true);
         return;
       }
@@ -455,7 +464,7 @@ function AppInner() {
       )}
 
       {/* Academic Footer */}
-      <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-20 sm:mt-28 pt-8 border-t border-deckle space-y-4 text-xs text-ink-muted">
+      <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-20 sm:mt-28 pt-8 pb-24 lg:pb-10 border-t border-deckle space-y-4 text-xs text-ink-muted">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
             <Feather className="w-4 h-4 text-claret shrink-0" />

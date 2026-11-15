@@ -125,8 +125,8 @@ export const NetVidyaInvoiceModal: React.FC<NetVidyaInvoiceModalProps> = ({
           </div>
 
           {/* Line Item Table */}
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            <table className="w-full text-left text-xs">
+          <div className="border border-gray-200 rounded-xl overflow-x-auto">
+            <table className="w-full text-left text-xs min-w-[340px]">
               <thead className="bg-gray-100 text-gray-700 font-bold uppercase tracking-wider border-b border-gray-200">
                 <tr>
                   <th className="py-3 px-4">Item Description</th>

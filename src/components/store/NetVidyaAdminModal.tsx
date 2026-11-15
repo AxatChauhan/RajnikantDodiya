@@ -756,8 +756,8 @@ export const NetVidyaAdminModal: React.FC<NetVidyaAdminModalProps> = ({ isOpen, 
                 />
               </div>
 
-              <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-2xs">
-                <table className="w-full text-left text-xs">
+              <div className="border border-gray-200 rounded-2xl overflow-x-auto shadow-2xs">
+                <table className="w-full text-left text-xs min-w-[520px]">
                   <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
                     <tr>
                       <th className="p-3 font-semibold">Candidate</th>

@@ -81,6 +81,33 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   // Universal Escape key listener
   useModalEscape(isOpen, onClose, !isSubmitting);
 
+  // Auto-detect reset-password route and token from URL
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return;
+    const hash = window.location.hash || '';
+    const search = window.location.search || '';
+    let extractedToken = '';
+
+    if (search.includes('token=')) {
+      const sp = new URLSearchParams(search);
+      extractedToken = sp.get('token') || '';
+    }
+    if (!extractedToken && hash.includes('?')) {
+      const hashQuery = hash.split('?')[1];
+      const sp = new URLSearchParams(hashQuery);
+      extractedToken = sp.get('token') || '';
+    }
+
+    if (extractedToken || hash.toLowerCase().includes('reset-password')) {
+      setActiveTab('forgot');
+      setIsResetStep(true);
+      if (extractedToken) {
+        setResetToken(extractedToken);
+        setSuccessMessage('Reset token verified from email. Please enter your new password.');
+      }
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSignIn = async (e: React.FormEvent) => {
