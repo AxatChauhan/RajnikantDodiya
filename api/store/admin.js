@@ -433,6 +433,7 @@ export default async function handler(req, res) {
       if (supabase) {
         try {
           await supabase.from('netvidya_reading_files').insert({
+            id: newFile.id,
             title: newFile.title,
             category: newFile.category,
             description: newFile.description,
@@ -476,6 +477,7 @@ export default async function handler(req, res) {
       if (supabase) {
         try {
           await supabase.from('netvidya_tests').insert({
+            id: newTest.id,
             title: newTest.title,
             release_date: newTest.releaseDate,
             duration_minutes: newTest.durationMinutes,

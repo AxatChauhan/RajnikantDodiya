@@ -230,6 +230,9 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: true,
+      watch: {
+        ignored: ['**/backup/**', '**/public/study-vault/**', '**/scratch/**'],
+      },
     },
     build: {
       rollupOptions: {

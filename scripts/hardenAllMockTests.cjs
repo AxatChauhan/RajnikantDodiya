@@ -79,6 +79,10 @@ function hardenGsetFile(filePath) {
     ? 'GSET Paper 2: English Literature Specialist Pack'
     : 'GSET Paper 2: Education Discipline Master Pack';
 
+  if (content.includes('// --- NET VIDYA CANDIDATE SHIELD & DRM ENGINE ---')) {
+    return { filename, questions: 'preserved', packId };
+  }
+
   // 1. Inject meta robots if not present
   if (!content.includes('name="robots"')) {
     content = content.replace('<head>', '<head><meta name="robots" content="noindex, nofollow">');
@@ -339,6 +343,10 @@ function runTimer(){
 function hardenUgcFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   const filename = path.basename(filePath);
+
+  if (content.includes('// --- NET VIDYA CANDIDATE SHIELD & DRM ENGINE ---')) {
+    return { filename, packId: 'ugc-net-english-bundle' };
+  }
 
   // 1. Inject meta robots if not present
   if (!content.includes('name="robots"')) {

@@ -53,7 +53,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'RECOMMENDED • BEST VALUE',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     isCombo: true,
-    testCountDesc: '19 Full CBT Tests (10 Paper 1 + 9 English Paper 2)',
+    testCountDesc: '20 Full CBT Tests (10 Paper 1 + 10 English Paper 2)',
     description: 'Complete dual-paper preparation: Paper 1 General Aptitude combined with English Literature & ELT.'
   },
   {
@@ -100,7 +100,7 @@ export const CHECKOUT_PRODUCTS: CheckoutProductOption[] = [
     badge: 'ENGLISH STREAM SPECIALIST',
     badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
     isCombo: false,
-    testCountDesc: '9 Specialist CBT Tests (100 Questions each)',
+    testCountDesc: '10 Specialist CBT Tests (100 Questions each)',
     description: 'British, American & Indian Literature, Literary Theory, Cultural Studies, and ELT in India.'
   },
   {

@@ -314,7 +314,7 @@ export const NetVidyaStoreHome: React.FC<NetVidyaStoreHomeProps> = ({
               <div className="space-y-1.5 pt-1 text-[11px] text-gray-600">
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>19 CBT Tests (10 P1 + 9 P2)</span>
+                  <span>20 CBT Tests (10 P1 + 10 P2)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />

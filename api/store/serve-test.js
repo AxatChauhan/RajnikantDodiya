@@ -626,6 +626,19 @@ export const TEST_HALL_SCHEDULE = [
     description: 'English Subject: 100 Questions covering British, American, Indian Literature, Literary Theory & ELT.'
   },
   {
+    id: 'gset-p2-eng-m2',
+    file: 'GSET_English_Paper2_Mock02_CBT.html',
+    title: 'GSET English Paper 2: Literature Specialist CBT Mock 02',
+    category: 'GSET English',
+    exam: 'gset',
+    stream: 'english',
+    totalQuestions: 100,
+    durationMinutes: 120,
+    releaseDate: '2026-11-01T00:00:00+05:30',
+    ready: true,
+    description: 'English Subject: 100 Questions covering Medieval to Contemporary British & World Literature, Critical Theory, Phonetics & ELT.'
+  },
+  {
     id: 'gset-p2-eng-m3',
     file: 'GSET_English_Paper2_Mock03_CBT.html',
     title: 'GSET English Paper 2: Literature Specialist CBT Mock 03',

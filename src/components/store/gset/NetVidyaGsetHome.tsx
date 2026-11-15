@@ -60,8 +60,8 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
     description: 'The definitive complete preparation package for GSET English aspirants: comprehensive Paper 1 General Aptitude combined with specialized Paper 2 English Literature & ELT.',
     features: [
       'Full Paper 1: 10 Computer-Based CBT Tests (General Aptitude)',
-      'Full Paper 2: 9 Computer-Based CBT Tests (English Literature, Theory & ELT)',
-      '19 Complete GSET Simulation Mock Exams with instant scoring',
+      'Full Paper 2: 10 Computer-Based CBT Tests (English Literature, Theory & ELT)',
+      '20 Complete GSET Simulation Mock Exams with instant scoring',
       '100% MSU Baroda GSET Syllabus Aligned & Verified Rationales',
       'Watermarked Digital Access valid till 31 Dec 2026',
       'Priority WhatsApp Academic Guidance with Mentor'
@@ -245,7 +245,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 )}
 
                 <p className="text-[10px] text-gray-400 font-mono">
-                  10 Paper 1 Mocks + 9 English Paper 2 Mocks (19 Total Tests)
+                  10 Paper 1 Mocks + 10 English Paper 2 Mocks (20 Total Tests)
                 </p>
               </div>
             </div>
@@ -421,7 +421,7 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                 price: 149,
                 originalPrice: 499,
                 description: 'Paper 2 English Literature, Criticism, Literary Theory, Cultural Studies, and ELT in India.',
-                testsLabel: '9 Full CBT Tests (100 Qs each)',
+                testsLabel: '10 Full CBT Tests (100 Qs each)',
                 tests: [
                   {
                     id: 'p2-eng-m1',
@@ -429,6 +429,13 @@ export const NetVidyaGsetHome: React.FC<NetVidyaGsetHomeProps> = ({
                     qs: 100,
                     mins: 120,
                     desc: 'Chaucer to Modern English Poetry, Drama, Fiction, Post-Method Pedagogy & ELT in India.'
+                  },
+                  {
+                    id: 'p2-eng-m2',
+                    title: 'GSET English Paper 2 — CBT Mock 02',
+                    qs: 100,
+                    mins: 120,
+                    desc: 'Medieval to Contemporary British & World Literature, Critical Theory, Phonetics & ELT.'
                   },
                   {
                     id: 'p2-eng-m3',

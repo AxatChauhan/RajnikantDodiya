@@ -14,6 +14,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { useModalEscape } from '../../hooks/useModalEscape';
+import { supabase } from '../../lib/supabase';
 
 export interface NtaQuestion {
   id: number;
@@ -244,20 +245,39 @@ export const NtaTestRunnerModal: React.FC<NtaTestRunnerModalProps> = ({
     setShowConfirmSubmit(false);
     setIsSubmitted(true);
 
-    // Save score in local storage
+    // Save score in local storage & persist to Supabase
     try {
       let correct = 0;
       questions.forEach((q, idx) => {
         if (selectedAnswers[idx] === q.correctAnswer) correct++;
       });
+      const scorePercentage = Math.round((correct / questions.length) * 100);
       const scoreRecord = {
         testTitle,
         totalQuestions: questions.length,
         correctCount: correct,
-        scorePercentage: Math.round((correct / questions.length) * 100),
+        scorePercentage,
         completedAt: new Date().toISOString()
       };
       localStorage.setItem(`netvidya_test_score_${testTitle.replace(/\s+/g, '_')}`, JSON.stringify(scoreRecord));
+
+      // Asynchronously record test attempt to Supabase for candidate analytics
+      try {
+        const storedSession = localStorage.getItem('netvidya_buyer_session_v1');
+        const sessionData = storedSession ? JSON.parse(storedSession) : null;
+        const candidateEmail = sessionData?.email || `${(candidateName || 'scholar').toLowerCase().replace(/\s+/g, '_')}@candidate.netvidya`;
+        
+        supabase.from('netvidya_test_submissions').insert({
+          student_email: candidateEmail,
+          student_name: candidateName,
+          test_title: testTitle,
+          total_questions: questions.length,
+          correct_count: correct,
+          score_percentage: scorePercentage,
+          submitted_answers: selectedAnswers,
+          completed_at: new Date().toISOString()
+        }).then(() => {}).catch(() => {});
+      } catch {}
     } catch {}
   };
 
