@@ -13,7 +13,9 @@ import {
   Layers,
   ChevronRight,
   Shield,
-  CheckCircle2
+  CheckCircle2,
+  Globe,
+  ExternalLink
 } from 'lucide-react';
 import { useNetVidyaStore, isPackEnrolled } from '../../contexts/NetVidyaStoreContext';
 import { useSiteContent } from '../../contexts/SiteContentContext';
@@ -193,6 +195,14 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleGoToAcademicSite = () => {
+    if (onBackToAcademicSite) {
+      onBackToAcademicSite();
+    } else {
+      window.location.href = '/';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col selection:bg-blue-900 selection:text-white w-full overflow-x-clip">
       
@@ -248,7 +258,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold text-gray-700 shrink-0">
+          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-gray-700 shrink-0">
             <button
               onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className={`px-2 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
@@ -275,16 +285,15 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                 Bookstore
               </button>
             )}
-            {onBackToAcademicSite && (
-              <button
-                onClick={onBackToAcademicSite}
-                className="hidden 2xl:flex px-2 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors items-center gap-1 whitespace-nowrap shrink-0"
-                title="Return to Academic Portfolio"
-              >
-                <span>Academic Site</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-              </button>
-            )}
+            <button
+              onClick={handleGoToAcademicSite}
+              className="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-blue-900 hover:bg-blue-50/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 border border-transparent hover:border-blue-200"
+              title="Return to main rajnikantdodiya.com site"
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>rajnikantdodiya.com</span>
+              <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+            </button>
           </nav>
 
           {/* Action Buttons */}
@@ -352,7 +361,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
               aria-label="Toggle Navigation Menu"
-              className="xl:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
+              className="lg:hidden p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shrink-0"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -361,7 +370,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
 
         {/* Mobile & Tablet Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
+          <div className="lg:hidden border-t border-gray-200 bg-white p-4 space-y-3 text-xs font-semibold shadow-lg animate-fade-in">
             {/* Student Account Card inside Mobile Drawer */}
             {buyerSession.isLoggedIn ? (
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
@@ -475,15 +484,16 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   <ChevronRight className="w-4 h-4 text-gray-400" />
                 </button>
               )}
-              {onBackToAcademicSite && (
-                <button
-                  onClick={() => { onBackToAcademicSite(); setMobileMenuOpen(false); }}
-                  className="w-full text-left p-2.5 rounded-lg hover:bg-gray-100 flex items-center justify-between text-blue-700"
-                >
-                  <span>Academic Portfolio ({STORE_MERCHANT.curatorShort})</span>
-                  <ChevronRight className="w-4 h-4 text-blue-500" />
-                </button>
-              )}
+              <button
+                onClick={() => { handleGoToAcademicSite(); setMobileMenuOpen(false); }}
+                className="w-full text-left p-2.5 rounded-lg hover:bg-blue-50/80 flex items-center justify-between text-blue-900 font-semibold bg-blue-50/40 border border-blue-100"
+              >
+                <span className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-blue-600" />
+                  <span>Main Academic Site (rajnikantdodiya.com)</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-blue-500" />
+              </button>
             </div>
 
             {/* Quick Action in Drawer */}
@@ -587,14 +597,13 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
                   <span>Academic Bookstore (Monographs &amp; Print Books)</span>
                 </button>
               )}
-              {onBackToAcademicSite && (
-                <button
-                  onClick={onBackToAcademicSite}
-                  className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
-                >
-                  <span>← Back to Academic Portfolio ({STORE_MERCHANT.curatorShort})</span>
-                </button>
-              )}
+              <button
+                onClick={handleGoToAcademicSite}
+                className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1.5"
+              >
+                <Globe className="w-3.5 h-3.5 text-blue-600" />
+                <span>Back to main site (rajnikantdodiya.com)</span>
+              </button>
             </div>
           </div>
 
