@@ -191,6 +191,7 @@ export const CirculationDeskModal: React.FC<CirculationDeskModalProps> = ({
                   razorpay_payment_id: razorpayPayId,
                   razorpay_signature: response.razorpay_signature,
                   order_id: orderId,
+                  email: studentEmail.trim(),
                   mobile: mobileCheck.cleanMobile,
                   student_name: cleanName,
                   product_type: activeProduct.type,

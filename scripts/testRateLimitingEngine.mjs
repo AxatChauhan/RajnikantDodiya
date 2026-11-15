@@ -141,7 +141,7 @@ async function runRateLimitingTests() {
       });
       await authHandler(req, res);
       const result = getResult();
-      assert(result.status === 401, `Login attempt ${i} reaches auth logic (Status 401 Invalid credentials)`);
+      assert(result.status === 401 || result.status === 404, `Login attempt ${i} reaches auth logic (Status ${result.status} Account Not Found / Invalid credentials)`);
     }
 
     // 11th attempt MUST be blocked by rate limiter with 429

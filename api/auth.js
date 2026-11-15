@@ -25,7 +25,8 @@ import {
   storeEmailOtp,
   verifyEmailOtp,
   canResendOtp,
-  markUserEmailVerified
+  markUserEmailVerified,
+  createStatelessResetToken
 } from '../lib/auth-helper.js';
 import { sendOtpEmail, sendPasswordResetEmail } from './store/email.js';
 import { enforceRateLimit } from '../lib/rate-limiter.js';
@@ -140,7 +141,7 @@ export default async function handler(req, res) {
 
         // Generate and dispatch 6-digit verification OTP to ensure email is genuine
         const otp = generateNumericOtp();
-        await storeEmailOtp(cleanEmail, otp, 'signup');
+        const otpRecord = await storeEmailOtp(cleanEmail, otp, 'signup');
         try {
           await sendOtpEmail({
             to: cleanEmail,
@@ -157,6 +158,8 @@ export default async function handler(req, res) {
           requiresOtp: true,
           email: cleanEmail,
           purpose: 'signup',
+          verificationTicket: otpRecord?.verificationTicket,
+          expiresAt: otpRecord?.expiresAt,
           message: 'Account created! Please enter the 6-digit verification code sent to your email to verify your email address.'
         });
       }
@@ -198,7 +201,11 @@ export default async function handler(req, res) {
           };
           await saveUser(user);
         } else if (!user) {
-          return res.status(401).json({ success: false, error: 'Invalid email or password.' });
+          return res.status(404).json({
+            success: false,
+            errorType: 'ACCOUNT_NOT_FOUND',
+            error: "No account found with this email. Please click 'Create Account' below to sign up."
+          });
         } else if (!user.password_hash && isBuyerKnown) {
           // User record was synthesized from verified buyer entry: bind password now
           const { salt, hash } = hashPassword(password);
@@ -211,7 +218,11 @@ export default async function handler(req, res) {
         } else {
           const isPasswordValid = verifyPassword(password, user.password_salt, user.password_hash);
           if (!isPasswordValid) {
-            return res.status(401).json({ success: false, error: 'Invalid email or password.' });
+            return res.status(401).json({
+              success: false,
+              errorType: 'INCORRECT_PASSWORD',
+              error: "Incorrect password. Please verify your password or use 'Forgot Password?' to reset it."
+            });
           }
         }
 
@@ -226,7 +237,7 @@ export default async function handler(req, res) {
         // If not verified (first login or pending verification), require OTP to verify email is genuine!
         if (!user.email_verified && !user.is_buyer) {
           const otp = generateNumericOtp();
-          await storeEmailOtp(cleanEmail, otp, 'first_login');
+          const otpRecord = await storeEmailOtp(cleanEmail, otp, 'first_login');
           try {
             await sendOtpEmail({
               to: cleanEmail,
@@ -243,6 +254,8 @@ export default async function handler(req, res) {
             requiresOtp: true,
             email: cleanEmail,
             purpose: 'first_login',
+            verificationTicket: otpRecord?.verificationTicket,
+            expiresAt: otpRecord?.expiresAt,
             message: 'Please enter the 6-digit verification code sent to your email to complete first-time login.'
           });
         }
@@ -280,7 +293,7 @@ export default async function handler(req, res) {
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
-        const { email, otp, purpose } = req.body || {};
+        const { email, otp, purpose, verificationTicket, expiresAt } = req.body || {};
         if (!email || !otp) {
           return res.status(400).json({ success: false, error: 'Email and verification code are required.' });
         }
@@ -288,7 +301,7 @@ export default async function handler(req, res) {
         if (!enforceRateLimit(req, res, 'auth_verify_otp', cleanEmail)) return;
         const cleanOtp = otp.toString().trim();
 
-        const verifyResult = await verifyEmailOtp(cleanEmail, cleanOtp, purpose);
+        const verifyResult = await verifyEmailOtp(cleanEmail, cleanOtp, purpose, verificationTicket, expiresAt);
         if (!verifyResult.valid) {
           return res.status(400).json({ success: false, error: verifyResult.error || 'Invalid verification code.' });
         }
@@ -355,7 +368,7 @@ export default async function handler(req, res) {
         }
 
         const otp = generateNumericOtp();
-        await storeEmailOtp(cleanEmail, otp, purpose || 'signup');
+        const otpRecord = await storeEmailOtp(cleanEmail, otp, purpose || 'signup');
         try {
           await sendOtpEmail({
             to: cleanEmail,
@@ -369,6 +382,8 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
           success: true,
+          verificationTicket: otpRecord?.verificationTicket,
+          expiresAt: otpRecord?.expiresAt,
           message: 'A fresh 6-digit verification code has been dispatched to your email.'
         });
       }
@@ -426,13 +441,19 @@ export default async function handler(req, res) {
 
         // Also generate and store a 6-digit OTP code for password reset
         const resetOtp = generateNumericOtp();
-        await storeEmailOtp(cleanEmail, resetOtp, 'reset_password');
+        const resetOtpRecord = await storeEmailOtp(cleanEmail, resetOtp, 'reset_password');
+
+        // Check if user exists to also issue a stateless reset token (immune to multi-container restarts)
+        const existingUser = await findUserByEmail(cleanEmail);
+        const statelessToken = existingUser
+          ? createStatelessResetToken(cleanEmail, existingUser.password_salt, Date.now() + 3600 * 1000)
+          : rawToken;
 
         // Dispatch password reset email with secure link and 6-digit reset code
         try {
           await sendPasswordResetEmail({
             to: cleanEmail,
-            resetToken: rawToken,
+            resetToken: statelessToken,
             otpCode: resetOtp
           });
         } catch (emailErr) {
@@ -441,6 +462,8 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
           success: true,
+          verificationTicket: resetOtpRecord?.verificationTicket,
+          expiresAt: resetOtpRecord?.expiresAt,
           message: 'If an account exists with this email, a 6-digit reset code and link have been dispatched to your inbox.'
         });
       }
@@ -450,7 +473,7 @@ export default async function handler(req, res) {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
         if (!enforceRateLimit(req, res, 'auth_reset_password')) return;
-        const { token, otp, email, newPassword } = req.body || {};
+        const { token, otp, email, newPassword, verificationTicket, expiresAt } = req.body || {};
         if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length === 0) {
           return res.status(400).json({ success: false, error: 'New password is required.' });
         }
@@ -461,22 +484,22 @@ export default async function handler(req, res) {
         let targetEmail = '';
 
         if (token) {
-          // Token-based reset
+          // Token-based reset (supports memory, Supabase, and stateless HMAC tokens)
           const tokenRecord = await findResetToken(token);
           if (!tokenRecord) {
             return res.status(400).json({ success: false, error: 'Invalid or expired reset token.' });
           }
-          const expiresAt = new Date(tokenRecord.expiresAt).getTime();
-          if (Date.now() > expiresAt) {
+          const expTime = new Date(tokenRecord.expiresAt).getTime();
+          if (Date.now() > expTime) {
             await invalidateResetToken(token);
             return res.status(400).json({ success: false, error: 'Invalid or expired reset token.' });
           }
           targetEmail = tokenRecord.email;
           await invalidateResetToken(token);
         } else if (otp && email) {
-          // OTP-based reset
+          // OTP-based reset (supports memory and stateless HMAC verification tickets)
           const cleanEmail = email.trim().toLowerCase();
-          const verifyResult = await verifyEmailOtp(cleanEmail, otp.toString().trim(), 'reset_password');
+          const verifyResult = await verifyEmailOtp(cleanEmail, otp.toString().trim(), 'reset_password', verificationTicket, expiresAt);
           if (!verifyResult.valid) {
             return res.status(400).json({ success: false, error: verifyResult.error || 'Invalid or expired reset code.' });
           }

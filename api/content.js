@@ -49,10 +49,30 @@ export default async function handler(req, res) {
 
   // 1. GET /api/content
   if (req.method === 'GET') {
-    const liveState = globalThis.__AUTHOR_STUDIO_LIVE_STATE__ || loadBaselineSnapshot() || {
-      version: 1,
-      updatedAt: new Date().toISOString()
-    };
+    let liveState = globalThis.__AUTHOR_STUDIO_LIVE_STATE__;
+
+    if (!liveState) {
+      const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+      if (supabaseUrl && supabaseKey) {
+        try {
+          const { createClient } = await import('@supabase/supabase-js');
+          const client = createClient(supabaseUrl, supabaseKey);
+          const { data } = await client.from('site_content').select('content').eq('key', 'live_studio_state').maybeSingle();
+          if (data?.content && typeof data.content === 'object') {
+            liveState = data.content;
+            globalThis.__AUTHOR_STUDIO_LIVE_STATE__ = data.content;
+          }
+        } catch {}
+      }
+    }
+
+    if (!liveState) {
+      liveState = loadBaselineSnapshot() || {
+        version: 1,
+        updatedAt: new Date().toISOString()
+      };
+    }
 
     // Ensure store.registeredUsers contains every user (bought or not bought)
     if (!liveState.store) liveState.store = {};
@@ -156,6 +176,22 @@ export default async function handler(req, res) {
     delete nextState.authorEmail;
 
     globalThis.__AUTHOR_STUDIO_LIVE_STATE__ = nextState;
+
+    // Persist live studio state to Supabase site_content table
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const client = createClient(supabaseUrl, supabaseKey);
+        await client.from('site_content').upsert({
+          key: 'live_studio_state',
+          content: nextState,
+          updated_at: nextState.updatedAt,
+          updated_by: 'author_master'
+        }, { onConflict: 'key' });
+      } catch {}
+    }
 
     return res.status(200).json({
       success: true,

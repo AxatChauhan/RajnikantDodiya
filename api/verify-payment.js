@@ -109,12 +109,78 @@ export default async function handler(req, res) {
       }
     }
 
+    // Cross-enroll buyer into NetVidya student database
+    let sessionToken = null;
+    let enrolledUser = null;
+    const cleanEmail = (req.body?.email || '').trim().toLowerCase();
+
+    if (cleanEmail && cleanEmail.includes('@')) {
+      try {
+        const { recordPaidBuyer, saveUser, findUserByEmail, createSessionToken, DEFAULT_ACCESS_EXPIRY } = await import('../lib/auth-helper.js');
+        const finalOrderId = order_id || `ORD-${Date.now()}`;
+        const amountNum = Number(amount) || 399;
+
+        await recordPaidBuyer({
+          email: cleanEmail,
+          studentName: student_name || 'Scholar',
+          mobile: mobile || '',
+          orderId: finalOrderId,
+          razorpayPaymentId: razorpay_payment_id,
+          razorpayOrderId: razorpay_order_id || null,
+          amountPaid: amountNum,
+          productId: product_type || 'scholar_bundle',
+          expiresAt: DEFAULT_ACCESS_EXPIRY
+        });
+
+        let user = await findUserByEmail(cleanEmail);
+        if (!user) {
+          user = {
+            id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            name: student_name || cleanEmail.split('@')[0],
+            email: cleanEmail,
+            mobile: mobile || '',
+            is_buyer: true,
+            email_verified: true,
+            is_active: true,
+            enrolled_at: new Date().toISOString(),
+            expires_at: DEFAULT_ACCESS_EXPIRY
+          };
+        } else {
+          user.is_buyer = true;
+          user.is_active = true;
+          if (!user.mobile && mobile) user.mobile = mobile;
+        }
+        await saveUser(user);
+
+        sessionToken = createSessionToken({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile,
+          isBuyer: true,
+          enrolledPacks: [product_type || 'scholar_bundle'],
+          expiresAt: user.expires_at
+        });
+        enrolledUser = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile,
+          isBuyer: true
+        };
+      } catch (enrollErr) {
+        console.warn('Cross-enrollment notice:', enrollErr);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       verified: true,
       fulfilled: fulfilledServerSide,
       paymentId: razorpay_payment_id,
-      orderId: order_id
+      orderId: order_id,
+      token: sessionToken,
+      user: enrolledUser
     });
   } catch (err) {
     return res.status(500).json({

@@ -693,12 +693,12 @@ interface NetVidyaStoreContextType {
   loginBuyer: (data: { name: string; email: string; mobile: string; orderId?: string; token?: string; isBuyer?: boolean; enrolledPacks?: string[] }) => void;
   verifyPaymentAndActivate: (query: { paymentId?: string; email?: string; mobile?: string }) => Promise<{ success: boolean; message?: string; error?: string }>;
   logoutBuyer: () => void;
-  login: (email: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; requiresOtp?: boolean; email?: string; purpose?: string; message?: string; error?: string }>;
-  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; requiresOtp?: boolean; email?: string; purpose?: string; message?: string; error?: string }>;
-  verifyOtp: (email: string, otp: string, purpose?: string) => Promise<{ success: boolean; isBuyer?: boolean; message?: string; error?: string }>;
-  resendOtp: (email: string, purpose?: string) => Promise<{ success: boolean; message?: string; error?: string }>;
-  forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string; token?: string }>;
-  resetPassword: (tokenOrPayload: string | { token?: string; otp?: string; email?: string; newPassword: string }, newPasswordParam?: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; requiresOtp?: boolean; email?: string; purpose?: string; message?: string; error?: string; errorType?: string; verificationTicket?: string; expiresAt?: number }>;
+  signup: (name: string, email: string, mobile: string, password: string) => Promise<{ success: boolean; isBuyer?: boolean; requiresOtp?: boolean; email?: string; purpose?: string; message?: string; error?: string; verificationTicket?: string; expiresAt?: number }>;
+  verifyOtp: (email: string, otp: string, purpose?: string, verificationTicket?: string, expiresAt?: number) => Promise<{ success: boolean; isBuyer?: boolean; message?: string; error?: string }>;
+  resendOtp: (email: string, purpose?: string) => Promise<{ success: boolean; message?: string; error?: string; verificationTicket?: string; expiresAt?: number }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string; token?: string; verificationTicket?: string; expiresAt?: number }>;
+  resetPassword: (tokenOrPayload: string | { token?: string; otp?: string; email?: string; newPassword: string; verificationTicket?: string; expiresAt?: number }, newPasswordParam?: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   refreshSession: () => Promise<{ isBuyer: boolean; isLoggedIn: boolean; error?: string }>;
   logout: () => void;
   readingFiles: ReadingFileItem[];
@@ -1195,7 +1195,11 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
-        return { success: false, error: data.error || 'Invalid credentials' };
+        return {
+          success: false,
+          error: data.error || 'Invalid credentials',
+          errorType: data.errorType || (res.status === 404 ? 'ACCOUNT_NOT_FOUND' : 'INCORRECT_PASSWORD')
+        };
       }
 
       // Check if candidate needs email verification OTP
@@ -1205,6 +1209,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
           requiresOtp: true,
           email: data.email || email,
           purpose: data.purpose || 'first_login',
+          verificationTicket: data.verificationTicket,
+          expiresAt: data.expiresAt,
           message: data.message
         };
       }
@@ -1257,6 +1263,8 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
           requiresOtp: true,
           email: data.email || email,
           purpose: data.purpose || 'signup',
+          verificationTicket: data.verificationTicket,
+          expiresAt: data.expiresAt,
           message: data.message
         };
       }
@@ -1290,12 +1298,12 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const verifyOtp = useCallback(async (email: string, otp: string, purpose?: string) => {
+  const verifyOtp = useCallback(async (email: string, otp: string, purpose?: string, verificationTicket?: string, expiresAt?: number) => {
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, purpose })
+        body: JSON.stringify({ email, otp, purpose, verificationTicket, expiresAt })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
@@ -1341,7 +1349,7 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || 'Could not resend verification code' };
       }
-      return { success: true, message: data.message };
+      return { success: true, message: data.message, verificationTicket: data.verificationTicket, expiresAt: data.expiresAt };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Network error resending code' };
     }
@@ -1358,13 +1366,13 @@ export const NetVidyaStoreProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || 'Password reset request failed' };
       }
-      return { success: true, message: data.message, token: data.token };
+      return { success: true, message: data.message, token: data.token, verificationTicket: data.verificationTicket, expiresAt: data.expiresAt };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Network error during reset request' };
     }
   }, []);
 
-  const resetPassword = useCallback(async (tokenOrPayload: string | { token?: string; otp?: string; email?: string; newPassword: string }, newPasswordParam?: string) => {
+  const resetPassword = useCallback(async (tokenOrPayload: string | { token?: string; otp?: string; email?: string; newPassword: string; verificationTicket?: string; expiresAt?: number }, newPasswordParam?: string) => {
     try {
       let body: any = {};
       if (typeof tokenOrPayload === 'string') {

@@ -65,11 +65,14 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   const [otpCode, setOtpCode] = useState('');
   const [otpEmail, setOtpEmail] = useState('');
   const [otpPurpose, setOtpPurpose] = useState<'signup' | 'first_login' | 'reset_password'>('signup');
+  const [otpVerificationTicket, setOtpVerificationTicket] = useState<string | null>(null);
+  const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   // Status and messages
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loginErrorType, setLoginErrorType] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Resend cooldown timer
@@ -148,10 +151,13 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     setIsSubmitting(false);
 
     if (result.success) {
+      setLoginErrorType(null);
       if (result.requiresOtp) {
         setIsOtpStep(true);
         setOtpEmail(result.email || cleanEmail);
         setOtpPurpose((result.purpose as any) || 'first_login');
+        setOtpVerificationTicket(result.verificationTicket || null);
+        setOtpExpiresAt(result.expiresAt || null);
         setOtpCode('');
         setResendCooldown(30);
         setSuccessMessage(result.message || 'Please enter the 6-digit verification code sent to your email.');
@@ -160,6 +166,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       onLoginSuccess();
       onClose();
     } else {
+      setLoginErrorType(result.errorType || null);
       setErrorMessage(result.error || 'Invalid email or password.');
     }
   };
@@ -167,6 +174,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setLoginErrorType(null);
     setSuccessMessage(null);
 
     const cleanName = signupName.trim();
@@ -202,6 +210,8 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
         setIsOtpStep(true);
         setOtpEmail(result.email || cleanEmail);
         setOtpPurpose('signup');
+        setOtpVerificationTicket(result.verificationTicket || null);
+        setOtpExpiresAt(result.expiresAt || null);
         setOtpCode('');
         setResendCooldown(30);
         setSuccessMessage(result.message || 'Account created! Please enter the 6-digit verification code sent to your email.');
@@ -226,7 +236,13 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     }
 
     setIsSubmitting(true);
-    const result = await verifyOtp(otpEmail, cleanCode, otpPurpose);
+    const result = await verifyOtp(
+      otpEmail,
+      cleanCode,
+      otpPurpose,
+      otpVerificationTicket || undefined,
+      otpExpiresAt || undefined
+    );
     setIsSubmitting(false);
 
     if (result.success) {
@@ -252,6 +268,8 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     setIsSubmitting(false);
 
     if (result.success) {
+      if (result.verificationTicket) setOtpVerificationTicket(result.verificationTicket);
+      if (result.expiresAt) setOtpExpiresAt(result.expiresAt);
       setSuccessMessage(result.message || 'A fresh verification code has been dispatched to your email.');
       setResendCooldown(30);
     } else {
@@ -262,6 +280,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setLoginErrorType(null);
     setSuccessMessage(null);
 
     const cleanEmail = forgotEmail.trim().toLowerCase();
@@ -279,6 +298,8 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
       if (result.token) {
         setResetToken(result.token);
       }
+      if (result.verificationTicket) setOtpVerificationTicket(result.verificationTicket);
+      if (result.expiresAt) setOtpExpiresAt(result.expiresAt);
       setSuccessMessage(result.message || 'Password reset code and link have been dispatched.');
     } else {
       setErrorMessage(result.error || 'Failed to process password reset request.');
@@ -304,7 +325,13 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
     setIsSubmitting(true);
     const isNumericOtp = /^\d{6}$/.test(cleanTokenOrCode);
     const payload = isNumericOtp
-      ? { otp: cleanTokenOrCode, email: forgotEmail.trim().toLowerCase(), newPassword }
+      ? {
+          otp: cleanTokenOrCode,
+          email: forgotEmail.trim().toLowerCase(),
+          newPassword,
+          verificationTicket: otpVerificationTicket || undefined,
+          expiresAt: otpExpiresAt || undefined
+        }
       : { token: cleanTokenOrCode, newPassword };
 
     const result = await resetPassword(payload);
@@ -359,9 +386,45 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
 
         {/* Error Feedback */}
         {errorMessage && (
-          <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
-            <p className="leading-snug">{errorMessage}</p>
+          <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+              <p className="leading-snug flex-1">{errorMessage}</p>
+            </div>
+            {loginErrorType === 'ACCOUNT_NOT_FOUND' && (
+              <div className="mt-2.5 pt-2 border-t border-rose-200 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[11px] text-rose-900 font-medium">New candidate? Create your account:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('signup');
+                    setSignupEmail(loginEmail.trim().toLowerCase());
+                    setErrorMessage(null);
+                    setLoginErrorType(null);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-2xs"
+                >
+                  Create Account with this Email →
+                </button>
+              </div>
+            )}
+            {loginErrorType === 'INCORRECT_PASSWORD' && (
+              <div className="mt-2.5 pt-2 border-t border-rose-200 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[11px] text-rose-900 font-medium">Forgot your password?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('forgot');
+                    setForgotEmail(loginEmail.trim().toLowerCase());
+                    setErrorMessage(null);
+                    setLoginErrorType(null);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-2xs"
+                >
+                  Reset Password →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -455,7 +518,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
             <div className="flex rounded-xl bg-gray-100 p-1 text-xs font-semibold gap-1 select-none">
               <button
                 type="button"
-                onClick={() => { setActiveTab('login'); setErrorMessage(null); setSuccessMessage(null); }}
+                onClick={() => { setActiveTab('login'); setErrorMessage(null); setLoginErrorType(null); setSuccessMessage(null); }}
                 className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
                   activeTab === 'login'
                     ? 'bg-white text-blue-900 shadow-2xs font-bold'
@@ -467,7 +530,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               </button>
               <button
                 type="button"
-                onClick={() => { setActiveTab('signup'); setErrorMessage(null); setSuccessMessage(null); }}
+                onClick={() => { setActiveTab('signup'); setErrorMessage(null); setLoginErrorType(null); setSuccessMessage(null); }}
                 className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
                   activeTab === 'signup'
                     ? 'bg-white text-blue-900 shadow-2xs font-bold'
@@ -479,7 +542,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
               </button>
               <button
                 type="button"
-                onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setSuccessMessage(null); }}
+                onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setLoginErrorType(null); setSuccessMessage(null); }}
                 className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer touch-manipulation ${
                   activeTab === 'forgot'
                     ? 'bg-white text-blue-900 shadow-2xs font-bold'
@@ -518,7 +581,7 @@ export const NetVidyaStudentLoginModal: React.FC<NetVidyaStudentLoginModalProps>
                     </label>
                     <button
                       type="button"
-                      onClick={() => { setActiveTab('forgot'); setErrorMessage(null); }}
+                      onClick={() => { setActiveTab('forgot'); setErrorMessage(null); setLoginErrorType(null); }}
                       className="text-[11px] text-blue-700 hover:text-blue-900 font-medium cursor-pointer"
                     >
                       Forgot password?
