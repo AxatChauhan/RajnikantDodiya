@@ -316,7 +316,7 @@ export const NetVidyaStoreLayout: React.FC<NetVidyaStoreLayoutProps> = ({
               </button>
             )}
 
-            {/* Buy CTA or Active Access Button */}
+            {/* Buy CTA Button */}
             {isPackEnrolled(activeExamStore === 'gset' ? 'gset-english-combo' : 'ugc-net-english-bundle', buyerSession) ? (
               <button
                 onClick={() => { setCurrentView('materials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
